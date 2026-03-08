@@ -20,8 +20,8 @@ export default function Home() {
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-stone-700">
                 Each module is a self-contained playground, simulation, or
-                visual explainer. Start with Monte Carlo Tree Search and watch
-                the search tree grow, branch by branch.
+                visual explainer. Start with Monte Carlo Tree Search or BM25
+                ranking and watch the hidden tradeoffs surface in real time.
               </p>
             </div>
             <div className="grid gap-4 rounded-[1.75rem] border border-stone-900/8 bg-white/70 p-5 backdrop-blur">
@@ -34,12 +34,20 @@ export default function Home() {
                   the concept feels tangible instead of abstract.
                 </p>
               </div>
-              <Link
-                href="/playgrounds/mcts"
-                className="inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-stone-50 transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                Open the MCTS lab
-              </Link>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Link
+                  href="/playgrounds/bm25"
+                  className="inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-stone-50 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open the BM25 lab
+                </Link>
+                <Link
+                  href="/playgrounds/mcts"
+                  className="inline-flex items-center justify-center rounded-full border border-stone-900/12 bg-white px-5 py-3 text-sm font-medium text-stone-900 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open the MCTS lab
+                </Link>
+              </div>
             </div>
           </div>
         </header>

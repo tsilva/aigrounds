@@ -106,3 +106,7 @@ Want to add a new AI playground? Each module follows a simple pattern:
 ## ⭐ Star Us
 
 If this helped you understand an AI concept, [give us a star](https://github.com/tsilva/aigrounds) — it helps others find these playgrounds too.
+
+## License
+
+MIT

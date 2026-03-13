@@ -78,6 +78,18 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) and jump into the BM25 or MCTS lab.
 
+## 🔎 Analytics
+
+Google Analytics 4 support is enabled automatically when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set.
+
+For local development, add it to `.env.local`:
+
+```bash
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+The app loads `gtag.js` only when that variable is present and sends page views for App Router navigations.
+
 ## 🏗️ Project Structure
 
 ```

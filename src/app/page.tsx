@@ -6,15 +6,15 @@ import {
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-5 py-6 sm:px-8 lg:px-12">
+    <main className="min-h-screen overflow-x-clip px-4 py-6 sm:px-8 lg:px-12">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10">
-        <header className="overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,251,239,0.94),rgba(250,236,208,0.88)_50%,rgba(191,225,214,0.82))] p-8 shadow-[0_24px_70px_rgba(41,37,36,0.12)] sm:p-10">
+        <header className="overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,251,239,0.94),rgba(250,236,208,0.88)_50%,rgba(191,225,214,0.82))] p-6 shadow-[0_24px_70px_rgba(41,37,36,0.12)] sm:p-8 lg:p-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl space-y-5">
+            <div className="min-w-0 max-w-3xl space-y-5">
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-stone-500">
                 AI Grounds
               </p>
-              <h1 className="max-w-2xl text-5xl font-semibold tracking-[-0.06em] text-stone-950 sm:text-6xl">
+              <h1 className="max-w-2xl text-4xl leading-none font-semibold tracking-[-0.06em] text-stone-950 sm:text-5xl lg:text-6xl">
                 Learn AI ideas by poking the algorithm until it explains
                 itself.
               </h1>
@@ -25,7 +25,7 @@ export default function Home() {
                 watch the hidden tradeoffs surface in real time.
               </p>
             </div>
-            <div className="grid gap-4 rounded-[1.75rem] border border-stone-900/8 bg-white/70 p-5 backdrop-blur">
+            <div className="min-w-0 rounded-[1.75rem] border border-stone-900/8 bg-white/70 p-5 backdrop-blur lg:max-w-md">
               <div>
                 <p className="text-sm font-medium uppercase tracking-[0.24em] text-stone-500">
                   What this app is for
@@ -35,34 +35,34 @@ export default function Home() {
                   the concept feels tangible instead of abstract.
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <Link
                   href="/playgrounds/attention"
-                  className="inline-flex items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 px-5 py-3 text-sm font-medium text-indigo-950 transition-transform duration-200 hover:-translate-y-0.5"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 px-5 py-3 text-sm font-medium text-indigo-950 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open attention maps
                 </Link>
                 <Link
                   href="/playgrounds/bm25"
-                  className="inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-stone-50 transition-transform duration-200 hover:-translate-y-0.5"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-stone-50 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open the BM25 lab
                 </Link>
                 <Link
                   href="/playgrounds/q-learning"
-                  className="inline-flex items-center justify-center rounded-full border border-sky-300 bg-sky-100 px-5 py-3 text-sm font-medium text-sky-950 transition-transform duration-200 hover:-translate-y-0.5"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-sky-300 bg-sky-100 px-5 py-3 text-sm font-medium text-sky-950 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open Q-learning
                 </Link>
                 <Link
                   href="/playgrounds/diffusion"
-                  className="inline-flex items-center justify-center rounded-full border border-cyan-300 bg-cyan-100 px-5 py-3 text-sm font-medium text-cyan-950 transition-transform duration-200 hover:-translate-y-0.5"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-cyan-300 bg-cyan-100 px-5 py-3 text-sm font-medium text-cyan-950 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open Diffusion
                 </Link>
                 <Link
                   href="/playgrounds/mcts"
-                  className="inline-flex items-center justify-center rounded-full border border-stone-900/12 bg-white px-5 py-3 text-sm font-medium text-stone-900 transition-transform duration-200 hover:-translate-y-0.5"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-stone-900/12 bg-white px-5 py-3 text-sm font-medium text-stone-900 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open the MCTS lab
                 </Link>

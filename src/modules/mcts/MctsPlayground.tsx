@@ -259,7 +259,7 @@ export function MctsPlayground() {
           <div className="overflow-x-auto rounded-[1.75rem] border border-stone-200 bg-[linear-gradient(180deg,#fffaf2,#f8f0e3)] p-3 sm:p-5">
             <svg
               viewBox="0 0 920 760"
-              className="h-auto min-w-[980px] overflow-visible"
+              className="block h-auto w-[980px] max-w-none overflow-visible"
               role="img"
               aria-label="Monte Carlo Tree Search visualization"
             >

@@ -24,11 +24,15 @@
 }
 
 html {
+  max-width: 100%;
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
   background:
     radial-gradient(circle at top left, rgba(255, 248, 220, 0.95), transparent 32%),
     radial-gradient(circle at top right, rgba(191, 225, 214, 0.82), transparent 30%),

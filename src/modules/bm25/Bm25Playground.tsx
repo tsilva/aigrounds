@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useState } from "react";
+import { useDeferredValue, useState } from "react";
 import { analyzeBm25Search } from "./bm25-engine";
 import { bm25Documents, defaultQuery, queryPresets } from "./corpus";
 
@@ -90,12 +90,6 @@ export function Bm25Playground() {
   const matchedDocumentCount = analysis.rankedDocuments.filter(
     (document) => document.score > 0,
   ).length;
-
-  useEffect(() => {
-    if (topDocument) {
-      setInspectedDocumentId(topDocument.document.id);
-    }
-  }, [topDocument?.document.id]);
 
   const maxContribution = Math.max(
     0,

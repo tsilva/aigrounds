@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   analyzeAttentionScenario,
   type AttentionCandidateSummary,
@@ -68,31 +68,39 @@ function candidateBarWidth(
 }
 
 export function AttentionPlayground() {
-  const [scenarioId, setScenarioId] = useState(attentionScenarios[0]?.id ?? "");
-  const scenario =
-    attentionScenarios.find((entry) => entry.id === scenarioId) ??
-    attentionScenarios[0];
+  const initialScenario = attentionScenarios[0];
+  const [scenarioId, setScenarioId] = useState(initialScenario?.id ?? "");
   const [contextStrength, setContextStrength] = useState(
-    scenario?.defaultContextStrength ?? 0.4,
+    initialScenario?.defaultContextStrength ?? 0.4,
   );
-  const [sharpness, setSharpness] = useState(scenario?.defaultSharpness ?? 1.7);
+  const [sharpness, setSharpness] = useState(
+    initialScenario?.defaultSharpness ?? 1.7,
+  );
   const [recencyBias, setRecencyBias] = useState(
-    scenario?.defaultRecencyBias ?? 0.3,
+    initialScenario?.defaultRecencyBias ?? 0.3,
   );
   const [selectedTokenId, setSelectedTokenId] = useState(
-    scenario?.tokens[0]?.id ?? "",
+    initialScenario?.tokens[0]?.id ?? "",
   );
+  const scenario =
+    attentionScenarios.find((entry) => entry.id === scenarioId) ??
+    initialScenario;
 
-  useEffect(() => {
-    if (!scenario) {
+  function selectScenario(nextScenarioId: string) {
+    const nextScenario =
+      attentionScenarios.find((entry) => entry.id === nextScenarioId) ??
+      initialScenario;
+
+    if (!nextScenario) {
       return;
     }
 
-    setContextStrength(scenario.defaultContextStrength);
-    setSharpness(scenario.defaultSharpness);
-    setRecencyBias(scenario.defaultRecencyBias);
-    setSelectedTokenId(scenario.tokens[0]?.id ?? "");
-  }, [scenarioId, scenario]);
+    setScenarioId(nextScenario.id);
+    setContextStrength(nextScenario.defaultContextStrength);
+    setSharpness(nextScenario.defaultSharpness);
+    setRecencyBias(nextScenario.defaultRecencyBias);
+    setSelectedTokenId(nextScenario.tokens[0]?.id ?? "");
+  }
 
   if (!scenario) {
     return null;
@@ -159,7 +167,7 @@ export function AttentionPlayground() {
                     <button
                       key={entry.id}
                       type="button"
-                      onClick={() => setScenarioId(entry.id)}
+                      onClick={() => selectScenario(entry.id)}
                       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                         entry.id === scenario.id
                           ? "bg-sky-300 text-sky-950"

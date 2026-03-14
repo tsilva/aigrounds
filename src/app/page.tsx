@@ -20,8 +20,9 @@ export default function Home() {
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-stone-700">
                 Each module is a self-contained playground, simulation, or
-                visual explainer. Start with Monte Carlo Tree Search or BM25
-                ranking and watch the hidden tradeoffs surface in real time.
+                visual explainer. Start with Attention Maps, BM25 ranking,
+                Monte Carlo Tree Search, Q-learning, or Diffusion Studio and
+                watch the hidden tradeoffs surface in real time.
               </p>
             </div>
             <div className="grid gap-4 rounded-[1.75rem] border border-stone-900/8 bg-white/70 p-5 backdrop-blur">
@@ -34,12 +35,30 @@ export default function Home() {
                   the concept feels tangible instead of abstract.
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                <Link
+                  href="/playgrounds/attention"
+                  className="inline-flex items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 px-5 py-3 text-sm font-medium text-indigo-950 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open attention maps
+                </Link>
                 <Link
                   href="/playgrounds/bm25"
                   className="inline-flex items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-stone-50 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open the BM25 lab
+                </Link>
+                <Link
+                  href="/playgrounds/q-learning"
+                  className="inline-flex items-center justify-center rounded-full border border-sky-300 bg-sky-100 px-5 py-3 text-sm font-medium text-sky-950 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open Q-learning
+                </Link>
+                <Link
+                  href="/playgrounds/diffusion"
+                  className="inline-flex items-center justify-center rounded-full border border-cyan-300 bg-cyan-100 px-5 py-3 text-sm font-medium text-cyan-950 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open Diffusion
                 </Link>
                 <Link
                   href="/playgrounds/mcts"
@@ -121,46 +140,49 @@ export default function Home() {
                 while making future modules easy to add.
               </p>
               <p>
-                Vercel deployment stays straightforward because the first module
-                is entirely static plus client-side interaction.
+                Vercel deployment stays straightforward because each module is
+                static plus client-side interaction.
               </p>
             </div>
           </aside>
         </section>
 
-        <section className="rounded-[1.75rem] border border-white/60 bg-white/75 p-6 shadow-[0_18px_40px_rgba(68,64,60,0.08)]">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.24em] text-stone-500">
-                Planned next
+        {upcomingPlaygrounds.length > 0 ? (
+          <section className="rounded-[1.75rem] border border-white/60 bg-white/75 p-6 shadow-[0_18px_40px_rgba(68,64,60,0.08)]">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm font-medium uppercase tracking-[0.24em] text-stone-500">
+                  Planned next
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-stone-950">
+                  The module shelf can keep expanding.
+                </h2>
+              </div>
+              <p className="max-w-xl text-sm leading-7 text-stone-600">
+                These are still placeholders, but the list shrinks as modules
+                graduate into live playgrounds.
               </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-stone-950">
-                The module shelf can keep expanding.
-              </h2>
             </div>
-            <p className="max-w-xl text-sm leading-7 text-stone-600">
-              These are placeholders to make the modular direction explicit.
-            </p>
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {upcomingPlaygrounds.map((playground) => (
-              <article
-                key={playground.slug}
-                className="rounded-[1.5rem] border border-dashed border-stone-300 bg-stone-50/80 p-5"
-              >
-                <p className="text-xs font-medium uppercase tracking-[0.24em] text-stone-500">
-                  Coming soon
-                </p>
-                <h3 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-stone-900">
-                  {playground.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-stone-600">
-                  {playground.summary}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {upcomingPlaygrounds.map((playground) => (
+                <article
+                  key={playground.slug}
+                  className="rounded-[1.5rem] border border-dashed border-stone-300 bg-stone-50/80 p-5"
+                >
+                  <p className="text-xs font-medium uppercase tracking-[0.24em] text-stone-500">
+                    Coming soon
+                  </p>
+                  <h3 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-stone-900">
+                    {playground.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-stone-600">
+                    {playground.summary}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
     </main>
   );

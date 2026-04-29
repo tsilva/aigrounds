@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./logo.png" alt="aigrounds" width="420" />
+  <img src="logo.png" alt="AI Grounds" width="420">
 
   **🧠 Learn AI ideas by poking the algorithm until it explains itself 🔬**
 

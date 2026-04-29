@@ -42,6 +42,22 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: [
+      {
+        url: "/brand/web-seo/favicon/favicon-32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/brand/web-seo/favicon/favicon-48.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+    ],
+    apple: "/brand/web-seo/apple-touch-icon.png",
+  },
+  manifest: "/brand/web-seo/site.webmanifest",
   openGraph: {
     title: SITE_TITLE,
     description: "Interactive AI playgrounds for learning algorithms and machine learning concepts through hands-on exploration. Start with Monte Carlo Tree Search.",
@@ -49,12 +65,21 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "AI Grounds",
     locale: "en_US",
+    images: [
+      {
+        url: "/brand/web-seo/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "AI Grounds interactive AI playgrounds",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: "Learn AI concepts through interactive playgrounds. Explore algorithms visually with Monte Carlo Tree Search.",
     creator: "@tiagosilva",
+    images: ["/brand/web-seo/og-image-1200x630.png"],
   },
   robots: {
     index: true,

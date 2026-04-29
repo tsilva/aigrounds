@@ -1,0 +1,21 @@
+{
+  "name": "AI Grounds",
+  "short_name": "AI Grounds",
+  "icons": [
+    {
+      "src": "android-chrome-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "android-chrome-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#0f766e",
+  "background_color": "#f4ede0",
+  "display": "standalone"
+}

@@ -5,7 +5,7 @@
 1. [x] **Softmax Temperature Lab**
    Adjust raw logits and temperature to see predictions snap from uncertain to overconfident. Best follow-up to cross entropy because it explains where class probabilities come from.
 
-2. **Gradient Descent Playground**
+2. [x] **Gradient Descent Playground**
    Move across a loss landscape step by step. Tune learning rate and momentum to see convergence, slow learning, and overshooting.
 
 3. **Confusion Matrix & Thresholds**

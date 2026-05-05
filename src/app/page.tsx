@@ -20,9 +20,10 @@ export default function Home() {
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-stone-700">
                 Each module is a self-contained playground, simulation, or
-                visual explainer. Start with Attention Maps, BM25 ranking,
-                Monte Carlo Tree Search, Q-learning, or Diffusion Studio and
-                watch the hidden tradeoffs surface in real time.
+                visual explainer. Start with Categorical Cross Entropy,
+                Attention Maps, BM25 ranking, Monte Carlo Tree Search,
+                Q-learning, or Diffusion Studio and watch the hidden tradeoffs
+                surface in real time.
               </p>
             </div>
             <div className="min-w-0 rounded-[1.75rem] border border-stone-900/8 bg-white/70 p-5 backdrop-blur lg:max-w-md">
@@ -37,8 +38,14 @@ export default function Home() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Link
-                  href="/playgrounds/attention"
+                  href="/playgrounds/categorical-cross-entropy"
                   className="inline-flex w-full items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 px-5 py-3 text-sm font-medium text-indigo-950 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open cross entropy
+                </Link>
+                <Link
+                  href="/playgrounds/attention"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-sky-300 bg-sky-100 px-5 py-3 text-sm font-medium text-sky-950 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open attention maps
                 </Link>

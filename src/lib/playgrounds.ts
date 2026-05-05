@@ -3,6 +3,7 @@ import { AttentionPlayground } from "@/modules/attention/AttentionPlayground";
 import { Bm25Playground } from "@/modules/bm25/Bm25Playground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { DiffusionPlayground } from "@/modules/diffusion/DiffusionPlayground";
+import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
 import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
 import { QLearningPlayground } from "@/modules/q-learning/QLearningPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
@@ -79,6 +80,31 @@ export const activePlaygrounds: ActivePlayground[] = [
       badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
     },
     component: SoftmaxTemperaturePlayground,
+    presentation: "immersive",
+  },
+  {
+    slug: "gradient-descent",
+    title: "Gradient Descent Playground",
+    kicker:
+      "Step downhill on a loss curve and see why the same gradient can crawl, land, or overshoot.",
+    summary:
+      "Tune learning rate and momentum while a point moves across a simple loss landscape. The lab links slope, step size, and carry-over so convergence and overshooting become visible.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Loss landscapes",
+      "Gradients",
+      "Learning rate",
+      "Momentum",
+    ],
+    learningGoals: [
+      "See that the gradient gives the downhill direction from the current position.",
+      "Understand how learning rate changes the distance traveled on each update.",
+      "Recognize how momentum carries previous updates and can speed convergence or overshoot.",
+    ],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+    component: GradientDescentPlayground,
     presentation: "immersive",
   },
   {

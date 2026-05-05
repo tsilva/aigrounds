@@ -6,6 +6,7 @@ import {
   formatNumber,
   formatPercent,
   setLogit,
+  type TemperatureAnalysis,
 } from "./softmax-temperature-engine";
 import {
   initialTemperature,
@@ -125,18 +126,59 @@ function PresetSelector({
 
 function TemperatureFormulaPanel({
   temperature,
+  logits,
+  analysis,
   confidence,
   entropyLabel,
   temperatureLabel,
   onTemperatureChange,
 }: {
   temperature: number;
+  logits: Record<string, number>;
+  analysis: TemperatureAnalysis;
   confidence: number;
   entropyLabel: string;
   temperatureLabel: string;
   onTemperatureChange: (value: number) => void;
 }) {
   const sliderFill = ((temperature - 0.25) / 2.75) * 100;
+  const exampleClass = analysis.topClass;
+  const exampleLogit = logits[exampleClass.id] ?? 0;
+  const scaledLogit = exampleLogit / temperature;
+  const expValue = Math.exp(scaledLogit);
+  const expTotal = softmaxClasses.reduce(
+    (total, classItem) =>
+      total + Math.exp((logits[classItem.id] ?? 0) / temperature),
+    0,
+  );
+  const exampleProbability = analysis.probabilities[exampleClass.id] ?? 0;
+  const exampleRows = [
+    {
+      label: "Scale logit",
+      value: `${formatNumber(exampleLogit, 1)} / ${formatNumber(
+        temperature,
+        2,
+      )} = ${formatNumber(scaledLogit, 2)}`,
+    },
+    {
+      label: "Exponentiate",
+      value: `exp(${formatNumber(scaledLogit, 2)}) = ${formatNumber(
+        expValue,
+        2,
+      )}`,
+    },
+    {
+      label: "Sum all exp values",
+      value: formatNumber(expTotal, 2),
+    },
+    {
+      label: "Normalize",
+      value: `${formatNumber(expValue, 2)} / ${formatNumber(
+        expTotal,
+        2,
+      )} = ${formatPercent(exampleProbability)}`,
+    },
+  ];
 
   return (
     <Panel className="p-5 sm:p-6">
@@ -145,7 +187,7 @@ function TemperatureFormulaPanel({
           <LessonTitle>2. Watch The Formula Sharpen</LessonTitle>
           <p className="mt-4 text-[16px] leading-[1.45] text-[#071024]">
             Softmax exponentiates every scaled logit, then normalizes the total
-            back to 1. Temperature controls the scaling.
+            back to one. Temperature controls the scaling.
           </p>
           <div className="mt-4 overflow-hidden rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-3 py-5 text-center font-serif text-[17px] leading-[1.45] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:px-4 sm:text-[30px] sm:leading-[1.35]">
             p
@@ -158,6 +200,37 @@ function TemperatureFormulaPanel({
               <sub className="text-[12px] sm:text-[14px]">j</sub> exp(z
               <sub className="text-[12px] sm:text-[14px]">j</sub> / T)
             </span>
+          </div>
+          <div className="mt-4 rounded-[8px] border border-[#ead7ac] bg-[#fffdf7] p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-[13px] font-black tracking-[0.03em] text-[#352cff] uppercase">
+                Worked Example: {exampleClass.label}
+              </p>
+              <span className="w-fit rounded-full border border-[#f2c96b] bg-[#fff7df] px-2.5 py-1 text-[11px] font-black tracking-[0.03em] text-[#9a6500] uppercase">
+                Chart example
+              </span>
+            </div>
+            <div className="mt-3 rounded-[7px] border border-[#efe3c4] bg-white px-3 py-2 font-mono text-[12px] font-bold leading-[1.45] text-[#071024] sm:text-[13px]">
+              p
+              <sub>{exampleClass.label}</sub> = exp(
+              {formatNumber(exampleLogit, 1)} / {formatNumber(temperature, 2)})
+              / &Sigma; exp(z / T) = {formatPercent(exampleProbability)}
+            </div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {exampleRows.map((row) => (
+                <div
+                  key={row.label}
+                  className="rounded-[7px] border border-[#ebe4d4] bg-white px-3 py-2"
+                >
+                  <p className="text-[10px] font-black tracking-[0.04em] text-[#7180a5] uppercase">
+                    {row.label}
+                  </p>
+                  <p className="mt-1 font-mono text-[13px] font-black text-[#071024]">
+                    {row.value}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -266,11 +339,13 @@ function BarGroup({
   values,
   valueFormatter,
   maxValue,
+  highlightedClassId,
 }: {
   title: string;
   values: Record<string, number>;
   valueFormatter: (value: number) => string;
   maxValue: number;
+  highlightedClassId?: string;
 }) {
   return (
     <div className="min-w-0">
@@ -282,15 +357,27 @@ function BarGroup({
           const value = values[classItem.id] ?? 0;
           const height = Math.max(6, (Math.abs(value) / maxValue) * 174);
           const isNegative = value < 0;
+          const isHighlighted = classItem.id === highlightedClassId;
 
           return (
             <div
               key={classItem.id}
-              className="grid h-full grid-rows-[24px_1fr_18px] justify-items-center"
+              className={`grid h-full grid-rows-[34px_1fr_18px] justify-items-center rounded-[8px] border px-1 pt-1 ${
+                isHighlighted
+                  ? "border-[#f2c96b] bg-[#fff8e8] shadow-[0_0_0_2px_rgba(245,158,11,0.12)]"
+                  : "border-transparent"
+              }`}
             >
-              <span className="font-mono text-[12px] font-black text-[#071024]">
-                {valueFormatter(value)}
-              </span>
+              <div className="grid justify-items-center gap-0.5">
+                {isHighlighted ? (
+                  <span className="rounded-full bg-[#f59e0b] px-1.5 py-0.5 text-[8px] leading-none font-black tracking-[0.04em] text-white uppercase">
+                    example
+                  </span>
+                ) : null}
+                <span className="font-mono text-[12px] leading-none font-black text-[#071024]">
+                  {valueFormatter(value)}
+                </span>
+              </div>
               <div className="flex h-full items-end">
                 <div
                   className="w-8 rounded-t-[4px]"
@@ -302,7 +389,11 @@ function BarGroup({
                   }}
                 />
               </div>
-              <span className="text-[12px] font-bold text-[#071024]">
+              <span
+                className={`text-[12px] font-bold ${
+                  isHighlighted ? "text-[#9a6500]" : "text-[#071024]"
+                }`}
+              >
                 {classItem.label.slice(0, 1)}
               </span>
             </div>
@@ -416,6 +507,7 @@ function SimulatorPanel({
             values={analysis.probabilities}
             valueFormatter={formatPercent}
             maxValue={1}
+            highlightedClassId={analysis.topClass.id}
           />
         </div>
       </div>
@@ -528,6 +620,8 @@ export function SoftmaxTemperaturePlayground() {
         />
         <TemperatureFormulaPanel
           temperature={temperature}
+          logits={logits}
+          analysis={analysis}
           confidence={analysis.confidence}
           entropyLabel={analysis.entropyLabel}
           temperatureLabel={analysis.temperatureLabel}

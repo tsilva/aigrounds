@@ -43,6 +43,10 @@ export default async function PlaygroundPage({
 
   const ModuleComponent = playground.component;
 
+  if (playground.presentation === "immersive") {
+    return <ModuleComponent />;
+  }
+
   return (
     <PlaygroundShell module={playground}>
       <ModuleComponent />

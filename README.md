@@ -8,7 +8,7 @@
 
 AI Grounds is an interactive educational web app for learning AI concepts through hands-on playgrounds. Instead of reading static explanations, you run small visual simulations and watch the important tradeoffs change in the browser.
 
-The app currently includes labs for Attention Maps, BM25 ranking, Q-learning, Diffusion Studio, and Monte Carlo Tree Search.
+The app currently includes labs for Cross Entropy Loss, Attention Maps, BM25 ranking, Q-learning, Diffusion Studio, and Monte Carlo Tree Search.
 
 ## Install
 
@@ -36,7 +36,7 @@ pnpm lint     # run ESLint
 - All playgrounds run client-side. There is no server API and no required database.
 - Google Analytics loads only when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set.
 - Vercel Analytics is wired through `@vercel/analytics/next`.
-- New playgrounds are registered in `src/lib/playgrounds.ts` and rendered through the dynamic playground route.
+- New playgrounds are registered in `src/lib/playgrounds.ts` and rendered through the dynamic playground route. Modules can opt into an immersive presentation when a lesson needs to match a custom full-page teaching surface.
 - No test framework is configured yet.
 
 ## Architecture

@@ -1,6 +1,7 @@
 import { type ComponentType } from "react";
 import { AttentionPlayground } from "@/modules/attention/AttentionPlayground";
 import { Bm25Playground } from "@/modules/bm25/Bm25Playground";
+import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { DiffusionPlayground } from "@/modules/diffusion/DiffusionPlayground";
 import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
 import { QLearningPlayground } from "@/modules/q-learning/QLearningPlayground";
@@ -19,6 +20,7 @@ export type ActivePlayground = {
   learningGoals: string[];
   theme: Theme;
   component: ComponentType;
+  presentation?: "standard" | "immersive";
 };
 
 export type UpcomingPlayground = {
@@ -28,6 +30,31 @@ export type UpcomingPlayground = {
 };
 
 export const activePlaygrounds: ActivePlayground[] = [
+  {
+    slug: "categorical-cross-entropy",
+    title: "Cross Entropy Loss",
+    kicker:
+      "Move probability mass around and watch classification penalties update instantly.",
+    summary:
+      "Switch between binary, categorical, and multi-label cross entropy. Choose targets, edit predicted probabilities, and see why the loss rewards confidence on the outcomes that are actually true.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Binary targets",
+      "One-hot targets",
+      "Multi-hot targets",
+      "Predicted probabilities",
+    ],
+    learningGoals: [
+      "Understand how binary cross entropy penalizes a yes/no prediction.",
+      "See why categorical cross entropy uses the predicted probability assigned to the one true class.",
+      "Recognize that multi-label cross entropy treats every label as an independent binary question.",
+    ],
+    theme: {
+      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+    component: CategoricalCrossEntropyPlayground,
+    presentation: "immersive",
+  },
   {
     slug: "attention",
     title: "Attention Maps",

@@ -15,6 +15,48 @@ import {
 } from "./scenario";
 
 const maxTeachingLoss = 5;
+const modeOrder: CrossEntropyMode[] = ["binary", "categorical", "multilabel"];
+
+const modeFacts: Record<
+  CrossEntropyMode,
+  {
+    shortLabel: string;
+    decisionLabel: string;
+    targetShape: string;
+    exampleTarget: string;
+    canBeTrue: string;
+    sumRule: string;
+    lossFocus: string;
+  }
+> = {
+  binary: {
+    shortLabel: "Yes / no",
+    decisionLabel: "Is it one yes/no question?",
+    targetShape: "One binary target",
+    exampleTarget: "y = 1",
+    canBeTrue: "One outcome",
+    sumRule: "No + Yes = 1",
+    lossFocus: "The outcome that happened",
+  },
+  categorical: {
+    shortLabel: "One class",
+    decisionLabel: "Is exactly one class true?",
+    targetShape: "One-hot target",
+    exampleTarget: "y = [1, 0, 0, 0]",
+    canBeTrue: "One class",
+    sumRule: "Probabilities sum to 1",
+    lossFocus: "The true class probability",
+  },
+  multilabel: {
+    shortLabel: "Many labels",
+    decisionLabel: "Can several labels be true?",
+    targetShape: "Multi-hot target",
+    exampleTarget: "y = [1, 0, 1, 0]",
+    canBeTrue: "Many labels",
+    sumRule: "Each label is independent",
+    lossFocus: "Every yes/no label",
+  },
+};
 
 function formatProbability(value: number) {
   return value.toFixed(2);
@@ -189,6 +231,262 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
     <h2 className="text-[19px] leading-none font-black tracking-[-0.03em] text-[#352cff] uppercase">
       {children}
     </h2>
+  );
+}
+
+function FormulaExpression({
+  classCount,
+  mode,
+  size = "large",
+}: {
+  classCount: number;
+  mode: CrossEntropyMode;
+  size?: "large" | "small";
+}) {
+  const sigmaSize = size === "large" ? "text-[36px]" : "text-[24px]";
+  const subSize = size === "large" ? "text-[13px]" : "text-[10px]";
+
+  if (mode === "binary") {
+    return (
+      <>
+        L = - [ y log(<span className="text-[#ff1e1e]">p</span>) + (1 - y)
+        log(1 - <span className="text-[#ff1e1e]">p</span>) ]
+      </>
+    );
+  }
+
+  if (mode === "multilabel") {
+    return (
+      <div className="mx-auto flex max-w-full flex-col items-center gap-1">
+        <div>
+          L = - 1/{classCount}{" "}
+          <span className={`inline-block align-middle ${sigmaSize}`}>
+            &Sigma;
+          </span>
+          <sub className={subSize}>l=1</sub>
+          <sup className={subSize}>{classCount}</sup>
+        </div>
+        <div>
+          [ y<sub className={subSize}>l</sub> log(
+          <span className="text-[#ff1e1e]">
+            p<sub className={subSize}>l</sub>
+          </span>
+          ) + (1 - y<sub className={subSize}>l</sub>) log(1 -{" "}
+          <span className="text-[#ff1e1e]">
+            p<sub className={subSize}>l</sub>
+          </span>
+          ) ]
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      L = -{" "}
+      <span className={`inline-block align-middle ${sigmaSize}`}>
+        &Sigma;
+      </span>
+      <sub className={subSize}>k=1</sub>
+      <sup className={subSize}>K</sup>{" "}
+      <span className="text-[#2f39ff]">
+        y<sub className={subSize}>k</sub>
+      </span>{" "}
+      log (
+      <span className="text-[#ff1e1e]">
+        p&#770;<sub className={subSize}>k</sub>
+      </span>
+      )
+    </>
+  );
+}
+
+function SimplifiedFormula({
+  mode,
+}: {
+  mode: CrossEntropyMode;
+}) {
+  if (mode === "multilabel") {
+    return (
+      <>
+        L = mean<sub className="text-[14px]">labels</sub> BCE(y
+        <sub className="text-[14px]">l</sub>, p
+        <sub className="text-[14px]">l</sub>)
+      </>
+    );
+  }
+
+  return (
+    <>
+      L = - log (
+      <span className="text-[#2f39ff]">
+        p&#770;
+        <sub className="text-[14px]">
+          {mode === "binary" ? "true outcome" : "true class"}
+        </sub>
+      </span>
+      )
+    </>
+  );
+}
+
+function TargetShapePanel({
+  mode,
+  onSelectMode,
+}: {
+  mode: CrossEntropyMode;
+  onSelectMode: (mode: CrossEntropyMode) => void;
+}) {
+  return (
+    <Panel className="p-5 sm:p-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <div className="min-w-0">
+          <LessonTitle>1. Choose The Target Shape</LessonTitle>
+          <p className="mt-4 max-w-[760px] text-[16px] leading-[1.45] text-[#16264e]">
+            Cross entropy is the same penalty idea with different truth shapes.
+            Pick the shape first, then the formula and simulator adapt.
+          </p>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            {modeOrder.map((entryMode) => {
+              const fact = modeFacts[entryMode];
+              const isSelected = entryMode === mode;
+
+              return (
+                <button
+                  key={entryMode}
+                  type="button"
+                  onClick={() => onSelectMode(entryMode)}
+                  className={`min-w-0 rounded-[10px] border p-4 text-left transition ${
+                    isSelected
+                      ? "border-[#5636f5] bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white shadow-[0_14px_24px_rgba(70,39,232,0.2)]"
+                      : "border-[#d8e0f0] bg-white text-[#0d1429] hover:border-[#b9c4de] hover:bg-[#fbfaff]"
+                  }`}
+                >
+                  <span className="block text-[13px] font-black uppercase tracking-[0.02em]">
+                    {fact.shortLabel}
+                  </span>
+                  <span className="mt-2 block text-[16px] leading-[1.25] font-black">
+                    {crossEntropyLessons[entryMode].switchLabel}
+                  </span>
+                  <span
+                    className={`mt-2 block text-[13px] leading-[1.35] ${
+                      isSelected ? "text-white/85" : "text-[#30446f]"
+                    }`}
+                  >
+                    {fact.decisionLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="min-w-0 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
+          <p className="text-[13px] font-black tracking-[0.02em] text-[#352cff] uppercase">
+            Current Shape
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <FactPill label="Target" value={modeFacts[mode].targetShape} />
+            <FactPill label="Example" value={modeFacts[mode].exampleTarget} />
+            <FactPill label="True at once" value={modeFacts[mode].canBeTrue} />
+            <FactPill label="Probability rule" value={modeFacts[mode].sumRule} />
+          </div>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function FactPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
+      <p className="text-[11px] font-black tracking-[0.03em] text-[#7180a5] uppercase">
+        {label}
+      </p>
+      <p className="mt-1 font-mono text-[13px] font-bold text-[#071024]">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function FormulaFamilyPanel({
+  classCount,
+  lesson,
+  mode,
+}: {
+  classCount: number;
+  lesson: (typeof crossEntropyLessons)[CrossEntropyMode];
+  mode: CrossEntropyMode;
+}) {
+  return (
+    <Panel className="p-5 sm:p-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="min-w-0">
+          <LessonTitle>2. Watch The Formula Morph</LessonTitle>
+          <p className="mt-4 text-[16px] leading-[1.45] text-[#071024]">
+            {lesson.formulaIntro}
+          </p>
+          <div
+            className={`mt-4 min-w-0 overflow-hidden rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-5 py-4 text-center font-serif shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] ${
+              mode === "multilabel"
+                ? "text-[21px] leading-[1.45] sm:text-[24px]"
+                : "text-[25px] leading-[1.3] sm:text-[30px]"
+            }`}
+          >
+            <FormulaExpression classCount={classCount} mode={mode} />
+          </div>
+          <p className="mt-4 text-[16px] leading-[1.35] text-[#071024]">
+            {lesson.simplificationIntro}
+          </p>
+          <div
+            className={`mt-3 min-w-0 overflow-hidden rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-5 py-2 text-center font-serif shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] ${
+              mode === "multilabel"
+                ? "text-[22px] leading-[1.3] sm:text-[25px]"
+                : "text-[25px] sm:text-[29px]"
+            }`}
+          >
+            <SimplifiedFormula mode={mode} />
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <LessonTitle>Same Idea, Different Contract</LessonTitle>
+          <div className="mt-4 overflow-hidden rounded-[10px] border border-[#dfe4f4]">
+            <div className="grid grid-cols-[1fr_1fr_1fr_1.2fr] bg-[#f7f8ff] text-[11px] font-black tracking-[0.03em] text-[#52628a] uppercase">
+              <span className="p-3">Mode</span>
+              <span className="p-3">Target</span>
+              <span className="p-3">Sum rule</span>
+              <span className="p-3">Loss focuses on</span>
+            </div>
+            {modeOrder.map((entryMode) => {
+              const fact = modeFacts[entryMode];
+              const isSelected = entryMode === mode;
+
+              return (
+                <div
+                  key={entryMode}
+                  className={`grid grid-cols-[1fr_1fr_1fr_1.2fr] border-t border-[#dfe4f4] text-[13px] leading-[1.3] ${
+                    isSelected ? "bg-[#f6f4ff]" : "bg-white"
+                  }`}
+                >
+                  <span className="p-3 font-black text-[#071024]">
+                    {fact.shortLabel}
+                  </span>
+                  <span className="p-3 text-[#263a68]">{fact.exampleTarget}</span>
+                  <span className="p-3 text-[#263a68]">{fact.sumRule}</span>
+                  <span className="p-3 text-[#263a68]">{fact.lossFocus}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 flex items-center gap-4 rounded-[8px] border border-[#dedcff] bg-[#f8f7ff] px-5 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
+            <BulbIcon />
+            <p>{lesson.insight}</p>
+          </div>
+        </div>
+      </div>
+    </Panel>
   );
 }
 
@@ -546,22 +844,21 @@ function FormulaBlock({
   loss: number;
 }) {
   return (
-    <div className="overflow-x-auto rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] px-5 py-2.5 text-center font-serif text-[15px] leading-[1.55] text-[#070b1a] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:px-8 sm:text-[16px]">
+    <div className="min-w-0 overflow-hidden rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] px-5 py-2.5 text-center font-serif text-[15px] leading-[1.55] text-[#070b1a] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:px-8 sm:text-[16px]">
       <p>
         {mode === "binary" ? (
           <>
             L = - [ y log(p) + (1 - y) log(1 - p) ]
           </>
         ) : mode === "multilabel" ? (
-          <>
+          <span className="block">
             L = - 1/{classCount}{" "}
             <span className="inline-block align-middle text-[22px]">
               &Sigma;
             </span>
             <sub>l=1</sub>
-            <sup>{classCount}</sup> [ y<sub>l</sub> log(p<sub>l</sub>) + (1 -
-            y<sub>l</sub>) log(1 - p<sub>l</sub>) ]
-          </>
+            <sup>{classCount}</sup> BCE(y<sub>l</sub>, p<sub>l</sub>)
+          </span>
         ) : (
           <>
             L = -{" "}
@@ -573,10 +870,17 @@ function FormulaBlock({
           </>
         )}
       </p>
-      <p>
-        = {mode === "multilabel" ? `- 1/${classCount}` : "-"} ({" "}
-        {terms.join(" + ")} )
-      </p>
+      {mode === "multilabel" ? (
+        <div className="mt-1 space-y-0.5 font-sans text-[12px] leading-[1.35] text-[#27385f] sm:text-[13px]">
+          <p>= - 1/{classCount} (</p>
+          {terms.map((term, index) => (
+            <p key={`${term}-${index}`}>{term}</p>
+          ))}
+          <p>)</p>
+        </div>
+      ) : (
+        <p>= - ( {terms.join(" + ")} )</p>
+      )}
       {mode === "multilabel" ? (
         <p>= mean BCE across all labels</p>
       ) : (
@@ -646,47 +950,25 @@ export function CategoricalCrossEntropyPlayground() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#fbfcff] px-3 py-4 text-[#071024] sm:px-5">
       <div className="mx-auto max-w-[1536px]">
-        <header className="mb-4 flex flex-col items-start justify-between gap-4 pl-0 sm:pl-6 lg:flex-row lg:gap-6">
-          <div>
+        <header className="mb-4 grid gap-4 pl-0 sm:pl-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:items-start">
+          <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <h1 className="text-[38px] leading-[1] font-black tracking-[-0.055em] text-[#030713] sm:text-[44px]">
-                {lesson.title}
+              <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black tracking-[-0.055em] text-[#030713] sm:text-[44px]">
+                Cross Entropy Loss
               </h1>
               <span className="text-[#435c8d]">
                 <InfoIcon />
               </span>
             </div>
-            <p className="mt-2 text-[18px] leading-tight font-medium text-[#30446f] sm:text-[22px] sm:leading-none">
-              {lesson.subtitle}
+            <p className="mt-2 max-w-[58rem] text-[18px] leading-tight font-medium text-[#30446f] sm:text-[22px]">
+              One penalty idea for binary, categorical, and multi-label targets.
             </p>
           </div>
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            <div className="inline-grid rounded-[12px] border border-[#dad7ff] bg-white p-1 shadow-[0_8px_20px_rgba(47,39,255,0.06)] sm:grid-cols-2">
-              {(Object.keys(crossEntropyLessons) as CrossEntropyMode[]).map(
-                (entryMode) => {
-                  const isSelected = entryMode === mode;
-
-                  return (
-                    <button
-                      key={entryMode}
-                      type="button"
-                      onClick={() => selectMode(entryMode)}
-                      className={`rounded-[9px] px-4 py-2 text-[14px] font-black transition ${
-                        isSelected
-                          ? "bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white shadow-[0_8px_16px_rgba(70,39,232,0.18)]"
-                          : "text-[#2f27ff] hover:bg-[#f7f6ff]"
-                      }`}
-                    >
-                      {crossEntropyLessons[entryMode].switchLabel}
-                    </button>
-                  );
-                },
-              )}
-            </div>
+          <div className="flex w-full min-w-0 flex-col items-stretch gap-3 lg:justify-self-end">
             <button
               type="button"
               onClick={() => setShowHelp((current) => !current)}
-              className="inline-flex max-w-full items-center gap-3 rounded-[10px] border border-[#dad7ff] bg-[#fbfaff] px-5 py-3 text-[16px] font-bold text-[#2f27ff] shadow-[0_8px_20px_rgba(47,39,255,0.06)] transition hover:border-[#b9b4ff]"
+              className="inline-flex w-full max-w-full items-center justify-center gap-3 rounded-[10px] border border-[#dad7ff] bg-[#fbfaff] px-5 py-3 text-[16px] font-bold text-[#2f27ff] shadow-[0_8px_20px_rgba(47,39,255,0.06)] transition hover:border-[#b9b4ff]"
             >
               <HelpIcon />
               What is Cross Entropy?
@@ -700,86 +982,14 @@ export function CategoricalCrossEntropyPlayground() {
           </div>
         ) : null}
 
-        <div className="grid gap-4 xl:grid-cols-[522px_minmax(0,1fr)]">
-          <Panel className="p-6 xl:min-h-[408px]">
-            <LessonTitle>The Formula</LessonTitle>
-            <p className="mt-5 max-w-[440px] text-[17px] leading-[1.45] text-[#071024]">
-              {lesson.formulaIntro}
-            </p>
-            <div className="mt-4 overflow-x-auto rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-6 py-4 text-center font-serif text-[28px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:text-[30px]">
-              {mode === "binary" ? (
-                <>
-                  L = - [ y log(
-                  <span className="text-[#ff1e1e]">p</span>) + (1 - y) log(1
-                  - <span className="text-[#ff1e1e]">p</span>) ]
-                </>
-              ) : mode === "multilabel" ? (
-                <>
-                  L = - 1/L{" "}
-                  <span className="inline-block align-middle text-[40px]">
-                    &Sigma;
-                  </span>
-                  <sub className="text-[14px]">l=1</sub>
-                  <sup className="text-[14px]">L</sup> [ y
-                  <sub className="text-[16px]">l</sub> log(
-                  <span className="text-[#ff1e1e]">
-                    p<sub className="text-[16px]">l</sub>
-                  </span>
-                  ) + (1 - y<sub className="text-[16px]">l</sub>) log(1 -{" "}
-                  <span className="text-[#ff1e1e]">
-                    p<sub className="text-[16px]">l</sub>
-                  </span>
-                  ) ]
-                </>
-              ) : (
-                <>
-                  L = -{" "}
-                  <span className="inline-block align-middle text-[40px]">
-                    &Sigma;
-                  </span>
-                  <sub className="text-[14px]">k=1</sub>
-                  <sup className="text-[14px]">K</sup>{" "}
-                  <span className="text-[#2f39ff]">
-                    y<sub className="text-[16px]">k</sub>
-                  </span>{" "}
-                  log (
-                  <span className="text-[#ff1e1e]">
-                    p&#770;<sub className="text-[16px]">k</sub>
-                  </span>
-                  )
-                </>
-              )}
-            </div>
-            <p className="mt-4 text-[17px] leading-[1.35] text-[#071024]">
-              {lesson.simplificationIntro}
-            </p>
-            <div className="mt-3 overflow-x-auto rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-6 py-2 text-center font-serif text-[27px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:text-[29px]">
-              {mode === "multilabel" ? (
-                <>
-                  L = mean<sub className="text-[15px]">labels</sub> BCE(y
-                  <sub className="text-[15px]">l</sub>, p
-                  <sub className="text-[15px]">l</sub>)
-                </>
-              ) : (
-                <>
-                  L = - log (
-                  <span className="text-[#2f39ff]">
-                    p&#770;
-                    <sub className="text-[15px]">
-                      {mode === "binary" ? "true outcome" : "true class"}
-                    </sub>
-                  </span>
-                  )
-                </>
-              )}
-            </div>
-            <div className="mt-4 flex items-center gap-4 rounded-[8px] border border-[#dedcff] bg-[#f8f7ff] px-5 py-3 text-[16px] leading-[1.3] text-[#2924ff]">
-              <BulbIcon />
-              <p>{lesson.insight}</p>
-            </div>
-          </Panel>
-
-          <Panel className="px-5 py-6 sm:px-8 xl:min-h-[408px]">
+        <div className="grid gap-4">
+          <TargetShapePanel mode={mode} onSelectMode={selectMode} />
+          <FormulaFamilyPanel
+            classCount={lesson.classes.length}
+            lesson={lesson}
+            mode={mode}
+          />
+          <Panel className="px-5 py-6 sm:px-8">
             <LessonTitle>The Intuition</LessonTitle>
             <div className="mt-1">
               {lesson.examples.map((example) => (
@@ -796,7 +1006,7 @@ export function CategoricalCrossEntropyPlayground() {
 
         <div className="mt-4 grid gap-5 xl:grid-cols-[410px_minmax(0,1fr)_444px]">
           <Panel className="min-h-[467px] p-6">
-            <LessonTitle>1. Set The Scenario</LessonTitle>
+            <LessonTitle>3. Set The Scenario</LessonTitle>
             <p className="mt-5 text-[14px] font-medium text-[#16264e]">
               {lesson.scenarioLabel}
             </p>
@@ -868,7 +1078,7 @@ export function CategoricalCrossEntropyPlayground() {
           </Panel>
 
           <Panel className="min-h-[467px] p-6 sm:p-7">
-            <LessonTitle>2. See The Visualization</LessonTitle>
+            <LessonTitle>4. See The Prediction</LessonTitle>
             <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(330px,1fr)_minmax(250px,0.88fr)]">
               <MainDistributionChart
                 classes={lesson.classes}
@@ -889,7 +1099,7 @@ export function CategoricalCrossEntropyPlayground() {
           </Panel>
 
           <Panel className="min-h-[467px] p-6">
-            <LessonTitle>3. The Loss</LessonTitle>
+            <LessonTitle>5. The Loss</LessonTitle>
             <div className="mt-2">
               <LossMeter
                 title={lesson.lossTitle}

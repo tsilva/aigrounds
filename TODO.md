@@ -2,7 +2,7 @@
 
 ## Ranked Playground Ideas
 
-1. **Softmax Temperature Lab**
+1. [x] **Softmax Temperature Lab**
    Adjust raw logits and temperature to see predictions snap from uncertain to overconfident. Best follow-up to cross entropy because it explains where class probabilities come from.
 
 2. **Gradient Descent Playground**

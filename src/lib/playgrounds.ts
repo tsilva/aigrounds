@@ -5,6 +5,7 @@ import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-e
 import { DiffusionPlayground } from "@/modules/diffusion/DiffusionPlayground";
 import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
 import { QLearningPlayground } from "@/modules/q-learning/QLearningPlayground";
+import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
 
 type Theme = {
   badgeClassName: string;
@@ -53,6 +54,31 @@ export const activePlaygrounds: ActivePlayground[] = [
       badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
     },
     component: CategoricalCrossEntropyPlayground,
+    presentation: "immersive",
+  },
+  {
+    slug: "softmax-temperature",
+    title: "Softmax Temperature Lab",
+    kicker:
+      "Adjust logits and temperature to see confidence sharpen without changing the winner.",
+    summary:
+      "Move raw class logits, tune temperature, and watch softmax convert scores into probabilities. The lab shows why low temperature gets overconfident and high temperature spreads probability mass back out.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Raw logits",
+      "Softmax normalization",
+      "Temperature scaling",
+      "Confidence",
+    ],
+    learningGoals: [
+      "Understand how softmax turns raw logits into a probability distribution.",
+      "See why temperature changes confidence while preserving the class ranking.",
+      "Recognize the difference between a sharp and a high-entropy prediction.",
+    ],
+    theme: {
+      badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
+    },
+    component: SoftmaxTemperaturePlayground,
     presentation: "immersive",
   },
   {

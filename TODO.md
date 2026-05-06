@@ -74,10 +74,10 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
     Learn R squared, adjusted R squared, residual plots, unexplained variance, overclaiming fit quality, and when a high R squared is misleading. Pair the same score with different residual patterns.
 
 24. **Train/Test Split & Generalization Lab**
-    Learn train/test split, validation sets, baseline models, generalization gap, data leakage, and why fitting known data is not the same as predicting new data.
+    Learn train/test split, validation sets, baseline models, generalization gap, data leakage, and why fitting known data is not the same as predicting new data. Overfitting covers part of this story, but this broader split-and-leakage lesson is still open.
 
 25. **Classification Metrics Foundations**
-    Learn accuracy, precision, recall, F1, specificity, sensitivity, false positives, false negatives, and class imbalance. Keep this focused on metric meaning before adding threshold curves.
+    Learn accuracy, precision, recall, F1, specificity, sensitivity, false positives, false negatives, and class imbalance. Confusion Matrix & Thresholds covers the threshold tradeoff; this foundations lesson is still open for specificity, sensitivity, and class imbalance.
 
 26. **Feature Scaling Lab**
     Learn units, normalization, standardization, min-max scaling, and why feature scale changes model behavior. Rescale axes or features and watch the same points become comparable.
@@ -86,10 +86,10 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
     Learn Euclidean distance, Manhattan distance, nearest neighbors, and why distance depends on both metric choice and feature scale. Move points on a grid and compare nearest-neighbor decisions.
 
 28. **Entropy & Information Starter**
-    Learn surprise, entropy, uncertainty, and information gain. Use guessing games or decision splits before introducing model loss functions.
+    Learn surprise, entropy, uncertainty, and information gain. Softmax Temperature shows an entropy readout, but this standalone uncertainty and information-gain lesson is still open.
 
 29. **Log Loss & Calibration Lab**
-    Learn log loss, calibrated probabilities, confidence, and why confident wrong predictions hurt. Compare predicted probabilities against observed frequencies to connect scoring with calibration.
+    Learn log loss, calibrated probabilities, confidence, and why confident wrong predictions hurt. Cross Entropy Loss covers the scoring penalty; this remains open for calibration against observed frequencies.
 
 30. **KL Divergence Intuition Lab**
     Learn KL divergence, reference distributions, model distributions, and why one distribution can be a poor approximation of another. Move probability mass between buckets and watch directional mismatch change.
@@ -108,26 +108,29 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 
 ## Ranked Playground Ideas
 
-1. [x] **Softmax Temperature Lab**
-   Adjust raw logits and temperature to see predictions snap from uncertain to overconfident. Best follow-up to cross entropy because it explains where class probabilities come from.
+1. [x] **Cross Entropy Loss**
+   Move probability mass around and watch classification penalties update instantly. This is live as the loss-focused bridge from probability foundations into model training.
 
-2. [x] **Gradient Descent Playground**
+2. [x] **Softmax Temperature Lab**
+   Adjust raw logits and temperature to see predictions snap from uncertain to overconfident. Best paired with cross entropy because it explains where class probabilities come from.
+
+3. [x] **Gradient Descent Playground**
    Move across a loss landscape step by step. Tune learning rate and momentum to see convergence, slow learning, and overshooting.
-
-3. [x] **Confusion Matrix & Thresholds**
-   Drag a classification threshold and watch precision, recall, F1, false positives, and false negatives update. Very practical and instantly understandable.
 
 4. [x] **Overfitting Lab**
    Fit curves to noisy data while changing model complexity. Show train loss dropping while test loss gets worse.
 
-5. **K-Means Clustering Studio**
-   Place points and centroids, then step through assign/update cycles. Simple, visual, and satisfying.
+5. [x] **Confusion Matrix & Thresholds**
+   Drag a classification threshold and watch precision, recall, F1, false positives, and false negatives update. Very practical and instantly understandable after generalization basics.
 
-6. **Backpropagation Inspector**
-   Use a tiny neural net to show forward activations and backward gradients. Powerful, but harder to make beginner-friendly on one page.
+6. **K-Means Clustering Studio**
+   Place points and centroids, then step through assign/update cycles. Simple, visual, and satisfying.
 
 7. **Regularization Lab**
    Compare no regularization, L1, and L2 while weights and decision boundaries change. Best if paired with overfitting.
 
-8. **ROC vs Precision-Recall Curves**
-    Move a threshold across classifier scores and trace both curves. Useful, but probably better after the confusion-matrix module exists.
+8. **Backpropagation Inspector**
+   Use a tiny neural net to show forward activations and backward gradients. Powerful, but harder to make beginner-friendly on one page.
+
+9. **ROC vs Precision-Recall Curves**
+   Move a threshold across classifier scores and trace both curves. Useful, but probably better after the confusion-matrix module exists.

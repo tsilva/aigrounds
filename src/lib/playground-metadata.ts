@@ -133,32 +133,6 @@ export const activePlaygroundMetadata = [
     },
   },
   {
-    slug: "categorical-cross-entropy",
-    title: "Cross Entropy Loss",
-    tag: "loss",
-    kicker:
-      "Move probability mass around and watch classification penalties update instantly.",
-    summary:
-      "Switch between binary, categorical, and multi-label cross entropy. Choose targets, edit predicted probabilities, and see why the loss rewards confidence on the outcomes that are actually true.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Binary targets",
-      "One-hot targets",
-      "Multi-hot targets",
-      "Predicted probabilities",
-    ],
-    learningGoals: [
-      "Understand how binary cross entropy penalizes a yes/no prediction.",
-      "See why categorical cross entropy uses the predicted probability assigned to the one true class.",
-      "Recognize that multi-label cross entropy treats every label as an independent binary question.",
-    ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["categorical-cross-entropy"],
-    theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
-    },
-  },
-  {
     slug: "probability-rules",
     title: "Probability Rules Simulator",
     tag: "probability",
@@ -237,6 +211,32 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "categorical-cross-entropy",
+    title: "Cross Entropy Loss",
+    tag: "loss",
+    kicker:
+      "Move probability mass around and watch classification penalties update instantly.",
+    summary:
+      "Switch between binary, categorical, and multi-label cross entropy. Choose targets, edit predicted probabilities, and see why the loss rewards confidence on the outcomes that are actually true.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Binary targets",
+      "One-hot targets",
+      "Multi-hot targets",
+      "Predicted probabilities",
+    ],
+    learningGoals: [
+      "Understand how binary cross entropy penalizes a yes/no prediction.",
+      "See why categorical cross entropy uses the predicted probability assigned to the one true class.",
+      "Recognize that multi-label cross entropy treats every label as an independent binary question.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["categorical-cross-entropy"],
+    theme: {
+      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+  },
+  {
     slug: "softmax-temperature",
     title: "Softmax Temperature Lab",
     tag: "probability",
@@ -289,32 +289,6 @@ export const activePlaygroundMetadata = [
     },
   },
   {
-    slug: "confusion-matrix-thresholds",
-    title: "Confusion Matrix & Thresholds",
-    tag: "evaluation",
-    kicker:
-      "Move one cutoff and watch false positives trade places with false negatives.",
-    summary:
-      "Drag a classification threshold across scored examples. The lab updates the confusion matrix, precision, recall, F1, and accuracy so decision tradeoffs become visible.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Classification thresholds",
-      "False positives",
-      "False negatives",
-      "Precision and recall",
-    ],
-    learningGoals: [
-      "See how a score threshold converts model confidence into a yes/no prediction.",
-      "Understand why lowering a threshold usually raises recall while adding false positives.",
-      "Recognize how precision, recall, and F1 summarize different mistake costs.",
-    ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
-    theme: {
-      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
-    },
-  },
-  {
     slug: "overfitting",
     title: "Overfitting Lab",
     tag: "generalization",
@@ -338,6 +312,32 @@ export const activePlaygroundMetadata = [
     tutorPlan: playgroundTutorPlans.overfitting,
     theme: {
       badgeClassName: "border-orange-300 bg-orange-100 text-orange-950",
+    },
+  },
+  {
+    slug: "confusion-matrix-thresholds",
+    title: "Confusion Matrix & Thresholds",
+    tag: "evaluation",
+    kicker:
+      "Move one cutoff and watch false positives trade places with false negatives.",
+    summary:
+      "Drag a classification threshold across scored examples. The lab updates the confusion matrix, precision, recall, F1, and accuracy so decision tradeoffs become visible.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Classification thresholds",
+      "False positives",
+      "False negatives",
+      "Precision and recall",
+    ],
+    learningGoals: [
+      "See how a score threshold converts model confidence into a yes/no prediction.",
+      "Understand why lowering a threshold usually raises recall while adding false positives.",
+      "Recognize how precision, recall, and F1 summarize different mistake costs.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
+    theme: {
+      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
     },
   },
 ] satisfies PlaygroundMetadata[];

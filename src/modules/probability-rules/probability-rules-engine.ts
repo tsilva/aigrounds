@@ -28,7 +28,7 @@ export type OutcomeMembership = {
   inView: boolean;
 };
 
-export type RuleAnalysis = {
+type RuleAnalysis = {
   sampleSpace: DiceOutcome[];
   memberships: OutcomeMembership[];
   counts: {
@@ -82,11 +82,7 @@ const sampleSpace = Array.from({ length: 36 }, (_, index) => {
   };
 });
 
-export function buildSampleSpace() {
-  return sampleSpace;
-}
-
-export function outcomeMatchesRule(
+function outcomeMatchesRule(
   outcome: DiceOutcome,
   ruleId: EventRuleId,
 ) {

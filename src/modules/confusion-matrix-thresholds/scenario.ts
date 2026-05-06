@@ -1,7 +1,9 @@
 import { type ThresholdExample } from "./confusion-matrix-thresholds-engine";
 
+export type ThresholdScenarioId = "medical" | "spam" | "fraud";
+
 export type ThresholdScenario = {
-  id: string;
+  id: ThresholdScenarioId;
   label: string;
   shortLabel: string;
   description: string;
@@ -12,6 +14,8 @@ export type ThresholdScenario = {
   defaultThreshold: number;
   examples: ThresholdExample[];
 };
+
+export type ThresholdByScenario = Record<ThresholdScenarioId, number>;
 
 export const thresholdScenarios: ThresholdScenario[] = [
   {
@@ -97,3 +101,15 @@ export const thresholdScenarios: ThresholdScenario[] = [
 export const defaultThresholdScenario =
   thresholdScenarios.find((scenario) => scenario.id === "medical") ??
   thresholdScenarios[0];
+
+export const defaultThresholdsByScenario = thresholdScenarios.reduce<ThresholdByScenario>(
+  (thresholds, scenario) => ({
+    ...thresholds,
+    [scenario.id]: scenario.defaultThreshold,
+  }),
+  {
+    medical: 0,
+    spam: 0,
+    fraud: 0,
+  },
+);

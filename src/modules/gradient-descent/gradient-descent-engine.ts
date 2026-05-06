@@ -11,7 +11,7 @@ export type DescentPoint = DescentState & {
   nextTheta: number;
 };
 
-export type DescentAnalysis = DescentPoint & {
+type DescentAnalysis = DescentPoint & {
   stepSize: number;
   distanceToMinimum: number;
   behavior: "creeping" | "converging" | "overshooting";
@@ -25,7 +25,7 @@ export function loss(theta: number) {
   return 0.5 * theta * theta;
 }
 
-export function gradient(theta: number) {
+function gradient(theta: number) {
   return theta;
 }
 

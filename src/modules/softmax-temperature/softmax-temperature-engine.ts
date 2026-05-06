@@ -1,9 +1,13 @@
-import { type SoftmaxClass } from "./scenario";
+import {
+  type SoftmaxClass,
+  type SoftmaxClassId,
+  type SoftmaxLogits,
+} from "./scenario";
 
 export type TemperatureAnalysis = {
-  scaledLogits: Record<string, number>;
-  expValues: Record<string, number>;
-  probabilities: Record<string, number>;
+  scaledLogits: SoftmaxLogits;
+  expValues: SoftmaxLogits;
+  probabilities: SoftmaxLogits;
   topClass: SoftmaxClass;
   runnerUpClass: SoftmaxClass;
   confidence: number;
@@ -21,7 +25,7 @@ const maxTemperature = 3;
 
 export function analyzeTemperature(
   classes: SoftmaxClass[],
-  logits: Record<string, number>,
+  logits: SoftmaxLogits,
   temperature: number,
 ): TemperatureAnalysis {
   if (classes.length < 2) {
@@ -29,41 +33,34 @@ export function analyzeTemperature(
   }
 
   const safeTemperature = clamp(temperature, minTemperature, maxTemperature);
-  const scaledLogits = Object.fromEntries(
-    classes.map((classItem) => [
-      classItem.id,
-      (logits[classItem.id] ?? 0) / safeTemperature,
-    ]),
+  const scaledLogits = mapClassValues(
+    classes,
+    (classItem) => logits[classItem.id] / safeTemperature,
   );
   const maxScaledLogit = Math.max(
-    ...classes.map((classItem) => scaledLogits[classItem.id] ?? 0),
+    ...classes.map((classItem) => scaledLogits[classItem.id]),
   );
-  const expValues = Object.fromEntries(
-    classes.map((classItem) => [
-      classItem.id,
-      Math.exp((scaledLogits[classItem.id] ?? 0) - maxScaledLogit),
-    ]),
+  const expValues = mapClassValues(classes, (classItem) =>
+    Math.exp(scaledLogits[classItem.id] - maxScaledLogit),
   );
   const expTotal = classes.reduce(
-    (total, classItem) => total + (expValues[classItem.id] ?? 0),
+    (total, classItem) => total + expValues[classItem.id],
     0,
   );
-  const probabilities = Object.fromEntries(
-    classes.map((classItem) => [
-      classItem.id,
-      (expValues[classItem.id] ?? 0) / expTotal,
-    ]),
+  const probabilities = mapClassValues(
+    classes,
+    (classItem) => expValues[classItem.id] / expTotal,
   );
   const rankedClasses = [...classes].sort(
     (left, right) =>
-      (probabilities[right.id] ?? 0) - (probabilities[left.id] ?? 0),
+      probabilities[right.id] - probabilities[left.id],
   );
   const topClass = rankedClasses[0] ?? classes[0];
   const runnerUpClass = rankedClasses[1] ?? classes[1] ?? topClass;
-  const confidence = probabilities[topClass.id] ?? 0;
-  const margin = confidence - (probabilities[runnerUpClass.id] ?? 0);
+  const confidence = probabilities[topClass.id];
+  const margin = confidence - probabilities[runnerUpClass.id];
   const entropy = classes.reduce((total, classItem) => {
-    const probability = probabilities[classItem.id] ?? 0;
+    const probability = probabilities[classItem.id];
 
     return probability > 0 ? total - probability * Math.log(probability) : total;
   }, 0);
@@ -87,14 +84,32 @@ export function analyzeTemperature(
 }
 
 export function setLogit(
-  logits: Record<string, number>,
-  classId: string,
+  logits: SoftmaxLogits,
+  classId: SoftmaxClassId,
   value: number,
 ) {
   return {
     ...logits,
     [classId]: round(clamp(value, -3, 3), 1),
   };
+}
+
+function mapClassValues(
+  classes: SoftmaxClass[],
+  getValue: (classItem: SoftmaxClass) => number,
+) {
+  return classes.reduce<SoftmaxLogits>(
+    (values, classItem) => ({
+      ...values,
+      [classItem.id]: getValue(classItem),
+    }),
+    {
+      rover: 0,
+      comet: 0,
+      harbor: 0,
+      signal: 0,
+    },
+  );
 }
 
 export function formatNumber(value: number, digits = 2) {

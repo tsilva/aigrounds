@@ -11,8 +11,6 @@ export type RangePreset = {
   values: number[];
 };
 
-export type QuartilePreset = RangePreset;
-
 export const rangePresets: RangePreset[] = [
   {
     id: "steady",
@@ -37,11 +35,7 @@ export const rangePresets: RangePreset[] = [
   },
 ];
 
-export const quartilePresets = rangePresets;
-
 export const initialRangePreset = rangePresets[2] ?? rangePresets[0]!;
-
-export const initialQuartilePreset = initialRangePreset;
 
 export function pointsForPreset(preset: RangePreset): RangePoint[] {
   return makeRangePoints(preset.values);

@@ -6,8 +6,6 @@ export type RangePoint = {
   role?: "regular" | "outlier";
 };
 
-export type DataPoint = RangePoint;
-
 export type FiveNumberSummary = {
   count: number;
   sortedValues: number[];
@@ -43,29 +41,6 @@ export type RangeQuartileAnalysis = FiveNumberSummary & {
     range: string;
     iqr: string;
     selected: string;
-  };
-};
-
-export type QuartileAnalysis = FiveNumberSummary & {
-  count: number;
-  sortedValues: number[];
-  sortedPoints: DataPoint[];
-  lowerHalf: number[];
-  upperHalf: number[];
-  summary: FiveNumberSummary;
-  range: number;
-  iqr: number;
-  outlierPointIds: string[];
-  selected: {
-    point: DataPoint;
-    valuesBelow: number;
-    valuesAtOrBelow: number;
-    percentileRank: number;
-  };
-  story: {
-    range: string;
-    iqr: string;
-    takeaway: string;
   };
 };
 
@@ -138,71 +113,6 @@ export function analyzeRangeQuartiles(
       range: rangeStory(rangeJump),
       iqr: iqrStory(iqrShift),
       selected: `${atOrBelow} of ${summary.count} values are at or below ${selectedPoint.label}.`,
-    },
-  };
-}
-
-export function analyzeQuartiles(
-  points: DataPoint[],
-  selectedPointId: string,
-): QuartileAnalysis {
-  if (points.length < 5) {
-    throw new Error("At least five data points are required.");
-  }
-
-  const summary = fiveNumberSummary(points.map((point) => point.value));
-  const sortedPoints = [...points].sort((left, right) => {
-    if (left.value === right.value) {
-      return left.label.localeCompare(right.label);
-    }
-
-    return left.value - right.value;
-  });
-  const middle = Math.floor(summary.sortedValues.length / 2);
-  const lowerHalf = summary.sortedValues.slice(0, middle);
-  const upperHalf =
-    summary.sortedValues.length % 2 === 0
-      ? summary.sortedValues.slice(middle)
-      : summary.sortedValues.slice(middle + 1);
-  const lowerFence = summary.q1 - 1.5 * summary.iqr;
-  const upperFence = summary.q3 + 1.5 * summary.iqr;
-  const outlierPointIds = points
-    .filter((point) => point.value < lowerFence || point.value > upperFence)
-    .map((point) => point.id);
-  const selectedPoint =
-    points.find((point) => point.id === selectedPointId) ?? sortedPoints[0]!;
-  const valuesBelow = summary.sortedValues.filter(
-    (value) => value < selectedPoint.value,
-  ).length;
-  const valuesAtOrBelow = summary.sortedValues.filter(
-    (value) => value <= selectedPoint.value,
-  ).length;
-  const percentileRank = (valuesAtOrBelow / summary.count) * 100;
-
-  return {
-    ...summary,
-    count: summary.count,
-    sortedValues: summary.sortedValues,
-    sortedPoints,
-    lowerHalf,
-    upperHalf,
-    summary,
-    range: summary.range,
-    iqr: summary.iqr,
-    outlierPointIds,
-    selected: {
-      point: selectedPoint,
-      valuesBelow,
-      valuesAtOrBelow,
-      percentileRank,
-    },
-    story: {
-      range: rangeStory(summary.range - summary.iqr),
-      iqr: iqrStory(outlierPointIds.length > 0 ? 0 : summary.iqr),
-      takeaway:
-        outlierPointIds.length > 0
-          ? "One edge can stretch the whisker without rewriting the middle half."
-          : "When the center values move, the IQR changes because the box itself changes.",
     },
   };
 }

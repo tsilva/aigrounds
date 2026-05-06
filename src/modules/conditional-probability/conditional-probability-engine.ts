@@ -17,7 +17,7 @@ export type PopulationMemberView = PopulationMember & {
   isDimmed: boolean;
 };
 
-export type ProbabilityAnalysis = {
+type ProbabilityAnalysis = {
   members: PopulationMemberView[];
   counts: {
     total: number;
@@ -47,7 +47,7 @@ export const filterLabels: Record<FilterView, string> = {
   "b-given-a": "B | A",
 };
 
-export function buildPopulation(scenario: ScenarioId): PopulationMember[] {
+function buildPopulation(scenario: ScenarioId): PopulationMember[] {
   return Array.from({ length: 100 }, (_, index) => {
     const row = Math.floor(index / 10);
     const column = index % 10;
@@ -229,4 +229,3 @@ function memberMatchesNumerator(member: PopulationMember, filter: FilterView) {
 
   return true;
 }
-

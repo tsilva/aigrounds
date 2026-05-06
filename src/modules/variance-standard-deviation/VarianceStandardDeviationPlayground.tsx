@@ -194,7 +194,6 @@ function NumberLine({
             row.point.id === analysis.largestDeviationPointId ||
             row.absoluteDeviation >= analysis.standardDeviation;
           const laneTop = 48 + index * 15;
-          const laneColor = row.deviation < 0 ? "#2563eb" : "#ef4444";
 
           return (
             <div key={row.point.id}>
@@ -208,7 +207,7 @@ function NumberLine({
                   left: `calc(1rem + (100% - 2rem) * ${start / 100})`,
                   top: `${laneTop}px`,
                   width: `calc((100% - 2rem) * ${Math.max(width, 0.8) / 100})`,
-                  backgroundColor: laneColor,
+                  backgroundColor: row.point.color,
                   opacity: isLarge ? 0.9 : 0.58,
                 }}
               />

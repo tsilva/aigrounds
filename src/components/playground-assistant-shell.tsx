@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { getPlaygroundMetadataFromPathname } from "@/lib/playground-metadata";
 
 type ChatRole = "user" | "assistant";
 
@@ -16,27 +17,22 @@ type ChatMessage = {
   id: string;
   role: ChatRole;
   content: string;
+  pathname?: string;
 };
 
 type PlaygroundAssistantShellProps = {
   children: ReactNode;
 };
 
+const welcomeMessage: ChatMessage = {
+  id: "welcome",
+  role: "assistant",
+  content:
+    "Ask me about the playground while you experiment. I can explain what changed and suggest what to try next.",
+};
+
 function createMessageId() {
   return `message-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-function readablePlaygroundName(pathname: string) {
-  const slug = pathname.split("/").filter(Boolean).at(-1);
-
-  if (!slug) {
-    return "this playground";
-  }
-
-  return slug
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function useIsDesktopViewport() {
@@ -63,14 +59,7 @@ export function PlaygroundAssistantShell({
 }: PlaygroundAssistantShellProps) {
   const pathname = usePathname();
   const isDesktop = useIsDesktopViewport();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        "Ask me about the playground while you experiment. I can explain what changed and suggest what to try next.",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage]);
   const [draft, setDraft] = useState("");
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -78,7 +67,13 @@ export function PlaygroundAssistantShell({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const playgroundName = useMemo(
-    () => readablePlaygroundName(pathname),
+    () =>
+      getPlaygroundMetadataFromPathname(pathname)?.title ??
+      "this playground",
+    [pathname],
+  );
+  const playgroundContext = useMemo(
+    () => getPlaygroundMetadataFromPathname(pathname),
     [pathname],
   );
 
@@ -107,6 +102,7 @@ export function PlaygroundAssistantShell({
       id: createMessageId(),
       role: "user",
       content,
+      pathname,
     };
     const nextMessages = [...messages, userMessage];
 
@@ -123,11 +119,15 @@ export function PlaygroundAssistantShell({
         },
         body: JSON.stringify({
           messages: nextMessages
-            .filter((message) => message.id !== "welcome")
+            .filter(
+              (message) =>
+                message.id !== "welcome" && message.pathname === pathname,
+            )
             .map(({ role, content }) => ({ role, content })),
           context: {
             pathname,
             playgroundName,
+            playground: playgroundContext,
           },
         }),
       });
@@ -149,6 +149,7 @@ export function PlaygroundAssistantShell({
           id: createMessageId(),
           role: "assistant",
           content: assistantMessage,
+          pathname,
         },
       ]);
     } catch (requestError) {
@@ -173,7 +174,9 @@ export function PlaygroundAssistantShell({
       draft={draft}
       error={error}
       isSending={isSending}
-      messages={messages}
+      messages={messages.filter(
+        (message) => message.id === "welcome" || message.pathname === pathname,
+      )}
       playgroundName={playgroundName}
       textareaRef={textareaRef}
       onDraftChange={setDraft}

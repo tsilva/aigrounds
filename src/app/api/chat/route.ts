@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  getPlaygroundMetadataFromPathname,
+  type PlaygroundMetadata,
+} from "@/lib/playground-metadata";
 
 type ChatRole = "user" | "assistant";
 
@@ -12,6 +16,7 @@ type ChatRequestBody = {
   context?: {
     pathname?: string;
     playgroundName?: string;
+    playground?: PlaygroundMetadata;
   };
 };
 
@@ -58,17 +63,38 @@ function cleanMessages(messages: ClientMessage[]) {
 }
 
 function systemPrompt(context: ChatRequestBody["context"]) {
-  const playgroundName = context?.playgroundName ?? "the current playground";
   const pathname = context?.pathname ?? "/playgrounds";
+  const resolvedPlayground =
+    getPlaygroundMetadataFromPathname(pathname) ?? context?.playground;
+  const playgroundName =
+    resolvedPlayground?.title ??
+    context?.playgroundName ??
+    "the current playground";
 
   return [
     "You are the AI Grounds playground assistant.",
     "Help learners understand the interactive AI concept they are currently exploring.",
     "Keep answers concise, concrete, and tied to what the learner can try in the UI.",
     "Prefer intuition, small experiments, and plain language over formal derivations.",
+    "Use the playground context below as the source of truth for the current lesson.",
+    "When suggesting experiments, name controls or visual surfaces from the lesson summary and goals.",
     `Current playground: ${playgroundName}.`,
     `Current path: ${pathname}.`,
-  ].join("\n");
+    resolvedPlayground
+      ? `Lesson hook: ${resolvedPlayground.kicker}.`
+      : undefined,
+    resolvedPlayground
+      ? `Lesson summary: ${resolvedPlayground.summary}`
+      : undefined,
+    resolvedPlayground
+      ? `Core concepts: ${resolvedPlayground.concepts.join(", ")}.`
+      : undefined,
+    resolvedPlayground
+      ? `Learning goals:\n${resolvedPlayground.learningGoals
+          .map((goal) => `- ${goal}`)
+          .join("\n")}`
+      : undefined,
+  ].filter(Boolean).join("\n");
 }
 
 async function parseOpenRouterResponse(response: Response) {

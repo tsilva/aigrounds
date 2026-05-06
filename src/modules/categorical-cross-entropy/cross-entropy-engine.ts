@@ -2,7 +2,7 @@ import { type CrossEntropyClass, type CrossEntropyMode } from "./scenario";
 
 const MIN_PROBABILITY = 0.01;
 
-export type LossAnalysis = {
+type LossAnalysis = {
   trueClass: CrossEntropyClass;
   trueClasses: CrossEntropyClass[];
   trueProbability: number;
@@ -42,7 +42,7 @@ export function categoricalCrossEntropyLoss(
   return -Math.log(trueProbability);
 }
 
-export function probabilityTotal(
+function probabilityTotal(
   classes: CrossEntropyClass[],
   probabilities: Record<string, number>,
 ) {

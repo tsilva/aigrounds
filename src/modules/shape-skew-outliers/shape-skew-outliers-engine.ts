@@ -1,4 +1,4 @@
-export type ShapePoint = {
+type ShapePoint = {
   id: string;
   value: number;
   role: "regular" | "outlier";
@@ -59,7 +59,7 @@ export function clampShapeValue(value: number) {
   return Math.min(maxValue, Math.max(minValue, Math.round(value)));
 }
 
-export function makeShapePoints(values: number[], outlierValue: number): ShapePoint[] {
+function makeShapePoints(values: number[], outlierValue: number): ShapePoint[] {
   return [
     ...values.map((value, index) => ({
       id: `point-${index + 1}`,

@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import {
   getPlaygroundMetadataFromPathname,
-  type PlaygroundMetadata,
 } from "@/lib/playground-metadata";
-
-type ChatRole = "user" | "assistant";
-
-type ClientMessage = {
-  role: ChatRole;
-  content: string;
-};
+import {
+  isClientMessage,
+  type ChatRequestBody,
+  type ChatStreamEvent,
+  type ClientMessage,
+  type PlaygroundScreenshot,
+  type ScreenshotToolCall,
+  type TutorContext,
+} from "@/lib/assistant-chat";
 
 type OpenRouterContentPart =
   | {
@@ -23,47 +24,11 @@ type OpenRouterContentPart =
       };
     };
 
-type OpenRouterToolCall = {
-  id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-};
-
-type ScreenshotToolResult = {
-  toolCall: OpenRouterToolCall;
-  dataUrl: string;
-  capturedAt: string;
-  pathname: string;
-  viewport: {
-    width: number;
-    height: number;
-    devicePixelRatio: number;
-  };
-  image: {
-    width: number;
-    height: number;
-  };
-};
-
-type ChatRequestBody = {
-  messages?: ClientMessage[];
-  screenshot?: ScreenshotToolResult;
-  stream?: boolean;
-  context?: {
-    pathname?: string;
-    playgroundName?: string;
-    playground?: PlaygroundMetadata;
-  };
-};
-
 type OpenRouterMessage = {
   role: "system" | "user" | "assistant" | "tool";
   content: string | OpenRouterContentPart[] | null;
   tool_call_id?: string;
-  tool_calls?: OpenRouterToolCall[];
+  tool_calls?: ScreenshotToolCall[];
 };
 
 type OpenRouterResponse = {
@@ -128,17 +93,53 @@ const PLAYGROUND_SCREENSHOT_TOOLS = [
   },
 ] as const;
 
-function isClientMessage(value: unknown): value is ClientMessage {
-  if (!value || typeof value !== "object") {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object";
+}
+
+function isChatRequestBody(value: unknown): value is ChatRequestBody {
+  if (!isRecord(value)) {
     return false;
   }
 
-  const message = value as Record<string, unknown>;
+  return (
+    (value.messages === undefined || Array.isArray(value.messages)) &&
+    (value.stream === undefined || typeof value.stream === "boolean") &&
+    (value.context === undefined || isRecord(value.context)) &&
+    (value.tutor === undefined || isRecord(value.tutor)) &&
+    (value.screenshot === undefined || isScreenshotToolResult(value.screenshot))
+  );
+}
+
+function isOpenRouterResponse(value: unknown): value is OpenRouterResponse {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const error = value.error;
 
   return (
-    (message.role === "user" || message.role === "assistant") &&
-    typeof message.content === "string" &&
-    message.content.trim().length > 0
+    (value.choices === undefined || Array.isArray(value.choices)) &&
+    (error === undefined ||
+      (isRecord(error) &&
+        (error.message === undefined || typeof error.message === "string")))
+  );
+}
+
+function isOpenRouterStreamChunk(
+  value: unknown,
+): value is OpenRouterStreamChunk {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const error = value.error;
+
+  return (
+    (value.choices === undefined || Array.isArray(value.choices)) &&
+    (error === undefined ||
+      (isRecord(error) &&
+        (error.message === undefined || typeof error.message === "string")))
   );
 }
 
@@ -149,7 +150,10 @@ function cleanMessages(messages: ClientMessage[]) {
   }));
 }
 
-function systemPrompt(context: ChatRequestBody["context"]) {
+function systemPrompt(
+  context: ChatRequestBody["context"],
+  tutor?: TutorContext,
+) {
   const pathname = context?.pathname ?? "/playgrounds";
   const resolvedPlayground =
     getPlaygroundMetadataFromPathname(pathname) ?? context?.playground;
@@ -183,10 +187,48 @@ function systemPrompt(context: ChatRequestBody["context"]) {
           .map((goal) => `- ${goal}`)
           .join("\n")}`
       : undefined,
+    tutor?.mode === "guide" && resolvedPlayground?.slug === "gradient-descent"
+      ? [
+          "Tutor mode is active for the Gradient Descent Playground.",
+          "Act like a patient lab tutor, not a generic answer bot.",
+          "Guide one experiment at a time. Do not jump ahead to later experiments unless the learner asks.",
+          "Prefer a Socratic loop: ask for a prediction, tell the learner exactly what to try, ask what they observed, then connect their observation to the concept.",
+          "Use the screenshot tool when the learner says they tried it, asks what happened, asks about the graph, or when checking the current visible state would improve your coaching.",
+          "Keep each tutor reply short: 2-5 concise sentences or a small bullet list.",
+          `Current tutor phase: ${tutor.phase ?? "start"}.`,
+          `Current experiment number: ${(tutor.stepIndex ?? 0) + 1}.`,
+          tutor.stepTitle ? `Experiment title: ${tutor.stepTitle}.` : undefined,
+          tutor.experiment ? `Experiment action: ${tutor.experiment}` : undefined,
+          tutor.predictionQuestion
+            ? `Prediction question: ${tutor.predictionQuestion}`
+            : undefined,
+          tutor.observationPrompt
+            ? `Observation prompt: ${tutor.observationPrompt}`
+            : undefined,
+          tutor.takeaway ? `Target takeaway: ${tutor.takeaway}` : undefined,
+          tutor.phase === "start" || tutor.phase === "predict"
+            ? "Your next move: give the exact experiment action and ask the prediction question before explaining the result."
+            : undefined,
+          tutor.phase === "observe"
+            ? "Your next move: tell the learner to run the experiment if needed, then ask what they observed. Avoid giving away the full explanation yet."
+            : undefined,
+          tutor.phase === "reflect"
+            ? "Your next move: respond to the learner's observation, connect it to the target takeaway, then ask what they learned in their own words."
+            : undefined,
+          tutor.phase === "next"
+            ? "Your next move: briefly acknowledge the last lesson, then introduce only the next experiment and ask for a prediction."
+            : undefined,
+          tutor.phase === "complete"
+            ? "Your next move: summarize the four gradient descent lessons and ask the learner to explain the learning-rate/momentum tradeoff back."
+            : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : undefined,
   ].filter(Boolean).join("\n");
 }
 
-function isScreenshotToolResult(value: unknown): value is ScreenshotToolResult {
+function isScreenshotToolResult(value: unknown): value is PlaygroundScreenshot {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -219,12 +261,13 @@ function isScreenshotToolResult(value: unknown): value is ScreenshotToolResult {
 function buildOpenRouterMessages(
   clientMessages: ClientMessage[],
   context: ChatRequestBody["context"],
-  screenshot?: ScreenshotToolResult,
+  tutor?: TutorContext,
+  screenshot?: PlaygroundScreenshot,
 ): OpenRouterMessage[] {
   const messages: OpenRouterMessage[] = [
     {
       role: "system",
-      content: systemPrompt(context),
+      content: systemPrompt(context, tutor),
     },
     ...cleanMessages(clientMessages),
   ];
@@ -274,7 +317,17 @@ async function parseOpenRouterResponse(response: Response) {
   const responseText = await response.text();
 
   try {
-    return JSON.parse(responseText) as OpenRouterResponse;
+    const payload = JSON.parse(responseText) as unknown;
+
+    if (isOpenRouterResponse(payload)) {
+      return payload;
+    }
+
+    return {
+      error: {
+        message: `OpenRouter returned an unexpected JSON response with status ${response.status}.`,
+      },
+    };
   } catch {
     return {
       error: {
@@ -286,7 +339,7 @@ async function parseOpenRouterResponse(response: Response) {
   }
 }
 
-function streamEvent(event: unknown, encoder: TextEncoder) {
+function streamEvent(event: ChatStreamEvent, encoder: TextEncoder) {
   return encoder.encode(`${JSON.stringify(event)}\n`);
 }
 
@@ -304,7 +357,73 @@ function streamOpenRouterResponse(response: Response) {
       }
 
       let buffer = "";
-      const toolCalls = new Map<number, OpenRouterToolCall>();
+      const toolCalls = new Map<number, ScreenshotToolCall>();
+
+      function processSseLine(line: string) {
+        const trimmedLine = line.trim();
+
+        if (!trimmedLine.startsWith("data:")) {
+          return;
+        }
+
+        const data = trimmedLine.slice("data:".length).trim();
+
+        if (!data || data === "[DONE]") {
+          return;
+        }
+
+        const payload = JSON.parse(data) as unknown;
+
+        if (!isOpenRouterStreamChunk(payload)) {
+          throw new Error("OpenRouter returned an invalid stream chunk.");
+        }
+
+        const errorMessage = payload.error?.message;
+
+        if (errorMessage) {
+          throw new Error(errorMessage);
+        }
+
+        for (const choice of payload.choices ?? []) {
+          const content = choice.delta?.content;
+
+          if (content) {
+            controller.enqueue(streamEvent({ type: "text", content }, encoder));
+          }
+
+          for (const toolCallDelta of choice.delta?.tool_calls ?? []) {
+            const index = toolCallDelta.index ?? toolCalls.size;
+            const current =
+              toolCalls.get(index) ??
+              ({
+                id: "",
+                type: "function",
+                function: {
+                  name: "",
+                  arguments: "",
+                },
+              } satisfies ScreenshotToolCall);
+
+            if (toolCallDelta.id) {
+              current.id = toolCallDelta.id;
+            }
+
+            if (toolCallDelta.type) {
+              current.type = toolCallDelta.type;
+            }
+
+            if (toolCallDelta.function?.name) {
+              current.function.name = toolCallDelta.function.name;
+            }
+
+            if (toolCallDelta.function?.arguments) {
+              current.function.arguments += toolCallDelta.function.arguments;
+            }
+
+            toolCalls.set(index, current);
+          }
+        }
+      }
 
       try {
         while (true) {
@@ -319,69 +438,18 @@ function streamOpenRouterResponse(response: Response) {
           buffer = lines.pop() ?? "";
 
           for (const line of lines) {
-            const trimmedLine = line.trim();
-
-            if (!trimmedLine.startsWith("data:")) {
-              continue;
-            }
-
-            const data = trimmedLine.slice("data:".length).trim();
-
-            if (!data || data === "[DONE]") {
-              continue;
-            }
-
-            const parsed = JSON.parse(data) as OpenRouterStreamChunk;
-            const errorMessage = parsed.error?.message;
-
-            if (errorMessage) {
-              controller.error(new Error(errorMessage));
-              return;
-            }
-
-            for (const choice of parsed.choices ?? []) {
-              const content = choice.delta?.content;
-
-              if (content) {
-                controller.enqueue(
-                  streamEvent({ type: "text", content }, encoder),
-                );
-              }
-
-              for (const toolCallDelta of choice.delta?.tool_calls ?? []) {
-                const index = toolCallDelta.index ?? toolCalls.size;
-                const current =
-                  toolCalls.get(index) ??
-                  ({
-                    id: "",
-                    type: "function",
-                    function: {
-                      name: "",
-                      arguments: "",
-                    },
-                  } satisfies OpenRouterToolCall);
-
-                if (toolCallDelta.id) {
-                  current.id = toolCallDelta.id;
-                }
-
-                if (toolCallDelta.type) {
-                  current.type = toolCallDelta.type;
-                }
-
-                if (toolCallDelta.function?.name) {
-                  current.function.name = toolCallDelta.function.name;
-                }
-
-                if (toolCallDelta.function?.arguments) {
-                  current.function.arguments +=
-                    toolCallDelta.function.arguments;
-                }
-
-                toolCalls.set(index, current);
-              }
-            }
+            processSseLine(line);
           }
+        }
+
+        buffer += decoder.decode();
+
+        if (buffer.trim()) {
+          if (!buffer.trim().startsWith("data:")) {
+            throw new Error("OpenRouter returned an incomplete stream event.");
+          }
+
+          processSseLine(buffer);
         }
 
         for (const toolCall of toolCalls.values()) {
@@ -422,7 +490,16 @@ export async function POST(request: Request) {
   let body: ChatRequestBody;
 
   try {
-    body = (await request.json()) as ChatRequestBody;
+    const payload = (await request.json()) as unknown;
+
+    if (!isChatRequestBody(payload)) {
+      return NextResponse.json(
+        { error: "Invalid chat request body." },
+        { status: 400 },
+      );
+    }
+
+    body = payload;
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
@@ -444,6 +521,7 @@ export async function POST(request: Request) {
   const messages = buildOpenRouterMessages(
     clientMessages,
     body.context,
+    body.tutor,
     screenshot,
   );
 
@@ -514,6 +592,15 @@ export async function POST(request: Request) {
           `OpenRouter request failed with status ${response.status}.`,
       },
       { status: response.status },
+    );
+  }
+
+  if (payload.error?.message) {
+    return NextResponse.json(
+      {
+        error: payload.error.message,
+      },
+      { status: 502 },
     );
   }
 

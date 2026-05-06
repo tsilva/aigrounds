@@ -18,7 +18,7 @@ export type ConfusionBucket = "tp" | "fp" | "fn" | "tn";
 
 export type ConfusionCounts = Record<ConfusionBucket, number>;
 
-export type ThresholdMetrics = {
+type ThresholdMetrics = {
   precision: number | null;
   recall: number | null;
   f1: number | null;
@@ -36,7 +36,7 @@ export type ThresholdAnalysis = {
   metrics: ThresholdMetrics;
 };
 
-export function clampThreshold(value: number) {
+function clampThreshold(value: number) {
   return Math.min(0.95, Math.max(0.05, value));
 }
 

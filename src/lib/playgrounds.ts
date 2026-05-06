@@ -16,14 +16,15 @@ import {
   type PlaygroundMetadata,
 } from "@/lib/playground-metadata";
 
-export type { Theme, UpcomingPlayground } from "@/lib/playground-metadata";
+export type ActivePlaygroundSlug =
+  (typeof activePlaygroundMetadata)[number]["slug"];
 
 export type ActivePlayground = PlaygroundMetadata & {
+  slug: ActivePlaygroundSlug;
   component: ComponentType;
-  presentation?: "standard" | "immersive";
 };
 
-const playgroundComponents: Record<string, ComponentType> = {
+const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "mean-median-mode": MeanMedianModePlayground,
   "range-quartiles-iqr": RangeQuartilesIqrPlayground,
   "variance-standard-deviation": VarianceStandardDeviationPlayground,
@@ -37,27 +38,10 @@ const playgroundComponents: Record<string, ComponentType> = {
   overfitting: OverfittingPlayground,
 };
 
-const immersivePlaygroundSlugs = new Set([
-  "mean-median-mode",
-  "range-quartiles-iqr",
-  "variance-standard-deviation",
-  "shape-skew-outliers",
-  "categorical-cross-entropy",
-  "probability-rules",
-  "conditional-probability",
-  "softmax-temperature",
-  "gradient-descent",
-  "confusion-matrix-thresholds",
-  "overfitting",
-]);
-
 export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.map(
   (metadata) => ({
     ...metadata,
-    component: playgroundComponents[metadata.slug]!,
-    presentation: immersivePlaygroundSlugs.has(metadata.slug)
-      ? "immersive"
-      : undefined,
+    component: playgroundComponents[metadata.slug],
   }),
 );
 

@@ -12,6 +12,7 @@ import {
 } from "./confusion-matrix-thresholds-engine";
 import {
   defaultThresholdScenario,
+  defaultThresholdsByScenario,
   thresholdScenarios,
   type ThresholdScenario,
 } from "./scenario";
@@ -568,11 +569,7 @@ export function ConfusionMatrixThresholdsPlayground() {
   const scenario =
     thresholdScenarios.find((entry) => entry.id === scenarioId) ??
     defaultThresholdScenario;
-  const [thresholds, setThresholds] = useState<Record<string, number>>(() =>
-    Object.fromEntries(
-      thresholdScenarios.map((entry) => [entry.id, entry.defaultThreshold]),
-    ),
-  );
+  const [thresholds, setThresholds] = useState(defaultThresholdsByScenario);
   const threshold = thresholds[scenario.id] ?? scenario.defaultThreshold;
   const analysis = useMemo(
     () => analyzeThreshold(scenario.examples, threshold),

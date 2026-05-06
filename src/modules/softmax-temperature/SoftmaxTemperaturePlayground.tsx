@@ -12,7 +12,9 @@ import {
   initialTemperature,
   softmaxClasses,
   softmaxPresets,
+  type SoftmaxClassId,
   type SoftmaxClass,
+  type SoftmaxLogits,
   type SoftmaxPreset,
 } from "./scenario";
 
@@ -59,7 +61,7 @@ function PresetSelector({
   onSelectPreset,
 }: {
   activePreset: SoftmaxPreset;
-  logits: Record<string, number>;
+  logits: SoftmaxLogits;
   onSelectPreset: (preset: SoftmaxPreset) => void;
 }) {
   return (
@@ -114,7 +116,7 @@ function PresetSelector({
               <FactPill
                 key={classItem.id}
                 label={classItem.label}
-                value={`z = ${formatNumber(logits[classItem.id] ?? 0, 1)}`}
+                value={`z = ${formatNumber(logits[classItem.id], 1)}`}
               />
             ))}
           </div>
@@ -134,7 +136,7 @@ function TemperatureFormulaPanel({
   onTemperatureChange,
 }: {
   temperature: number;
-  logits: Record<string, number>;
+  logits: SoftmaxLogits;
   analysis: TemperatureAnalysis;
   confidence: number;
   entropyLabel: string;
@@ -143,15 +145,15 @@ function TemperatureFormulaPanel({
 }) {
   const sliderFill = ((temperature - 0.25) / 2.75) * 100;
   const exampleClass = analysis.topClass;
-  const exampleLogit = logits[exampleClass.id] ?? 0;
+  const exampleLogit = logits[exampleClass.id];
   const scaledLogit = exampleLogit / temperature;
   const expValue = Math.exp(scaledLogit);
   const expTotal = softmaxClasses.reduce(
     (total, classItem) =>
-      total + Math.exp((logits[classItem.id] ?? 0) / temperature),
+      total + Math.exp(logits[classItem.id] / temperature),
     0,
   );
-  const exampleProbability = analysis.probabilities[exampleClass.id] ?? 0;
+  const exampleProbability = analysis.probabilities[exampleClass.id];
   const exampleRows = [
     {
       label: "Scale logit",
@@ -342,10 +344,10 @@ function BarGroup({
   highlightedClassId,
 }: {
   title: string;
-  values: Record<string, number>;
+  values: SoftmaxLogits;
   valueFormatter: (value: number) => string;
   maxValue: number;
-  highlightedClassId?: string;
+  highlightedClassId?: SoftmaxClassId;
 }) {
   return (
     <div className="min-w-0">
@@ -354,7 +356,7 @@ function BarGroup({
       </p>
       <div className="mt-4 grid h-[220px] grid-cols-4 items-end gap-3 border-b border-[#8b99bb] px-1">
         {softmaxClasses.map((classItem) => {
-          const value = values[classItem.id] ?? 0;
+          const value = values[classItem.id];
           const height = Math.max(6, (Math.abs(value) / maxValue) * 174);
           const isNegative = value < 0;
           const isHighlighted = classItem.id === highlightedClassId;
@@ -439,9 +441,9 @@ function SimulatorPanel({
   temperature,
   onLogitChange,
 }: {
-  logits: Record<string, number>;
+  logits: SoftmaxLogits;
   temperature: number;
-  onLogitChange: (classId: string, value: number) => void;
+  onLogitChange: (classId: SoftmaxClassId, value: number) => void;
 }) {
   const analysis = useMemo(
     () => analyzeTemperature(softmaxClasses, logits, temperature),
@@ -449,7 +451,7 @@ function SimulatorPanel({
   );
   const maxLogit = Math.max(
     3,
-    ...softmaxClasses.map((classItem) => Math.abs(logits[classItem.id] ?? 0)),
+    ...softmaxClasses.map((classItem) => Math.abs(logits[classItem.id])),
   );
 
   return (
@@ -480,7 +482,7 @@ function SimulatorPanel({
               <LogitSlider
                 key={classItem.id}
                 classItem={classItem}
-                value={logits[classItem.id] ?? 0}
+                value={logits[classItem.id]}
                 onChange={(value) => onLogitChange(classItem.id, value)}
               />
             ))}
@@ -591,7 +593,7 @@ export function SoftmaxTemperaturePlayground() {
     setLogits(preset.logits);
   }
 
-  function handleLogitChange(classId: string, value: number) {
+  function handleLogitChange(classId: SoftmaxClassId, value: number) {
     setLogits((currentLogits) => setLogit(currentLogits, classId, value));
   }
 

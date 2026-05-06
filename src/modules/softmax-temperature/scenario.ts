@@ -1,16 +1,20 @@
+export type SoftmaxClassId = "rover" | "comet" | "harbor" | "signal";
+
 export type SoftmaxClass = {
-  id: string;
+  id: SoftmaxClassId;
   label: string;
   color: string;
   mutedColor: string;
 };
+
+export type SoftmaxLogits = Record<SoftmaxClassId, number>;
 
 export type SoftmaxPreset = {
   id: string;
   label: string;
   shortLabel: string;
   description: string;
-  logits: Record<string, number>;
+  logits: SoftmaxLogits;
 };
 
 export const softmaxClasses: SoftmaxClass[] = [

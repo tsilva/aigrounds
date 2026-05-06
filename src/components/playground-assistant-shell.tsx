@@ -9,54 +9,47 @@ import {
   useRef,
   useState,
 } from "react";
-import { getPlaygroundMetadataFromPathname } from "@/lib/playground-metadata";
-
-type ChatRole = "user" | "assistant";
+import {
+  getPlaygroundMetadataFromPathname,
+  type TutorStep,
+} from "@/lib/playground-metadata";
+import {
+  isChatStreamEvent,
+  type ChatRole,
+  type ChatStreamEvent,
+  type PlaygroundScreenshot,
+  type ScreenshotToolCall,
+  type TutorContext,
+  type TutorRequestPhase,
+} from "@/lib/assistant-chat";
 
 type ChatMessage = {
   id: string;
   role: ChatRole;
   content: string;
+  createdAt: number;
   pathname?: string;
 };
 
-type ScreenshotToolCall = {
+type ScreenshotAction = {
   id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-};
-
-type PlaygroundScreenshot = {
-  toolCall: ScreenshotToolCall;
-  dataUrl: string;
-  capturedAt: string;
+  createdAt: number;
   pathname: string;
-  viewport: {
-    width: number;
-    height: number;
-    devicePixelRatio: number;
-  };
-  image: {
-    width: number;
-    height: number;
-  };
+  capturedAt: string;
+  dataUrl: string;
+  previewUrl: string;
+  image: PlaygroundScreenshot["image"];
 };
 
-type ChatStreamEvent =
-  | {
-      type: "text";
-      content: string;
-    }
-  | {
-      type: "tool_call";
-      toolCall: ScreenshotToolCall;
-    }
-  | {
-      type: "done";
-    };
+type TutorPhase = "predict" | "observe" | "reflect" | "readyNext" | "complete";
+
+type QuickReply = {
+  label: string;
+  message: string;
+  requestPhase: TutorRequestPhase;
+  nextPhase: TutorPhase;
+  nextStepIndex?: number;
+};
 
 type PlaygroundAssistantShellProps = {
   children: ReactNode;
@@ -67,6 +60,7 @@ type MarkdownLineKind = "paragraph" | "heading" | "list" | "quote" | "code";
 const welcomeMessage: ChatMessage = {
   id: "welcome",
   role: "assistant",
+  createdAt: 0,
   content:
     "Ask me about the playground while you experiment. I can explain what changed and suggest what to try next.",
 };
@@ -91,6 +85,60 @@ function isMarkdownBlockStart(line: string, currentKind: MarkdownLineKind) {
 
 function safeLinkHref(href: string) {
   return /^(https?:|mailto:)/i.test(href) ? href : undefined;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object";
+}
+
+async function readAssistantError(response: Response) {
+  const responseText = await response.text();
+
+  try {
+    const payload = JSON.parse(responseText) as unknown;
+
+    if (isRecord(payload) && typeof payload.error === "string") {
+      return payload.error;
+    }
+  } catch {
+    return (
+      responseText.slice(0, 300) ||
+      `The assistant request failed with status ${response.status}.`
+    );
+  }
+
+  return (
+    responseText.slice(0, 300) ||
+    `The assistant request failed with status ${response.status}.`
+  );
+}
+
+async function readAssistantMessage(response: Response) {
+  const payload = (await response.json()) as unknown;
+
+  if (!isRecord(payload)) {
+    throw new Error("The assistant returned an invalid JSON response.");
+  }
+
+  if (typeof payload.error === "string") {
+    throw new Error(payload.error);
+  }
+
+  if (typeof payload.message !== "string" || !payload.message.trim()) {
+    throw new Error("The assistant did not respond.");
+  }
+
+  return payload.message;
+}
+
+function parseStreamEvent(line: string) {
+  const parsed = JSON.parse(line) as unknown;
+
+  if (!isChatStreamEvent(parsed)) {
+    throw new Error("The assistant returned an invalid stream event.");
+  }
+
+  return parsed;
 }
 
 function renderInlineMarkdown(text: string, keyPrefix: string): ReactNode[] {
@@ -352,6 +400,24 @@ function createMessageId() {
   return `message-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function createTimelineTimestamp() {
+  return Date.now();
+}
+
+function createScreenshotPreviewUrl(dataUrl: string) {
+  const [metadata, base64Data] = dataUrl.split(",");
+  const mimeType =
+    metadata.match(/^data:([^;]+);base64$/)?.[1] ?? "image/jpeg";
+  const binary = window.atob(base64Data ?? "");
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return window.URL.createObjectURL(new Blob([bytes], { type: mimeType }));
+}
+
 function copyComputedStyles(source: Element, target: Element) {
   const computed = window.getComputedStyle(source);
   const cssText = Array.from(computed)
@@ -386,6 +452,23 @@ function imageFromSource(source: string) {
     image.onerror = () => reject(new Error("Could not render screenshot."));
     image.src = source;
   });
+}
+
+function tutorContextFromStep(
+  step: TutorStep,
+  stepIndex: number,
+  phase: TutorRequestPhase,
+): TutorContext {
+  return {
+    mode: "guide",
+    phase,
+    stepIndex,
+    stepTitle: step.title,
+    experiment: step.experiment,
+    predictionQuestion: step.predictionQuestion,
+    observationPrompt: step.observationPrompt,
+    takeaway: step.takeaway,
+  };
 }
 
 async function capturePlaygroundScreenshot(
@@ -508,7 +591,14 @@ export function PlaygroundAssistantShell({
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toolStatus, setToolStatus] = useState<string | null>(null);
+  const [screenshotActions, setScreenshotActions] = useState<
+    ScreenshotAction[]
+  >([]);
+  const [isTutorActive, setIsTutorActive] = useState(false);
+  const [tutorStepIndex, setTutorStepIndex] = useState(0);
+  const [tutorPhase, setTutorPhase] = useState<TutorPhase>("predict");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const screenshotActionsRef = useRef<ScreenshotAction[]>([]);
 
   const playgroundName = useMemo(
     () =>
@@ -520,6 +610,11 @@ export function PlaygroundAssistantShell({
     () => getPlaygroundMetadataFromPathname(pathname),
     [pathname],
   );
+  const tutorPlan =
+    playgroundContext?.slug === "gradient-descent"
+      ? playgroundContext.tutorPlan
+      : undefined;
+  const currentTutorStep = tutorPlan?.steps[tutorStepIndex];
 
   useEffect(() => {
     if (!isAssistantOpen) {
@@ -533,6 +628,19 @@ export function PlaygroundAssistantShell({
     return () => window.clearTimeout(focusTimer);
   }, [isAssistantOpen]);
 
+  useEffect(() => {
+    screenshotActionsRef.current = screenshotActions;
+  }, [screenshotActions]);
+
+  useEffect(
+    () => () => {
+      for (const action of screenshotActionsRef.current) {
+        window.URL.revokeObjectURL(action.previewUrl);
+      }
+    },
+    [],
+  );
+
   async function submitMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -542,10 +650,18 @@ export function PlaygroundAssistantShell({
       return;
     }
 
+    await sendChatMessage(content);
+  }
+
+  async function sendChatMessage(
+    content: string,
+    tutorContext?: TutorContext,
+  ): Promise<boolean> {
     const userMessage: ChatMessage = {
       id: createMessageId(),
       role: "user",
       content,
+      createdAt: createTimelineTimestamp(),
       pathname,
     };
     const nextMessages = [...messages, userMessage];
@@ -556,13 +672,26 @@ export function PlaygroundAssistantShell({
     setIsSending(true);
 
     try {
-      await streamAssistantResponse(nextMessages);
+      await streamAssistantResponse(
+        nextMessages,
+        undefined,
+        tutorContext ??
+          (isTutorActive && currentTutorStep
+            ? tutorContextFromStep(
+                currentTutorStep,
+                tutorStepIndex,
+                tutorPhase === "readyNext" ? "reflect" : tutorPhase,
+              )
+            : undefined),
+      );
+      return true;
     } catch (requestError) {
       setError(
         requestError instanceof Error
           ? requestError.message
           : "The assistant could not respond.",
       );
+      return false;
     } finally {
       setIsSending(false);
       setToolStatus(null);
@@ -570,9 +699,45 @@ export function PlaygroundAssistantShell({
     }
   }
 
+  function handleQuickReply(reply: QuickReply) {
+    if (!tutorPlan) {
+      return;
+    }
+
+    const nextStepIndex = reply.nextStepIndex ?? tutorStepIndex;
+    const requestStep = tutorPlan.steps[nextStepIndex];
+
+    if (!requestStep || isSending) {
+      return;
+    }
+
+    const previousTutorState = {
+      isTutorActive,
+      tutorPhase,
+      tutorStepIndex,
+    };
+
+    setIsTutorActive(true);
+    setTutorStepIndex(nextStepIndex);
+    setTutorPhase(reply.nextPhase);
+    void sendChatMessage(
+      reply.message,
+      tutorContextFromStep(requestStep, nextStepIndex, reply.requestPhase),
+    ).then((didSend) => {
+      if (didSend) {
+        return;
+      }
+
+      setIsTutorActive(previousTutorState.isTutorActive);
+      setTutorStepIndex(previousTutorState.tutorStepIndex);
+      setTutorPhase(previousTutorState.tutorPhase);
+    });
+  }
+
   async function streamAssistantResponse(
     conversationMessages: ChatMessage[],
     screenshot?: PlaygroundScreenshot,
+    tutorContext?: TutorContext,
   ): Promise<string> {
     const requestMessages = conversationMessages
       .filter(
@@ -593,30 +758,18 @@ export function PlaygroundAssistantShell({
         },
         screenshot,
         stream: true,
+        tutor: tutorContext,
       }),
     });
 
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-
-      throw new Error(payload?.error ?? "The assistant did not respond.");
+      throw new Error(await readAssistantError(response));
     }
 
     const contentType = response.headers.get("Content-Type") ?? "";
 
     if (contentType.includes("application/json")) {
-      const payload = (await response.json()) as {
-        message?: string;
-        error?: string;
-      };
-
-      if (!payload.message) {
-        throw new Error(payload.error ?? "The assistant did not respond.");
-      }
-
-      const assistantMessage = payload.message;
+      const assistantMessage = await readAssistantMessage(response);
 
       setMessages((currentMessages) => [
         ...currentMessages,
@@ -624,6 +777,7 @@ export function PlaygroundAssistantShell({
           id: createMessageId(),
           role: "assistant",
           content: assistantMessage,
+          createdAt: createTimelineTimestamp(),
           pathname,
         },
       ]);
@@ -644,6 +798,7 @@ export function PlaygroundAssistantShell({
         id: streamingMessageId,
         role: "assistant",
         content: "",
+        createdAt: createTimelineTimestamp(),
         pathname,
       },
     ]);
@@ -682,10 +837,25 @@ export function PlaygroundAssistantShell({
           event.toolCall,
           pathname,
         );
+        setScreenshotActions((currentActions) => [
+          ...currentActions,
+          {
+            id: createMessageId(),
+            createdAt: createTimelineTimestamp(),
+            pathname,
+            capturedAt: capturedScreenshot.capturedAt,
+            dataUrl: capturedScreenshot.dataUrl,
+            previewUrl: createScreenshotPreviewUrl(
+              capturedScreenshot.dataUrl,
+            ),
+            image: capturedScreenshot.image,
+          },
+        ]);
         setToolStatus("Screenshot captured. Reading the graph...");
         assistantMessage = await streamAssistantResponse(
           conversationMessages,
           capturedScreenshot,
+          tutorContext,
         );
       }
     }
@@ -704,7 +874,7 @@ export function PlaygroundAssistantShell({
             continue;
           }
 
-          await handleStreamEvent(JSON.parse(line) as ChatStreamEvent);
+          await handleStreamEvent(parseStreamEvent(line));
         }
       }
 
@@ -720,7 +890,7 @@ export function PlaygroundAssistantShell({
     }
 
     if (eventBuffer.trim()) {
-      await handleStreamEvent(JSON.parse(eventBuffer) as ChatStreamEvent);
+      await handleStreamEvent(parseStreamEvent(eventBuffer));
     }
 
     if (!assistantMessage.trim()) {
@@ -736,6 +906,130 @@ export function PlaygroundAssistantShell({
     isDesktop && isAssistantOpen
       ? "min-h-screen bg-[#f7f9ff] text-slate-950 lg:grid lg:grid-cols-[minmax(0,1fr)_24rem]"
       : "min-h-screen bg-[#f7f9ff] text-slate-950";
+  const quickReplies = useMemo<QuickReply[]>(() => {
+    if (!tutorPlan) {
+      return [];
+    }
+
+    if (!isTutorActive) {
+      return [
+        {
+          label: "Guide me",
+          message:
+            "Guide me through the Gradient Descent Playground one experiment at a time. Start with the first experiment and ask me to predict what will happen.",
+          requestPhase: "start",
+          nextPhase: "predict",
+          nextStepIndex: 0,
+        },
+      ];
+    }
+
+    const step = tutorPlan.steps[tutorStepIndex];
+
+    if (!step) {
+      return [];
+    }
+
+    if (tutorPhase === "predict") {
+      return [
+        {
+          label: "I made a prediction",
+          message:
+            "I made my prediction. Remind me of the exact controls to use and what to watch for, but do not explain the result yet.",
+          requestPhase: "observe",
+          nextPhase: "observe",
+        },
+        {
+          label: "Give me a hint",
+          message:
+            "Give me a small hint for this prediction without revealing the answer.",
+          requestPhase: "predict",
+          nextPhase: "predict",
+        },
+      ];
+    }
+
+    if (tutorPhase === "observe") {
+      return [
+        {
+          label: "I tried it",
+          message:
+            "I tried the experiment. Use the screenshot tool if helpful, then ask what I observed before giving the full explanation.",
+          requestPhase: "reflect",
+          nextPhase: "reflect",
+        },
+        {
+          label: "I am stuck",
+          message:
+            "I am stuck on this experiment. Use the screenshot tool if helpful and give me one concrete next action.",
+          requestPhase: "observe",
+          nextPhase: "observe",
+        },
+      ];
+    }
+
+    if (tutorPhase === "reflect") {
+      return step.observationOptions.map((option) => ({
+        label: option,
+        message: `What I noticed: ${option}. Connect that observation to the lesson and ask what I learned.`,
+        requestPhase: "reflect",
+        nextPhase: "readyNext",
+      }));
+    }
+
+    if (tutorPhase === "readyNext") {
+      const nextStepIndex = tutorStepIndex + 1;
+
+      if (nextStepIndex >= tutorPlan.steps.length) {
+        return [
+          {
+            label: "Finish summary",
+            message:
+              "Wrap up the guided lab. Ask me to explain the learning-rate and momentum tradeoff back in my own words.",
+            requestPhase: "complete",
+            nextPhase: "complete",
+            nextStepIndex: tutorStepIndex,
+          },
+        ];
+      }
+
+      return [
+        {
+          label: "Next experiment",
+          message:
+            "Move me to the next experiment. Give one concrete action and ask me to predict what will happen.",
+          requestPhase: "next",
+          nextPhase: "predict",
+          nextStepIndex,
+        },
+        {
+          label: "Review this one",
+          message:
+            "Review this experiment once more in plain language and ask me one quick check question.",
+          requestPhase: "reflect",
+          nextPhase: "readyNext",
+        },
+      ];
+    }
+
+    return [
+      {
+        label: "Quiz me",
+        message:
+          "Quiz me on the four Gradient Descent Playground experiments, one question at a time.",
+        requestPhase: "complete",
+        nextPhase: "complete",
+      },
+    ];
+  }, [isTutorActive, tutorPhase, tutorPlan, tutorStepIndex]);
+  const tutorProgress =
+    isTutorActive && tutorPlan && currentTutorStep
+      ? `Guide ${tutorStepIndex + 1}/${tutorPlan.steps.length}: ${
+          currentTutorStep.title
+        }`
+      : tutorPlan
+        ? "Gradient descent tutor"
+        : undefined;
 
   const assistantPanel = (
     <ChatPanel
@@ -746,11 +1040,17 @@ export function PlaygroundAssistantShell({
         (message) => message.id === "welcome" || message.pathname === pathname,
       )}
       playgroundName={playgroundName}
+      quickReplies={quickReplies}
+      screenshotActions={screenshotActions.filter(
+        (action) => action.pathname === pathname,
+      )}
       textareaRef={textareaRef}
       toolStatus={toolStatus}
+      tutorProgress={tutorProgress}
       onDraftChange={setDraft}
       onClose={() => setIsAssistantOpen(false)}
       onSubmit={submitMessage}
+      onQuickReply={handleQuickReply}
     />
   );
 
@@ -807,10 +1107,14 @@ function ChatPanel({
   isSending,
   messages,
   playgroundName,
+  quickReplies,
+  screenshotActions,
   textareaRef,
   toolStatus,
+  tutorProgress,
   onDraftChange,
   onClose,
+  onQuickReply,
   onSubmit,
 }: {
   draft: string;
@@ -818,12 +1122,19 @@ function ChatPanel({
   isSending: boolean;
   messages: ChatMessage[];
   playgroundName: string;
+  quickReplies: QuickReply[];
+  screenshotActions: ScreenshotAction[];
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   toolStatus: string | null;
+  tutorProgress?: string;
   onDraftChange: (value: string) => void;
   onClose: () => void;
+  onQuickReply: (reply: QuickReply) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const [expandedScreenshotId, setExpandedScreenshotId] = useState<
+    string | null
+  >(null);
   const lastMessage = messages.at(-1);
   const shouldShowThinking =
     (isSending || toolStatus) &&
@@ -831,6 +1142,24 @@ function ChatPanel({
       lastMessage?.role === "assistant" &&
       lastMessage.content.trim().length > 0
     );
+  const timelineItems = useMemo(
+    () =>
+      [
+        ...messages.map((message) => ({
+          id: message.id,
+          createdAt: message.createdAt,
+          type: "message" as const,
+          message,
+        })),
+        ...screenshotActions.map((action) => ({
+          id: action.id,
+          createdAt: action.createdAt,
+          type: "screenshot" as const,
+          action,
+        })),
+      ].sort((first, second) => first.createdAt - second.createdAt),
+    [messages, screenshotActions],
+  );
 
   return (
     <section
@@ -845,6 +1174,11 @@ function ChatPanel({
           <h2 className="mt-1 truncate text-lg font-semibold text-slate-950">
             {playgroundName}
           </h2>
+          {tutorProgress ? (
+            <p className="mt-1 truncate text-xs font-medium text-slate-500">
+              {tutorProgress}
+            </p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -857,22 +1191,35 @@ function ChatPanel({
       </header>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5">
-        {messages.map((message) => (
-          <article
-            key={message.id}
-            className={
-              message.role === "user"
-                ? "ml-auto max-w-[86%] rounded-[14px] bg-slate-950 px-4 py-3 text-sm leading-6 text-white"
-                : "max-w-[86%] rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700"
-            }
-          >
-            {message.role === "assistant" ? (
-              <MarkdownMessage content={message.content} />
-            ) : (
-              message.content
-            )}
-          </article>
-        ))}
+        {timelineItems.map((item) =>
+          item.type === "message" ? (
+            <article
+              key={item.id}
+              className={
+                item.message.role === "user"
+                  ? "ml-auto max-w-[86%] rounded-[14px] bg-slate-950 px-4 py-3 text-sm leading-6 text-white"
+                  : "max-w-[86%] rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700"
+              }
+            >
+              {item.message.role === "assistant" ? (
+                <MarkdownMessage content={item.message.content} />
+              ) : (
+                item.message.content
+              )}
+            </article>
+          ) : (
+            <ScreenshotActionTip
+              key={item.id}
+              action={item.action}
+              isExpanded={expandedScreenshotId === item.id}
+              onToggle={() =>
+                setExpandedScreenshotId((currentId) =>
+                  currentId === item.id ? null : item.id,
+                )
+              }
+            />
+          ),
+        )}
 
         {shouldShowThinking ? (
           <div className="max-w-[86%] rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xs text-slate-500">
@@ -889,6 +1236,21 @@ function ChatPanel({
           <p className="mb-3 rounded-[10px] border border-rose-200 bg-rose-50 px-3 py-2 text-sm leading-5 text-rose-700">
             {error}
           </p>
+        ) : null}
+        {quickReplies.length > 0 ? (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {quickReplies.map((reply) => (
+              <button
+                key={`${reply.requestPhase}-${reply.label}`}
+                type="button"
+                disabled={isSending}
+                onClick={() => onQuickReply(reply)}
+                className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+              >
+                {reply.label}
+              </button>
+            ))}
+          </div>
         ) : null}
         <label className="block">
           <span className="sr-only">Message assistant</span>
@@ -919,5 +1281,54 @@ function ChatPanel({
         </div>
       </form>
     </section>
+  );
+}
+
+function ScreenshotActionTip({
+  action,
+  isExpanded,
+  onToggle,
+}: {
+  action: ScreenshotAction;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  const capturedAt = new Date(action.capturedAt);
+  const capturedLabel = Number.isNaN(capturedAt.getTime())
+    ? "now"
+    : capturedAt.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+  return (
+    <div className="max-w-[86%]">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+        className="inline-flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+        <span className="truncate">Screenshot captured</span>
+        <span className="font-mono text-[10px] text-slate-400">
+          {capturedLabel}
+        </span>
+        <span className="text-indigo-600">{isExpanded ? "Hide" : "View"}</span>
+      </button>
+
+      {isExpanded ? (
+        <div className="mt-2 rounded-[10px] border border-slate-200 bg-white p-2 shadow-sm">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={action.previewUrl}
+            alt={`Playground screenshot captured at ${capturedLabel}`}
+            className="max-h-72 w-full rounded-md object-contain"
+            width={action.image.width}
+            height={action.image.height}
+          />
+        </div>
+      ) : null}
+    </div>
   );
 }

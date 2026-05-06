@@ -4,14 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Grounds is an interactive educational web app for learning AI concepts through hands-on playgrounds. Users explore algorithms by interacting with visualizations rather than reading theory. Currently features a Monte Carlo Tree Search (MCTS) module.
+AI Grounds is an interactive educational web app for learning AI concepts through hands-on playgrounds. Users explore algorithms by interacting with visualizations rather than reading theory. Current modules cover statistics, probability, loss functions, optimization, model evaluation, and generalization.
 
 ## Commands
 
-- `npm run dev` — start dev server (localhost:3000)
-- `npm run build` — production build (also validates TypeScript and ESLint)
-- `npm run lint` — run ESLint
-- `npm run start` — serve production build locally
+- `pnpm dev` — start dev server (localhost:3000)
+- `pnpm build` — production build (also validates TypeScript and ESLint)
+- `pnpm lint` — run ESLint
+- `pnpm check:cycles` — verify local imports are acyclic
+- `pnpm start` — serve production build locally
 
 No test framework is configured yet.
 
@@ -24,18 +25,20 @@ Each AI playground is a self-contained module under `src/modules/{name}/`. A mod
 - An engine file (`{name}-engine.ts`) — pure-functional algorithm implementation
 - A scenario/data file — domain-specific data structures
 
-Modules are registered in `src/lib/playgrounds.ts` which serves as the central registry. Adding a new module requires:
+Modules are described in `src/lib/playground-metadata.ts` and wired to components in `src/lib/playgrounds.ts`. Adding a new module requires:
 1. Creating the module folder under `src/modules/`
-2. Adding an entry to `activePlaygrounds` in `src/lib/playgrounds.ts`
-3. Routing is automatic via the `[slug]` dynamic route
+2. Adding metadata to `activePlaygroundMetadata` in `src/lib/playground-metadata.ts`
+3. Adding the component to `playgroundComponents` in `src/lib/playgrounds.ts`
+4. Routing is automatic via the `[slug]` dynamic route
 
 ### Key Paths
 
 - `src/app/` — Next.js App Router (layout, pages, global styles)
 - `src/app/playgrounds/[slug]/page.tsx` — dynamic route that resolves modules by slug
 - `src/components/playground-shell.tsx` — shared wrapper providing consistent header, breadcrumb, learning goals
-- `src/lib/playgrounds.ts` — playground registry, types (`ActivePlayground`, `UpcomingPlayground`, `Theme`)
-- `src/modules/mcts/` — MCTS module (engine is pure-functional, scenario defines a starship decision tree)
+- `src/lib/playground-metadata.ts` — canonical playground metadata, tags, presentation mode, and learning goals
+- `src/lib/playgrounds.ts` — slug-to-component registry and `ActivePlayground` type
+- `src/app/api/chat/route.ts` — OpenRouter-backed playground assistant API route
 
 ### Tech Stack
 
@@ -43,7 +46,7 @@ Modules are registered in `src/lib/playgrounds.ts` which serves as the central r
 - Tailwind CSS 4 with PostCSS
 - Fonts: Space Grotesk (headings), IBM Plex Mono (code/stats)
 - Path alias: `@/*` → `./src/*`
-- Deployed on Vercel (static + client-side, no server API)
+- Deployed on Vercel (client-side playgrounds plus a server API route for chat)
 
 ## Conventions
 

@@ -22,10 +22,10 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 6. [x] **Conditional Probability & Independence Lab**
    Learn conditional probability, joint probability, marginal probability, independence, dependence, and base rates. Filter a population grid and watch probabilities change as conditions are applied.
 
-7. [x] **Bayes Rule Playground**
+7. **Bayes Rule Playground**
    Learn Bayes theorem, priors, likelihoods, posteriors, false positives, false negatives, and base-rate neglect. Use a medical-test or fraud-detection scenario with adjustable prevalence and test accuracy.
 
-8. [x] **Expected Value & Risk Lab**
+8. **Expected Value & Risk Lab**
    Learn random variables, expected value, probability-weighted outcomes, variance of outcomes, and risk/reward tradeoffs. Build simple games or bets and compare long-run average outcomes.
 
 9. **Bernoulli, Categorical & Binomial Lab**

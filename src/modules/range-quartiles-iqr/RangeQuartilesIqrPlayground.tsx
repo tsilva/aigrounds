@@ -11,6 +11,10 @@ import {
   useState,
 } from "react";
 import {
+  clientXToPercentValue,
+  useStackedPointLayout,
+} from "@/lib/number-line";
+import {
   analyzeRangeQuartiles,
   clampValue,
   movePoint,
@@ -170,26 +174,6 @@ function FactPill({ label, value }: { label: string; value: string }) {
       </p>
     </div>
   );
-}
-
-function useStackedPointLayout(points: RangePoint[]) {
-  return useMemo(() => {
-    const grouped = new Map<number, RangePoint[]>();
-
-    for (const point of points) {
-      grouped.set(point.value, [...(grouped.get(point.value) ?? []), point]);
-    }
-
-    const offsets = new Map<string, number>();
-
-    for (const group of grouped.values()) {
-      group.forEach((point, index) => {
-        offsets.set(point.id, (index - (group.length - 1) / 2) * 20);
-      });
-    }
-
-    return offsets;
-  }, [points]);
 }
 
 function NumberLine({
@@ -762,9 +746,9 @@ export function RangeQuartilesIqrPlayground() {
         return;
       }
 
-      const rect = trackRef.current.getBoundingClientRect();
-      const ratio = (clientX - rect.left) / rect.width;
-      const nextValue = clampValue(ratio * 100);
+      const nextValue = clampValue(
+        clientXToPercentValue(clientX, trackRef.current.getBoundingClientRect()),
+      );
 
       setPoints((currentPoints) =>
         movePoint(currentPoints, activePointId, nextValue),
@@ -811,8 +795,7 @@ export function RangeQuartilesIqrPlayground() {
       return;
     }
 
-    const ratio = (clientX - rect.left) / rect.width;
-    const nextValue = clampValue(ratio * 100);
+    const nextValue = clampValue(clientXToPercentValue(clientX, rect));
 
     setPoints((currentPoints) => movePoint(currentPoints, pointId, nextValue));
   }

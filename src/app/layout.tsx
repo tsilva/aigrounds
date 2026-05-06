@@ -6,7 +6,7 @@ import "./globals.css";
 
 const SITE_URL = "https://aigrounds.tsilva.eu";
 const SITE_TITLE = "AI Grounds | Interactive AI Playgrounds";
-const SITE_DESCRIPTION = "Learn AI concepts through hands-on interactive playgrounds. Explore Monte Carlo Tree Search, algorithms, and machine learning concepts visually. Free educational platform for AI learners.";
+const SITE_DESCRIPTION = "Learn AI concepts through hands-on interactive playgrounds. Explore algorithms, statistics, and machine learning concepts visually. Free educational platform for AI learners.";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -26,8 +26,6 @@ export const metadata: Metadata = {
     "AI education",
     "machine learning",
     "interactive learning",
-    "Monte Carlo Tree Search",
-    "MCTS",
     "algorithms",
     "AI playground",
     "educational platform",
@@ -60,7 +58,7 @@ export const metadata: Metadata = {
   manifest: "/brand/web-seo/site.webmanifest",
   openGraph: {
     title: SITE_TITLE,
-    description: "Interactive AI playgrounds for learning algorithms and machine learning concepts through hands-on exploration. Start with Monte Carlo Tree Search.",
+    description: "Interactive AI playgrounds for learning algorithms and machine learning concepts through hands-on exploration.",
     type: "website",
     url: SITE_URL,
     siteName: "AI Grounds",
@@ -77,7 +75,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: SITE_TITLE,
-    description: "Learn AI concepts through interactive playgrounds. Explore algorithms visually with Monte Carlo Tree Search.",
+    description: "Learn AI concepts through interactive playgrounds. Explore algorithms, statistics, and machine learning concepts visually.",
     creator: "@tiagosilva",
     images: ["/brand/web-seo/og-image-1200x630.png"],
   },

@@ -8,33 +8,31 @@ import packageJson from "../../package.json";
 const learningProgressionSlugs = [
   "mean-median-mode",
   "range-quartiles-iqr",
+  "variance-standard-deviation",
   "shape-skew-outliers",
+  "probability-rules",
+  "conditional-probability",
   "categorical-cross-entropy",
   "softmax-temperature",
   "gradient-descent",
   "confusion-matrix-thresholds",
   "overfitting",
   "bm25",
-  "attention",
-  "q-learning",
-  "mcts",
-  "diffusion",
 ];
 
 const conceptTags: Record<string, string> = {
   "mean-median-mode": "statistics",
   "range-quartiles-iqr": "statistics",
+  "variance-standard-deviation": "statistics",
   "shape-skew-outliers": "statistics",
+  "probability-rules": "probability",
+  "conditional-probability": "probability",
   "categorical-cross-entropy": "loss",
   "softmax-temperature": "probability",
   "gradient-descent": "optimization",
   "confusion-matrix-thresholds": "evaluation",
   overfitting: "generalization",
   bm25: "retrieval",
-  attention: "transformers",
-  "q-learning": "reinforcement",
-  mcts: "planning",
-  diffusion: "generation",
 };
 
 function compactOutcome(summary: string) {

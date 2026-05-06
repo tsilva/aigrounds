@@ -17,7 +17,6 @@ const learningProgressionSlugs = [
   "gradient-descent",
   "confusion-matrix-thresholds",
   "overfitting",
-  "bm25",
 ];
 
 const conceptTags: Record<string, string> = {
@@ -32,7 +31,6 @@ const conceptTags: Record<string, string> = {
   "gradient-descent": "optimization",
   "confusion-matrix-thresholds": "evaluation",
   overfitting: "generalization",
-  bm25: "retrieval",
 };
 
 function compactOutcome(summary: string) {

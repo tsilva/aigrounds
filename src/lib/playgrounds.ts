@@ -6,6 +6,7 @@ import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-
 import { DiffusionPlayground } from "@/modules/diffusion/DiffusionPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
 import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
+import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
 import { QLearningPlayground } from "@/modules/q-learning/QLearningPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
 
@@ -131,6 +132,31 @@ export const activePlaygrounds: ActivePlayground[] = [
       badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
     },
     component: ConfusionMatrixThresholdsPlayground,
+    presentation: "immersive",
+  },
+  {
+    slug: "overfitting",
+    title: "Overfitting Lab",
+    kicker:
+      "Raise model complexity and watch memorization beat training loss while future error gets worse.",
+    summary:
+      "Fit polynomial curves to noisy training dots, then compare them against held-out test dots. The lab shows why the lowest training loss can be the wrong model when a wiggly curve starts chasing noise.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Model complexity",
+      "Training loss",
+      "Test loss",
+      "Generalization",
+    ],
+    learningGoals: [
+      "See how higher model complexity can keep reducing training error.",
+      "Understand why test error can rise when a curve memorizes noisy training examples.",
+      "Recognize the useful middle between underfitting and overfitting.",
+    ],
+    theme: {
+      badgeClassName: "border-orange-300 bg-orange-100 text-orange-950",
+    },
+    component: OverfittingPlayground,
     presentation: "immersive",
   },
   {

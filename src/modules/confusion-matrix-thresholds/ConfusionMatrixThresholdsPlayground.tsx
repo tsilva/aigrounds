@@ -149,7 +149,7 @@ function ScenarioSelector({
             <FactPill label="Score" value={scenario.scoreLabel} />
             <FactPill
               label="Decision"
-              value={`score >= threshold`}
+              value="score ≥ threshold"
             />
           </div>
         </div>
@@ -465,7 +465,7 @@ function MetricsPanel({ analysis }: { analysis: ThresholdAnalysis }) {
         <MetricCard
           label="F1"
           value={formatDecimal(metrics.f1)}
-          formula="2 * precision * recall / (precision + recall)"
+          formula="2 × precision × recall / (precision + recall)"
         />
         <MetricCard
           label="Accuracy"

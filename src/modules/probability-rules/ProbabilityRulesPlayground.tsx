@@ -125,7 +125,7 @@ function membershipTone(membership: OutcomeMembership) {
     return {
       className:
         "border-[#8053ff] bg-[#efeaff] text-[#24115f] shadow-[inset_0_0_0_2px_rgba(128,83,255,0.18)]",
-      label: "A and B",
+      label: "A ∩ B",
     };
   }
 
@@ -485,7 +485,7 @@ export function ProbabilityRulesPlayground() {
             />
             <LegendSwatch
               className="border-[#8053ff] bg-[#efeaff]"
-              label="A and B"
+              label="A ∩ B"
             />
             <LegendSwatch
               className="border-[#352cff] bg-white"

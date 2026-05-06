@@ -43,8 +43,8 @@ export const filterLabels: Record<FilterView, string> = {
   all: "All",
   a: "A",
   b: "B",
-  intersection: "A and B",
-  "b-given-a": "B | A",
+  intersection: "A ∩ B",
+  "b-given-a": "B ∣ A",
 };
 
 function buildPopulation(scenario: ScenarioId): PopulationMember[] {

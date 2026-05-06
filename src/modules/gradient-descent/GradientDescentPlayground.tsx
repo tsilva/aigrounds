@@ -239,10 +239,10 @@ function LossChart({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <LessonTitle>2. Watch One Update</LessonTitle>
         <div className="grid gap-2 sm:grid-cols-3">
-          <FactPill label="Position" value={`theta ${formatSigned(analysis.theta)}`} />
+          <FactPill label="Position" value={`θ ${formatSigned(analysis.theta)}`} />
           <FactPill
             label="Gradient"
-            value={`dL/dtheta ${formatSigned(analysis.gradient)}`}
+            value={`∂L/∂θ ${formatSigned(analysis.gradient)}`}
           />
           <FactPill label="Loss" value={formatNumber(analysis.loss, 3)} />
         </div>
@@ -346,7 +346,7 @@ function LossChart({
           textAnchor="start"
           className="font-serif text-[18px] fill-[#071024]"
         >
-          L(theta)
+          L(θ)
         </text>
         <text
           x={chart.width - chart.right - 2}
@@ -354,7 +354,7 @@ function LossChart({
           textAnchor="end"
           className="font-serif text-[18px] fill-[#071024]"
         >
-          theta
+          θ
         </text>
         <text
           x={xScale(minimumTheta)}
@@ -528,7 +528,7 @@ function PresetPanel({
                   {preset.label}
                 </span>
                 <span className="font-mono text-[12px] font-black">
-                  eta {formatNumber(preset.learningRate, 2)}
+                  η {formatNumber(preset.learningRate, 2)}
                 </span>
               </span>
               <span
@@ -571,7 +571,7 @@ function ControlsPanel({
       <div className="mt-5 grid gap-6">
         <Slider
           id="learning-rate"
-          label="Learning rate eta"
+          label="Learning rate η"
           min={0.02}
           max={1.8}
           step={0.01}
@@ -581,7 +581,7 @@ function ControlsPanel({
         />
         <Slider
           id="momentum"
-          label="Momentum beta"
+          label="Momentum β"
           min={0}
           max={0.9}
           step={0.01}
@@ -639,7 +639,7 @@ function MicroscopePanel({
       <LessonTitle>4. Next Step Microscope</LessonTitle>
       <div className="mt-4 rounded-[10px] border border-[#dedcff] bg-[#f8f7ff] px-4 py-4 font-mono text-[15px] font-black leading-[1.8] text-[#071024] sm:text-[17px]">
         <p>
-          theta_next ={" "}
+          θₙ₊₁ ={" "}
           <span className="text-[#2f39ff]">{formatNumber(state.theta, 2)}</span>
         </p>
         <p>
@@ -775,7 +775,7 @@ function TakeawayPanel({ state }: { state: DescentState }) {
         </div>
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
           <FactPill label="Step" value={String(state.step)} />
-          <FactPill label="Theta" value={formatSigned(state.theta, 3)} />
+          <FactPill label="θ" value={formatSigned(state.theta, 3)} />
           <FactPill label="Distance left" value={formatNumber(Math.abs(state.theta), 3)} />
         </div>
       </div>
@@ -885,7 +885,7 @@ export function GradientDescentPlayground() {
             </p>
           </div>
           <div className="rounded-[10px] border border-[#dedcff] bg-white px-5 py-3 text-center font-mono text-[13px] font-black text-[#2924ff] shadow-[0_12px_30px_rgba(26,38,80,0.04)]">
-            theta_next = theta - eta * gradient + beta * velocity
+            θₙ₊₁ = θₙ - η · ∇L(θₙ) + β · vₙ
           </div>
         </header>
 
@@ -929,7 +929,7 @@ export function GradientDescentPlayground() {
                   value={formatSigned(currentState.velocity, 3)}
                 />
                 <FactPill
-                  label="Next theta"
+                  label="Next θ"
                   value={formatSigned(analysis.nextTheta, 3)}
                 />
               </div>

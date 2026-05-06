@@ -99,10 +99,10 @@ export function analyzeLoss(
       const probability = probabilities[classItem.id] ?? 0;
 
       if (mode === "multilabel" && target === 0) {
-        return `(1 - ${target}) * log(1 - ${probability.toFixed(2)})`;
+        return `(1 − ${target}) × log(1 − ${probability.toFixed(2)})`;
       }
 
-      return `${target} * log(${probability.toFixed(2)})`;
+      return `${target} × log(${probability.toFixed(2)})`;
     }),
   };
 }

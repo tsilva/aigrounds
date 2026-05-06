@@ -65,52 +65,6 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M12 10.5v6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <circle cx="12" cy="7.4" r="1.15" fill="currentColor" />
-    </svg>
-  );
-}
-
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M9.7 9.2a2.4 2.4 0 0 1 4.7.6c0 2.3-2.4 2.1-2.4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.2"
-      />
-      <circle cx="12" cy="17" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function FactPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
@@ -177,27 +131,38 @@ function NumberLine({
   const rowsByPoint = new Map(
     analysis.rows.map((row) => [row.point.id, row]),
   );
+  const axisTop = 68;
 
   return (
     <div className="mt-6 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
       <div
         ref={trackRef}
-        className="relative h-[190px] select-none overflow-hidden rounded-[10px] bg-white px-4"
+        className="relative h-[260px] select-none overflow-hidden rounded-[10px] bg-white px-4"
       >
-        <div className="absolute right-4 left-4 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#cfd8ec]" />
+        <div className="absolute top-5 right-4 left-4 bottom-[88px] rounded-[10px] border border-[#eef2fb] bg-[#fbfcff]" />
+        <p className="absolute top-7 left-7 z-[3] rounded-full border border-[#dfe4f4] bg-white px-2.5 py-1 font-mono text-[10px] font-black tracking-normal text-[#52628a] uppercase shadow-[0_8px_16px_rgba(26,38,80,0.05)]">
+          distance lanes
+        </p>
+        <div
+          className="absolute right-4 left-4 h-1 -translate-y-1/2 rounded-full bg-[#cfd8ec]"
+          style={{ top: `${axisTop}%` }}
+        />
         {[0, 25, 50, 75, 100].map((tick) => (
           <div
             key={tick}
-            className="absolute top-1/2 h-4 w-px -translate-y-1/2 bg-[#9aa8c5]"
-            style={{ left: `calc(1rem + (100% - 2rem) * ${tick / 100})` }}
+            className="absolute h-4 w-px -translate-y-1/2 bg-[#9aa8c5]"
+            style={{
+              left: `calc(1rem + (100% - 2rem) * ${tick / 100})`,
+              top: `${axisTop}%`,
+            }}
           >
-            <span className="absolute top-5 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-[#52628a]">
+            <span className="absolute top-8 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-[#52628a]">
               {tick}
             </span>
           </div>
         ))}
         <div
-          className="absolute top-[22px] bottom-[36px] z-[1] w-1 -translate-x-1/2 rounded-full bg-[#071024]"
+          className="absolute top-[22px] bottom-[44px] z-[1] w-1 -translate-x-1/2 rounded-full bg-[#071024]"
           style={{
             left: `calc(1rem + (100% - 2rem) * ${analysis.mean / 100})`,
           }}
@@ -212,19 +177,36 @@ function NumberLine({
           const isLarge =
             row.point.id === analysis.largestDeviationPointId ||
             row.absoluteDeviation >= analysis.standardDeviation;
+          const laneTop = 48 + index * 15;
+          const laneColor = row.deviation < 0 ? "#2563eb" : "#ef4444";
 
           return (
-            <div
-              key={row.point.id}
-              className="absolute z-[2] h-2 -translate-y-1/2 rounded-full"
-              style={{
-                left: `calc(1rem + (100% - 2rem) * ${start / 100})`,
-                top: `calc(50% + ${(index - 3) * 8}px)`,
-                width: `calc((100% - 2rem) * ${Math.max(width, 0.8) / 100})`,
-                backgroundColor: isLarge ? "#ef4444" : "#2563eb",
-                opacity: 0.78,
-              }}
-            />
+            <div key={row.point.id}>
+              <div
+                className="absolute right-4 left-4 z-[1] h-px bg-[#edf1fa]"
+                style={{ top: `${laneTop}px` }}
+              />
+              <div
+                className="absolute z-[2] h-2 -translate-y-1/2 rounded-full"
+                style={{
+                  left: `calc(1rem + (100% - 2rem) * ${start / 100})`,
+                  top: `${laneTop}px`,
+                  width: `calc((100% - 2rem) * ${Math.max(width, 0.8) / 100})`,
+                  backgroundColor: laneColor,
+                  opacity: isLarge ? 0.9 : 0.58,
+                }}
+              />
+              <span
+                className="absolute z-[3] grid h-5 w-5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white font-mono text-[10px] font-black text-[#071024] shadow-[0_5px_12px_rgba(26,38,80,0.1)]"
+                style={{
+                  left: `calc(1rem + (100% - 2rem) * ${row.point.value / 100})`,
+                  top: `${laneTop}px`,
+                  background: row.point.color,
+                }}
+              >
+                {row.point.label}
+              </span>
+            </div>
           );
         })}
         {points.map((point) => {
@@ -261,7 +243,7 @@ function NumberLine({
               style={
                 {
                   left: `calc(1rem + (100% - 2rem) * ${point.value / 100})`,
-                  top: `calc(50% + ${topOffset}px)`,
+                  top: `calc(${axisTop}% + ${topOffset}px)`,
                   background: `linear-gradient(180deg, #ffffff 0%, ${point.color} 270%)`,
                 } as CSSProperties
               }
@@ -446,7 +428,7 @@ function DeviationPanel({ analysis }: { analysis: SpreadAnalysis }) {
             {analysis.story.variance}
           </p>
           <div className="mt-5 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 font-mono text-[13px] leading-[1.5] font-bold text-[#071024]">
-            sum squared deviations
+            Σ(x − x̄)²
             <br />= {analysis.squaredDeviationSum.toFixed(1)}
           </div>
         </div>
@@ -471,7 +453,7 @@ function FormulaPanel({ analysis }: { analysis: SpreadAnalysis }) {
                 Variance
               </p>
               <div className="mt-4 rounded-[8px] border border-[#e4e8f4] bg-white px-4 py-4 font-mono text-[15px] leading-[1.6] font-bold text-[#071024]">
-                variance = average((x - mean)^2)
+                σ² = mean((x − x̄)²)
                 <br />= {analysis.squaredDeviationSum.toFixed(1)} /{" "}
                 {analysis.count}
                 <br />= <span className="text-[#ef4444]">{analysis.variance.toFixed(1)}</span>
@@ -482,8 +464,8 @@ function FormulaPanel({ analysis }: { analysis: SpreadAnalysis }) {
                 Standard Deviation
               </p>
               <div className="mt-4 rounded-[8px] border border-[#e4e8f4] bg-white px-4 py-4 font-mono text-[15px] leading-[1.6] font-bold text-[#071024]">
-                std dev = sqrt(variance)
-                <br />= sqrt({analysis.variance.toFixed(1)})
+                σ = √σ²
+                <br />= √{analysis.variance.toFixed(1)}
                 <br />= <span className="text-[#16a34a]">{analysis.standardDeviation.toFixed(1)}</span>
               </div>
             </div>
@@ -668,26 +650,16 @@ export function VarianceStandardDeviationPlayground() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#f7f9ff] px-4 pt-5 pb-28 text-[#071024] sm:px-7 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-4">
-        <header className="flex flex-col gap-3 py-1 md:flex-row md:items-start md:justify-between">
+        <header className="py-1">
           <div>
-            <h1 className="flex items-center gap-2 text-[40px] leading-[0.98] font-black text-[#070b1a] sm:text-[56px]">
+            <h1 className="text-[40px] leading-[0.98] font-black text-[#070b1a] sm:text-[56px]">
               {"Variance & Standard Deviation Lab"}
-              <span className="text-[#315690]">
-                <InfoIcon />
-              </span>
             </h1>
             <p className="mt-3 max-w-4xl text-[18px] leading-[1.35] font-semibold text-[#30446f] sm:text-[21px]">
               Move values and watch squared distances turn spread into a
               typical distance.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex w-fit items-center justify-center gap-3 rounded-[10px] border border-[#dedcff] bg-white px-5 py-3 text-center font-mono text-[13px] font-black text-[#2924ff] shadow-[0_12px_30px_rgba(26,38,80,0.04)]"
-          >
-            <HelpIcon />
-            What is Std Dev?
-          </button>
         </header>
 
         <DatasetPanel

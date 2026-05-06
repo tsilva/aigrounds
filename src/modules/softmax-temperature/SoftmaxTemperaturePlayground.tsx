@@ -198,7 +198,7 @@ function TemperatureFormulaPanel({
             <sub className="text-[12px] text-[#ff2525] sm:text-[14px]">i</sub>
             <span className="text-[#ff2525]"> / T)</span> /{" "}
             <span className="text-[#2f39ff]">
-              &Sigma;
+              Σ
               <sub className="text-[12px] sm:text-[14px]">j</sub> exp(z
               <sub className="text-[12px] sm:text-[14px]">j</sub> / T)
             </span>
@@ -216,7 +216,7 @@ function TemperatureFormulaPanel({
               p
               <sub>{exampleClass.label}</sub> = exp(
               {formatNumber(exampleLogit, 1)} / {formatNumber(temperature, 2)})
-              / &Sigma; exp(z / T) = {formatPercent(exampleProbability)}
+              / Σ exp(z / T) = {formatPercent(exampleProbability)}
             </div>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {exampleRows.map((row) => (
@@ -611,7 +611,7 @@ export function SoftmaxTemperaturePlayground() {
             </p>
           </div>
           <div className="rounded-[10px] border border-[#dedcff] bg-white px-5 py-3 text-center font-mono text-[13px] font-black text-[#2924ff] shadow-[0_12px_30px_rgba(26,38,80,0.04)]">
-            z -&gt; softmax(z / T) -&gt; p
+            z → softmax(z / T) → p
           </div>
         </header>
 

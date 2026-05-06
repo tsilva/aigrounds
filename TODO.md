@@ -16,71 +16,89 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 4. [x] **Shape, Skew & Outliers Lab**
    Learn histograms, density shape, skew, tails, outliers, robustness, and why a single summary statistic is not enough. Add/remove outliers and compare histogram, box plot, and summary stats.
 
-5. **Probability Rules Simulator**
+5. [x] **Probability Rules Simulator**
    Learn sample spaces, events, complements, unions, intersections, mutually exclusive events, and basic probability arithmetic. Use dice/cards/spinners so probability starts as counting outcomes.
 
-6. **Conditional Probability & Independence Lab**
+6. [x] **Conditional Probability & Independence Lab**
    Learn conditional probability, joint probability, marginal probability, independence, dependence, and base rates. Filter a population grid and watch probabilities change as conditions are applied.
 
-7. **Bayes Rule Playground**
+7. [x] **Bayes Rule Playground**
    Learn Bayes theorem, priors, likelihoods, posteriors, false positives, false negatives, and base-rate neglect. Use a medical-test or fraud-detection scenario with adjustable prevalence and test accuracy.
 
-8. **Expected Value & Risk Lab**
+8. [x] **Expected Value & Risk Lab**
    Learn random variables, expected value, probability-weighted outcomes, variance of outcomes, and risk/reward tradeoffs. Build simple games or bets and compare long-run average outcomes.
 
-9. **Discrete Distributions Playground**
-   Learn Bernoulli, categorical, binomial, geometric, and Poisson distributions. Adjust parameters and watch probability mass move across outcomes.
+9. **Bernoulli, Categorical & Binomial Lab**
+   Learn Bernoulli trials, categorical outcomes, binomial counts, parameters, and probability mass. Adjust success probability and trial count to watch mass move across outcome counts.
 
-10. **Continuous Distributions Playground**
-    Learn uniform, normal, PDF, CDF, percentiles, z-scores, and probability as area under a curve. Move interval bounds and watch shaded probability update.
+10. **Waiting & Arrival Distributions Lab**
+    Learn geometric and Poisson distributions, waiting time, event counts, rates, and rare-event intuition. Tune event probability or arrival rate and compare likely waits or counts.
 
-11. **Sampling & Sample Size Lab**
+11. **PDF, CDF & Probability Area Lab**
+    Learn continuous random variables, uniform and normal shapes, PDFs, CDFs, percentiles, and probability as area under a curve. Move interval bounds and watch shaded probability update.
+
+12. **Normal Distribution & Z-Scores Lab**
+    Learn the normal distribution, mean, standard deviation, z-scores, tail probabilities, and percentile lookup. Move a value across a bell curve and connect raw units to standardized distance.
+
+13. **Sampling & Sample Size Lab**
     Learn population vs sample, random sampling, sample size, sampling variability, law of large numbers, and why bigger samples stabilize estimates. Repeatedly sample from a hidden population.
 
-12. **Sampling Bias Lab**
+14. **Sampling Bias Lab**
     Learn selection bias, survivorship bias, nonresponse bias, confounding from bad sampling, and why a large biased sample can still be wrong. Compare random samples with biased collection rules.
 
-13. **Standard Error & Margin of Error Lab**
+15. **Standard Error & Margin of Error Lab**
     Learn sampling distributions, standard error, margin of error, and how uncertainty shrinks with sample size. This is the bridge from sampling into confidence intervals.
 
-14. **Confidence Intervals Explorer**
+16. **Confidence Intervals Explorer**
     Learn confidence level, confidence intervals, coverage, interval width, and common misinterpretations. Run many simulated samples and show which intervals capture the true population value.
 
-15. **Hypothesis Testing Basics**
+17. **Hypothesis Testing Basics**
     Learn null hypothesis, alternative hypothesis, test statistic, p-value, significance level, and statistical decision rules. Use one clean A/B test with controllable difference between groups.
 
-16. **Errors, Power & Effect Size Lab**
+18. **Errors, Power & Effect Size Lab**
     Learn Type I error, Type II error, statistical power, effect size, sample size, and practical vs statistical significance. Show why "not significant" does not always mean "no effect."
 
-17. **Covariance & Correlation Map**
+19. **Covariance & Correlation Map**
     Learn covariance, Pearson correlation, correlation direction, correlation strength, and scale sensitivity. Drag points on a scatterplot and watch the metrics update.
 
-18. **Correlation Traps Lab**
-    Learn Spearman rank correlation, nonlinear relationships, outliers, Simpson's paradox intuition, confounders, and why correlation is not causation. Use multiple datasets that share similar correlations but tell different stories.
+20. **Correlation Shape & Outliers Lab**
+    Learn Spearman rank correlation, nonlinear relationships, outliers, and why similar Pearson correlations can hide different scatterplot shapes. Switch among datasets and drag outliers to compare correlation metrics.
 
-19. **Linear Regression Line Fitting**
+21. **Simpson's Paradox & Confounding Lab**
+    Learn confounders, grouped relationships, Simpson's paradox intuition, and why correlation is not causation. Toggle between subgroup and combined views to see the apparent relationship reverse.
+
+22. **Linear Regression Line Fitting**
     Learn slope, intercept, predictions, residuals, least squares, mean absolute error, and mean squared error. Drag a regression line before revealing the best-fit line.
 
-20. **R Squared & Residual Diagnostics**
+23. **R Squared & Residual Diagnostics**
     Learn R squared, adjusted R squared, residual plots, unexplained variance, overclaiming fit quality, and when a high R squared is misleading. Pair the same score with different residual patterns.
 
-21. **Train/Test Split & Generalization Lab**
+24. **Train/Test Split & Generalization Lab**
     Learn train/test split, validation sets, baseline models, generalization gap, data leakage, and why fitting known data is not the same as predicting new data.
 
-22. **Classification Metrics Foundations**
+25. **Classification Metrics Foundations**
     Learn accuracy, precision, recall, F1, specificity, sensitivity, false positives, false negatives, and class imbalance. Keep this focused on metric meaning before adding threshold curves.
 
-23. **Feature Scaling & Distance Lab**
-    Learn units, normalization, standardization, min-max scaling, Euclidean distance, Manhattan distance, and why scale changes k-NN, clustering, and gradient descent behavior.
+26. **Feature Scaling Lab**
+    Learn units, normalization, standardization, min-max scaling, and why feature scale changes model behavior. Rescale axes or features and watch the same points become comparable.
 
-24. **Entropy & Information Starter**
+27. **Distance Metrics Lab**
+    Learn Euclidean distance, Manhattan distance, nearest neighbors, and why distance depends on both metric choice and feature scale. Move points on a grid and compare nearest-neighbor decisions.
+
+28. **Entropy & Information Starter**
     Learn surprise, entropy, uncertainty, and information gain. Use guessing games or decision splits before introducing model loss functions.
 
-25. **Cross Entropy, KL & Log Loss Bridge**
-    Learn cross entropy, KL divergence intuition, log loss, calibrated probabilities, and why confident wrong predictions hurt. This should connect directly to the existing categorical cross entropy and softmax playgrounds.
+29. **Log Loss & Calibration Lab**
+    Learn log loss, calibrated probabilities, confidence, and why confident wrong predictions hurt. Compare predicted probabilities against observed frequencies to connect scoring with calibration.
 
-26. **Vectors, Projection & PCA Foundations**
-    Learn vectors, dimensions, dot products, projection, variance captured, principal components, and explained variance. This prepares users for embeddings, PCA, and representation learning.
+30. **KL Divergence Intuition Lab**
+    Learn KL divergence, reference distributions, model distributions, and why one distribution can be a poor approximation of another. Move probability mass between buckets and watch directional mismatch change.
+
+31. **Vector Geometry & Similarity Lab**
+    Learn vectors, dimensions, dot products, magnitude, cosine similarity, and nearest-neighbor intuition. Move vectors in 2D before connecting the same geometry to embeddings.
+
+32. **Projection Foundations Lab**
+    Learn projection, components, reconstruction error, variance captured, and why choosing an axis can preserve or lose structure. Rotate a projection axis and watch points collapse onto one dimension.
 
 ## Ranked Playground Ideas
 

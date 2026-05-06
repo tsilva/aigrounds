@@ -198,12 +198,23 @@ export function PlaygroundAssistantShell({
         <button
           type="button"
           onClick={() => setIsAssistantOpen(true)}
-          className="fixed right-4 bottom-4 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-slate-950 px-4 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(15,23,42,0.25)] transition hover:bg-slate-800"
+          className="fixed right-4 bottom-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 px-5 py-3 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none"
           aria-expanded={isAssistantOpen}
           aria-controls="playground-assistant-panel"
+          aria-label="Open chat"
         >
-          <span aria-hidden="true">?</span>
-          <span>Assistant</span>
+          <span
+            aria-hidden="true"
+            className="grid h-8 w-8 place-items-center rounded-full bg-indigo-500 font-mono text-base font-bold"
+          >
+            ?
+          </span>
+          <span className="flex flex-col leading-none">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-200">
+              AI Guide
+            </span>
+            <span className="mt-1 text-sm font-semibold">Open chat</span>
+          </span>
         </button>
       ) : null}
 

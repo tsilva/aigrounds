@@ -1,6 +1,6 @@
 ---
 name: aigrounds-learning-page
-description: Use when creating or updating an AI Grounds learning playground/page for a concept. The workflow must design the simplest memorable interactive teaching page in the existing AI Grounds design system, show an imagegen mockup to the user, iterate until explicit acceptance, then implement and hook it into the app.
+description: Use when creating or updating one or more AI Grounds learning playgrounds/pages for concepts. The workflow must design the simplest memorable interactive teaching page in the existing AI Grounds design system, show imagegen mockups to the user, iterate until explicit acceptance, then implement and hook the accepted playgrounds into the app. Supports explicit parallel batches such as "parallelize with 3".
 ---
 
 # AI Grounds Learning Page
@@ -15,6 +15,11 @@ applies when the user asks for the "next" page or "next task".
 When a task is selected from `TODO.md`, immediately edit `TODO.md` to mark that
 task as done before starting concept design, image generation, or implementation.
 
+If the user asks to parallelize with a number `N`, treat that as explicit
+permission to use subagents for this skill. Select the next `N` unchecked
+playground-sized items in `TODO.md` unless the user names specific concepts.
+Immediately mark those `N` TODO items done before design work begins.
+
 ## Hard Rules
 
 - Do not implement before the user explicitly accepts a visual design.
@@ -24,6 +29,7 @@ task as done before starting concept design, image generation, or implementation
 - Match the existing AI Grounds design system; the canonical reference screenshot is `assets/cross-entropy-design-reference.png`.
 - Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
 - Do not show a generated mockup if it violates the reference structure. Regenerate it first.
+- In a parallel batch, do not dispatch implementation subagents until the user has explicitly accepted the final mockup for every lesson in the batch.
 
 ## Workflow
 
@@ -73,6 +79,53 @@ task as done before starting concept design, image generation, or implementation
    - Exercise the primary interaction at low, middle, and high settings. Confirm it updates at least two teaching surfaces, such as a chart plus metrics or a formula plus narration.
    - Inspect browser screenshots for SVG/canvas overflow, clipped controls, cramped numeric pills, and visualizations escaping their plot bounds.
    - Check browser console errors before considering verification complete.
+
+## Parallel Batch Workflow
+
+Use this section only when the user explicitly asks to parallelize or gives a
+batch size, for example "parallelize with 3".
+
+1. Select the batch.
+   - If no concepts are named, inspect `TODO.md` and select the next `N`
+     unchecked playground-sized items.
+   - Mark all selected TODO items done immediately, before design, image
+     generation, or implementation work begins.
+   - Assign each lesson a stable label such as `Lesson 1: Variance` so the user
+     can request targeted revisions.
+
+2. Parallelize design.
+   - Spawn exactly `N` design subagents, one per lesson.
+   - Each design subagent must inspect `assets/cross-entropy-design-reference.png`,
+     identify the core intuition, choose the smallest interaction, generate or
+     request an imagegen mockup, self-check it against the reference invariants,
+     and return a concise design summary plus the mockup.
+   - Present all `N` accepted-by-agent mockups to the user together, grouped by
+     lesson label.
+
+3. Iterate per lesson.
+   - When the user asks to tweak one lesson, route only that lesson back through
+     design revision and imagegen.
+   - Preserve the other accepted mockups unchanged.
+   - Keep showing the current batch state until the user explicitly confirms the
+     final design set.
+
+4. Parallelize implementation after final confirmation.
+   - Dispatch exactly `N` implementation subagents, one per accepted lesson.
+   - Tell each worker it is not alone in the codebase, must not revert edits made
+     by others, and must adapt to concurrent changes.
+   - Give each worker disjoint ownership of its `src/modules/{slug}/` directory.
+     Avoid assigning shared files such as `src/lib/playgrounds.ts`, the home
+     page, or `README.md` to multiple workers unless ownership is explicitly
+     divided.
+   - Prefer having workers implement module files and return the registry/home
+     metadata they need. The main agent should integrate shared files after the
+     workers finish to avoid merge conflicts.
+
+5. Verify the batch.
+   - Run the normal verification workflow for every new playground.
+   - Check `/` links to each lesson and each lesson works on desktop and mobile.
+   - Exercise the primary interaction for each lesson at low, middle, and high
+     settings before handing control back.
 
 ## Design System
 

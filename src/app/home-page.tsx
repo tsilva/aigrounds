@@ -117,7 +117,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
 
 function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
   const tileClassName =
-    "group flex min-h-72 flex-col rounded-xl border border-blue-100 bg-white p-5 shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)]";
+    "group flex min-h-56 flex-col rounded-xl border border-blue-100 bg-white p-5 shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)]";
   const content = (
     <>
       <div className="flex items-start justify-between gap-4">
@@ -140,22 +140,6 @@ function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
       <p className="mt-3 text-sm leading-6 text-slate-600">
         {playground.outcome}.
       </p>
-
-      <div className="mt-auto flex items-end justify-between gap-4 pt-8">
-        <div className="space-y-2 font-mono text-xs text-slate-500">
-          <p>{playground.duration}</p>
-          <p>{playground.concepts.length} concepts</p>
-        </div>
-        <span
-          className={
-            playground.status === "live"
-              ? "rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition group-hover:bg-indigo-700"
-              : "rounded-lg border border-blue-100 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-500"
-          }
-        >
-          {playground.status === "live" ? "Open" : "Soon"}
-        </span>
-      </div>
     </>
   );
 

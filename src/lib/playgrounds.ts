@@ -1,4 +1,5 @@
 import { type ComponentType } from "react";
+import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { ConditionalProbabilityPlayground } from "@/modules/conditional-probability/ConditionalProbabilityPlayground";
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
@@ -32,6 +33,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "categorical-cross-entropy": CategoricalCrossEntropyPlayground,
   "probability-rules": ProbabilityRulesPlayground,
   "conditional-probability": ConditionalProbabilityPlayground,
+  "bayes-rule": BayesRulePlayground,
   "softmax-temperature": SoftmaxTemperaturePlayground,
   "gradient-descent": GradientDescentPlayground,
   "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,

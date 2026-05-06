@@ -184,6 +184,7 @@ function ArrowLine({
   color,
   markerId,
   width = 4,
+  opacity = 1,
 }: {
   x1: number;
   y1: number;
@@ -192,6 +193,7 @@ function ArrowLine({
   color: string;
   markerId: string;
   width?: number;
+  opacity?: number;
 }) {
   return (
     <line
@@ -202,6 +204,7 @@ function ArrowLine({
       stroke={color}
       strokeLinecap="round"
       strokeWidth={width}
+      opacity={opacity}
       markerEnd={`url(#${markerId})`}
     />
   );
@@ -257,23 +260,25 @@ function LossChart({
         <defs>
           <marker
             id="gradient-arrow"
+            markerHeight="7"
+            markerUnits="userSpaceOnUse"
+            markerWidth="7"
+            orient="auto"
+            refX="6"
+            refY="3.5"
+          >
+            <path d="M0 0 7 3.5 0 7Z" fill="#ff7a68" />
+          </marker>
+          <marker
+            id="step-arrow"
             markerHeight="8"
+            markerUnits="userSpaceOnUse"
             markerWidth="8"
             orient="auto"
             refX="7"
             refY="4"
           >
-            <path d="M0 0 8 4 0 8Z" fill="#ff3b2f" />
-          </marker>
-          <marker
-            id="step-arrow"
-            markerHeight="9"
-            markerWidth="9"
-            orient="auto"
-            refX="8"
-            refY="4.5"
-          >
-            <path d="M0 0 9 4.5 0 9Z" fill="#352cff" />
+            <path d="M0 0 8 4 0 8Z" fill="#6570ff" />
           </marker>
         </defs>
 
@@ -401,18 +406,20 @@ function LossChart({
           y1={currentY - 18}
           x2={gradientEndX}
           y2={gradientEndY - 18}
-          color="#ff3b2f"
+          color="#ff7a68"
           markerId="gradient-arrow"
-          width={5}
+          opacity={0.68}
+          width={2.5}
         />
         <ArrowLine
           x1={currentX}
           y1={currentY + 20}
           x2={nextX}
           y2={nextY + 20}
-          color="#352cff"
+          color="#6570ff"
           markerId="step-arrow"
-          width={6}
+          opacity={0.55}
+          width={2.5}
         />
         <circle
           cx={nextX}

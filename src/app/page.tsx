@@ -17,7 +17,7 @@ export default function Home() {
     tag: playground.tag,
     outcome: compactOutcome(playground.summary),
     duration: playground.estimatedDuration,
-    level: `level ${String(index + 1).padStart(2, "0")}`,
+    level: `lesson ${String(index + 1).padStart(2, "0")}`,
     concepts: playground.concepts,
     status: "live",
     href: `/playgrounds/${playground.slug}`,
@@ -30,7 +30,7 @@ export default function Home() {
     tag: "concept",
     outcome: compactOutcome(playground.summary),
     duration: "coming soon",
-    level: `level ${String(liveCards.length + index + 1).padStart(2, "0")}`,
+    level: `lesson ${String(liveCards.length + index + 1).padStart(2, "0")}`,
     concepts: [],
     status: "coming-soon",
   }));

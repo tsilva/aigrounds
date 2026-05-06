@@ -11,8 +11,8 @@ import {
 } from "react";
 import {
   getPlaygroundMetadataFromPathname,
-  type TutorStep,
 } from "@/lib/playground-metadata";
+import { type TutorStep } from "@/lib/tutor-plans";
 import {
   isChatStreamEvent,
   type ChatRole,
@@ -610,10 +610,7 @@ export function PlaygroundAssistantShell({
     () => getPlaygroundMetadataFromPathname(pathname),
     [pathname],
   );
-  const tutorPlan =
-    playgroundContext?.slug === "gradient-descent"
-      ? playgroundContext.tutorPlan
-      : undefined;
+  const tutorPlan = playgroundContext?.tutorPlan;
   const currentTutorStep = tutorPlan?.steps[tutorStepIndex];
 
   useEffect(() => {
@@ -915,8 +912,7 @@ export function PlaygroundAssistantShell({
       return [
         {
           label: "Guide me",
-          message:
-            "Guide me through the Gradient Descent Playground one experiment at a time. Start with the first experiment and ask me to predict what will happen.",
+          message: `Guide me through ${playgroundName} one experiment at a time. Start with the first experiment and ask me to predict what will happen.`,
           requestPhase: "start",
           nextPhase: "predict",
           nextStepIndex: 0,
@@ -985,7 +981,7 @@ export function PlaygroundAssistantShell({
           {
             label: "Finish summary",
             message:
-              "Wrap up the guided lab. Ask me to explain the learning-rate and momentum tradeoff back in my own words.",
+              "Wrap up the guided lab. Ask me to explain the main lesson in my own words.",
             requestPhase: "complete",
             nextPhase: "complete",
             nextStepIndex: tutorStepIndex,
@@ -1015,20 +1011,19 @@ export function PlaygroundAssistantShell({
     return [
       {
         label: "Quiz me",
-        message:
-          "Quiz me on the four Gradient Descent Playground experiments, one question at a time.",
+        message: `Quiz me on the ${playgroundName} guided experiments, one question at a time.`,
         requestPhase: "complete",
         nextPhase: "complete",
       },
     ];
-  }, [isTutorActive, tutorPhase, tutorPlan, tutorStepIndex]);
+  }, [isTutorActive, playgroundName, tutorPhase, tutorPlan, tutorStepIndex]);
   const tutorProgress =
     isTutorActive && tutorPlan && currentTutorStep
       ? `Guide ${tutorStepIndex + 1}/${tutorPlan.steps.length}: ${
           currentTutorStep.title
         }`
       : tutorPlan
-        ? "Gradient descent tutor"
+        ? `${playgroundName} tutor`
         : undefined;
 
   const assistantPanel = (
@@ -1161,6 +1156,17 @@ function ChatPanel({
     [messages, screenshotActions],
   );
 
+  useEffect(() => {
+    const textarea = textareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [draft, textareaRef]);
+
   return (
     <section
       id="playground-assistant-panel"
@@ -1230,7 +1236,7 @@ function ChatPanel({
 
       <form
         onSubmit={onSubmit}
-        className="border-t border-slate-200 bg-white px-4 py-4"
+        className="border-t border-slate-200 bg-white px-4 py-3"
       >
         {error ? (
           <p className="mb-3 rounded-[10px] border border-rose-200 bg-rose-50 px-3 py-2 text-sm leading-5 text-rose-700">
@@ -1259,26 +1265,17 @@ function ChatPanel({
             value={draft}
             onChange={(event) => onDraftChange(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
+              if (event.key === "Enter" && !event.altKey) {
                 event.preventDefault();
                 event.currentTarget.form?.requestSubmit();
               }
             }}
-            placeholder="Ask what to try next"
-            rows={3}
-            className="max-h-40 min-h-24 w-full resize-none rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+            placeholder="Ask next. Enter submits."
+            rows={1}
+            className="min-h-10 w-full resize-none overflow-hidden rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
+            disabled={isSending}
           />
         </label>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="font-mono text-[11px] text-slate-400">Enter to send</p>
-          <button
-            type="submit"
-            disabled={!draft.trim() || isSending}
-            className="inline-flex h-10 items-center rounded-full bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-          >
-            {isSending ? "Sending" : "Send"}
-          </button>
-        </div>
       </form>
     </section>
   );

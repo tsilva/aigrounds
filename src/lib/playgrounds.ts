@@ -10,6 +10,7 @@ import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
 import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
 import { QLearningPlayground } from "@/modules/q-learning/QLearningPlayground";
 import { RangeQuartilesIqrPlayground } from "@/modules/range-quartiles-iqr/RangeQuartilesIqrPlayground";
+import { ShapeSkewOutliersPlayground } from "@/modules/shape-skew-outliers/ShapeSkewOutliersPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
 
 type Theme = {
@@ -84,6 +85,31 @@ export const activePlaygrounds: ActivePlayground[] = [
       badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
     },
     component: RangeQuartilesIqrPlayground,
+    presentation: "immersive",
+  },
+  {
+    slug: "shape-skew-outliers",
+    title: "Shape, Skew & Outliers Lab",
+    kicker:
+      "Move one outlier and watch the histogram, box plot, and summaries disagree.",
+    summary:
+      "Choose a distribution shape, slide an outlier across the scale, and compare how mean, median, range, and IQR respond when tails stretch.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Histograms",
+      "Skew",
+      "Outliers",
+      "Robust summaries",
+    ],
+    learningGoals: [
+      "Recognize distribution shape from pile-ups, tails, and clusters.",
+      "See how outliers can pull the mean and range more than the median and IQR.",
+      "Understand why a histogram and box plot explain what one summary number hides.",
+    ],
+    theme: {
+      badgeClassName: "border-sky-300 bg-sky-100 text-sky-950",
+    },
+    component: ShapeSkewOutliersPlayground,
     presentation: "immersive",
   },
   {

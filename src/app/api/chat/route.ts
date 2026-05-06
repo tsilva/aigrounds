@@ -32,7 +32,7 @@ type OpenRouterResponse = {
 };
 
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
-const DEFAULT_MODEL = "openai/gpt-4o-mini";
+const DEFAULT_MODEL = "openai/gpt-5.5";
 const MAX_MESSAGES = 16;
 const MAX_CONTENT_LENGTH = 4000;
 

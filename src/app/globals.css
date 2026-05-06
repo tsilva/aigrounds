@@ -91,3 +91,13 @@ a {
 .pulse-ring {
   animation: pulse-ring 1.5s ease-out infinite;
 }
+
+.playground-page-with-home > main {
+  padding-top: calc(env(safe-area-inset-top) + 5rem);
+}
+
+@media (min-width: 640px) {
+  .playground-page-with-home > main {
+    padding-top: calc(env(safe-area-inset-top) + 5.5rem);
+  }
+}

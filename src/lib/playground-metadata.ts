@@ -1,19 +1,10 @@
+import {
+  playgroundTutorPlans,
+  type TutorPlan,
+} from "@/lib/tutor-plans";
+
 type Theme = {
   badgeClassName: string;
-};
-
-export type TutorStep = {
-  title: string;
-  experiment: string;
-  predictionQuestion: string;
-  observationPrompt: string;
-  observationOptions: string[];
-  takeaway: string;
-};
-
-export type TutorPlan = {
-  intro: string;
-  steps: TutorStep[];
 };
 
 export type PlaygroundMetadata = {
@@ -26,7 +17,7 @@ export type PlaygroundMetadata = {
   concepts: string[];
   learningGoals: string[];
   presentation: "standard" | "immersive";
-  tutorPlan?: TutorPlan;
+  tutorPlan: TutorPlan;
   theme: Theme;
 };
 
@@ -58,6 +49,7 @@ export const activePlaygroundMetadata = [
       "Recognize mode as the most common value and when a dataset has no mode.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["mean-median-mode"],
     theme: {
       badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
     },
@@ -83,6 +75,7 @@ export const activePlaygroundMetadata = [
       "Recognize why IQR describes the middle 50% and resists outliers better than range.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["range-quartiles-iqr"],
     theme: {
       badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
     },
@@ -108,6 +101,7 @@ export const activePlaygroundMetadata = [
       "Recognize standard deviation as a typical distance from the mean in the original units.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["variance-standard-deviation"],
     theme: {
       badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
     },
@@ -133,6 +127,7 @@ export const activePlaygroundMetadata = [
       "Understand why a histogram and box plot explain what one summary number hides.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["shape-skew-outliers"],
     theme: {
       badgeClassName: "border-sky-300 bg-sky-100 text-sky-950",
     },
@@ -158,6 +153,7 @@ export const activePlaygroundMetadata = [
       "Recognize that multi-label cross entropy treats every label as an independent binary question.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["categorical-cross-entropy"],
     theme: {
       badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
     },
@@ -183,6 +179,7 @@ export const activePlaygroundMetadata = [
       "Recognize why union probability subtracts overlap that was counted twice.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["probability-rules"],
     theme: {
       badgeClassName: "border-sky-300 bg-sky-100 text-sky-950",
     },
@@ -208,8 +205,35 @@ export const activePlaygroundMetadata = [
       "Recognize independence as the case where filtering by A does not change the probability of B.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["conditional-probability"],
     theme: {
       badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+  },
+  {
+    slug: "bayes-rule",
+    title: "Bayes Rule Playground",
+    tag: "probability",
+    kicker:
+      "Tune base rates and test errors to see why a positive signal can still be uncertain.",
+    summary:
+      "Adjust prevalence, sensitivity, and false-positive rate in a rare-event scenario. The lab shows how true positives and false positives combine into the posterior probability after evidence arrives.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Bayes theorem",
+      "Priors",
+      "Likelihoods",
+      "False positives",
+    ],
+    learningGoals: [
+      "Understand the prior as the number of real cases available before evidence.",
+      "See how sensitivity and false-positive rate create the positive-test denominator.",
+      "Recognize why rare base rates can make a positive result less certain than expected.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["bayes-rule"],
+    theme: {
+      badgeClassName: "border-emerald-300 bg-emerald-100 text-emerald-950",
     },
   },
   {
@@ -233,6 +257,7 @@ export const activePlaygroundMetadata = [
       "Recognize the difference between a sharp and a high-entropy prediction.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["softmax-temperature"],
     theme: {
       badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
     },
@@ -258,76 +283,7 @@ export const activePlaygroundMetadata = [
       "Recognize how momentum carries previous updates and can speed convergence or overshoot.",
     ],
     presentation: "immersive",
-    tutorPlan: {
-      intro:
-        "Work through four tiny experiments. Predict first, change the controls, observe the graph, then explain what you learned.",
-      steps: [
-        {
-          title: "Make descent crawl",
-          experiment:
-            "Choose Creep, press Reset, then press Step three times. Watch the point and the loss value.",
-          predictionQuestion:
-            "Before stepping, do you expect θ to move a little or a lot each step?",
-          observationPrompt:
-            "What did you notice about the point and the loss after three tiny steps?",
-          observationOptions: [
-            "It moved slowly",
-            "Loss changed only a little",
-            "I am not sure",
-          ],
-          takeaway:
-            "A small learning rate follows the downhill direction but makes tiny updates, so progress is stable and slow.",
-        },
-        {
-          title: "Find a useful step",
-          experiment:
-            "Choose Converge, press Reset, then press Step two or three times. Compare the point's path to Creep.",
-          predictionQuestion:
-            "What do you think a useful learning rate should do differently from Creep?",
-          observationPrompt:
-            "What changed faster this time: θ, loss, or both?",
-          observationOptions: [
-            "θ moved near the valley",
-            "Loss dropped faster",
-            "I am not sure",
-          ],
-          takeaway:
-            "A useful learning rate makes visible progress toward the minimum without jumping wildly across the valley.",
-        },
-        {
-          title: "Force an overshoot",
-          experiment:
-            "Choose Overshoot, press Reset, then press Step once or twice. Watch whether the point crosses the minimum.",
-          predictionQuestion:
-            "If the learning rate is too large, where do you expect the next point to land?",
-          observationPrompt:
-            "What did the point do relative to the minimum?",
-          observationOptions: [
-            "It jumped across the minimum",
-            "The step was too large",
-            "I am not sure",
-          ],
-          takeaway:
-            "A large learning rate can still point downhill locally, but the step can be so long that it launches past the minimum.",
-        },
-        {
-          title: "Test momentum",
-          experiment:
-            "Choose Converge, press Reset, raise Momentum β toward heavy, then press Step several times. Compare it with low momentum.",
-          predictionQuestion:
-            "What do you expect momentum to carry from one step into the next?",
-          observationPrompt:
-            "How did the path change when previous movement carried into later steps?",
-          observationOptions: [
-            "Momentum carried the point forward",
-            "It sped up but could overshoot",
-            "I am not sure",
-          ],
-          takeaway:
-            "Momentum reuses previous motion. It can speed travel on smooth slopes, but too much carry-over can push past the valley.",
-        },
-      ],
-    },
+    tutorPlan: playgroundTutorPlans["gradient-descent"],
     theme: {
       badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
     },
@@ -353,6 +309,7 @@ export const activePlaygroundMetadata = [
       "Recognize how precision, recall, and F1 summarize different mistake costs.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
     theme: {
       badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
     },
@@ -378,6 +335,7 @@ export const activePlaygroundMetadata = [
       "Recognize the useful middle between underfitting and overfitting.",
     ],
     presentation: "immersive",
+    tutorPlan: playgroundTutorPlans.overfitting,
     theme: {
       badgeClassName: "border-orange-300 bg-orange-100 text-orange-950",
     },

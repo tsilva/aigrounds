@@ -22,7 +22,7 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 6. [x] **Conditional Probability & Independence Lab**
    Learn conditional probability, joint probability, marginal probability, independence, dependence, and base rates. Filter a population grid and watch probabilities change as conditions are applied.
 
-7. **Bayes Rule Playground**
+7. [x] **Bayes Rule Playground**
    Learn Bayes theorem, priors, likelihoods, posteriors, false positives, false negatives, and base-rate neglect. Use a medical-test or fraud-detection scenario with adjustable prevalence and test accuracy.
 
 8. **Expected Value & Risk Lab**
@@ -100,6 +100,12 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 32. **Projection Foundations Lab**
     Learn projection, components, reconstruction error, variance captured, and why choosing an axis can preserve or lose structure. Rotate a projection axis and watch points collapse onto one dimension.
 
+33. **Embedding Retrieval Lab**
+    Learn embeddings, query vectors, document vectors, cosine similarity ranking, nearest-neighbor retrieval, and why semantic search depends on geometry. Move a query point and watch retrieved items reorder.
+
+34. **Contrastive Loss Lab**
+    Learn anchor, positive, and negative examples, pair similarity, margins, temperature, and why representation learning pulls matching pairs together while pushing mismatches apart. Move embedding points and tune the margin or temperature to watch pairwise loss terms change.
+
 ## Ranked Playground Ideas
 
 1. [x] **Softmax Temperature Lab**
@@ -114,20 +120,14 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 4. [x] **Overfitting Lab**
    Fit curves to noisy data while changing model complexity. Show train loss dropping while test loss gets worse.
 
-5. **Embedding Similarity Explorer**
-   Move vectors around and watch cosine similarity, nearest neighbors, and retrieval rankings change. Strong bridge from keyword search to semantic search.
-
-6. **K-Means Clustering Studio**
+5. **K-Means Clustering Studio**
    Place points and centroids, then step through assign/update cycles. Simple, visual, and satisfying.
 
-7. **Backpropagation Inspector**
+6. **Backpropagation Inspector**
    Use a tiny neural net to show forward activations and backward gradients. Powerful, but harder to make beginner-friendly on one page.
 
-8. **Regularization Lab**
+7. **Regularization Lab**
    Compare no regularization, L1, and L2 while weights and decision boundaries change. Best if paired with overfitting.
 
-9. **PCA Projection Lab**
-   Rotate a projection axis and show variance captured. Good visual geometry, but a little less central than the others.
-
-10. **ROC vs Precision-Recall Curves**
+8. **ROC vs Precision-Recall Curves**
     Move a threshold across classifier scores and trace both curves. Useful, but probably better after the confusion-matrix module exists.

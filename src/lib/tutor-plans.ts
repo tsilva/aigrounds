@@ -1,0 +1,694 @@
+type TutorPlanSlug =
+  | "mean-median-mode"
+  | "range-quartiles-iqr"
+  | "variance-standard-deviation"
+  | "shape-skew-outliers"
+  | "categorical-cross-entropy"
+  | "probability-rules"
+  | "conditional-probability"
+  | "bayes-rule"
+  | "softmax-temperature"
+  | "gradient-descent"
+  | "confusion-matrix-thresholds"
+  | "overfitting";
+
+export type TutorStep = {
+  title: string;
+  experiment: string;
+  predictionQuestion: string;
+  observationPrompt: string;
+  observationOptions: string[];
+  takeaway: string;
+};
+
+export type TutorPlan = {
+  intro: string;
+  steps: TutorStep[];
+};
+
+export const playgroundTutorPlans = {
+  "mean-median-mode": {
+    intro:
+      "Work through three small experiments. Predict first, change the data, observe the summaries, then explain which measure of typical stayed useful.",
+    steps: [
+      {
+        title: "Compare one calm center",
+        experiment:
+          "Choose Balanced. Watch the number line, sorted values, and the Mean, Median, and Mode panels.",
+        predictionQuestion:
+          "When the values are fairly even, which typical value do you expect to best describe the middle?",
+        observationPrompt:
+          "What did you notice about the mean and median in the balanced data?",
+        observationOptions: [
+          "Mean and median nearly matched",
+          "No single repeated value mattered",
+          "I am not sure",
+        ],
+        takeaway:
+          "When data is fairly symmetric, the mean and median tell a similar center story.",
+      },
+      {
+        title: "Create a mode",
+        experiment:
+          "Choose Repeated Peak. Compare the repeated value pill with the Mode panel.",
+        predictionQuestion:
+          "What do you expect the mode to do when one value appears several times?",
+        observationPrompt:
+          "Which summary changed because a value repeated?",
+        observationOptions: [
+          "Mode locked onto the repeat",
+          "Mean still balanced all values",
+          "I am not sure",
+        ],
+        takeaway:
+          "Mode is about frequency, not balance or position, so repeats can make it the clearest typical value.",
+      },
+      {
+        title: "Pull with an outlier",
+        experiment:
+          "Choose Add Outlier, then nudge the far-right point. Watch the mean marker and median marker.",
+        predictionQuestion:
+          "Which should move more when one extreme value moves: mean or median?",
+        observationPrompt:
+          "What happened to the center summaries when the outlier was far away?",
+        observationOptions: [
+          "Mean moved toward the outlier",
+          "Median stayed closer to the middle",
+          "I am not sure",
+        ],
+        takeaway:
+          "The mean uses every value and gets pulled by extremes; the median uses sorted position and is more resistant.",
+      },
+    ],
+  },
+  "range-quartiles-iqr": {
+    intro:
+      "Work through three spread experiments. Predict what will stretch, change one view, then connect the box plot to the five-number summary.",
+    steps: [
+      {
+        title: "Read the full span",
+        experiment:
+          "Choose Compact. Compare the minimum, maximum, range bar, and box plot whiskers.",
+        predictionQuestion:
+          "If the smallest and largest values are close together, what should happen to the range?",
+        observationPrompt:
+          "How did the whiskers and range read in the compact dataset?",
+        observationOptions: [
+          "Range stayed short",
+          "Whiskers covered the full span",
+          "I am not sure",
+        ],
+        takeaway:
+          "Range is only maximum minus minimum, so it describes the full span from the two edge values.",
+      },
+      {
+        title: "Open the middle box",
+        experiment:
+          "Choose Wide Middle. Watch Q1, Q3, IQR, and the box width.",
+        predictionQuestion:
+          "What should happen to IQR when the middle half of the values spreads out?",
+        observationPrompt:
+          "What changed in the five-number summary and box plot?",
+        observationOptions: [
+          "The box got wider",
+          "IQR increased",
+          "I am not sure",
+        ],
+        takeaway:
+          "IQR measures Q3 minus Q1, so it grows when the middle 50% spreads apart.",
+      },
+      {
+        title: "Stretch one edge",
+        experiment:
+          "Choose Outlier, then move the far point farther right. Compare Range with IQR.",
+        predictionQuestion:
+          "Which spread summary should react more to one far edge value: range or IQR?",
+        observationPrompt:
+          "What did the outlier do to the whisker and the middle box?",
+        observationOptions: [
+          "Range stretched a lot",
+          "IQR stayed steadier",
+          "I am not sure",
+        ],
+        takeaway:
+          "Range follows the extremes, while IQR focuses on the middle half and resists a single outlier better.",
+      },
+    ],
+  },
+  "variance-standard-deviation": {
+    intro:
+      "Work through three spread experiments. Predict how distances from the mean behave, then connect deviations, variance, and standard deviation.",
+    steps: [
+      {
+        title: "Start with short deviations",
+        experiment:
+          "Choose Tight. Look at the deviation bars and the variance formula rows.",
+        predictionQuestion:
+          "If most points sit near the mean, what should happen to variance and standard deviation?",
+        observationPrompt:
+          "What did the short deviation bars do to the squared terms?",
+        observationOptions: [
+          "Squared distances stayed small",
+          "Standard deviation was low",
+          "I am not sure",
+        ],
+        takeaway:
+          "Small distances from the mean produce small squared deviations, so both variance and standard deviation stay low.",
+      },
+      {
+        title: "Spread the same mean",
+        experiment:
+          "Choose Balanced, then Wide. Notice that the mean stays at 50 while the points spread.",
+        predictionQuestion:
+          "Can standard deviation change even when the mean stays the same?",
+        observationPrompt:
+          "What changed when the center stayed fixed but points moved away?",
+        observationOptions: [
+          "Spread increased",
+          "Standard deviation increased",
+          "I am not sure",
+        ],
+        takeaway:
+          "Standard deviation measures typical distance from the mean, so it can change even when the mean does not.",
+      },
+      {
+        title: "Watch squaring amplify edges",
+        experiment:
+          "Choose Wide, then nudge an edge point farther from 50. Compare deviation with squared deviation.",
+        predictionQuestion:
+          "What should squaring do to a point that is very far from the mean?",
+        observationPrompt:
+          "Which row dominated the variance calculation?",
+        observationOptions: [
+          "Far points dominated",
+          "Squared terms grew fast",
+          "I am not sure",
+        ],
+        takeaway:
+          "Squaring makes large deviations count much more, which is why far-away values can dominate variance.",
+      },
+    ],
+  },
+  "shape-skew-outliers": {
+    intro:
+      "Work through three distribution-shape experiments. Predict the shape first, move the outlier, then decide which summary is trustworthy.",
+    steps: [
+      {
+        title: "Read a skewed tail",
+        experiment:
+          "Choose Right Skew. Compare the histogram pile-up zone with the long tail direction.",
+        predictionQuestion:
+          "Where do you expect most values to sit when a distribution is right-skewed?",
+        observationPrompt:
+          "What did the histogram show about pile-up and tail direction?",
+        observationOptions: [
+          "Most values were lower",
+          "The tail stretched high",
+          "I am not sure",
+        ],
+        takeaway:
+          "Skew describes tail direction: right skew means most values are lower with a long tail toward high values.",
+      },
+      {
+        title: "Move the outlier",
+        experiment:
+          "Drag the outlier slider from Center to High tail. Watch mean, median, range, and IQR.",
+        predictionQuestion:
+          "Which summaries should react most when one value moves far into the tail?",
+        observationPrompt:
+          "What changed most when the outlier moved away from the pile-up?",
+        observationOptions: [
+          "Mean and range moved most",
+          "Median and IQR stayed steadier",
+          "I am not sure",
+        ],
+        takeaway:
+          "Outliers pull summaries that use extremes or every value, while median and IQR stay more robust.",
+      },
+      {
+        title: "Spot hidden clusters",
+        experiment:
+          "Choose Two Clusters. Compare the histogram with the mean and median markers.",
+        predictionQuestion:
+          "Can one center value describe a dataset split into two piles?",
+        observationPrompt:
+          "What did the histogram reveal that the center summaries hid?",
+        observationOptions: [
+          "There were two piles",
+          "One center hid the split",
+          "I am not sure",
+        ],
+        takeaway:
+          "Shape matters because one summary number can hide clusters, gaps, skew, and outliers.",
+      },
+    ],
+  },
+  "categorical-cross-entropy": {
+    intro:
+      "Work through three loss experiments. Predict which probability matters, change the target or prediction, then connect surprise to loss.",
+    steps: [
+      {
+        title: "Reward the true outcome",
+        experiment:
+          "Use Binary Cross Entropy. Select the true outcome, then raise its predicted probability.",
+        predictionQuestion:
+          "What should happen to loss when the model assigns more probability to what actually happened?",
+        observationPrompt:
+          "How did the loss respond as the true outcome probability increased?",
+        observationOptions: [
+          "Loss went down",
+          "The model was less surprised",
+          "I am not sure",
+        ],
+        takeaway:
+          "Cross entropy is low when the prediction puts high probability on the true outcome.",
+      },
+      {
+        title: "Punish confident wrong guesses",
+        experiment:
+          "Switch to Categorical Cross Entropy. Put low probability on the selected true class and watch the loss.",
+        predictionQuestion:
+          "What should happen when the true class gets almost no probability?",
+        observationPrompt:
+          "What did the loss do when the model was confident in the wrong direction?",
+        observationOptions: [
+          "Loss became large",
+          "The true class probability drove it",
+          "I am not sure",
+        ],
+        takeaway:
+          "Categorical cross entropy mostly cares about the probability assigned to the one true class.",
+      },
+      {
+        title: "Treat labels independently",
+        experiment:
+          "Switch to Multi-label Cross Entropy. Select multiple true labels, then raise true labels and lower false labels.",
+        predictionQuestion:
+          "Should multi-label probabilities need to add up to 1?",
+        observationPrompt:
+          "What happened when each label was treated as its own yes/no question?",
+        observationOptions: [
+          "Probabilities did not need to sum to 1",
+          "Each label contributed loss",
+          "I am not sure",
+        ],
+        takeaway:
+          "Multi-label cross entropy applies a binary loss to each label, so several labels can be true at once.",
+      },
+    ],
+  },
+  "probability-rules": {
+    intro:
+      "Work through three sample-space experiments. Predict which grid cells count, switch the rule view, then connect the colored region to the formula.",
+    steps: [
+      {
+        title: "Count a single event",
+        experiment:
+          "Set A to Sum is 7. Look at the highlighted cells and the A count in the sample-space grid.",
+        predictionQuestion:
+          "Out of 36 dice outcomes, how many cells do you expect Sum is 7 to count?",
+        observationPrompt:
+          "What did the grid make visible about probability as counting?",
+        observationOptions: [
+          "Only matching cells counted",
+          "The denominator stayed 36",
+          "I am not sure",
+        ],
+        takeaway:
+          "Probability starts as counted outcomes divided by the whole sample space.",
+      },
+      {
+        title: "Find overlap",
+        experiment:
+          "Choose an intersection view for A and B. Compare A, B, and A and B on the grid.",
+        predictionQuestion:
+          "What must be true for an outcome to land in the overlap?",
+        observationPrompt:
+          "Which cells counted in the intersection?",
+        observationOptions: [
+          "Cells had to satisfy both events",
+          "Overlap was smaller than either event",
+          "I am not sure",
+        ],
+        takeaway:
+          "An intersection counts only outcomes where both event rules are true.",
+      },
+      {
+        title: "Subtract double-counting",
+        experiment:
+          "Switch to the union view. Watch the formula include A plus B minus the overlap.",
+        predictionQuestion:
+          "Why should the union formula subtract the overlap once?",
+        observationPrompt:
+          "What did the union formula do with cells that belonged to both A and B?",
+        observationOptions: [
+          "Overlap was counted once",
+          "A plus B double-counted it first",
+          "I am not sure",
+        ],
+        takeaway:
+          "A union counts A or B, so overlapping cells must be subtracted once after adding both regions.",
+      },
+    ],
+  },
+  "conditional-probability": {
+    intro:
+      "Work through three filtering experiments. Predict how the denominator changes, switch scenarios, then decide whether the events are independent.",
+    steps: [
+      {
+        title: "Filter the denominator",
+        experiment:
+          "Choose Dependent. Compare P(B), P(B given A), and the highlighted A group in the 100-person grid.",
+        predictionQuestion:
+          "When we ask for P(B given A), which people should be in the denominator?",
+        observationPrompt:
+          "What changed when the grid filtered down to A first?",
+        observationOptions: [
+          "The denominator became A",
+          "The B rate changed inside A",
+          "I am not sure",
+        ],
+        takeaway:
+          "Conditional probability changes the denominator first: P(B given A) counts B only inside the A group.",
+      },
+      {
+        title: "Check independence",
+        experiment:
+          "Choose Independent. Compare P(B given A) with P(B).",
+        predictionQuestion:
+          "If A and B are independent, should filtering by A change the chance of B?",
+        observationPrompt:
+          "What did the independent scenario show about the two rates?",
+        observationOptions: [
+          "The rates matched",
+          "Filtering did not change B",
+          "I am not sure",
+        ],
+        takeaway:
+          "Events are independent when knowing A does not change the probability of B.",
+      },
+      {
+        title: "Watch base rates",
+        experiment:
+          "Choose Base-rate shift. Compare the conditional rate with the joint count in the grid.",
+        predictionQuestion:
+          "Can a conditional probability jump even when the total number of true cases is small?",
+        observationPrompt:
+          "What did the base-rate scenario reveal about rate versus count?",
+        observationOptions: [
+          "The conditional rate jumped",
+          "The joint count stayed small",
+          "I am not sure",
+        ],
+        takeaway:
+          "A strong signal can raise a conditional rate while the rare event still occupies a small slice of the full population.",
+      },
+    ],
+  },
+  "bayes-rule": {
+    intro:
+      "Work through three evidence experiments. Predict the posterior, move the rates, then connect the positive-result denominator to true and false positives.",
+    steps: [
+      {
+        title: "Start from the prior",
+        experiment:
+          "Choose Medical Test. Look at People, Real cases, Prior, and the 1000-person grid before changing any sliders.",
+        predictionQuestion:
+          "When the condition is rare, do you expect many real cases before any test result arrives?",
+        observationPrompt:
+          "What did the prior population show before the positive signal was applied?",
+        observationOptions: [
+          "Real cases were rare",
+          "Most people did not have the condition",
+          "I am not sure",
+        ],
+        takeaway:
+          "The prior is the base pool of real cases available before evidence. Rare priors limit how many true positives a signal can find.",
+      },
+      {
+        title: "Build the positive denominator",
+        experiment:
+          "Raise Sensitivity and compare True positives with False positives in the Bayes denominator.",
+        predictionQuestion:
+          "What else besides true positives appears in the denominator after a positive result?",
+        observationPrompt:
+          "Which groups made up all positive results?",
+        observationOptions: [
+          "True positives were included",
+          "False positives were included",
+          "I am not sure",
+        ],
+        takeaway:
+          "After a positive result, Bayes compares true positives against every positive result, including false positives.",
+      },
+      {
+        title: "Let false alarms compete",
+        experiment:
+          "Increase the False-positive rate, then switch to Fraud Alert and compare the false alarm share.",
+        predictionQuestion:
+          "What should happen to certainty after a positive signal when false alarms become more common?",
+        observationPrompt:
+          "How did false positives change the posterior probability?",
+        observationOptions: [
+          "False alarms took more of the positives",
+          "Posterior certainty dropped",
+          "I am not sure",
+        ],
+        takeaway:
+          "A positive signal is less convincing when the false-positive pool is large, especially for rare events.",
+      },
+    ],
+  },
+  "softmax-temperature": {
+    intro:
+      "Work through three softmax experiments. Predict the ranking and confidence, change logits or temperature, then explain what temperature actually controls.",
+    steps: [
+      {
+        title: "Convert logits to probabilities",
+        experiment:
+          "Choose Clear Winner. Compare raw logits, scaled logits, and probability bars.",
+        predictionQuestion:
+          "Which class should receive the highest probability before temperature changes anything?",
+        observationPrompt:
+          "What stayed connected between the largest logit and the probability chart?",
+        observationOptions: [
+          "The largest logit won",
+          "Softmax normalized scores",
+          "I am not sure",
+        ],
+        takeaway:
+          "Softmax preserves the ranking from logits while converting the scores into probabilities that sum to 1.",
+      },
+      {
+        title: "Sharpen the winner",
+        experiment:
+          "Lower Temperature toward the left. Watch confidence, entropy, and the winner probability.",
+        predictionQuestion:
+          "What should low temperature do to the probability mass around the top class?",
+        observationPrompt:
+          "How did confidence and entropy change at low temperature?",
+        observationOptions: [
+          "Winner confidence rose",
+          "Entropy went down",
+          "I am not sure",
+        ],
+        takeaway:
+          "Low temperature sharpens the distribution by pushing more probability onto the leading class.",
+      },
+      {
+        title: "Soften without changing the winner",
+        experiment:
+          "Raise Temperature toward the right. Watch whether the top class changes while probabilities spread out.",
+        predictionQuestion:
+          "Should high temperature usually change the winner, or mostly change confidence?",
+        observationPrompt:
+          "What happened to the ranking and the probability spread?",
+        observationOptions: [
+          "The winner stayed the same",
+          "Probabilities spread out",
+          "I am not sure",
+        ],
+        takeaway:
+          "Temperature changes confidence and entropy, but it does not usually change class ranking because all logits are scaled together.",
+      },
+    ],
+  },
+  "gradient-descent": {
+    intro:
+      "Work through four tiny experiments. Predict first, change the controls, observe the graph, then explain what you learned.",
+    steps: [
+      {
+        title: "Make descent crawl",
+        experiment:
+          "Choose Creep, press Reset, then press Step three times. Watch the point and the loss value.",
+        predictionQuestion:
+          "Before stepping, do you expect theta to move a little or a lot each step?",
+        observationPrompt:
+          "What did you notice about the point and the loss after three tiny steps?",
+        observationOptions: [
+          "It moved slowly",
+          "Loss changed only a little",
+          "I am not sure",
+        ],
+        takeaway:
+          "A small learning rate follows the downhill direction but makes tiny updates, so progress is stable and slow.",
+      },
+      {
+        title: "Find a useful step",
+        experiment:
+          "Choose Converge, press Reset, then press Step two or three times. Compare the point's path to Creep.",
+        predictionQuestion:
+          "What do you think a useful learning rate should do differently from Creep?",
+        observationPrompt:
+          "What changed faster this time: theta, loss, or both?",
+        observationOptions: [
+          "Theta moved near the valley",
+          "Loss dropped faster",
+          "I am not sure",
+        ],
+        takeaway:
+          "A useful learning rate makes visible progress toward the minimum without jumping wildly across the valley.",
+      },
+      {
+        title: "Force an overshoot",
+        experiment:
+          "Choose Overshoot, press Reset, then press Step once or twice. Watch whether the point crosses the minimum.",
+        predictionQuestion:
+          "If the learning rate is too large, where do you expect the next point to land?",
+        observationPrompt:
+          "What did the point do relative to the minimum?",
+        observationOptions: [
+          "It jumped across the minimum",
+          "The step was too large",
+          "I am not sure",
+        ],
+        takeaway:
+          "A large learning rate can still point downhill locally, but the step can be so long that it launches past the minimum.",
+      },
+      {
+        title: "Test momentum",
+        experiment:
+          "Choose Converge, press Reset, raise Momentum beta toward heavy, then press Step several times. Compare it with low momentum.",
+        predictionQuestion:
+          "What do you expect momentum to carry from one step into the next?",
+        observationPrompt:
+          "How did the path change when previous movement carried into later steps?",
+        observationOptions: [
+          "Momentum carried the point forward",
+          "It sped up but could overshoot",
+          "I am not sure",
+        ],
+        takeaway:
+          "Momentum reuses previous motion. It can speed travel on smooth slopes, but too much carry-over can push past the valley.",
+      },
+    ],
+  },
+  "confusion-matrix-thresholds": {
+    intro:
+      "Work through three threshold experiments. Predict which mistakes change, move the cutoff, then connect the confusion matrix to precision and recall.",
+    steps: [
+      {
+        title: "Lower the cutoff",
+        experiment:
+          "Choose Medical Screen. Lower the threshold and watch the score strip, false positives, and false negatives.",
+        predictionQuestion:
+          "When the threshold drops, do you expect more or fewer examples to be predicted positive?",
+        observationPrompt:
+          "What happened to missed positives and extra positives after lowering the threshold?",
+        observationOptions: [
+          "Recall went up",
+          "False positives increased",
+          "I am not sure",
+        ],
+        takeaway:
+          "Lower thresholds catch more actual positives, but they often create more false positives.",
+      },
+      {
+        title: "Raise the cutoff",
+        experiment:
+          "Raise the threshold and compare precision, recall, and the confusion matrix.",
+        predictionQuestion:
+          "What mistake becomes more likely when the model only accepts very high scores?",
+        observationPrompt:
+          "How did the positive queue and false negatives change?",
+        observationOptions: [
+          "Fewer items were predicted positive",
+          "False negatives increased",
+          "I am not sure",
+        ],
+        takeaway:
+          "Higher thresholds are stricter, which can improve precision but can miss positives and reduce recall.",
+      },
+      {
+        title: "Pick the cost that matters",
+        experiment:
+          "Switch between Medical Screen, Spam Filter, and Fraud Review. Compare the default thresholds and mistake stories.",
+        predictionQuestion:
+          "Why might two tasks choose different thresholds for the same kind of score?",
+        observationPrompt:
+          "What changed when the cost of false positives and false negatives changed?",
+        observationOptions: [
+          "The best threshold depended on the task",
+          "Mistake costs changed the tradeoff",
+          "I am not sure",
+        ],
+        takeaway:
+          "A threshold is a decision policy, so the best cutoff depends on which mistake costs more in the real task.",
+      },
+    ],
+  },
+  overfitting: {
+    intro:
+      "Work through three generalization experiments. Predict how complexity affects train and test loss, then find the useful middle.",
+    steps: [
+      {
+        title: "Underfit with too little shape",
+        experiment:
+          "Choose Balanced Split and set Model complexity to a low degree. Compare the curve with the training and test dots.",
+        predictionQuestion:
+          "What should happen when a model is too simple to follow the real pattern?",
+        observationPrompt:
+          "How did the curve miss both training and test structure?",
+        observationOptions: [
+          "The curve was too simple",
+          "Both losses stayed high",
+          "I am not sure",
+        ],
+        takeaway:
+          "Underfitting happens when the model is too simple to capture the signal, so it performs poorly on both training and test data.",
+      },
+      {
+        title: "Find the useful middle",
+        experiment:
+          "Raise complexity to a moderate degree. Watch training loss and test loss together.",
+        predictionQuestion:
+          "What should happen when complexity is enough to learn the pattern but not enough to chase every wiggle?",
+        observationPrompt:
+          "What changed for training and test loss in the middle range?",
+        observationOptions: [
+          "Both losses improved",
+          "The curve followed the trend",
+          "I am not sure",
+        ],
+        takeaway:
+          "A moderate model often generalizes best because it captures signal without memorizing noise.",
+      },
+      {
+        title: "Overfit the noise",
+        experiment:
+          "Push Model complexity high. Compare the wiggly curve, training loss, and test loss.",
+        predictionQuestion:
+          "Can training loss keep improving while test loss gets worse?",
+        observationPrompt:
+          "What did the high-complexity curve do around individual training dots?",
+        observationOptions: [
+          "Training loss dropped",
+          "Test loss got worse",
+          "I am not sure",
+        ],
+        takeaway:
+          "Overfitting lowers training error by memorizing noise, but that extra wiggle can hurt future examples.",
+      },
+    ],
+  },
+} satisfies Record<TutorPlanSlug, TutorPlan>;

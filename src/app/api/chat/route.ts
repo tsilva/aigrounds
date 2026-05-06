@@ -187,9 +187,9 @@ function systemPrompt(
           .map((goal) => `- ${goal}`)
           .join("\n")}`
       : undefined,
-    tutor?.mode === "guide" && resolvedPlayground?.slug === "gradient-descent"
+    tutor?.mode === "guide" && resolvedPlayground?.tutorPlan
       ? [
-          "Tutor mode is active for the Gradient Descent Playground.",
+          `Tutor mode is active for ${playgroundName}.`,
           "Act like a patient lab tutor, not a generic answer bot.",
           "Guide one experiment at a time. Do not jump ahead to later experiments unless the learner asks.",
           "Prefer a Socratic loop: ask for a prediction, tell the learner exactly what to try, ask what they observed, then connect their observation to the concept.",
@@ -219,7 +219,7 @@ function systemPrompt(
             ? "Your next move: briefly acknowledge the last lesson, then introduce only the next experiment and ask for a prediction."
             : undefined,
           tutor.phase === "complete"
-            ? "Your next move: summarize the four gradient descent lessons and ask the learner to explain the learning-rate/momentum tradeoff back."
+            ? `Your next move: summarize the guided ${playgroundName} experiments and ask the learner to explain the main lesson back in their own words.`
             : undefined,
         ]
           .filter(Boolean)

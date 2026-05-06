@@ -5,9 +5,11 @@ import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-e
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
 import { DiffusionPlayground } from "@/modules/diffusion/DiffusionPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
+import { MeanMedianModePlayground } from "@/modules/mean-median-mode/MeanMedianModePlayground";
 import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
 import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
 import { QLearningPlayground } from "@/modules/q-learning/QLearningPlayground";
+import { RangeQuartilesIqrPlayground } from "@/modules/range-quartiles-iqr/RangeQuartilesIqrPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
 
 type Theme = {
@@ -34,6 +36,56 @@ export type UpcomingPlayground = {
 };
 
 export const activePlaygrounds: ActivePlayground[] = [
+  {
+    slug: "mean-median-mode",
+    title: "Mean, Median & Mode Lab",
+    kicker:
+      "Drag data points and watch three definitions of typical tell different stories.",
+    summary:
+      "Move values on a number line, switch between dataset shapes, and see how the mean, median, and mode respond when values repeat or an outlier appears.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Mean",
+      "Median",
+      "Mode",
+      "Outliers",
+    ],
+    learningGoals: [
+      "Understand mean as the balance point of all values.",
+      "See why the median resists extreme values after sorting.",
+      "Recognize mode as the most common value and when a dataset has no mode.",
+    ],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+    component: MeanMedianModePlayground,
+    presentation: "immersive",
+  },
+  {
+    slug: "range-quartiles-iqr",
+    title: "Range, Quartiles & IQR Explorer",
+    kicker:
+      "Move outliers and watch the full span stretch while the middle 50% stays steady.",
+    summary:
+      "Drag values on a number line, inspect the five-number summary, and see how range, quartiles, percentile rank, IQR, and box plots respond when one edge gets extreme.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Range",
+      "Quartiles",
+      "Interquartile range",
+      "Box plots",
+    ],
+    learningGoals: [
+      "Understand range as the distance from minimum to maximum.",
+      "See how quartiles split sorted data into lower, middle, and upper sections.",
+      "Recognize why IQR describes the middle 50% and resists outliers better than range.",
+    ],
+    theme: {
+      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+    component: RangeQuartilesIqrPlayground,
+    presentation: "immersive",
+  },
   {
     slug: "categorical-cross-entropy",
     title: "Cross Entropy Loss",

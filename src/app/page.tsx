@@ -6,6 +6,8 @@ import {
 import packageJson from "../../package.json";
 
 const learningProgressionSlugs = [
+  "mean-median-mode",
+  "range-quartiles-iqr",
   "categorical-cross-entropy",
   "softmax-temperature",
   "gradient-descent",
@@ -19,6 +21,8 @@ const learningProgressionSlugs = [
 ];
 
 const conceptTags: Record<string, string> = {
+  "mean-median-mode": "statistics",
+  "range-quartiles-iqr": "statistics",
   "categorical-cross-entropy": "loss",
   "softmax-temperature": "probability",
   "gradient-descent": "optimization",

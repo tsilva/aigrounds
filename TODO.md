@@ -4,16 +4,16 @@
 
 Ranked by learning priority. Each item is scoped as one fully interactive playground-sized chunk: one core intuition, one primary visual interaction, and enough description to teach the concept thoroughly. Concepts are merged only when they naturally share the same interaction.
 
-1. **Mean, Median & Mode Lab**
+1. [x] **Mean, Median & Mode Lab**
    Learn mean, median, mode, weighted mean, and why each "typical value" can tell a different story. Drag data points across a number line and watch the summaries move differently.
 
-2. **Range, Quartiles & IQR Explorer**
+2. [x] **Range, Quartiles & IQR Explorer**
    Learn minimum, maximum, range, quartiles, percentile rank, interquartile range, and box plots. Move points in and out of the middle 50% to see which summaries resist extremes.
 
-3. **Variance & Standard Deviation Lab**
+3. [x] **Variance & Standard Deviation Lab**
    Learn deviations from the mean, squared deviations, variance, standard deviation, and why spread can change while the mean stays fixed. Use one draggable dataset with live deviation bars.
 
-4. **Shape, Skew & Outliers Lab**
+4. [x] **Shape, Skew & Outliers Lab**
    Learn histograms, density shape, skew, tails, outliers, robustness, and why a single summary statistic is not enough. Add/remove outliers and compare histogram, box plot, and summary stats.
 
 5. **Probability Rules Simulator**

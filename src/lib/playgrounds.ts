@@ -1,5 +1,4 @@
 import { type ComponentType } from "react";
-import { Bm25Playground } from "@/modules/bm25/Bm25Playground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { ConditionalProbabilityPlayground } from "@/modules/conditional-probability/ConditionalProbabilityPlayground";
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
@@ -36,7 +35,6 @@ const playgroundComponents: Record<string, ComponentType> = {
   "gradient-descent": GradientDescentPlayground,
   "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,
   overfitting: OverfittingPlayground,
-  bm25: Bm25Playground,
 };
 
 const immersivePlaygroundSlugs = new Set([

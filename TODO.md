@@ -115,7 +115,7 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
    Fit curves to noisy data while changing model complexity. Show train loss dropping while test loss gets worse.
 
 5. **Embedding Similarity Explorer**
-   Move vectors around and watch cosine similarity, nearest neighbors, and retrieval rankings change. Strong bridge from BM25 to semantic search.
+   Move vectors around and watch cosine similarity, nearest neighbors, and retrieval rankings change. Strong bridge from keyword search to semantic search.
 
 6. **K-Means Clustering Studio**
    Place points and centroids, then step through assign/update cycles. Simple, visual, and satisfying.

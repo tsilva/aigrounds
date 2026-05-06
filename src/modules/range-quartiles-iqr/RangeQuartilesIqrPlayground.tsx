@@ -83,52 +83,6 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M12 10.5v6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <circle cx="12" cy="7.4" r="1.15" fill="currentColor" />
-    </svg>
-  );
-}
-
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M9.7 9.2a2.4 2.4 0 0 1 4.7.6c0 2.3-2.4 2.1-2.4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.2"
-      />
-      <circle cx="12" cy="17" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function PresetButton({
   preset,
   isSelected,
@@ -817,26 +771,16 @@ export function RangeQuartilesIqrPlayground() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#f7f9ff] px-4 py-5 text-[#071024] sm:px-7 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-4">
-        <header className="flex flex-col gap-3 py-1 md:flex-row md:items-start md:justify-between">
+        <header className="py-1">
           <div>
-            <h1 className="flex items-center gap-2 text-[40px] leading-[0.98] font-black text-[#070b1a] sm:text-[56px]">
+            <h1 className="text-[40px] leading-[0.98] font-black text-[#070b1a] sm:text-[56px]">
               {"Range, Quartiles & IQR Explorer"}
-              <span className="text-[#315690]">
-                <InfoIcon />
-              </span>
             </h1>
             <p className="mt-3 max-w-4xl text-[18px] leading-[1.35] font-semibold text-[#30446f] sm:text-[21px]">
               Move values around and watch extremes stretch range while the
               middle 50% defines IQR.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex w-fit items-center justify-center gap-3 rounded-[10px] border border-[#dedcff] bg-white px-5 py-3 text-center font-mono text-[13px] font-black text-[#2924ff] shadow-[0_12px_30px_rgba(26,38,80,0.04)]"
-          >
-            <HelpIcon />
-            What is IQR?
-          </button>
         </header>
 
         <DatasetPanel

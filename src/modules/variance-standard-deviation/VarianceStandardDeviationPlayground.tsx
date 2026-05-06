@@ -10,10 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  clientXToPercentValue,
-  useStackedPointLayout,
-} from "@/lib/number-line";
+import { clientXToPercentValue } from "@/lib/number-line";
 import {
   analyzeSpread,
   clampValue,
@@ -127,11 +124,33 @@ function NumberLine({
   onPointStart: (pointId: string, clientX: number) => void;
   onPointStep: (pointId: string, delta: number) => void;
 }) {
-  const stackOffsets = useStackedPointLayout(points);
+  const stackOffsets = useMemo(() => {
+    const sortedPoints = points
+      .slice()
+      .sort((left, right) => left.value - right.value);
+    const laneValues: number[] = [];
+    const offsets = new Map<string, number>();
+    const laneOffsets = [0, -46, -92, -138, 46, 92, 138];
+
+    for (const point of sortedPoints) {
+      const laneIndex = laneValues.findIndex(
+        (value) => Math.abs(point.value - value) >= 9,
+      );
+      const nextLaneIndex = laneIndex === -1 ? laneValues.length : laneIndex;
+
+      laneValues[nextLaneIndex] = point.value;
+      offsets.set(
+        point.id,
+        laneOffsets[nextLaneIndex] ?? -(nextLaneIndex * 30),
+      );
+    }
+
+    return offsets;
+  }, [points]);
   const rowsByPoint = new Map(
     analysis.rows.map((row) => [row.point.id, row]),
   );
-  const axisTop = 68;
+  const axisTop = 76;
 
   return (
     <div className="mt-6 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
@@ -139,10 +158,7 @@ function NumberLine({
         ref={trackRef}
         className="relative h-[260px] select-none overflow-hidden rounded-[10px] bg-white px-4"
       >
-        <div className="absolute top-5 right-4 left-4 bottom-[88px] rounded-[10px] border border-[#eef2fb] bg-[#fbfcff]" />
-        <p className="absolute top-7 left-7 z-[3] rounded-full border border-[#dfe4f4] bg-white px-2.5 py-1 font-mono text-[10px] font-black tracking-normal text-[#52628a] uppercase shadow-[0_8px_16px_rgba(26,38,80,0.05)]">
-          distance lanes
-        </p>
+        <div className="absolute top-5 right-4 left-4 bottom-[68px] rounded-[10px] border border-[#eef2fb] bg-[#fbfcff]" />
         <div
           className="absolute right-4 left-4 h-1 -translate-y-1/2 rounded-full bg-[#cfd8ec]"
           style={{ top: `${axisTop}%` }}
@@ -156,13 +172,13 @@ function NumberLine({
               top: `${axisTop}%`,
             }}
           >
-            <span className="absolute top-8 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-[#52628a]">
+            <span className="absolute top-7 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-[#52628a]">
               {tick}
             </span>
           </div>
         ))}
         <div
-          className="absolute top-[22px] bottom-[44px] z-[1] w-1 -translate-x-1/2 rounded-full bg-[#071024]"
+          className="absolute top-[22px] bottom-[38px] z-[1] w-1 -translate-x-1/2 rounded-full bg-[#071024]"
           style={{
             left: `calc(1rem + (100% - 2rem) * ${analysis.mean / 100})`,
           }}
@@ -196,16 +212,6 @@ function NumberLine({
                   opacity: isLarge ? 0.9 : 0.58,
                 }}
               />
-              <span
-                className="absolute z-[3] grid h-5 w-5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white font-mono text-[10px] font-black text-[#071024] shadow-[0_5px_12px_rgba(26,38,80,0.1)]"
-                style={{
-                  left: `calc(1rem + (100% - 2rem) * ${row.point.value / 100})`,
-                  top: `${laneTop}px`,
-                  background: row.point.color,
-                }}
-              >
-                {row.point.label}
-              </span>
             </div>
           );
         })}
@@ -237,7 +243,7 @@ function NumberLine({
                 event.preventDefault();
                 onPointStart(point.id, event.clientX);
               }}
-              className={`absolute z-10 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border-2 bg-white font-mono text-[12px] font-black text-[#071024] shadow-[0_10px_20px_rgba(26,38,80,0.13)] transition active:cursor-grabbing ${
+              className={`absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border-2 bg-white font-mono text-[11px] font-black text-[#071024] shadow-[0_10px_20px_rgba(26,38,80,0.13)] transition active:cursor-grabbing ${
                 isActive ? "scale-110 border-[#352cff]" : "border-white"
               } ${isLargest ? "ring-4 ring-[#ef4444]/20" : ""}`}
               style={

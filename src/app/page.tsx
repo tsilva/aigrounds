@@ -21,9 +21,10 @@ export default function Home() {
               <p className="max-w-2xl text-lg leading-8 text-stone-700">
                 Each module is a self-contained playground, simulation, or
                 visual explainer. Start with Categorical Cross Entropy,
-                Softmax Temperature, Gradient Descent, Attention Maps, BM25
-                ranking, Monte Carlo Tree Search, Q-learning, or Diffusion
-                Studio and watch the hidden tradeoffs surface in real time.
+                Softmax Temperature, Gradient Descent, Confusion Matrix
+                Thresholds, Attention Maps, BM25 ranking, Monte Carlo Tree
+                Search, Q-learning, or Diffusion Studio and watch the hidden
+                tradeoffs surface in real time.
               </p>
             </div>
             <div className="min-w-0 rounded-[1.75rem] border border-stone-900/8 bg-white/70 p-5 backdrop-blur lg:max-w-md">
@@ -54,6 +55,12 @@ export default function Home() {
                   className="inline-flex w-full items-center justify-center rounded-full border border-blue-300 bg-blue-100 px-5 py-3 text-sm font-medium text-blue-950 transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   Open gradient descent
+                </Link>
+                <Link
+                  href="/playgrounds/confusion-matrix-thresholds"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-rose-300 bg-rose-100 px-5 py-3 text-sm font-medium text-rose-950 transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  Open thresholds
                 </Link>
                 <Link
                   href="/playgrounds/attention"

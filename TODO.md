@@ -8,7 +8,7 @@
 2. [x] **Gradient Descent Playground**
    Move across a loss landscape step by step. Tune learning rate and momentum to see convergence, slow learning, and overshooting.
 
-3. **Confusion Matrix & Thresholds**
+3. [x] **Confusion Matrix & Thresholds**
    Drag a classification threshold and watch precision, recall, F1, false positives, and false negatives update. Very practical and instantly understandable.
 
 4. **Overfitting Lab**

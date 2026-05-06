@@ -2,6 +2,7 @@ import { type ComponentType } from "react";
 import { AttentionPlayground } from "@/modules/attention/AttentionPlayground";
 import { Bm25Playground } from "@/modules/bm25/Bm25Playground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
+import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
 import { DiffusionPlayground } from "@/modules/diffusion/DiffusionPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
 import { MctsPlayground } from "@/modules/mcts/MctsPlayground";
@@ -105,6 +106,31 @@ export const activePlaygrounds: ActivePlayground[] = [
       badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
     },
     component: GradientDescentPlayground,
+    presentation: "immersive",
+  },
+  {
+    slug: "confusion-matrix-thresholds",
+    title: "Confusion Matrix & Thresholds",
+    kicker:
+      "Move one cutoff and watch false positives trade places with false negatives.",
+    summary:
+      "Drag a classification threshold across scored examples. The lab updates the confusion matrix, precision, recall, F1, and accuracy so decision tradeoffs become visible.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Classification thresholds",
+      "False positives",
+      "False negatives",
+      "Precision and recall",
+    ],
+    learningGoals: [
+      "See how a score threshold converts model confidence into a yes/no prediction.",
+      "Understand why lowering a threshold usually raises recall while adding false positives.",
+      "Recognize how precision, recall, and F1 summarize different mistake costs.",
+    ],
+    theme: {
+      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
+    },
+    component: ConfusionMatrixThresholdsPlayground,
     presentation: "immersive",
   },
   {

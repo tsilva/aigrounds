@@ -657,7 +657,7 @@ export function ShapeSkewOutliersPlayground() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-[42px] leading-[0.95] font-black tracking-[-0.02em] text-[#071024] sm:text-[56px]">
-                Shape, Skew &amp; Outliers Lab
+                Shape, Skew & Outliers Lab
               </h1>
               <span className="hidden text-[#405f9b] sm:inline-flex">
                 <InfoIcon />

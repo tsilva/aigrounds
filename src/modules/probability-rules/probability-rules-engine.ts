@@ -63,11 +63,11 @@ export type SimulationResult = SimulationState & {
 
 export const ruleLabels: Record<RuleView, string> = {
   a: "A",
-  "not-a": "not A",
-  intersection: "A and B",
-  union: "A or B",
-  "a-only": "A only",
-  "b-only": "B only",
+  "not-a": "¬A",
+  intersection: "A ∩ B",
+  union: "A ∪ B",
+  "a-only": "A ∖ B",
+  "b-only": "B ∖ A",
 };
 
 const sampleSpace = Array.from({ length: 36 }, (_, index) => {
@@ -235,7 +235,7 @@ function ruleCopy(
 
   if (view === "not-a") {
     return {
-      formula: "P(not A) = 1 - P(A)",
+      formula: "P(¬A) = 1 - P(A)",
       expandedFormula: `${counts.notA} / ${counts.sampleSpace} = 1 - ${counts.a} / ${counts.sampleSpace}`,
       takeaway: "The complement is everything in the sample space outside A.",
     };
@@ -243,7 +243,7 @@ function ruleCopy(
 
   if (view === "intersection") {
     return {
-      formula: "P(A and B) = |A and B| / |S|",
+      formula: "P(A ∩ B) = |A ∩ B| / |S|",
       expandedFormula: `${counts.intersection} / ${counts.sampleSpace} = ${(counts.intersection / counts.sampleSpace).toFixed(3)}`,
       takeaway: "The intersection keeps only outcomes that satisfy both events.",
     };
@@ -251,7 +251,7 @@ function ruleCopy(
 
   if (view === "union") {
     return {
-      formula: "P(A or B) = P(A) + P(B) - P(A and B)",
+      formula: "P(A ∪ B) = P(A) + P(B) - P(A ∩ B)",
       expandedFormula: `${counts.a} / ${counts.sampleSpace} + ${counts.b} / ${counts.sampleSpace} - ${counts.intersection} / ${counts.sampleSpace} = ${counts.union} / ${counts.sampleSpace}`,
       takeaway: "Overlap is counted twice unless you subtract it once.",
     };
@@ -259,14 +259,14 @@ function ruleCopy(
 
   if (view === "a-only") {
     return {
-      formula: "P(A only) = P(A) - P(A and B)",
+      formula: "P(A ∖ B) = P(A) - P(A ∩ B)",
       expandedFormula: `${counts.a} / ${counts.sampleSpace} - ${counts.intersection} / ${counts.sampleSpace} = ${counts.aOnly} / ${counts.sampleSpace}`,
       takeaway: "A only removes the part of A that also belongs to B.",
     };
   }
 
   return {
-    formula: "P(B only) = P(B) - P(A and B)",
+    formula: "P(B ∖ A) = P(B) - P(A ∩ B)",
     expandedFormula: `${counts.b} / ${counts.sampleSpace} - ${counts.intersection} / ${counts.sampleSpace} = ${counts.bOnly} / ${counts.sampleSpace}`,
     takeaway: "B only removes the part of B that also belongs to A.",
   };

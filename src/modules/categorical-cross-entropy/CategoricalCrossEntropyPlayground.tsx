@@ -249,8 +249,8 @@ function FormulaExpression({
   if (mode === "binary") {
     return (
       <>
-        L = - [ y log(<span className="text-[#ff1e1e]">p</span>) + (1 - y)
-        log(1 - <span className="text-[#ff1e1e]">p</span>) ]
+        L = − [ y log(<span className="text-[#ff1e1e]">p</span>) + (1 − y)
+        log(1 − <span className="text-[#ff1e1e]">p</span>) ]
       </>
     );
   }
@@ -259,9 +259,9 @@ function FormulaExpression({
     return (
       <div className="mx-auto flex max-w-full flex-col items-center gap-1">
         <div>
-          L = - 1/{classCount}{" "}
+          L = − 1/{classCount}{" "}
           <span className={`inline-block align-middle ${sigmaSize}`}>
-            &Sigma;
+            Σ
           </span>
           <sub className={subSize}>l=1</sub>
           <sup className={subSize}>{classCount}</sup>
@@ -271,7 +271,7 @@ function FormulaExpression({
           <span className="text-[#ff1e1e]">
             p<sub className={subSize}>l</sub>
           </span>
-          ) + (1 - y<sub className={subSize}>l</sub>) log(1 -{" "}
+          ) + (1 − y<sub className={subSize}>l</sub>) log(1 −{" "}
           <span className="text-[#ff1e1e]">
             p<sub className={subSize}>l</sub>
           </span>
@@ -283,9 +283,9 @@ function FormulaExpression({
 
   return (
     <>
-      L = -{" "}
+      L = −{" "}
       <span className={`inline-block align-middle ${sigmaSize}`}>
-        &Sigma;
+        Σ
       </span>
       <sub className={subSize}>k=1</sub>
       <sup className={subSize}>K</sup>{" "}
@@ -294,7 +294,7 @@ function FormulaExpression({
       </span>{" "}
       log (
       <span className="text-[#ff1e1e]">
-        p&#770;<sub className={subSize}>k</sub>
+        p̂<sub className={subSize}>k</sub>
       </span>
       )
     </>
@@ -318,9 +318,9 @@ function SimplifiedFormula({
 
   return (
     <>
-      L = - log (
+      L = − log (
       <span className="text-[#2f39ff]">
-        p&#770;
+        p̂
         <sub className="text-[14px]">
           {mode === "binary" ? "true outcome" : "true class"}
         </sub>
@@ -767,7 +767,7 @@ function FocusChart({
         <p className="mt-5 text-[18px] text-[#071024]">
           {mode === "multilabel"
             ? "Loss = mean BCE(all labels)"
-            : `Loss = -log(${formatProbability(probability)})`}
+            : `Loss = −log(${formatProbability(probability)})`}
         </p>
         <p className="mt-3 text-[18px] font-bold text-[#071024]">
           ={" "}
@@ -848,25 +848,25 @@ function FormulaBlock({
       <p>
         {mode === "binary" ? (
           <>
-            L = - [ y log(p) + (1 - y) log(1 - p) ]
+            L = − [ y log(p) + (1 − y) log(1 − p) ]
           </>
         ) : mode === "multilabel" ? (
           <span className="block">
-            L = - 1/{classCount}{" "}
+            L = − 1/{classCount}{" "}
             <span className="inline-block align-middle text-[22px]">
-              &Sigma;
+              Σ
             </span>
             <sub>l=1</sub>
             <sup>{classCount}</sup> BCE(y<sub>l</sub>, p<sub>l</sub>)
           </span>
         ) : (
           <>
-            L = -{" "}
+            L = −{" "}
             <span className="inline-block align-middle text-[22px]">
-              &Sigma;
+              Σ
             </span>
             <sub>k=1</sub>
-            <sup>{classCount}</sup> y<sub>k</sub> log (p&#770;<sub>k</sub>)
+            <sup>{classCount}</sup> y<sub>k</sub> log (p̂<sub>k</sub>)
           </>
         )}
       </p>
@@ -879,12 +879,12 @@ function FormulaBlock({
           <p>)</p>
         </div>
       ) : (
-        <p>= - ( {terms.join(" + ")} )</p>
+        <p>= − ( {terms.join(" + ")} )</p>
       )}
       {mode === "multilabel" ? (
         <p>= mean BCE across all labels</p>
       ) : (
-        <p>= -log({formatProbability(probability)})</p>
+        <p>= −log({formatProbability(probability)})</p>
       )}
       <p>
         ={" "}

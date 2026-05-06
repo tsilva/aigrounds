@@ -16,8 +16,8 @@ export const eventAOptions: EventOption[] = [
   },
   {
     id: "sum-nine-plus",
-    label: "Sum >= 9",
-    shortLabel: "sum >= 9",
+    label: "Sum ≥ 9",
+    shortLabel: "sum ≥ 9",
     description: "The upper-right corner.",
   },
   {
@@ -37,8 +37,8 @@ export const eventBOptions: EventOption[] = [
   },
   {
     id: "second-four-plus",
-    label: "Second die >= 4",
-    shortLabel: "die 2 >= 4",
+    label: "Second die ≥ 4",
+    shortLabel: "die 2 ≥ 4",
     description: "Columns 4, 5, and 6.",
   },
   {

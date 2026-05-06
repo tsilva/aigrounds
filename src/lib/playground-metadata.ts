@@ -204,7 +204,7 @@ export const activePlaygroundMetadata = [
     ],
     learningGoals: [
       "Understand conditional probability as counting inside a filtered denominator.",
-      "See how P(B | A), P(B), and P(A and B) describe different slices of the same population.",
+      "See how P(B ∣ A), P(B), and P(A ∩ B) describe different slices of the same population.",
       "Recognize independence as the case where filtering by A does not change the probability of B.",
     ],
     presentation: "immersive",
@@ -267,7 +267,7 @@ export const activePlaygroundMetadata = [
           experiment:
             "Choose Creep, press Reset, then press Step three times. Watch the point and the loss value.",
           predictionQuestion:
-            "Before stepping, do you expect theta to move a little or a lot each step?",
+            "Before stepping, do you expect θ to move a little or a lot each step?",
           observationPrompt:
             "What did you notice about the point and the loss after three tiny steps?",
           observationOptions: [
@@ -285,9 +285,9 @@ export const activePlaygroundMetadata = [
           predictionQuestion:
             "What do you think a useful learning rate should do differently from Creep?",
           observationPrompt:
-            "What changed faster this time: theta, loss, or both?",
+            "What changed faster this time: θ, loss, or both?",
           observationOptions: [
-            "Theta moved near the valley",
+            "θ moved near the valley",
             "Loss dropped faster",
             "I am not sure",
           ],
@@ -313,7 +313,7 @@ export const activePlaygroundMetadata = [
         {
           title: "Test momentum",
           experiment:
-            "Choose Converge, press Reset, raise Momentum beta toward heavy, then press Step several times. Compare it with low momentum.",
+            "Choose Converge, press Reset, raise Momentum β toward heavy, then press Step several times. Compare it with low momentum.",
           predictionQuestion:
             "What do you expect momentum to carry from one step into the next?",
           observationPrompt:

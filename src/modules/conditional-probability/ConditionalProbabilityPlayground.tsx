@@ -412,14 +412,14 @@ export function ConditionalProbabilityPlayground() {
               />
               <FormulaBox
                 label="Conditional"
-                formula="P(B | A) = |A and B| / |A|"
+                formula="P(B ∣ A) = |A ∩ B| / |A|"
                 fraction={`${analysis.counts.intersection} / ${analysis.counts.a}`}
                 percent={formatPercent(analysis.probabilities.pBGivenA)}
                 tone="indigo"
               />
               <FormulaBox
                 label="Joint"
-                formula="P(A and B) = |A and B| / |S|"
+                formula="P(A ∩ B) = |A ∩ B| / |S|"
                 fraction={`${analysis.counts.intersection} / ${analysis.counts.total}`}
                 percent={formatPercent(analysis.probabilities.pAAndB)}
                 tone="green"
@@ -449,7 +449,7 @@ export function ConditionalProbabilityPlayground() {
                 colorClass="bg-[#ff4f62]"
               />
               <ProbabilityBar
-                label="P(B | A) after filtering"
+                label="P(B ∣ A) after filtering"
                 value={analysis.probabilities.pBGivenA}
                 colorClass="bg-[#352cff]"
               />
@@ -463,7 +463,7 @@ export function ConditionalProbabilityPlayground() {
               />
               <FactPill
                 label="Rule"
-                value={analysis.isIndependent ? "P(B | A) = P(B)" : "P(B | A) != P(B)"}
+                value={analysis.isIndependent ? "P(B ∣ A) = P(B)" : "P(B ∣ A) ≠ P(B)"}
               />
             </div>
           </Panel>

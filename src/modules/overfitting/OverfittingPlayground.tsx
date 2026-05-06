@@ -101,29 +101,6 @@ function FactPill({ label, value }: { label: string; value: string }) {
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M9.7 9.2a2.4 2.4 0 0 1 4.7.6c0 2.3-2.4 2.1-2.4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.2"
-      />
-      <circle cx="12" cy="17" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function BulbIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7">
@@ -681,28 +658,16 @@ export function OverfittingPlayground() {
   return (
     <main className="min-h-screen bg-[#f8faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-[1536px]">
-        <header className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+        <header>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-[44px] leading-none font-black tracking-normal text-[#050816] sm:text-[54px]">
-                Overfitting Lab
-              </h1>
-              <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-[#4d65a0] text-[#284578]">
-                i
-              </span>
-            </div>
+            <h1 className="text-[44px] leading-none font-black tracking-normal text-[#050816] sm:text-[54px]">
+              Overfitting Lab
+            </h1>
             <p className="mt-3 max-w-3xl text-[21px] leading-[1.35] font-semibold text-[#344777]">
               Watch a curve get better at memorizing the past and worse at
               predicting the future.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex h-[50px] items-center justify-center gap-3 rounded-[10px] border border-[#d8d0ff] bg-white px-8 text-[15px] font-black text-[#3028ff] shadow-[0_12px_28px_rgba(79,70,229,0.08)] transition hover:border-[#bcb1ff] hover:bg-[#fbfaff] md:min-w-[320px]"
-          >
-            <HelpIcon />
-            What is overfitting?
-          </button>
         </header>
 
         <div className="mt-6 space-y-4">

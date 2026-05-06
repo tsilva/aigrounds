@@ -90,52 +90,6 @@ function moodCopy(mood: IntuitionExample["mood"]) {
   return ":(";
 }
 
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M12 10.5v6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <circle cx="12" cy="7.4" r="1.15" fill="currentColor" />
-    </svg>
-  );
-}
-
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M9.7 9.2a2.4 2.4 0 0 1 4.7.6c0 2.3-2.4 2.1-2.4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.2"
-      />
-      <circle cx="12" cy="17" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function BulbIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-8 w-8">
@@ -904,7 +858,6 @@ export function CategoricalCrossEntropyPlayground() {
   const lesson = crossEntropyLessons[mode];
   const [trueClassIds, setTrueClassIds] = useState(lesson.initialTrueClassIds);
   const [probabilities, setProbabilities] = useState(lesson.initialProbabilities);
-  const [showHelp, setShowHelp] = useState(false);
   const [showCalculation, setShowCalculation] = useState(true);
   const analysis = useMemo(
     () => analyzeLoss(lesson.classes, probabilities, trueClassIds, mode),
@@ -950,37 +903,16 @@ export function CategoricalCrossEntropyPlayground() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#fbfcff] px-3 py-4 text-[#071024] sm:px-5">
       <div className="mx-auto max-w-[1536px]">
-        <header className="mb-4 grid gap-4 pl-0 sm:pl-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:items-start">
+        <header className="mb-4 pl-0 sm:pl-6">
           <div className="min-w-0">
-            <div className="flex items-center gap-3">
-              <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black tracking-[-0.055em] text-[#030713] sm:text-[44px]">
-                Cross Entropy Loss
-              </h1>
-              <span className="text-[#435c8d]">
-                <InfoIcon />
-              </span>
-            </div>
+            <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black tracking-[-0.055em] text-[#030713] sm:text-[44px]">
+              Cross Entropy Loss
+            </h1>
             <p className="mt-2 max-w-[58rem] text-[18px] leading-tight font-medium text-[#30446f] sm:text-[22px]">
               One penalty idea for binary, categorical, and multi-label targets.
             </p>
           </div>
-          <div className="flex w-full min-w-0 flex-col items-stretch gap-3 lg:justify-self-end">
-            <button
-              type="button"
-              onClick={() => setShowHelp((current) => !current)}
-              className="inline-flex w-full max-w-full items-center justify-center gap-3 rounded-[10px] border border-[#dad7ff] bg-[#fbfaff] px-5 py-3 text-[16px] font-bold text-[#2f27ff] shadow-[0_8px_20px_rgba(47,39,255,0.06)] transition hover:border-[#b9b4ff]"
-            >
-              <HelpIcon />
-              What is Cross Entropy?
-            </button>
-          </div>
         </header>
-
-        {showHelp ? (
-          <div className="mb-4 ml-auto max-w-[520px] rounded-[12px] border border-[#d8e0f3] bg-white px-5 py-4 text-[15px] leading-7 text-[#27385f] shadow-[0_18px_35px_rgba(26,38,80,0.08)]">
-            {lesson.helpText}
-          </div>
-        ) : null}
 
         <div className="grid gap-4">
           <TargetShapePanel mode={mode} onSelectMode={selectMode} />

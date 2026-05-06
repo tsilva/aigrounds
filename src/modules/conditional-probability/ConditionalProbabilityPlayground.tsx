@@ -21,29 +21,6 @@ const filterViews: FilterView[] = [
   "b-given-a",
 ];
 
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M9.7 9.2a2.4 2.4 0 0 1 4.7.6c0 2.3-2.4 2.1-2.4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.2"
-      />
-      <circle cx="12" cy="17" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function Panel({
   children,
   className = "",
@@ -292,28 +269,15 @@ export function ConditionalProbabilityPlayground() {
   return (
     <main className="min-h-screen bg-[#f7faff] px-4 py-5 text-[#071024] sm:px-6 lg:px-10">
       <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-5">
-        <header className="flex flex-col gap-5 pb-1 md:flex-row md:items-start md:justify-between">
+        <header className="pb-1">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-[42px] leading-none font-black tracking-[-0.04em] text-[#070b1a] sm:text-[52px] lg:text-[60px]">
-                Conditional Probability
-              </h1>
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 border-[#49679d] text-[18px] font-black text-[#49679d]">
-                i
-              </span>
-            </div>
+            <h1 className="text-[42px] leading-none font-black tracking-[-0.04em] text-[#070b1a] sm:text-[52px] lg:text-[60px]">
+              Conditional Probability
+            </h1>
             <p className="mt-3 max-w-3xl text-[20px] leading-[1.35] font-bold text-[#314571] sm:text-[24px]">
               Probabilities change when the world is filtered.
             </p>
           </div>
-
-          <button
-            type="button"
-            className="inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-[8px] border border-[#d8d7ff] bg-white/75 px-5 text-[15px] font-black text-[#2924ff] shadow-[0_12px_28px_rgba(71,85,195,0.08)] transition hover:border-[#aaa7ff] md:min-w-[280px]"
-          >
-            <HelpIcon />
-            What is Conditional Probability?
-          </button>
         </header>
 
         <Panel className="p-5 sm:p-6">

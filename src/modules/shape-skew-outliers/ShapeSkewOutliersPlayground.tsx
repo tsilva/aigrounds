@@ -56,52 +56,6 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M12 10.5v6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <circle cx="12" cy="7.4" r="1.15" fill="currentColor" />
-    </svg>
-  );
-}
-
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-      />
-      <path
-        d="M9.7 9.2a2.4 2.4 0 0 1 4.7.6c0 2.3-2.4 2.1-2.4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.2"
-      />
-      <circle cx="12" cy="17" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function ShapeButton({
   preset,
   isSelected,
@@ -653,28 +607,15 @@ export function ShapeSkewOutliersPlayground() {
   return (
     <main className="min-h-screen bg-[#f7f9ff] px-4 py-5 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1536px]">
-        <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header className="mb-5">
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-[42px] leading-[0.95] font-black tracking-[-0.02em] text-[#071024] sm:text-[56px]">
-                Shape, Skew & Outliers Lab
-              </h1>
-              <span className="hidden text-[#405f9b] sm:inline-flex">
-                <InfoIcon />
-              </span>
-            </div>
+            <h1 className="text-[42px] leading-[0.95] font-black tracking-[-0.02em] text-[#071024] sm:text-[56px]">
+              Shape, Skew & Outliers Lab
+            </h1>
             <p className="mt-3 max-w-[900px] text-[19px] leading-[1.35] font-semibold text-[#2d4270] sm:text-[22px]">
               See the pile-up, tail, and outlier before trusting one summary.
             </p>
           </div>
-
-          <button
-            type="button"
-            className="inline-flex min-h-12 items-center justify-center gap-3 rounded-[9px] border border-[#cdc9ff] bg-white px-5 text-[15px] font-black text-[#2924ff] shadow-[0_16px_38px_rgba(41,36,255,0.06)] transition hover:border-[#a9a2ff] hover:bg-[#fbfaff]"
-          >
-            <HelpIcon />
-            What is skew?
-          </button>
         </header>
 
         <div className="grid gap-4">

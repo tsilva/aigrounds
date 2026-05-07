@@ -17,6 +17,7 @@ import { TransformerAttentionPlayground } from "@/modules/transformer-attention/
 import { VarianceStandardDeviationPlayground } from "@/modules/variance-standard-deviation/VarianceStandardDeviationPlayground";
 import {
   activePlaygroundMetadata,
+  roadmapPlaygroundOrder,
   upcomingPlaygrounds,
   type PlaygroundMetadata,
 } from "@/lib/playground-metadata";
@@ -34,17 +35,17 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "range-quartiles-iqr": RangeQuartilesIqrPlayground,
   "variance-standard-deviation": VarianceStandardDeviationPlayground,
   "shape-skew-outliers": ShapeSkewOutliersPlayground,
-  "categorical-cross-entropy": CategoricalCrossEntropyPlayground,
   "probability-rules": ProbabilityRulesPlayground,
   "conditional-probability": ConditionalProbabilityPlayground,
   "bayes-rule": BayesRulePlayground,
   "expected-value-risk": ExpectedValueRiskPlayground,
   "bernoulli-categorical-binomial": BernoulliCategoricalBinomialPlayground,
+  overfitting: OverfittingPlayground,
+  "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,
   "softmax-temperature": SoftmaxTemperaturePlayground,
+  "categorical-cross-entropy": CategoricalCrossEntropyPlayground,
   "gradient-descent": GradientDescentPlayground,
   "monte-carlo-tree-search": MonteCarloTreeSearchPlayground,
-  "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,
-  overfitting: OverfittingPlayground,
   "transformer-attention": TransformerAttentionPlayground,
 };
 
@@ -55,7 +56,7 @@ export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.ma
   }),
 );
 
-export { upcomingPlaygrounds };
+export { roadmapPlaygroundOrder, upcomingPlaygrounds };
 
 export function getActivePlayground(slug: string) {
   return activePlaygrounds.find((playground) => playground.slug === slug);

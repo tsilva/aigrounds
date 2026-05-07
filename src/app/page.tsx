@@ -1,6 +1,7 @@
 import { HomePage, type HomePlaygroundCard } from "@/app/home-page";
 import {
   activePlaygrounds,
+  roadmapPlaygroundOrder,
   upcomingPlaygrounds,
 } from "@/lib/playgrounds";
 import packageJson from "../../package.json";
@@ -10,34 +11,59 @@ function compactOutcome(summary: string) {
 }
 
 export default function Home() {
-  const liveCards: HomePlaygroundCard[] = activePlaygrounds.map((playground, index) => ({
-    step: index + 1,
-    slug: playground.slug,
-    title: playground.title,
-    tag: playground.tag,
-    outcome: compactOutcome(playground.summary),
-    duration: playground.estimatedDuration,
-    level: `lesson ${String(index + 1).padStart(2, "0")}`,
-    concepts: playground.concepts,
-    status: "live",
-    href: `/playgrounds/${playground.slug}`,
-  }));
+  const livePlaygroundsBySlug = new Map<string, (typeof activePlaygrounds)[number]>(
+    activePlaygrounds.map((playground) => [playground.slug, playground]),
+  );
+  const upcomingPlaygroundsBySlug = new Map<
+    string,
+    (typeof upcomingPlaygrounds)[number]
+  >(
+    upcomingPlaygrounds.map((playground) => [playground.slug, playground]),
+  );
 
-  const upcomingCards: HomePlaygroundCard[] = upcomingPlaygrounds.map((playground, index) => ({
-    step: liveCards.length + index + 1,
-    slug: playground.slug,
-    title: playground.title,
-    tag: "concept",
-    outcome: compactOutcome(playground.summary),
-    duration: "coming soon",
-    level: `lesson ${String(liveCards.length + index + 1).padStart(2, "0")}`,
-    concepts: [],
-    status: "coming-soon",
-  }));
+  const playgrounds: HomePlaygroundCard[] = roadmapPlaygroundOrder.flatMap(
+    (slug, index) => {
+      const step = index + 1;
+      const livePlayground = livePlaygroundsBySlug.get(slug);
+
+      if (livePlayground) {
+        return {
+          step,
+          slug: livePlayground.slug,
+          title: livePlayground.title,
+          tag: livePlayground.tag,
+          outcome: compactOutcome(livePlayground.summary),
+          duration: livePlayground.estimatedDuration,
+          level: `lesson ${String(step).padStart(2, "0")}`,
+          concepts: livePlayground.concepts,
+          status: "live",
+          href: `/playgrounds/${livePlayground.slug}`,
+        };
+      }
+
+      const upcomingPlayground = upcomingPlaygroundsBySlug.get(slug);
+
+      if (!upcomingPlayground) {
+        return [];
+      }
+
+      return {
+        step,
+        slug: upcomingPlayground.slug,
+        title: upcomingPlayground.title,
+        tag: upcomingPlayground.tag,
+        outcome: compactOutcome(upcomingPlayground.summary),
+        duration: "coming soon",
+        level: `lesson ${String(step).padStart(2, "0")}`,
+        concepts: upcomingPlayground.concepts,
+        status: "coming-soon",
+      };
+    },
+  );
 
   return (
     <HomePage
-      playgrounds={[...liveCards, ...upcomingCards]}
+      playgrounds={playgrounds}
       version={packageJson.version}
     />
   );

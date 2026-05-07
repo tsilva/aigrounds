@@ -24,7 +24,9 @@ export type PlaygroundMetadata = {
 type UpcomingPlayground = {
   slug: string;
   title: string;
+  tag: string;
   summary: string;
+  concepts: string[];
 };
 
 export const activePlaygroundMetadata = [
@@ -263,29 +265,55 @@ export const activePlaygroundMetadata = [
     },
   },
   {
-    slug: "categorical-cross-entropy",
-    title: "Cross Entropy Loss",
-    tag: "loss",
+    slug: "overfitting",
+    title: "Overfitting Lab",
+    tag: "generalization",
     kicker:
-      "Move probability mass around and watch classification penalties update instantly.",
+      "Raise model complexity and watch memorization beat training loss while future error gets worse.",
     summary:
-      "Switch between binary, categorical, and multi-label cross entropy. Choose targets, edit predicted probabilities, and see why the loss rewards confidence on the outcomes that are actually true.",
+      "Fit polynomial curves to noisy training dots, then compare them against held-out test dots. The lab shows why the lowest training loss can be the wrong model when a wiggly curve starts chasing noise.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
-      "Binary targets",
-      "One-hot targets",
-      "Multi-hot targets",
-      "Predicted probabilities",
+      "Model complexity",
+      "Training loss",
+      "Test loss",
+      "Generalization",
     ],
     learningGoals: [
-      "Understand how binary cross entropy penalizes a yes/no prediction.",
-      "See why categorical cross entropy uses the predicted probability assigned to the one true class.",
-      "Recognize that multi-label cross entropy treats every label as an independent binary question.",
+      "See how higher model complexity can keep reducing training error.",
+      "Understand why test error can rise when a curve memorizes noisy training examples.",
+      "Recognize the useful middle between underfitting and overfitting.",
     ],
     presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["categorical-cross-entropy"],
+    tutorPlan: playgroundTutorPlans.overfitting,
     theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+      badgeClassName: "border-orange-300 bg-orange-100 text-orange-950",
+    },
+  },
+  {
+    slug: "confusion-matrix-thresholds",
+    title: "Confusion Matrix & Thresholds",
+    tag: "evaluation",
+    kicker:
+      "Move one cutoff and watch false positives trade places with false negatives.",
+    summary:
+      "Drag a classification threshold across scored examples. The lab updates the confusion matrix, precision, recall, F1, and accuracy so decision tradeoffs become visible.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Classification thresholds",
+      "False positives",
+      "False negatives",
+      "Precision and recall",
+    ],
+    learningGoals: [
+      "See how a score threshold converts model confidence into a yes/no prediction.",
+      "Understand why lowering a threshold usually raises recall while adding false positives.",
+      "Recognize how precision, recall, and F1 summarize different mistake costs.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
+    theme: {
+      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
     },
   },
   {
@@ -312,6 +340,32 @@ export const activePlaygroundMetadata = [
     tutorPlan: playgroundTutorPlans["softmax-temperature"],
     theme: {
       badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
+    },
+  },
+  {
+    slug: "categorical-cross-entropy",
+    title: "Cross Entropy Loss",
+    tag: "loss",
+    kicker:
+      "Move probability mass around and watch classification penalties update instantly.",
+    summary:
+      "Switch between binary, categorical, and multi-label cross entropy. Choose targets, edit predicted probabilities, and see why the loss rewards confidence on the outcomes that are actually true.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Binary targets",
+      "One-hot targets",
+      "Multi-hot targets",
+      "Predicted probabilities",
+    ],
+    learningGoals: [
+      "Understand how binary cross entropy penalizes a yes/no prediction.",
+      "See why categorical cross entropy uses the predicted probability assigned to the one true class.",
+      "Recognize that multi-label cross entropy treats every label as an independent binary question.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["categorical-cross-entropy"],
+    theme: {
+      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
     },
   },
   {
@@ -367,58 +421,6 @@ export const activePlaygroundMetadata = [
     },
   },
   {
-    slug: "overfitting",
-    title: "Overfitting Lab",
-    tag: "generalization",
-    kicker:
-      "Raise model complexity and watch memorization beat training loss while future error gets worse.",
-    summary:
-      "Fit polynomial curves to noisy training dots, then compare them against held-out test dots. The lab shows why the lowest training loss can be the wrong model when a wiggly curve starts chasing noise.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Model complexity",
-      "Training loss",
-      "Test loss",
-      "Generalization",
-    ],
-    learningGoals: [
-      "See how higher model complexity can keep reducing training error.",
-      "Understand why test error can rise when a curve memorizes noisy training examples.",
-      "Recognize the useful middle between underfitting and overfitting.",
-    ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans.overfitting,
-    theme: {
-      badgeClassName: "border-orange-300 bg-orange-100 text-orange-950",
-    },
-  },
-  {
-    slug: "confusion-matrix-thresholds",
-    title: "Confusion Matrix & Thresholds",
-    tag: "evaluation",
-    kicker:
-      "Move one cutoff and watch false positives trade places with false negatives.",
-    summary:
-      "Drag a classification threshold across scored examples. The lab updates the confusion matrix, precision, recall, F1, and accuracy so decision tradeoffs become visible.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Classification thresholds",
-      "False positives",
-      "False negatives",
-      "Precision and recall",
-    ],
-    learningGoals: [
-      "See how a score threshold converts model confidence into a yes/no prediction.",
-      "Understand why lowering a threshold usually raises recall while adding false positives.",
-      "Recognize how precision, recall, and F1 summarize different mistake costs.",
-    ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
-    theme: {
-      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
-    },
-  },
-  {
     slug: "transformer-attention",
     title: "Transformer Attention",
     tag: "transformers",
@@ -446,7 +448,315 @@ export const activePlaygroundMetadata = [
   },
 ] satisfies PlaygroundMetadata[];
 
-export const upcomingPlaygrounds: UpcomingPlayground[] = [];
+export const upcomingPlaygrounds: UpcomingPlayground[] = [
+  {
+    slug: "waiting-arrival-distributions",
+    title: "Waiting & Arrival Distributions Lab",
+    tag: "probability",
+    summary:
+      "Tune event probability or arrival rate and compare likely waits or counts.",
+    concepts: ["Geometric distribution", "Poisson distribution", "Rates"],
+  },
+  {
+    slug: "pdf-cdf-probability-area",
+    title: "PDF, CDF & Probability Area Lab",
+    tag: "probability",
+    summary:
+      "Move interval bounds and watch probability update as shaded area under a curve.",
+    concepts: ["PDFs", "CDFs", "Continuous variables"],
+  },
+  {
+    slug: "normal-distribution-z-scores",
+    title: "Normal Distribution & Z-Scores Lab",
+    tag: "probability",
+    summary:
+      "Move a value across a bell curve and connect raw units to standardized distance.",
+    concepts: ["Normal distribution", "Z-scores", "Tail probabilities"],
+  },
+  {
+    slug: "sampling-sample-size",
+    title: "Sampling & Sample Size Lab",
+    tag: "inference",
+    summary:
+      "Repeatedly sample from a hidden population and see why bigger samples stabilize estimates.",
+    concepts: ["Sampling", "Sample size", "Sampling variability"],
+  },
+  {
+    slug: "sampling-bias",
+    title: "Sampling Bias Lab",
+    tag: "inference",
+    summary:
+      "Compare random samples with biased collection rules and see why size cannot fix bad sampling.",
+    concepts: ["Selection bias", "Nonresponse bias", "Survivorship bias"],
+  },
+  {
+    slug: "standard-error-margin-of-error",
+    title: "Standard Error & Margin of Error Lab",
+    tag: "inference",
+    summary:
+      "Watch uncertainty shrink as sample size grows and estimates form a sampling distribution.",
+    concepts: ["Standard error", "Margin of error", "Sampling distributions"],
+  },
+  {
+    slug: "confidence-intervals",
+    title: "Confidence Intervals Explorer",
+    tag: "inference",
+    summary:
+      "Run many simulated samples and show which intervals capture the true population value.",
+    concepts: ["Confidence intervals", "Coverage", "Interval width"],
+  },
+  {
+    slug: "hypothesis-testing-basics",
+    title: "Hypothesis Testing Basics",
+    tag: "inference",
+    summary:
+      "Use one clean A/B test to connect null hypotheses, p-values, and decision rules.",
+    concepts: ["Null hypothesis", "P-values", "Significance"],
+  },
+  {
+    slug: "errors-power-effect-size",
+    title: "Errors, Power & Effect Size Lab",
+    tag: "inference",
+    summary:
+      "Show why not significant does not always mean no effect.",
+    concepts: ["Type I error", "Type II error", "Power"],
+  },
+  {
+    slug: "covariance-correlation",
+    title: "Covariance & Correlation Map",
+    tag: "relationships",
+    summary:
+      "Drag points on a scatterplot and watch direction, strength, and scale sensitivity update.",
+    concepts: ["Covariance", "Pearson correlation", "Scale sensitivity"],
+  },
+  {
+    slug: "correlation-shape-outliers",
+    title: "Correlation Shape & Outliers Lab",
+    tag: "relationships",
+    summary:
+      "Switch among datasets and drag outliers to compare correlation metrics.",
+    concepts: ["Spearman correlation", "Nonlinear relationships", "Outliers"],
+  },
+  {
+    slug: "simpsons-paradox-confounding",
+    title: "Simpson's Paradox & Confounding Lab",
+    tag: "relationships",
+    summary:
+      "Toggle subgroup and combined views to see an apparent relationship reverse.",
+    concepts: ["Confounders", "Grouped relationships", "Causation"],
+  },
+  {
+    slug: "linear-regression-line-fitting",
+    title: "Linear Regression Line Fitting",
+    tag: "regression",
+    summary:
+      "Drag a regression line before revealing the least-squares best-fit line.",
+    concepts: ["Slope", "Intercept", "Residuals"],
+  },
+  {
+    slug: "r-squared-residual-diagnostics",
+    title: "R Squared & Residual Diagnostics",
+    tag: "regression",
+    summary:
+      "Pair the same fit score with different residual patterns to spot misleading models.",
+    concepts: ["R squared", "Residual plots", "Unexplained variance"],
+  },
+  {
+    slug: "train-test-generalization",
+    title: "Train/Test Split & Generalization Lab",
+    tag: "generalization",
+    summary:
+      "Compare known-data fit with held-out prediction and expose data leakage.",
+    concepts: ["Train/test split", "Validation sets", "Data leakage"],
+  },
+  {
+    slug: "classification-metrics-foundations",
+    title: "Classification Metrics Foundations",
+    tag: "evaluation",
+    summary:
+      "Build confusion-matrix intuition before tuning a decision threshold.",
+    concepts: ["Accuracy", "Specificity", "Class imbalance"],
+  },
+  {
+    slug: "roc-precision-recall-curves",
+    title: "ROC vs Precision-Recall Curves",
+    tag: "evaluation",
+    summary:
+      "Trace both curves while moving a threshold across classifier scores.",
+    concepts: ["ROC curves", "Precision-recall curves", "Thresholds"],
+  },
+  {
+    slug: "feature-scaling",
+    title: "Feature Scaling Lab",
+    tag: "features",
+    summary:
+      "Rescale axes or features and watch the same points become comparable.",
+    concepts: ["Normalization", "Standardization", "Min-max scaling"],
+  },
+  {
+    slug: "distance-metrics",
+    title: "Distance Metrics Lab",
+    tag: "features",
+    summary:
+      "Move points on a grid and compare nearest-neighbor decisions.",
+    concepts: ["Euclidean distance", "Manhattan distance", "Nearest neighbors"],
+  },
+  {
+    slug: "entropy-information",
+    title: "Entropy & Information Starter",
+    tag: "information",
+    summary:
+      "Move probability mass across buckets and watch uncertainty shrink or spread.",
+    concepts: ["Surprise", "Entropy", "Information gain"],
+  },
+  {
+    slug: "log-loss-calibration",
+    title: "Log Loss & Calibration Lab",
+    tag: "loss",
+    summary:
+      "Compare predicted probabilities against observed frequencies.",
+    concepts: ["Log loss", "Calibration", "Confidence"],
+  },
+  {
+    slug: "kl-divergence",
+    title: "KL Divergence Intuition Lab",
+    tag: "loss",
+    summary:
+      "Move probability mass between buckets and watch directional mismatch change.",
+    concepts: ["KL divergence", "Reference distributions", "Approximation"],
+  },
+  {
+    slug: "vector-geometry-similarity",
+    title: "Vector Geometry & Similarity Lab",
+    tag: "vectors",
+    summary:
+      "Move vectors in 2D before connecting the same geometry to embeddings.",
+    concepts: ["Dot products", "Magnitude", "Cosine similarity"],
+  },
+  {
+    slug: "projection-foundations",
+    title: "Projection Foundations Lab",
+    tag: "vectors",
+    summary:
+      "Rotate a projection axis and watch points collapse onto one dimension.",
+    concepts: ["Projection", "Components", "Reconstruction error"],
+  },
+  {
+    slug: "embedding-retrieval",
+    title: "Embedding Retrieval Lab",
+    tag: "retrieval",
+    summary:
+      "Move a query point and watch retrieved items reorder.",
+    concepts: ["Embeddings", "Query vectors", "Nearest-neighbor retrieval"],
+  },
+  {
+    slug: "contrastive-loss",
+    title: "Contrastive Loss Lab",
+    tag: "loss",
+    summary:
+      "Move embedding points and tune margin or temperature to watch pairwise loss terms change.",
+    concepts: ["Anchor pairs", "Margins", "Representation learning"],
+  },
+  {
+    slug: "regularization",
+    title: "Regularization Lab",
+    tag: "optimization",
+    summary:
+      "Compare no regularization, L1, and L2 while weights and decision boundaries change.",
+    concepts: ["L1", "L2", "Penalty strength"],
+  },
+  {
+    slug: "k-means-clustering",
+    title: "K-Means Clustering Studio",
+    tag: "clustering",
+    summary:
+      "Place points and centroids, then step through assign/update cycles.",
+    concepts: ["Centroids", "Assignment", "Clusters"],
+  },
+  {
+    slug: "exploration-exploitation",
+    title: "Exploration vs Exploitation Lab",
+    tag: "search",
+    summary:
+      "Allocate trials across options and watch a policy balance rewards against learning value.",
+    concepts: ["Exploration", "Exploitation", "UCB"],
+  },
+  {
+    slug: "neural-network-forward-pass",
+    title: "Neural Network Forward Pass Lab",
+    tag: "neural networks",
+    summary:
+      "Move weights in a tiny network and watch inputs become class scores.",
+    concepts: ["Layers", "Weights", "Activations"],
+  },
+  {
+    slug: "backpropagation-inspector",
+    title: "Backpropagation Inspector",
+    tag: "neural networks",
+    summary:
+      "Trace how one loss value sends credit assignment back through weights.",
+    concepts: ["Backpropagation", "Gradients", "Credit assignment"],
+  },
+  {
+    slug: "token-context-position",
+    title: "Token Context & Position Lab",
+    tag: "transformers",
+    summary:
+      "Rearrange tokens and inspect how positions change the representation.",
+    concepts: ["Tokens", "Context windows", "Position"],
+  },
+];
+
+export const roadmapPlaygroundOrder = [
+  "mean-median-mode",
+  "range-quartiles-iqr",
+  "variance-standard-deviation",
+  "shape-skew-outliers",
+  "probability-rules",
+  "conditional-probability",
+  "bayes-rule",
+  "expected-value-risk",
+  "bernoulli-categorical-binomial",
+  "waiting-arrival-distributions",
+  "pdf-cdf-probability-area",
+  "normal-distribution-z-scores",
+  "sampling-sample-size",
+  "sampling-bias",
+  "standard-error-margin-of-error",
+  "confidence-intervals",
+  "hypothesis-testing-basics",
+  "errors-power-effect-size",
+  "covariance-correlation",
+  "correlation-shape-outliers",
+  "simpsons-paradox-confounding",
+  "linear-regression-line-fitting",
+  "r-squared-residual-diagnostics",
+  "train-test-generalization",
+  "overfitting",
+  "classification-metrics-foundations",
+  "confusion-matrix-thresholds",
+  "roc-precision-recall-curves",
+  "feature-scaling",
+  "distance-metrics",
+  "entropy-information",
+  "softmax-temperature",
+  "log-loss-calibration",
+  "categorical-cross-entropy",
+  "kl-divergence",
+  "vector-geometry-similarity",
+  "projection-foundations",
+  "embedding-retrieval",
+  "contrastive-loss",
+  "gradient-descent",
+  "regularization",
+  "k-means-clustering",
+  "exploration-exploitation",
+  "monte-carlo-tree-search",
+  "neural-network-forward-pass",
+  "backpropagation-inspector",
+  "token-context-position",
+  "transformer-attention",
+] as const;
 
 function getPlaygroundMetadata(slug: string) {
   return activePlaygroundMetadata.find((playground) => playground.slug === slug);

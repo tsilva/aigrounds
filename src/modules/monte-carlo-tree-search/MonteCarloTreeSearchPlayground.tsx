@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   analyzeSearch,
   formatPercent,
@@ -863,7 +863,7 @@ export function MonteCarloTreeSearchPlayground() {
     setIsRunning(false);
   }
 
-  function runToBudget() {
+  const runToBudget = useCallback(() => {
     setSearchState((current) => {
       const steps = Math.max(0, Math.min(8, budget - current.rootVisits));
 
@@ -879,22 +879,18 @@ export function MonteCarloTreeSearchPlayground() {
 
       return next;
     });
-  }
+  }, [budget, explorationConstant]);
 
   useEffect(() => {
     if (!isRunning) {
       return;
     }
 
-    if (searchState.rootVisits >= budget) {
-      setIsRunning(false);
-      return;
-    }
-
-    const timeout = window.setTimeout(runToBudget, 520);
+    const delay = searchState.rootVisits >= budget ? 0 : 520;
+    const timeout = window.setTimeout(runToBudget, delay);
 
     return () => window.clearTimeout(timeout);
-  }, [budget, explorationConstant, isRunning, searchState.rootVisits]);
+  }, [budget, isRunning, runToBudget, searchState.rootVisits]);
 
   return (
     <main className="min-h-screen overflow-x-clip bg-[#fbfcff] px-3 py-4 text-[#071024] sm:px-5">

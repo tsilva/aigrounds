@@ -565,7 +565,7 @@ function useIsDesktopViewport() {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
 
     function syncViewport() {
       setIsDesktop(mediaQuery.matches);
@@ -974,8 +974,14 @@ export function PlaygroundAssistantShell({
 
   const shellClassName =
     isDesktop && isAssistantOpen
-      ? "min-h-screen bg-[#f7f9ff] text-slate-950 lg:grid lg:grid-cols-[minmax(0,1fr)_24rem]"
-      : "min-h-screen bg-[#f7f9ff] text-slate-950";
+      ? "min-h-screen bg-[#f7f9ff] text-slate-950 md:grid md:grid-cols-[minmax(0,1fr)_24rem]"
+      : isAssistantOpen
+        ? "grid h-screen grid-rows-[minmax(0,1fr)_minmax(18rem,46vh)] overflow-hidden bg-[#f7f9ff] text-slate-950"
+        : "min-h-screen bg-[#f7f9ff] text-slate-950";
+  const playgroundRootClassName =
+    isAssistantOpen && !isDesktop
+      ? "min-h-0 min-w-0 overflow-y-auto"
+      : "min-w-0";
   const quickReplies = useMemo<QuickReply[]>(() => {
     if (!tutorPlan) {
       return [];
@@ -1142,7 +1148,7 @@ export function PlaygroundAssistantShell({
 
   return (
     <div className={shellClassName}>
-      <div id="playground-capture-root" className="min-w-0">
+      <div id="playground-capture-root" className={playgroundRootClassName}>
         {children}
       </div>
 
@@ -1156,7 +1162,7 @@ export function PlaygroundAssistantShell({
         <button
           type="button"
           onClick={() => setIsAssistantOpen(true)}
-          className="fixed right-4 bottom-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 px-5 py-3 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none"
+          className="fixed right-4 bottom-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 p-2 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none xl:px-5 xl:py-3"
           aria-expanded={isAssistantOpen}
           aria-controls="playground-assistant-panel"
           aria-label="Open chat"
@@ -1167,7 +1173,7 @@ export function PlaygroundAssistantShell({
           >
             ?
           </span>
-          <span className="flex flex-col leading-none">
+          <span className="hidden flex-col leading-none xl:flex">
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-200">
               AI Guide
             </span>
@@ -1177,11 +1183,9 @@ export function PlaygroundAssistantShell({
       ) : null}
 
       {!isDesktop && isAssistantOpen ? (
-        <div className="fixed inset-0 z-50 bg-slate-950/35">
-          <div className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white shadow-2xl">
-            {assistantPanel}
-          </div>
-        </div>
+        <aside className="min-h-0 border-t border-slate-200 bg-white shadow-[0_-18px_50px_rgba(15,23,42,0.12)]">
+          {assistantPanel}
+        </aside>
       ) : null}
     </div>
   );

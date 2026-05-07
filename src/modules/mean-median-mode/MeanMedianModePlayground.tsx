@@ -70,17 +70,43 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function FactPill({ label, value }: { label: string; value: string }) {
+const numberLineInsetPx = 16;
+
+function FactPill({
+  label,
+  value,
+  wrap = false,
+}: {
+  label: string;
+  value: string;
+  wrap?: boolean;
+}) {
   return (
     <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
       <p className="text-[11px] font-black tracking-[0.03em] text-[#7180a5] uppercase">
         {label}
       </p>
-      <p className="mt-1 truncate font-mono text-[13px] font-bold text-[#071024]">
+      <p
+        className={`mt-1 font-mono text-[13px] leading-[1.35] font-bold text-[#071024] ${
+          wrap ? "break-words" : "truncate"
+        }`}
+      >
         {value}
       </p>
     </div>
   );
+}
+
+function datasetHint(preset: TypicalPreset) {
+  if (preset.id === "balanced") {
+    return "Start here for the guide: mean and median should land on the same center.";
+  }
+
+  if (preset.id === "repeated-peak") {
+    return "Look for the value that repeats. The mode follows frequency, not distance.";
+  }
+
+  return "Drag the far-right value left or right and watch the mean move more than the median.";
 }
 
 function PresetButton({
@@ -277,6 +303,7 @@ function DatasetPanel({
             <FactPill
               label="Sorted values"
               value={analysis.sortedValues.join(", ")}
+              wrap
             />
             <FactPill
               label="Repeated value"
@@ -288,8 +315,7 @@ function DatasetPanel({
             />
           </div>
           <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
-            Drag the far-right value left or right and watch the mean move more
-            than the median.
+            {datasetHint(activePreset)}
           </div>
         </div>
       </div>
@@ -437,6 +463,14 @@ function ComparePanel({ analysis }: { analysis: TypicalValuesAnalysis }) {
     analysis.modeValues.length > 0
       ? analysis.modeValues.join(", ")
       : "none";
+  const meanPhrase =
+    Math.abs(analysis.meanMedianGap) < 0.5
+      ? "Matches the middle."
+      : "Pulled by extremes.";
+  const meanDetail =
+    Math.abs(analysis.meanMedianGap) < 0.5
+      ? "It balances the values at the same point as the sorted median."
+      : `It sits ${formatSigned(analysis.meanMedianGap)} away from the median.`;
 
   return (
     <Panel className="p-5 sm:p-6">
@@ -448,8 +482,8 @@ function ComparePanel({ analysis }: { analysis: TypicalValuesAnalysis }) {
               label="Mean"
               value={analysis.mean.toFixed(1)}
               color="#2563eb"
-              phrase="Pulled by extremes."
-              detail={`It sits ${formatSigned(analysis.meanMedianGap)} away from the median.`}
+              phrase={meanPhrase}
+              detail={meanDetail}
             />
             <StoryRow
               label="Median"
@@ -499,7 +533,11 @@ export function MeanMedianModePlayground() {
       }
 
       const nextValue = clampValue(
-        clientXToPercentValue(clientX, trackRef.current.getBoundingClientRect()),
+        clientXToPercentValue(
+          clientX,
+          trackRef.current.getBoundingClientRect(),
+          numberLineInsetPx,
+        ),
       );
 
       setPoints((currentPoints) =>
@@ -545,7 +583,9 @@ export function MeanMedianModePlayground() {
       return;
     }
 
-    const nextValue = clampValue(clientXToPercentValue(clientX, rect));
+    const nextValue = clampValue(
+      clientXToPercentValue(clientX, rect, numberLineInsetPx),
+    );
 
     setPoints((currentPoints) => movePoint(currentPoints, pointId, nextValue));
   }

@@ -7,10 +7,14 @@ type TutorPlanSlug =
   | "probability-rules"
   | "conditional-probability"
   | "bayes-rule"
+  | "expected-value-risk"
+  | "bernoulli-categorical-binomial"
   | "softmax-temperature"
   | "gradient-descent"
+  | "monte-carlo-tree-search"
   | "confusion-matrix-thresholds"
-  | "overfitting";
+  | "overfitting"
+  | "transformer-attention";
 
 export type TutorStep = {
   title: string;
@@ -186,6 +190,60 @@ export const playgroundTutorPlans = {
         ],
         takeaway:
           "Squaring makes large deviations count much more, which is why far-away values can dominate variance.",
+      },
+    ],
+  },
+  "transformer-attention": {
+    intro:
+      "Work through three attention experiments. Pick the ambiguous token, predict which context word should matter, then change sharpness and inspect the value mix.",
+    steps: [
+      {
+        title: "Disambiguate bank",
+        experiment:
+          "Choose River Bank and keep bank selected. Compare the attention weights for river and bank.",
+        predictionQuestion:
+          "Which token should bank attend to if the sentence is about a river?",
+        observationPrompt:
+          "What happened to the strongest key and output meaning?",
+        observationOptions: [
+          "River received the largest context weight",
+          "The output leaned toward shore meaning",
+          "I am not sure",
+        ],
+        takeaway:
+          "The same token can lean toward different meanings when its query finds different context keys.",
+      },
+      {
+        title: "Switch context",
+        experiment:
+          "Choose Money Bank and keep bank selected. Watch cash compete against the other keys.",
+        predictionQuestion:
+          "Which token should pull bank toward a finance meaning?",
+        observationPrompt:
+          "What changed when the sentence switched from river to cash?",
+        observationOptions: [
+          "Cash became the strongest context key",
+          "Finance meaning increased in the value vector",
+          "I am not sure",
+        ],
+        takeaway:
+          "Attention uses the sentence around a token, so context can steer an ambiguous word before the next layer.",
+      },
+      {
+        title: "Sharpen the lookup",
+        experiment:
+          "Move Focus Sharpness from spread to sharp. Compare entropy, top weight, and the connection diagram.",
+        predictionQuestion:
+          "What should happen when softmax focus becomes sharper?",
+        observationPrompt:
+          "How did the weights change as sharpness increased?",
+        observationOptions: [
+          "The top key took more weight",
+          "Entropy decreased",
+          "I am not sure",
+        ],
+        takeaway:
+          "Sharper attention concentrates the weighted lookup, while softer attention blends more tokens together.",
       },
     ],
   },
@@ -580,6 +638,168 @@ export const playgroundTutorPlans = {
         ],
         takeaway:
           "Momentum reuses previous motion. It can speed travel on smooth slopes, but too much carry-over can push past the valley.",
+      },
+    ],
+  },
+  "expected-value-risk": {
+    intro:
+      "Work through three payoff experiments. Predict which bet should win on average, move the sliders, then compare expected value with the outcome swings.",
+    steps: [
+      {
+        title: "Weight the outcomes",
+        experiment:
+          "Choose Steady vs Swingy. Compare each bet's win probability, win amount, loss amount, and EV formula.",
+        predictionQuestion:
+          "Which part should matter more for expected value: the biggest payoff or the probability-weighted payoff?",
+        observationPrompt:
+          "What happened to EV when probability and payoff were multiplied together?",
+        observationOptions: [
+          "Probability changed the weight",
+          "The biggest prize did not decide alone",
+          "I am not sure",
+        ],
+        takeaway:
+          "Expected value is a weighted average, so each outcome only counts as much as its probability allows.",
+      },
+      {
+        title: "Separate average from risk",
+        experiment:
+          "Choose Higher EV, Wider Swings. Compare the EV markers with the red-to-green spread bars.",
+        predictionQuestion:
+          "Can the bet with the higher expected value still have rougher short-run outcomes?",
+        observationPrompt:
+          "What did the spread bar show that EV alone did not show?",
+        observationOptions: [
+          "The higher EV bet swung wider",
+          "Risk and average were different",
+          "I am not sure",
+        ],
+        takeaway:
+          "EV describes the center of the long run; risk describes how far individual outcomes can land from that center.",
+      },
+      {
+        title: "Watch the long run",
+        experiment:
+          "Switch between 24, 60, and 120 rounds. Compare simulated average with expected average for both bets.",
+        predictionQuestion:
+          "Should a short simulation match expected value exactly, or only drift toward it over many repeats?",
+        observationPrompt:
+          "How did the simulated average behave as the number of rounds changed?",
+        observationOptions: [
+          "Short runs bounced around",
+          "More rounds moved toward EV",
+          "I am not sure",
+        ],
+        takeaway:
+          "Expected value is a long-run target, not a promise about the next few outcomes.",
+      },
+    ],
+  },
+  "bernoulli-categorical-binomial": {
+    intro:
+      "Work through three probability-mass experiments. Predict which outcome gets mass, change p or n, then connect the visible shape to the question being asked.",
+    steps: [
+      {
+        title: "Start with one yes/no trial",
+        experiment:
+          "Choose Bernoulli Trial. Move Success probability p and compare the 0 and 1 bars.",
+        predictionQuestion:
+          "When p rises, where should probability mass move in a one-trial yes/no model?",
+        observationPrompt:
+          "What happened to the failure and success bars as p changed?",
+        observationOptions: [
+          "Success mass increased",
+          "Failure mass decreased",
+          "I am not sure",
+        ],
+        takeaway:
+          "A Bernoulli trial has only two outcomes, so adding mass to success removes the same amount from failure.",
+      },
+      {
+        title: "Spread one choice across classes",
+        experiment:
+          "Choose Categorical Choice. Move p and watch class A trade mass with the other class buckets.",
+        predictionQuestion:
+          "If class A receives more probability, what must happen to the other classes?",
+        observationPrompt:
+          "How did the class probabilities keep the total mass at 1?",
+        observationOptions: [
+          "Class A gained mass",
+          "Other classes shared the remainder",
+          "I am not sure",
+        ],
+        takeaway:
+          "Categorical probabilities describe one draw from many buckets, and all buckets must still sum to 1.",
+      },
+      {
+        title: "Repeat and count successes",
+        experiment:
+          "Choose Binomial Count. Change Trials n, then move p and compare where the tallest count bars land.",
+        predictionQuestion:
+          "When p rises across repeated trials, should the likely success count move left or right?",
+        observationPrompt:
+          "What happened to the count shape and expected value?",
+        observationOptions: [
+          "The likely count moved right",
+          "Expected successes increased",
+          "I am not sure",
+        ],
+        takeaway:
+          "A binomial model repeats the same Bernoulli trial and summarizes the run by how many successes occurred.",
+      },
+    ],
+  },
+  "monte-carlo-tree-search": {
+    intro:
+      "Work through three search experiments. Predict which move gets the next rollout, change the exploration pressure, then connect the result to the counters that flow back up the tree.",
+    steps: [
+      {
+        title: "Choose by UCB",
+        experiment:
+          "Keep c near 1.4 and compare the UCB table with the highlighted tree branch.",
+        predictionQuestion:
+          "Should the next rollout always choose the move with the highest win rate?",
+        observationPrompt:
+          "Why did the selected move win the UCB comparison?",
+        observationOptions: [
+          "Exploration bonus helped a less-visited move",
+          "Win rate was not the only score",
+          "I am not sure",
+        ],
+        takeaway:
+          "MCTS selects by confidence plus curiosity, so a less-proven move can earn the next rollout.",
+      },
+      {
+        title: "Turn exploration down",
+        experiment:
+          "Move c toward exploit. Watch the UCB table and selected branch update.",
+        predictionQuestion:
+          "What should happen when the exploration bonus becomes small?",
+        observationPrompt:
+          "Which part of the UCB score mattered more after lowering c?",
+        observationOptions: [
+          "Win rate dominated",
+          "The best-proven move became more attractive",
+          "I am not sure",
+        ],
+        takeaway:
+          "Low exploration pressure makes MCTS behave more like it is exploiting the strongest current evidence.",
+      },
+      {
+        title: "Backpropagate one rollout",
+        experiment:
+          "Press Step once. Compare the tree, rollout result, and Backpropagate table.",
+        predictionQuestion:
+          "After one simulated win, which counters should change?",
+        observationPrompt:
+          "Where did the rollout result travel after the simulation ended?",
+        observationOptions: [
+          "The selected move updated",
+          "The root counters updated too",
+          "I am not sure",
+        ],
+        takeaway:
+          "Backpropagation pushes the rollout result through every node on the selected path, changing later UCB choices.",
       },
     ],
   },

@@ -1,15 +1,19 @@
 import { type ComponentType } from "react";
 import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
+import { BernoulliCategoricalBinomialPlayground } from "@/modules/bernoulli-categorical-binomial/BernoulliCategoricalBinomialPlayground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { ConditionalProbabilityPlayground } from "@/modules/conditional-probability/ConditionalProbabilityPlayground";
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
+import { ExpectedValueRiskPlayground } from "@/modules/expected-value-risk/ExpectedValueRiskPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
 import { MeanMedianModePlayground } from "@/modules/mean-median-mode/MeanMedianModePlayground";
+import { MonteCarloTreeSearchPlayground } from "@/modules/monte-carlo-tree-search/MonteCarloTreeSearchPlayground";
 import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
 import { ProbabilityRulesPlayground } from "@/modules/probability-rules/ProbabilityRulesPlayground";
 import { RangeQuartilesIqrPlayground } from "@/modules/range-quartiles-iqr/RangeQuartilesIqrPlayground";
 import { ShapeSkewOutliersPlayground } from "@/modules/shape-skew-outliers/ShapeSkewOutliersPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
+import { TransformerAttentionPlayground } from "@/modules/transformer-attention/TransformerAttentionPlayground";
 import { VarianceStandardDeviationPlayground } from "@/modules/variance-standard-deviation/VarianceStandardDeviationPlayground";
 import {
   activePlaygroundMetadata,
@@ -34,10 +38,14 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "probability-rules": ProbabilityRulesPlayground,
   "conditional-probability": ConditionalProbabilityPlayground,
   "bayes-rule": BayesRulePlayground,
+  "expected-value-risk": ExpectedValueRiskPlayground,
+  "bernoulli-categorical-binomial": BernoulliCategoricalBinomialPlayground,
   "softmax-temperature": SoftmaxTemperaturePlayground,
   "gradient-descent": GradientDescentPlayground,
+  "monte-carlo-tree-search": MonteCarloTreeSearchPlayground,
   "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,
   overfitting: OverfittingPlayground,
+  "transformer-attention": TransformerAttentionPlayground,
 };
 
 export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.map(

@@ -38,11 +38,22 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "mean-median-mode": {
     intro:
       "Work through three small experiments. Predict first, change the data, observe the summaries, then explain which measure of typical stayed useful.",
+    openingMessage:
+      "No prior statistics knowledge needed. We will build three ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Mean is the average: add all values, then divide by how many values there are.\n- Median is the middle value after sorting the data.\n- Mode is the most common value. A dataset can have no mode, one mode, or more than one mode.\n- Outliers are far-away values that can pull some summaries more than others.\n\nFirst prediction: when the values are fairly even, which typical value do you expect to best describe the middle: mean, median, or mode? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Defines mean as the average that uses every value.",
+      "Defines median as the middle after sorting the values.",
+      "Defines mode as the most common value and recognizes when repeats matter.",
+      "Explains why mean and median often agree in a balanced dataset.",
+      "Explains why an outlier pulls the mean more than the median.",
+      "Chooses an appropriate typical-value summary for balanced, repeated, and outlier-heavy datasets.",
+    ],
     steps: [
       {
         title: "Compare one calm center",
         experiment:
-          "Choose Balanced. Watch the number line, sorted values, and the Mean, Median, and Mode panels.",
+          "Choose Balanced if it is not already selected. Watch the number line, sorted values, and the Mean, Median, and Mode panels.",
         predictionQuestion:
           "When the values are fairly even, which typical value do you expect to best describe the middle?",
         observationPrompt:

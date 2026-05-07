@@ -31,6 +31,9 @@ export function useStackedPointLayout<T extends NumericValuePoint>(
 export function clientXToPercentValue(
   clientX: number,
   rect: Pick<DOMRect, "left" | "width">,
+  insetPx = 0,
 ) {
-  return ((clientX - rect.left) / rect.width) * 100;
+  const usableWidth = Math.max(1, rect.width - insetPx * 2);
+
+  return ((clientX - rect.left - insetPx) / usableWidth) * 100;
 }

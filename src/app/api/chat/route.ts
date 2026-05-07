@@ -223,7 +223,7 @@ function systemPrompt(
               : "Your next move: give the exact experiment action and ask the prediction question before explaining the result."
             : undefined,
           tutor.phase === "observe"
-            ? "Your next move: treat the learner's latest message as their prediction. Briefly acknowledge it, tell the learner the exact experiment action, name the UI surfaces to watch, and ask what they observe. Avoid giving away the full explanation yet."
+            ? "Your next move: treat the learner's latest message as their prediction. Do not call the screenshot tool in this phase unless the learner explicitly says they already changed controls or asks about the current graph. Briefly acknowledge the prediction, tell the learner the exact experiment action, name the UI surfaces to watch, and ask what they observe. Avoid giving away the full explanation yet."
             : undefined,
           tutor.phase === "reflect"
             ? "Your next move: treat the learner's latest message as their observation. Respond to it, connect it to the target takeaway, then ask them to explain the concept in their own words before moving on."

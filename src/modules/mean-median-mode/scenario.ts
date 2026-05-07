@@ -32,7 +32,7 @@ export const typicalPresets: TypicalPreset[] = [
   },
 ];
 
-export const initialTypicalPreset = typicalPresets[2] ?? typicalPresets[0]!;
+export const initialTypicalPreset = typicalPresets[0]!;
 
 export function pointsForPreset(preset: TypicalPreset): DataPoint[] {
   return makePoints(preset.values);

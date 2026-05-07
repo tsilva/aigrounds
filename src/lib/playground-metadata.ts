@@ -211,6 +211,58 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "expected-value-risk",
+    title: "Expected Value & Risk Lab",
+    tag: "probability",
+    kicker:
+      "Tune two bets and see why the best long-run average can still swing hard.",
+    summary:
+      "Build a safe bet and a risky bet, then compare expected value, spread, break-even probability, and deterministic long-run simulations as the payoff sliders move.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Random variables",
+      "Expected value",
+      "Risk",
+      "Long-run averages",
+    ],
+    learningGoals: [
+      "Understand expected value as a probability-weighted average of outcomes.",
+      "See why two bets with similar expected value can have very different spread.",
+      "Recognize that short-run samples can bounce around before the long-run average appears.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["expected-value-risk"],
+    theme: {
+      badgeClassName: "border-amber-300 bg-amber-100 text-amber-950",
+    },
+  },
+  {
+    slug: "bernoulli-categorical-binomial",
+    title: "Bernoulli, Categorical & Binomial Lab",
+    tag: "probability",
+    kicker:
+      "Switch between one trial, one choice, and repeated counts while probability mass reshapes.",
+    summary:
+      "Move a success probability, change repeated trials, and compare Bernoulli, categorical, and binomial probability mass so the shared idea and different questions stay distinct.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Bernoulli trials",
+      "Categorical outcomes",
+      "Binomial counts",
+      "Probability mass",
+    ],
+    learningGoals: [
+      "Understand Bernoulli as one yes/no trial with a success probability.",
+      "See categorical outcomes as one draw from several probability buckets.",
+      "Recognize binomial counts as repeated Bernoulli trials summarized by number of successes.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["bernoulli-categorical-binomial"],
+    theme: {
+      badgeClassName: "border-emerald-300 bg-emerald-100 text-emerald-950",
+    },
+  },
+  {
     slug: "categorical-cross-entropy",
     title: "Cross Entropy Loss",
     tag: "loss",
@@ -289,6 +341,32 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "monte-carlo-tree-search",
+    title: "Monte Carlo Tree Search",
+    tag: "search",
+    kicker:
+      "Spend rollouts where confidence and curiosity say the tree can learn most.",
+    summary:
+      "Tune the UCB exploration constant, step through selection, expansion, simulation, and backpropagation, and see why MCTS sometimes samples an uncertain move before returning to the best-proven branch.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Tree search",
+      "Rollouts",
+      "UCB selection",
+      "Backpropagation",
+    ],
+    learningGoals: [
+      "Understand MCTS as a loop of select, expand, simulate, and backpropagate.",
+      "See how UCB combines win rate with an exploration bonus for less-visited moves.",
+      "Recognize why more rollouts turn uncertain branches into evidence-backed decisions.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["monte-carlo-tree-search"],
+    theme: {
+      badgeClassName: "border-amber-300 bg-amber-100 text-amber-950",
+    },
+  },
+  {
     slug: "overfitting",
     title: "Overfitting Lab",
     tag: "generalization",
@@ -338,6 +416,32 @@ export const activePlaygroundMetadata = [
     tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
     theme: {
       badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
+    },
+  },
+  {
+    slug: "transformer-attention",
+    title: "Transformer Attention",
+    tag: "transformers",
+    kicker:
+      "Select a token and watch query-key scores become a weighted context mix.",
+    summary:
+      "Switch between two meanings of bank, choose a query token, and adjust attention sharpness. The lab shows how queries compare with keys, softmax creates weights, and values blend into the next token representation.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Self-attention",
+      "Queries and keys",
+      "Softmax weights",
+      "Value mixing",
+    ],
+    learningGoals: [
+      "Understand attention as a weighted lookup over context tokens.",
+      "See how query-key scores decide which tokens receive larger weights.",
+      "Recognize that values, not keys, are blended into the next representation.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["transformer-attention"],
+    theme: {
+      badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
     },
   },
 ] satisfies PlaygroundMetadata[];

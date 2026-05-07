@@ -25,10 +25,10 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 7. [x] **Bayes Rule Playground**
    Learn Bayes theorem, priors, likelihoods, posteriors, false positives, false negatives, and base-rate neglect. Use a medical-test or fraud-detection scenario with adjustable prevalence and test accuracy.
 
-8. **Expected Value & Risk Lab**
+8. [x] **Expected Value & Risk Lab**
    Learn random variables, expected value, probability-weighted outcomes, variance of outcomes, and risk/reward tradeoffs. Build simple games or bets and compare long-run average outcomes.
 
-9. **Bernoulli, Categorical & Binomial Lab**
+9. [x] **Bernoulli, Categorical & Binomial Lab**
    Learn Bernoulli trials, categorical outcomes, binomial counts, parameters, and probability mass. Adjust success probability and trial count to watch mass move across outcome counts.
 
 10. **Waiting & Arrival Distributions Lab**
@@ -134,3 +134,6 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 
 9. **ROC vs Precision-Recall Curves**
    Move a threshold across classifier scores and trace both curves. Useful, but probably better after the confusion-matrix module exists.
+
+10. [x] **Transformer Attention Playground**
+    Adjust a token's query focus and watch attention weights decide which context tokens flow into its next representation.

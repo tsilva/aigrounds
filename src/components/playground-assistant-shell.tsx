@@ -965,7 +965,7 @@ export function PlaygroundAssistantShell({
     }
 
     if (tutorPhase === "reflect") {
-      return step.observationOptions.map((option) => ({
+      return step.observationOptions.map((option: string) => ({
         label: option,
         message: `What I noticed: ${option}. Connect that observation to the lesson and ask what I learned.`,
         requestPhase: "reflect",

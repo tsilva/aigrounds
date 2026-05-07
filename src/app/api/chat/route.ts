@@ -197,6 +197,17 @@ function systemPrompt(
           "Keep each tutor reply short: 2-5 concise sentences or a small bullet list.",
           `Current tutor phase: ${tutor.phase ?? "start"}.`,
           `Current experiment number: ${(tutor.stepIndex ?? 0) + 1}.`,
+          resolvedPlayground.tutorPlan.openingMessage
+            ? `Tutor opening message shown to learner:\n${resolvedPlayground.tutorPlan.openingMessage}`
+            : undefined,
+          resolvedPlayground.tutorPlan.requireTypedPredictionToStart
+            ? "This tutor plan is typed-only: quick reply buttons are hidden. Use the learner's typed messages as the signal to advance. The learner must type a prediction before you give experiment controls. After a prediction, acknowledge it briefly, give the exact experiment action, and ask what they observe. After an observation, connect it to the target takeaway and ask for a short explanation in their own words."
+            : undefined,
+          resolvedPlayground.tutorPlan.masteryCriteria?.length
+            ? `Mastery criteria. The learner has understood this lesson only when their answers show they can:\n${resolvedPlayground.tutorPlan.masteryCriteria
+                .map((criterion) => `- ${criterion}`)
+                .join("\n")}`
+            : undefined,
           tutor.stepTitle ? `Experiment title: ${tutor.stepTitle}.` : undefined,
           tutor.experiment ? `Experiment action: ${tutor.experiment}` : undefined,
           tutor.predictionQuestion
@@ -207,19 +218,25 @@ function systemPrompt(
             : undefined,
           tutor.takeaway ? `Target takeaway: ${tutor.takeaway}` : undefined,
           tutor.phase === "start" || tutor.phase === "predict"
-            ? "Your next move: give the exact experiment action and ask the prediction question before explaining the result."
+            ? resolvedPlayground.tutorPlan.requireTypedPredictionToStart
+              ? "Your next move: explain the playground and key concepts in plain language, then ask only the prediction question. Do not give the experiment action until the learner has answered."
+              : "Your next move: give the exact experiment action and ask the prediction question before explaining the result."
             : undefined,
           tutor.phase === "observe"
-            ? "Your next move: tell the learner to run the experiment if needed, then ask what they observed. Avoid giving away the full explanation yet."
+            ? "Your next move: treat the learner's latest message as their prediction. Briefly acknowledge it, tell the learner the exact experiment action, name the UI surfaces to watch, and ask what they observe. Avoid giving away the full explanation yet."
             : undefined,
           tutor.phase === "reflect"
-            ? "Your next move: respond to the learner's observation, connect it to the target takeaway, then ask what they learned in their own words."
+            ? "Your next move: treat the learner's latest message as their observation. Respond to it, connect it to the target takeaway, then ask them to explain the concept in their own words before moving on."
             : undefined,
           tutor.phase === "next"
-            ? "Your next move: briefly acknowledge the last lesson, then introduce only the next experiment and ask for a prediction."
+            ? resolvedPlayground.tutorPlan.requireTypedPredictionToStart
+              ? "Your next move: treat the learner's latest message as their explanation of the previous concept. Briefly acknowledge or correct it, introduce only the next experiment title, then ask the prediction question. Do not give the next experiment controls until the learner answers."
+              : "Your next move: briefly acknowledge the last lesson, then introduce only the next experiment and ask for a prediction."
             : undefined,
           tutor.phase === "complete"
-            ? `Your next move: summarize the guided ${playgroundName} experiments and ask the learner to explain the main lesson back in their own words.`
+            ? resolvedPlayground.tutorPlan.masteryCriteria?.length
+              ? `Your next move: evaluate the learner's latest answer against the mastery criteria. If it demonstrates the core ideas, start with exactly "Lesson finished." and give a one-sentence summary. If it is incomplete or vague, do not say "Lesson finished"; ask one targeted Socratic follow-up question or prescribe one small UI check that addresses the missing idea.`
+              : `Your next move: summarize the guided ${playgroundName} experiments and ask the learner to explain the main lesson back in their own words.`
             : undefined,
         ]
           .filter(Boolean)

@@ -647,6 +647,79 @@ export function PlaygroundAssistantShell({
       return;
     }
 
+    if (
+      tutorPlan?.requireTypedPredictionToStart &&
+      currentTutorStep
+    ) {
+      const previousTutorState = {
+        isTutorActive,
+        tutorPhase,
+        tutorStepIndex,
+      };
+      const nextStepIndex = (() => {
+        if (
+          isTutorActive &&
+          tutorPhase === "readyNext" &&
+          tutorStepIndex + 1 < tutorPlan.steps.length
+        ) {
+          return tutorStepIndex + 1;
+        }
+
+        return tutorStepIndex;
+      })();
+      const requestStep = tutorPlan.steps[nextStepIndex] ?? currentTutorStep;
+      const requestPhase: TutorRequestPhase = (() => {
+        if (!isTutorActive || tutorPhase === "predict") {
+          return "observe";
+        }
+
+        if (tutorPhase === "observe") {
+          return "reflect";
+        }
+
+        if (tutorPhase === "readyNext") {
+          return nextStepIndex >= tutorPlan.steps.length - 1 &&
+            tutorStepIndex + 1 >= tutorPlan.steps.length
+            ? "complete"
+            : "next";
+        }
+
+        return "complete";
+      })();
+      const nextPhase: TutorPhase = (() => {
+        if (requestPhase === "observe") {
+          return "observe";
+        }
+
+        if (requestPhase === "reflect") {
+          return "readyNext";
+        }
+
+        if (requestPhase === "next") {
+          return "predict";
+        }
+
+        return "complete";
+      })();
+
+      setIsTutorActive(true);
+      setTutorStepIndex(nextStepIndex);
+      setTutorPhase(nextPhase);
+
+      const didSend = await sendChatMessage(
+        content,
+        tutorContextFromStep(requestStep, nextStepIndex, requestPhase),
+      );
+
+      if (!didSend) {
+        setIsTutorActive(previousTutorState.isTutorActive);
+        setTutorStepIndex(previousTutorState.tutorStepIndex);
+        setTutorPhase(previousTutorState.tutorPhase);
+      }
+
+      return;
+    }
+
     await sendChatMessage(content);
   }
 
@@ -909,6 +982,10 @@ export function PlaygroundAssistantShell({
     }
 
     if (!isTutorActive) {
+      if (tutorPlan.requireTypedPredictionToStart) {
+        return [];
+      }
+
       return [
         {
           label: "Guide me",
@@ -923,6 +1000,10 @@ export function PlaygroundAssistantShell({
     const step = tutorPlan.steps[tutorStepIndex];
 
     if (!step) {
+      return [];
+    }
+
+    if (tutorPlan.requireTypedPredictionToStart) {
       return [];
     }
 
@@ -1025,15 +1106,25 @@ export function PlaygroundAssistantShell({
       : tutorPlan
         ? `${playgroundName} tutor`
         : undefined;
+  const scopedMessages = messages
+    .filter(
+      (message) => message.id === "welcome" || message.pathname === pathname,
+    )
+    .map((message) =>
+      message.id === "welcome"
+        ? {
+            ...message,
+            content: tutorPlan?.openingMessage ?? welcomeMessage.content,
+          }
+        : message,
+    );
 
   const assistantPanel = (
     <ChatPanel
       draft={draft}
       error={error}
       isSending={isSending}
-      messages={messages.filter(
-        (message) => message.id === "welcome" || message.pathname === pathname,
-      )}
+      messages={scopedMessages}
       playgroundName={playgroundName}
       quickReplies={quickReplies}
       screenshotActions={screenshotActions.filter(
@@ -1163,8 +1254,13 @@ function ChatPanel({
       return;
     }
 
+    if (!draft.trim()) {
+      textarea.style.height = "40px";
+      return;
+    }
+
     textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`;
   }, [draft, textareaRef]);
 
   return (
@@ -1272,7 +1368,7 @@ function ChatPanel({
             }}
             placeholder="Ask next. Enter submits."
             rows={1}
-            className="min-h-10 w-full resize-none overflow-hidden rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
+            className="h-10 max-h-32 min-h-10 w-full resize-none overflow-y-auto rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
             disabled={isSending}
           />
         </label>

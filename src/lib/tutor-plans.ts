@@ -9,6 +9,7 @@ type TutorPlanSlug =
   | "bayes-rule"
   | "expected-value-risk"
   | "bernoulli-categorical-binomial"
+  | "waiting-arrival-distributions"
   | "softmax-temperature"
   | "gradient-descent"
   | "monte-carlo-tree-search"
@@ -27,10 +28,13 @@ export type TutorStep = {
 
 export type TutorPlan = {
   intro: string;
+  openingMessage?: string;
+  requireTypedPredictionToStart?: boolean;
+  masteryCriteria?: string[];
   steps: TutorStep[];
 };
 
-export const playgroundTutorPlans = {
+export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "mean-median-mode": {
     intro:
       "Work through three small experiments. Predict first, change the data, observe the summaries, then explain which measure of typical stayed useful.",
@@ -88,6 +92,16 @@ export const playgroundTutorPlans = {
   "range-quartiles-iqr": {
     intro:
       "Work through three spread experiments. Predict what will stretch, change one view, then connect the box plot to the five-number summary.",
+    openingMessage:
+      "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Range is the full span: maximum minus minimum.\n- Quartiles come from sorted data. Q1 is around the lower quarter, the median is the middle, and Q3 is around the upper quarter.\n- IQR is Q3 minus Q1, so it measures the width of the middle 50%.\n- A box plot draws the five-number summary: min, Q1, median, Q3, and max.\n\nFirst prediction: if the smallest and largest values are close together, what should happen to the range? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Defines range as maximum minus minimum and connects it to the whisker-to-whisker span.",
+      "Explains quartiles as positions in sorted data that split lower, middle, and upper portions.",
+      "Defines IQR as Q3 minus Q1 and connects it to the width of the middle 50%.",
+      "Explains why a single far outlier changes range more than IQR.",
+      "Can use the box plot and five-number summary together to justify a claim about spread.",
+    ],
     steps: [
       {
         title: "Read the full span",
@@ -746,6 +760,60 @@ export const playgroundTutorPlans = {
         ],
         takeaway:
           "A binomial model repeats the same Bernoulli trial and summarizes the run by how many successes occurred.",
+      },
+    ],
+  },
+  "waiting-arrival-distributions": {
+    intro:
+      "Work through three arrival experiments. Predict how one event chance changes waits and counts, then connect the tick model to the Poisson rate view.",
+    steps: [
+      {
+        title: "Split one rate into two questions",
+        experiment:
+          "Start with Website Visits. Compare the geometric wait formula, Poisson count formula, and the bridge from p to lambda T.",
+        predictionQuestion:
+          "If the per-second event chance increases, what should happen to both the typical wait and expected count?",
+        observationPrompt:
+          "What changed together when the same rate fed both views?",
+        observationOptions: [
+          "Expected count increased",
+          "Typical wait got shorter",
+          "I am not sure",
+        ],
+        takeaway:
+          "The same arrival rate can answer a wait question and a count question, as long as the model assumptions stay clear.",
+      },
+      {
+        title: "Read the waiting tail",
+        experiment:
+          "Move p lower and watch the waiting-time histogram. Compare P(wait <= 20s) with P(wait > 60s).",
+        predictionQuestion:
+          "When events become rarer, should the long-wait bucket shrink or grow?",
+        observationPrompt:
+          "How did the waiting histogram change when arrivals became less likely?",
+        observationOptions: [
+          "The 60s+ bucket grew",
+          "Short waits became less likely",
+          "I am not sure",
+        ],
+        takeaway:
+          "In a geometric waiting model, rare per-tick events put more probability into long waits.",
+      },
+      {
+        title: "Compare exact and rare-event shortcuts",
+        experiment:
+          "Use the Rare Defects scenario, then compare the exact at-least-one formula with the rare-event approximation.",
+        predictionQuestion:
+          "When lambda T is tiny, should P(at least one event) be close to lambda T?",
+        observationPrompt:
+          "What did the rare-event panel show about the approximation?",
+        observationOptions: [
+          "The shortcut was close when lambda T was tiny",
+          "The exact formula is safer as lambda T grows",
+          "I am not sure",
+        ],
+        takeaway:
+          "For very rare arrivals, lambda T is a useful quick estimate; otherwise use 1 - e^-lambda T.",
       },
     ],
   },

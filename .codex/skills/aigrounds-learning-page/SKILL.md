@@ -25,6 +25,11 @@ Immediately mark those `N` TODO items done before design work begins.
 - Do not implement before the user explicitly accepts a visual design.
 - Always show the proposed page design using imagegen before editing app code.
 - Iterate the imagegen design with the user until they clearly accept it.
+- Before showing the first proposed design to the user, run a learning-quality
+  self-review loop: generate an initial design, assess whether it is the best
+  practical design for thoroughly teaching the topic through interaction, and
+  revise it when important experiences are missing or any widget lacks a clear
+  teaching purpose. Do at most three design passes before user approval.
 - Keep the page as simple as possible while making the concept interactive and memorable.
 - Match the existing AI Grounds design system; the canonical reference screenshot is `assets/cross-entropy-design-reference.png`.
 - Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
@@ -51,14 +56,23 @@ Immediately mark those `N` TODO items done before design work begins.
      - Controls and formulas live inside those panels; avoid decorative chrome.
    - Use imagegen to create a high-fidelity mockup of the page.
    - Base the prompt on the design system below and the inspected reference screenshot. Include the required invariants explicitly in the prompt, especially the absence of logo/nav/site chrome.
-   - After imagegen returns, visually compare the mockup to the reference before presenting it. Check for:
+   - After imagegen returns, visually compare the mockup to the reference before considering it for presentation. Check for:
      - unwanted logo/nav/sidebar/marketing hero elements,
      - missing numbered lesson panels,
      - nested decorative cards or ornamental backgrounds,
      - text that appears too cramped, clipped, or visually dominant,
      - a central interaction that does not visibly teach the chosen intuition.
-   - If the mockup fails any of those checks, regenerate with stricter negative instructions before showing it to the user.
-   - Show the generated design to the user and ask whether to revise or implement.
+   - Run a learning-quality self-review before showing the mockup to the user.
+     Treat the initial mockup as draft 1, then ask:
+     - Would a user learn the topic thoroughly by manipulating this playground, rather than merely seeing a diagram?
+     - Is the core intuition visible in the main interaction within a few seconds?
+     - Does every widget, metric, control, panel, and visual element have a clear teaching job?
+     - Are any important experiences missing, such as comparing cases, seeing failure modes, stepping through a process, changing assumptions, or connecting a formula to behavior?
+     - Does each interaction update at least two teaching surfaces, such as a chart plus formula, simulation plus metric, or state diagram plus narration?
+     - Is anything decorative, redundant, confusing, or likely to distract from the concept?
+   - If the mockup fails the reference/style checks or the learning-quality review finds a meaningful gap, generate another design pass with a stricter prompt that names exactly what to add, remove, or simplify.
+   - Repeat the self-review loop up to three total design passes. Stop early when the design is reference-compliant and no meaningful teaching gap remains. If three passes still leave tradeoffs, choose the strongest design and briefly note the unresolved tradeoff when asking for approval.
+   - Show only the best self-reviewed design to the user and ask whether to revise or approve it for implementation. Do not implement until the user explicitly approves.
    - If the user requests changes, generate an updated mockup before coding.
 
 3. Implement after acceptance.
@@ -98,7 +112,9 @@ batch size, for example "parallelize with 3".
    - Each design subagent must inspect `assets/cross-entropy-design-reference.png`,
      identify the core intuition, choose the smallest interaction, generate or
      request an imagegen mockup, self-check it against the reference invariants,
-     and return a concise design summary plus the mockup.
+     run the learning-quality self-review loop for up to three design passes,
+     and return the strongest design with a concise summary of why every major
+     widget belongs.
    - Present all `N` accepted-by-agent mockups to the user together, grouped by
      lesson label.
 

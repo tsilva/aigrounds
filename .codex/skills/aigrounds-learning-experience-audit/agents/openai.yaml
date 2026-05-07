@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Grounds Learning Experience Audit"
+  short_description: "Iterative beginner UX review for AI Grounds"
+  default_prompt: "Use $aigrounds-learning-experience-audit to play through this playground as a beginner, fix learning-experience flaws, and loop until it is clean."

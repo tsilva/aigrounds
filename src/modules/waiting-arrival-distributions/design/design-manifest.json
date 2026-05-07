@@ -1,6 +1,6 @@
 {
-  "todoItem": 10,
-  "todoTitle": "Waiting & Arrival Distributions Lab",
+  "lessonPlanStep": 10,
+  "lessonPlanTitle": "Waiting & Arrival Distributions Lab",
   "slug": "waiting-arrival-distributions",
   "modulePath": "src/modules/waiting-arrival-distributions",
   "acceptedMockup": "src/modules/waiting-arrival-distributions/design/accepted-mockup.png",

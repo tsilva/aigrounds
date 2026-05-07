@@ -25,18 +25,19 @@ Each AI playground is a self-contained module under `src/modules/{name}/`. A mod
 - An engine file (`{name}-engine.ts`) — pure-functional algorithm implementation
 - A scenario/data file — domain-specific data structures
 
-Modules are described in `src/lib/playground-metadata.ts` and wired to components in `src/lib/playgrounds.ts`. Adding a new module requires:
+Modules are described in `src/lib/playground-metadata.ts` and wired to components in `src/lib/playgrounds.ts`. The home dashboard is the canonical current and future lesson plan: `activePlaygroundMetadata` holds live lessons, `upcomingPlaygrounds` holds planned lesson cards, and `dashboardLessonPlanOrder` controls their combined order. Adding a new live module requires:
 1. Creating the module folder under `src/modules/`
 2. Adding metadata to `activePlaygroundMetadata` in `src/lib/playground-metadata.ts`
 3. Adding the component to `playgroundComponents` in `src/lib/playgrounds.ts`
-4. Routing is automatic via the `[slug]` dynamic route
+4. Placing the slug in `dashboardLessonPlanOrder`
+5. Routing is automatic via the `[slug]` dynamic route
 
 ### Key Paths
 
 - `src/app/` — Next.js App Router (layout, pages, global styles)
 - `src/app/playgrounds/[slug]/page.tsx` — dynamic route that resolves modules by slug
 - `src/components/playground-shell.tsx` — shared wrapper providing consistent header, breadcrumb, learning goals
-- `src/lib/playground-metadata.ts` — canonical playground metadata, tags, presentation mode, and learning goals
+- `src/lib/playground-metadata.ts` — canonical dashboard lesson plan, playground metadata, tags, presentation mode, and learning goals
 - `src/lib/playgrounds.ts` — slug-to-component registry and `ActivePlayground` type
 - `src/app/api/chat/route.ts` — OpenRouter-backed playground assistant API route
 

@@ -29,6 +29,9 @@ type UpcomingPlayground = {
   concepts: string[];
 };
 
+// The landing dashboard is the canonical lesson plan for both live and planned
+// playgrounds. Keep this metadata and the dashboard order in sync with what `/`
+// should show.
 export const activePlaygroundMetadata = [
   {
     slug: "mean-median-mode",
@@ -660,6 +663,30 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Projection", "Components", "Reconstruction error"],
   },
   {
+    slug: "pca-principal-components",
+    title: "PCA & Principal Components Lab",
+    tag: "dimensionality",
+    summary:
+      "Rotate principal axes and watch variance concentrate into fewer dimensions.",
+    concepts: ["PCA", "Principal components", "Variance captured"],
+  },
+  {
+    slug: "t-sne-neighborhood-map",
+    title: "t-SNE Neighborhood Map",
+    tag: "dimensionality",
+    summary:
+      "Tune perplexity and see how local neighborhoods become a two-dimensional map.",
+    concepts: ["t-SNE", "Perplexity", "Local neighborhoods"],
+  },
+  {
+    slug: "umap-manifold-projection",
+    title: "UMAP Manifold Projection Lab",
+    tag: "dimensionality",
+    summary:
+      "Adjust neighbor and distance settings to compare local clusters with global shape.",
+    concepts: ["UMAP", "Nearest neighbors", "Manifold structure"],
+  },
+  {
     slug: "embedding-retrieval",
     title: "Embedding Retrieval Lab",
     tag: "retrieval",
@@ -725,7 +752,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
   },
 ];
 
-export const roadmapPlaygroundOrder = [
+export const dashboardLessonPlanOrder = [
   "mean-median-mode",
   "range-quartiles-iqr",
   "variance-standard-deviation",
@@ -763,6 +790,9 @@ export const roadmapPlaygroundOrder = [
   "kl-divergence",
   "vector-geometry-similarity",
   "projection-foundations",
+  "pca-principal-components",
+  "t-sne-neighborhood-map",
+  "umap-manifold-projection",
   "embedding-retrieval",
   "contrastive-loss",
   "gradient-descent",

@@ -265,6 +265,32 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "waiting-arrival-distributions",
+    title: "Waiting & Arrival Distributions Lab",
+    tag: "probability",
+    kicker:
+      "Tune one event chance and watch waits stretch while arrival counts shift.",
+    summary:
+      "Move a per-second event chance, change the time window, and compare a geometric waiting-time view with a Poisson rate-model count view.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Geometric distribution",
+      "Poisson distribution",
+      "Arrival rates",
+      "Rare events",
+    ],
+    learningGoals: [
+      "Understand geometric waiting time as the question of how long until the next event.",
+      "See how a Poisson rate model describes counts inside a fixed time window.",
+      "Recognize when the rare-event approximation is useful and when the exact formula is safer.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["waiting-arrival-distributions"],
+    theme: {
+      badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
+    },
+  },
+  {
     slug: "overfitting",
     title: "Overfitting Lab",
     tag: "generalization",
@@ -449,14 +475,6 @@ export const activePlaygroundMetadata = [
 ] satisfies PlaygroundMetadata[];
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-  {
-    slug: "waiting-arrival-distributions",
-    title: "Waiting & Arrival Distributions Lab",
-    tag: "probability",
-    summary:
-      "Tune event probability or arrival rate and compare likely waits or counts.",
-    concepts: ["Geometric distribution", "Poisson distribution", "Rates"],
-  },
   {
     slug: "pdf-cdf-probability-area",
     title: "PDF, CDF & Probability Area Lab",

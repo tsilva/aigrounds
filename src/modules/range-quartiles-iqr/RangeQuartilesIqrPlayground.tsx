@@ -123,7 +123,7 @@ function FactPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
       <p className="text-[11px] font-black text-[#7180a5] uppercase">{label}</p>
-      <p className="mt-1 truncate font-mono text-[13px] font-bold text-[#071024]">
+      <p className="mt-1 break-words font-mono text-[13px] leading-[1.35] font-bold text-[#071024]">
         {value}
       </p>
     </div>

@@ -1,0 +1,9 @@
+{
+  "todoItem": 10,
+  "todoTitle": "Waiting & Arrival Distributions Lab",
+  "slug": "waiting-arrival-distributions",
+  "modulePath": "src/modules/waiting-arrival-distributions",
+  "acceptedMockup": "src/modules/waiting-arrival-distributions/design/accepted-mockup.png",
+  "prompt": "src/modules/waiting-arrival-distributions/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e01a3-b2a7-7833-8740-e8c39f04434a/ig_041c4266945841b10169fc5bd38ef081919e62c4bc3f260e9d.png"
+}

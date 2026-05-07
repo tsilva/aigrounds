@@ -24,12 +24,18 @@ Immediately mark those `N` TODO items done before design work begins.
 
 - Do not implement before the user explicitly accepts a visual design.
 - Always show the proposed page design using imagegen before editing app code.
+- After the user accepts a visual design, persist the accepted mockup and prompt
+  in the lesson module's design artifacts before implementing the module.
 - Iterate the imagegen design with the user until they clearly accept it.
-- Before showing the first proposed design to the user, run a learning-quality
-  self-review loop: generate an initial design, assess whether it is the best
-  practical design for thoroughly teaching the topic through interaction, and
-  revise it when important experiences are missing or any widget lacks a clear
-  teaching purpose. Do at most three design passes before user approval.
+- Before showing any proposed design to the user, run a rigorous
+  evaluate-redesign loop: generate a design, inspect it, name every material
+  reference, teaching, numeric, visual, or interaction defect, then regenerate
+  when any material defect remains. Continue until the latest design has no
+  material issue worth fixing. Do not stop merely because a fixed number of
+  passes has been reached.
+- A design is not ready to show if any chart, timeline, formula, probability,
+  metric, label, control range, or visible state is internally inconsistent or
+  likely to teach the wrong idea.
 - Keep the page as simple as possible while making the concept interactive and memorable.
 - Match the existing AI Grounds design system; the canonical reference screenshot is `assets/cross-entropy-design-reference.png`.
 - Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
@@ -41,6 +47,10 @@ Immediately mark those `N` TODO items done before design work begins.
 1. Understand the concept.
    - If using a default item from `TODO.md`, mark that item done before any
      other work on the page begins.
+   - Record the selected `TODO.md` item number and exact title. Derive the
+     implementation slug from that title using the repo's existing slug style
+     (lowercase words joined by hyphens, preserving established abbreviations
+     such as `iqr` when already used).
    - Identify the one core intuition the user should remember.
    - Choose the smallest interaction that makes that intuition visible.
    - Prefer direct manipulation: sliders, toggles, segmented controls, selectable examples, step/run controls, draggable values, or live visual state.
@@ -62,20 +72,74 @@ Immediately mark those `N` TODO items done before design work begins.
      - nested decorative cards or ornamental backgrounds,
      - text that appears too cramped, clipped, or visually dominant,
      - a central interaction that does not visibly teach the chosen intuition.
-   - Run a learning-quality self-review before showing the mockup to the user.
-     Treat the initial mockup as draft 1, then ask:
+   - Run an evaluate-redesign loop before showing any mockup to the user.
+     Treat every generated mockup as a draft, then inspect it against all of
+     these checks:
+     - Reference fidelity: no logo/nav/sidebar/marketing hero, numbered compact
+       lesson panels, pale borders, no nested decorative cards, no ornamental
+       backgrounds.
+     - Learning quality: the core intuition is visible in the main interaction
+       within a few seconds and every widget has a clear teaching job.
+     - Interaction coverage: each control updates at least two teaching
+       surfaces, such as a chart plus formula, simulation plus metric, or state
+       diagram plus narration.
+     - Numeric and model consistency: formulas, parameters, chart labels,
+       probabilities, simulated examples, timeline counts, control ranges, and
+       takeaway statements agree with each other and with the concept's actual
+       assumptions.
+     - Visual correctness: no clipped text, malformed labels, duplicated axis
+       ticks, overcrowded controls, hidden marks, chart overflow, or misleading
+       visual encodings.
+     - Simplicity: nothing decorative, redundant, confusing, or likely to
+       distract from the concept.
+   - During the loop, ask:
      - Would a user learn the topic thoroughly by manipulating this playground, rather than merely seeing a diagram?
      - Is the core intuition visible in the main interaction within a few seconds?
      - Does every widget, metric, control, panel, and visual element have a clear teaching job?
      - Are any important experiences missing, such as comparing cases, seeing failure modes, stepping through a process, changing assumptions, or connecting a formula to behavior?
      - Does each interaction update at least two teaching surfaces, such as a chart plus formula, simulation plus metric, or state diagram plus narration?
      - Is anything decorative, redundant, confusing, or likely to distract from the concept?
-   - If the mockup fails the reference/style checks or the learning-quality review finds a meaningful gap, generate another design pass with a stricter prompt that names exactly what to add, remove, or simplify.
-   - Repeat the self-review loop up to three total design passes. Stop early when the design is reference-compliant and no meaningful teaching gap remains. If three passes still leave tradeoffs, choose the strongest design and briefly note the unresolved tradeoff when asking for approval.
+   - If the mockup fails any reference, learning, interaction, numeric/model, or
+     visual-correctness check, generate another design pass with a stricter
+     prompt that names exactly what to add, remove, simplify, or correct.
+   - Continue evaluating and redesigning until the latest mockup has no material
+     issue worth fixing. If a remaining tradeoff is unavoidable rather than a
+     fixable defect, name the tradeoff when asking the user for approval.
    - Show only the best self-reviewed design to the user and ask whether to revise or approve it for implementation. Do not implement until the user explicitly approves.
    - If the user requests changes, generate an updated mockup before coding.
 
-3. Implement after acceptance.
+3. Persist the accepted design.
+   - Immediately after explicit user approval, copy the accepted generated PNG
+     into the module-owned artifact path:
+     `src/modules/{slug}/design/accepted-mockup.png`.
+   - Also create `src/modules/{slug}/design/imagegen-prompt.md` containing the
+     final accepted imagegen prompt or a faithful reconstruction of it if the
+     prompt was assembled across revision rounds.
+   - Also create `src/modules/{slug}/design/design-manifest.json` with this
+     shape, using stable deterministic fields:
+
+     ```json
+     {
+       "todoItem": 10,
+       "todoTitle": "Waiting & Arrival Distributions Lab",
+       "slug": "waiting-arrival-distributions",
+       "modulePath": "src/modules/waiting-arrival-distributions",
+       "acceptedMockup": "src/modules/waiting-arrival-distributions/design/accepted-mockup.png",
+       "prompt": "src/modules/waiting-arrival-distributions/design/imagegen-prompt.md",
+       "sourceGeneratedImage": "/absolute/path/to/generated/image.png"
+     }
+     ```
+
+   - The deterministic pairing is: `TODO.md` item number and title ->
+     `design-manifest.json` -> module slug/path -> accepted screenshot and
+     implementation. Do not store accepted lesson mockups only in
+     `/Users/.../.codex/generated_images`, because that path is session-oriented
+     and is not paired with the module.
+   - If the lesson is not from `TODO.md`, use `null` for `todoItem` and the
+     chosen concept title for `todoTitle`, but still store the slug, module path,
+     prompt, and accepted mockup in the module directory.
+
+4. Implement after acceptance.
    - Add a self-contained module under `src/modules/{slug}/`.
    - Put pure concept logic in `{slug}-engine.ts` when there is meaningful algorithmic state.
    - Put scenario/example data in a separate scenario file when it helps readability.
@@ -84,7 +148,7 @@ Immediately mark those `N` TODO items done before design work begins.
    - Use `presentation: "immersive"` when the page should own the full viewport like the cross entropy page.
    - Update `README.md` for significant new playgrounds.
 
-4. Verify.
+5. Verify.
    - Run `npm run build`.
    - Start or reuse `npm run dev`.
    - Use the official Browser Use plugin for browser verification and screenshots.
@@ -112,9 +176,9 @@ batch size, for example "parallelize with 3".
    - Each design subagent must inspect `assets/cross-entropy-design-reference.png`,
      identify the core intuition, choose the smallest interaction, generate or
      request an imagegen mockup, self-check it against the reference invariants,
-     run the learning-quality self-review loop for up to three design passes,
-     and return the strongest design with a concise summary of why every major
-     widget belongs.
+     run the evaluate-redesign loop until no material issue remains, and return
+     the strongest design with a concise summary of why every major widget
+     belongs.
    - Present all `N` accepted-by-agent mockups to the user together, grouped by
      lesson label.
 
@@ -126,6 +190,10 @@ batch size, for example "parallelize with 3".
      final design set.
 
 4. Parallelize implementation after final confirmation.
+   - Before dispatching implementation workers, persist the accepted design
+     artifacts for every lesson using the normal design artifact convention:
+     `src/modules/{slug}/design/accepted-mockup.png`,
+     `imagegen-prompt.md`, and `design-manifest.json`.
    - Dispatch exactly `N` implementation subagents, one per accepted lesson.
    - Tell each worker it is not alone in the codebase, must not revert edits made
      by others, and must adapt to concurrent changes.

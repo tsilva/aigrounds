@@ -15,6 +15,7 @@ import { ShapeSkewOutliersPlayground } from "@/modules/shape-skew-outliers/Shape
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
 import { TransformerAttentionPlayground } from "@/modules/transformer-attention/TransformerAttentionPlayground";
 import { VarianceStandardDeviationPlayground } from "@/modules/variance-standard-deviation/VarianceStandardDeviationPlayground";
+import { WaitingArrivalDistributionsPlayground } from "@/modules/waiting-arrival-distributions/WaitingArrivalDistributionsPlayground";
 import {
   activePlaygroundMetadata,
   roadmapPlaygroundOrder,
@@ -40,6 +41,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "bayes-rule": BayesRulePlayground,
   "expected-value-risk": ExpectedValueRiskPlayground,
   "bernoulli-categorical-binomial": BernoulliCategoricalBinomialPlayground,
+  "waiting-arrival-distributions": WaitingArrivalDistributionsPlayground,
   overfitting: OverfittingPlayground,
   "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,
   "softmax-temperature": SoftmaxTemperaturePlayground,

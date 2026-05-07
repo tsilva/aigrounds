@@ -63,6 +63,47 @@ a {
   background: rgba(15, 118, 110, 0.22);
 }
 
+.assistant-chat-scrollbar {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+
+.assistant-chat-scrollbar:hover,
+.assistant-chat-scrollbar:focus-within,
+.assistant-chat-scrollbar[data-scrolling="true"] {
+  scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
+}
+
+.assistant-chat-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.assistant-chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.assistant-chat-scrollbar::-webkit-scrollbar-thumb {
+  background-clip: content-box;
+  background-color: transparent;
+  border: 3px solid transparent;
+  border-radius: 999px;
+}
+
+.assistant-chat-scrollbar:hover::-webkit-scrollbar-thumb,
+.assistant-chat-scrollbar:focus-within::-webkit-scrollbar-thumb,
+.assistant-chat-scrollbar[data-scrolling="true"]::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.45);
+}
+
+.assistant-textarea-scrollbarless {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.assistant-textarea-scrollbarless::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes drift {
   0%,
   100% {

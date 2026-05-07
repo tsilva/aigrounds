@@ -1221,6 +1221,9 @@ function ChatPanel({
   const [expandedScreenshotId, setExpandedScreenshotId] = useState<
     string | null
   >(null);
+  const [isChatScrolling, setIsChatScrolling] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+  const chatScrollTimerRef = useRef<number | null>(null);
   const lastMessage = messages.at(-1);
   const shouldShowThinking =
     (isSending || toolStatus) &&
@@ -1263,6 +1266,53 @@ function ChatPanel({
     textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`;
   }, [draft, textareaRef]);
 
+  useEffect(
+    () => () => {
+      if (chatScrollTimerRef.current !== null) {
+        window.clearTimeout(chatScrollTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  function handleChatScroll() {
+    setIsChatScrolling(true);
+
+    if (chatScrollTimerRef.current !== null) {
+      window.clearTimeout(chatScrollTimerRef.current);
+    }
+
+    chatScrollTimerRef.current = window.setTimeout(() => {
+      setIsChatScrolling(false);
+      chatScrollTimerRef.current = null;
+    }, 700);
+  }
+
+  useEffect(() => {
+    const scrollElement = chatScrollRef.current;
+    const shouldAutoScroll =
+      isSending || Boolean(toolStatus) || lastMessage?.role === "user";
+
+    if (!scrollElement || !shouldAutoScroll) {
+      return;
+    }
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      scrollElement.scrollTo({
+        top: scrollElement.scrollHeight,
+        behavior: "smooth",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [
+    isSending,
+    lastMessage?.content,
+    lastMessage?.id,
+    lastMessage?.role,
+    toolStatus,
+  ]);
+
   return (
     <section
       id="playground-assistant-panel"
@@ -1292,7 +1342,12 @@ function ChatPanel({
         </button>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5">
+      <div
+        ref={chatScrollRef}
+        className="assistant-chat-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5"
+        data-scrolling={isChatScrolling ? "true" : "false"}
+        onScroll={handleChatScroll}
+      >
         {timelineItems.map((item) =>
           item.type === "message" ? (
             <article
@@ -1368,7 +1423,7 @@ function ChatPanel({
             }}
             placeholder="Ask next. Enter submits."
             rows={1}
-            className="h-10 max-h-32 min-h-10 w-full resize-none overflow-y-auto rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
+            className="assistant-textarea-scrollbarless h-10 max-h-32 min-h-10 w-full resize-none overflow-y-auto rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
             disabled={isSending}
           />
         </label>

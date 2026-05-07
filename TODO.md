@@ -31,7 +31,7 @@ Ranked by learning priority. Each item is scoped as one fully interactive playgr
 9. [x] **Bernoulli, Categorical & Binomial Lab**
    Learn Bernoulli trials, categorical outcomes, binomial counts, parameters, and probability mass. Adjust success probability and trial count to watch mass move across outcome counts.
 
-10. [ ] **Waiting & Arrival Distributions Lab**
+10. [x] **Waiting & Arrival Distributions Lab**
     Learn geometric and Poisson distributions, waiting time, event counts, rates, and rare-event intuition. Tune event probability or arrival rate and compare likely waits or counts.
 
 11. [ ] **PDF, CDF & Probability Area Lab**

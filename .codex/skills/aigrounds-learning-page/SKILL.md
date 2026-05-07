@@ -8,17 +8,22 @@ description: Use when creating or updating one or more AI Grounds learning playg
 Use this skill when the user gives a topic or concept to teach in AI Grounds.
 
 If the user invokes this skill without naming a concept or task, assume the task
-is the next unchecked playground-sized item in `TODO.md`. Inspect `TODO.md`,
-choose that item, and proceed without asking for a concept. The same default
-applies when the user asks for the "next" page or "next task".
+is the next planned playground-sized item on the home dashboard. Inspect
+`src/lib/playground-metadata.ts`, choose the first slug in
+`dashboardLessonPlanOrder` that appears in `upcomingPlaygrounds`, and proceed
+without asking for a concept. The same default applies when the user asks for
+the "next" page or "next task".
 
-When a task is selected from `TODO.md`, immediately edit `TODO.md` to mark that
-task as done before starting concept design, image generation, or implementation.
+When a task is selected from the dashboard lesson plan, reserve that planned
+lesson by noting its slug and title in the work summary before starting concept
+design, image generation, or implementation. Do not edit the dashboard metadata
+until the accepted design is ready to implement.
 
 If the user asks to parallelize with a number `N`, treat that as explicit
 permission to use subagents for this skill. Select the next `N` unchecked
-playground-sized items in `TODO.md` unless the user names specific concepts.
-Immediately mark those `N` TODO items done before design work begins.
+planned playground-sized items from the dashboard lesson plan unless the user
+names specific concepts. Reserve those `N` planned lessons before design work
+begins.
 
 ## Hard Rules
 
@@ -45,12 +50,13 @@ Immediately mark those `N` TODO items done before design work begins.
 ## Workflow
 
 1. Understand the concept.
-   - If using a default item from `TODO.md`, mark that item done before any
-     other work on the page begins.
-   - Record the selected `TODO.md` item number and exact title. Derive the
+   - If using a default dashboard item, record the selected lesson number, slug,
+     and exact title before any other work on the page begins.
+   - Derive the
      implementation slug from that title using the repo's existing slug style
      (lowercase words joined by hyphens, preserving established abbreviations
-     such as `iqr` when already used).
+     such as `iqr` when already used), unless the dashboard already provides a
+     slug.
    - Identify the one core intuition the user should remember.
    - Choose the smallest interaction that makes that intuition visible.
    - Prefer direct manipulation: sliders, toggles, segmented controls, selectable examples, step/run controls, draggable values, or live visual state.
@@ -120,8 +126,8 @@ Immediately mark those `N` TODO items done before design work begins.
 
      ```json
      {
-       "todoItem": 10,
-       "todoTitle": "Waiting & Arrival Distributions Lab",
+       "lessonPlanStep": 10,
+       "lessonPlanTitle": "Waiting & Arrival Distributions Lab",
        "slug": "waiting-arrival-distributions",
        "modulePath": "src/modules/waiting-arrival-distributions",
        "acceptedMockup": "src/modules/waiting-arrival-distributions/design/accepted-mockup.png",
@@ -130,27 +136,31 @@ Immediately mark those `N` TODO items done before design work begins.
      }
      ```
 
-   - The deterministic pairing is: `TODO.md` item number and title ->
+   - The deterministic pairing is: dashboard lesson-plan step and title ->
      `design-manifest.json` -> module slug/path -> accepted screenshot and
      implementation. Do not store accepted lesson mockups only in
      `/Users/.../.codex/generated_images`, because that path is session-oriented
      and is not paired with the module.
-   - If the lesson is not from `TODO.md`, use `null` for `todoItem` and the
-     chosen concept title for `todoTitle`, but still store the slug, module path,
-     prompt, and accepted mockup in the module directory.
+   - If the lesson is not from the dashboard lesson plan, use `null` for
+     `lessonPlanStep` and the chosen concept title for `lessonPlanTitle`, but
+     still store the slug, module path, prompt, and accepted mockup in the module
+     directory.
 
 4. Implement after acceptance.
    - Add a self-contained module under `src/modules/{slug}/`.
    - Put pure concept logic in `{slug}-engine.ts` when there is meaningful algorithmic state.
    - Put scenario/example data in a separate scenario file when it helps readability.
    - Register the module in `src/lib/playgrounds.ts`.
-   - Link the finished playground into the landing page gallery/home page ordering so users can open it from `/`.
+   - Move the implemented lesson from `upcomingPlaygrounds` to
+     `activePlaygroundMetadata`, keep its slug in `dashboardLessonPlanOrder`, and
+     link the finished playground through the landing page so users can open it
+     from `/`.
    - Use `presentation: "immersive"` when the page should own the full viewport like the cross entropy page.
    - Update `README.md` for significant new playgrounds.
 
 5. Verify.
-   - Run `npm run build`.
-   - Start or reuse `npm run dev`.
+   - Run `pnpm build`.
+   - Start or reuse `pnpm dev`.
    - Use the official Browser Use plugin for browser verification and screenshots.
    - Check the home page has a working link/card for the new playground.
    - Check desktop and mobile widths for text overflow, layout collisions, and broken interactions.
@@ -164,9 +174,10 @@ Use this section only when the user explicitly asks to parallelize or gives a
 batch size, for example "parallelize with 3".
 
 1. Select the batch.
-   - If no concepts are named, inspect `TODO.md` and select the next `N`
-     unchecked playground-sized items.
-   - Mark all selected TODO items done immediately, before design, image
+   - If no concepts are named, inspect `src/lib/playground-metadata.ts` and
+     select the next `N` planned playground-sized items from the dashboard
+     lesson plan.
+   - Reserve all selected dashboard lessons immediately, before design, image
      generation, or implementation work begins.
    - Assign each lesson a stable label such as `Lesson 1: Variance` so the user
      can request targeted revisions.

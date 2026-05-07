@@ -42,13 +42,27 @@ OPENROUTER_SITE_URL=https://aigrounds.tsilva.eu
 OPENROUTER_APP_NAME=AI Grounds
 ```
 
+Sentry error monitoring is wired through `@sentry/nextjs`. Configure the runtime DSN and source map upload token:
+
+```bash
+SENTRY_DSN=...
+NEXT_PUBLIC_SENTRY_DSN=...
+SENTRY_ORG=tsilva
+SENTRY_PROJECT=aigrounds
+SENTRY_AUTH_TOKEN=...
+```
+
+Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. Set `SENTRY_DSN` for server and edge errors, `NEXT_PUBLIC_SENTRY_DSN` for browser errors, and `SENTRY_AUTH_TOKEN` only in local/CI/Vercel build environments so production source maps can be uploaded. Do not commit real values.
+
 ## Notes
 
 - The repo enforces pnpm in `package.json`; run `corepack enable` first if pnpm is not available.
 - Playgrounds run client-side. The chat sidebar uses a server API route to keep the OpenRouter key out of the browser.
 - Google Analytics loads only when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set.
 - Vercel Analytics is wired through `@vercel/analytics/next`.
-- New playgrounds are registered in `src/lib/playground-metadata.ts`, wired to components in `src/lib/playgrounds.ts`, and rendered through the dynamic playground route. Sitemap entries are generated from the active playground metadata.
+- Sentry initializes only when its DSN environment variables are present.
+- The home dashboard is the canonical current and future lesson plan. Live lessons are registered in `activePlaygroundMetadata`, future lesson cards live in `upcomingPlaygrounds`, and `dashboardLessonPlanOrder` controls the combined dashboard order.
+- New live playgrounds are registered in `src/lib/playground-metadata.ts`, wired to components in `src/lib/playgrounds.ts`, and rendered through the dynamic playground route. Sitemap entries are generated from the active playground metadata.
 - No test framework is configured yet.
 
 ## Architecture

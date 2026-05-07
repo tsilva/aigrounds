@@ -18,7 +18,7 @@ import { VarianceStandardDeviationPlayground } from "@/modules/variance-standard
 import { WaitingArrivalDistributionsPlayground } from "@/modules/waiting-arrival-distributions/WaitingArrivalDistributionsPlayground";
 import {
   activePlaygroundMetadata,
-  roadmapPlaygroundOrder,
+  dashboardLessonPlanOrder,
   upcomingPlaygrounds,
   type PlaygroundMetadata,
 } from "@/lib/playground-metadata";
@@ -58,7 +58,7 @@ export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.ma
   }),
 );
 
-export { roadmapPlaygroundOrder, upcomingPlaygrounds };
+export { dashboardLessonPlanOrder, upcomingPlaygrounds };
 
 export function getActivePlayground(slug: string) {
   return activePlaygrounds.find((playground) => playground.slug === slug);

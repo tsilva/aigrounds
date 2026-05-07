@@ -1,7 +1,7 @@
 import { HomePage, type HomePlaygroundCard } from "@/app/home-page";
 import {
   activePlaygrounds,
-  roadmapPlaygroundOrder,
+  dashboardLessonPlanOrder,
   upcomingPlaygrounds,
 } from "@/lib/playgrounds";
 import packageJson from "../../package.json";
@@ -21,7 +21,7 @@ export default function Home() {
     upcomingPlaygrounds.map((playground) => [playground.slug, playground]),
   );
 
-  const playgrounds: HomePlaygroundCard[] = roadmapPlaygroundOrder.flatMap(
+  const playgrounds: HomePlaygroundCard[] = dashboardLessonPlanOrder.flatMap(
     (slug, index) => {
       const step = index + 1;
       const livePlayground = livePlaygroundsBySlug.get(slug);

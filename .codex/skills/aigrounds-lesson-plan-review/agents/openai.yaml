@@ -1,4 +1,4 @@
 interface:
   display_name: "AI Grounds Lesson Plan Review"
-  short_description: "Audit and sequence the AI Grounds lesson roadmap"
-  default_prompt: "Use $aigrounds-lesson-plan-review to audit TODO.md, reconcile implemented lessons, fill roadmap gaps, and align the home dashboard order."
+  short_description: "Audit and sequence the AI Grounds dashboard lesson plan"
+  default_prompt: "Use $aigrounds-lesson-plan-review to audit the home dashboard lesson plan, reconcile live and planned lessons, fill sequence gaps, and align the rendered dashboard order."

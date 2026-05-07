@@ -116,8 +116,12 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
 }
 
 function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
-  const tileClassName =
+  const isComingSoon = playground.status === "coming-soon";
+  const baseTileClassName =
+    "group flex min-h-56 flex-col rounded-xl border bg-white p-5 shadow-[0_16px_40px_rgba(37,99,235,0.08)]";
+  const liveTileClassName =
     "group flex min-h-56 flex-col rounded-xl border border-blue-100 bg-white p-5 shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)]";
+  const comingSoonTileClassName = `${baseTileClassName} border-slate-200`;
   const content = (
     <>
       <div className="flex items-start justify-between gap-4">
@@ -134,9 +138,16 @@ function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
         </span>
       </div>
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600">
-        {playground.tag}
-      </p>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600">
+          {playground.tag}
+        </p>
+        {isComingSoon ? (
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
+            coming soon
+          </span>
+        ) : null}
+      </div>
       <p className="mt-3 text-sm leading-6 text-slate-600">
         {playground.outcome}.
       </p>
@@ -145,11 +156,11 @@ function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
 
   if (playground.href) {
     return (
-      <Link href={playground.href} className={tileClassName}>
+      <Link href={playground.href} className={liveTileClassName}>
         {content}
       </Link>
     );
   }
 
-  return <article className={tileClassName}>{content}</article>;
+  return <article className={comingSoonTileClassName}>{content}</article>;
 }

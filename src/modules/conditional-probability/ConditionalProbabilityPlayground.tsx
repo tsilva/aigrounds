@@ -149,7 +149,7 @@ function PopulationDot({ member }: { member: PopulationMemberView }) {
     : "border-[#d9e1f2]";
   const focusClass = member.isInNumerator
     ? "ring-2 ring-[#15a85b] ring-offset-2"
-    : member.isInDenominator
+    : member.isDenominatorFocus
       ? "ring-2 ring-[#352cff] ring-offset-2"
       : "";
 
@@ -245,8 +245,8 @@ function ProbabilityBar({
 }
 
 export function ConditionalProbabilityPlayground() {
-  const [scenarioId, setScenarioId] = useState<ScenarioId>("independent");
-  const [filter, setFilter] = useState<FilterView>("b-given-a");
+  const [scenarioId, setScenarioId] = useState<ScenarioId>("dependent");
+  const [filter, setFilter] = useState<FilterView>("all");
   const scenario =
     conditionalScenarios.find((entry) => entry.id === scenarioId) ??
     conditionalScenarios[0];
@@ -263,7 +263,6 @@ export function ConditionalProbabilityPlayground() {
 
   function chooseScenario(nextScenario: ScenarioId) {
     setScenarioId(nextScenario);
-    setFilter("b-given-a");
   }
 
   return (
@@ -325,8 +324,9 @@ export function ConditionalProbabilityPlayground() {
             <div className="min-w-0">
               <LessonTitle>2. Filter The Population</LessonTitle>
               <p className="mt-4 max-w-[820px] text-[16px] leading-[1.45] text-[#16264e]">
-                Blue dots are A. Red rings are B. The selected filter dims
-                everyone outside the current denominator.
+                Blue dots are A. Red rings are B. Each view highlights the
+                counted numerator; B given A also dims everyone outside A, the
+                new denominator.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -356,7 +356,7 @@ export function ConditionalProbabilityPlayground() {
             />
             <LegendSwatch
               className="border-[#352cff] bg-white"
-              label="denominator"
+              label="filtered denominator"
             />
           </div>
 
@@ -376,7 +376,7 @@ export function ConditionalProbabilityPlayground() {
               />
               <FormulaBox
                 label="Conditional"
-                formula="P(B ∣ A) = |A ∩ B| / |A|"
+                formula="P(B given A) = |A ∩ B| / |A|"
                 fraction={`${analysis.counts.intersection} / ${analysis.counts.a}`}
                 percent={formatPercent(analysis.probabilities.pBGivenA)}
                 tone="indigo"
@@ -413,7 +413,7 @@ export function ConditionalProbabilityPlayground() {
                 colorClass="bg-[#ff4f62]"
               />
               <ProbabilityBar
-                label="P(B ∣ A) after filtering"
+                label="P(B given A) after filtering"
                 value={analysis.probabilities.pBGivenA}
                 colorClass="bg-[#352cff]"
               />
@@ -427,7 +427,7 @@ export function ConditionalProbabilityPlayground() {
               />
               <FactPill
                 label="Rule"
-                value={analysis.isIndependent ? "P(B ∣ A) = P(B)" : "P(B ∣ A) ≠ P(B)"}
+                value={analysis.isIndependent ? "P(B given A) = P(B)" : "P(B given A) ≠ P(B)"}
               />
             </div>
           </Panel>

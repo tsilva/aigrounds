@@ -167,6 +167,11 @@ function systemPrompt(
     "Help learners understand the interactive AI concept they are currently exploring.",
     "Keep answers concise, concrete, and tied to what the learner can try in the UI.",
     "Prefer intuition, small experiments, and plain language over formal derivations.",
+    [
+      "Do not use LaTeX or TeX delimiters such as \\(...\\), $...$, \\mid, or \\frac;",
+      "the chat UI renders plain Markdown only.",
+      "Write formulas in the same plain text used by the playground, such as P(B given A), A ∩ B, and 22 / 40.",
+    ].join(" "),
     "Use the playground context below as the source of truth for the current lesson.",
     "When suggesting experiments, name controls or visual surfaces from the lesson summary and goals.",
     "You have a take_playground_screenshot tool. Use it when the learner asks about the current graph, current controls, visible values, what they are looking at, or when a screenshot would materially improve the answer.",

@@ -13,6 +13,7 @@ export type PopulationMember = {
 
 export type PopulationMemberView = PopulationMember & {
   isInDenominator: boolean;
+  isDenominatorFocus: boolean;
   isInNumerator: boolean;
   isDimmed: boolean;
 };
@@ -44,7 +45,7 @@ export const filterLabels: Record<FilterView, string> = {
   a: "A",
   b: "B",
   intersection: "A ∩ B",
-  "b-given-a": "B ∣ A",
+  "b-given-a": "B given A",
 };
 
 function buildPopulation(scenario: ScenarioId): PopulationMember[] {
@@ -92,12 +93,14 @@ export function analyzeConditionalProbability(
     members: population.map((member) => {
       const isInDenominator = memberMatchesDenominator(member, filter);
       const isInNumerator = memberMatchesNumerator(member, filter);
+      const isFilteredDenominator = filter === "b-given-a";
 
       return {
         ...member,
         isInDenominator,
+        isDenominatorFocus: isFilteredDenominator && isInDenominator,
         isInNumerator,
-        isDimmed: filter === "all" ? false : !isInDenominator,
+        isDimmed: isFilteredDenominator ? !isInDenominator : false,
       };
     }),
     counts: {
@@ -199,16 +202,8 @@ function memberMatchesDenominator(
   member: PopulationMember,
   filter: FilterView,
 ) {
-  if (filter === "a" || filter === "b-given-a") {
+  if (filter === "b-given-a") {
     return member.inA;
-  }
-
-  if (filter === "b") {
-    return member.inB;
-  }
-
-  if (filter === "intersection") {
-    return member.inA && member.inB;
   }
 
   return true;

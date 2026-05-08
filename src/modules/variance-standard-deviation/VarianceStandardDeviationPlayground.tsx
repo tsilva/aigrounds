@@ -121,7 +121,7 @@ function NumberLine({
   analysis: SpreadAnalysis;
   activePointId: string | null;
   trackRef: RefObject<HTMLDivElement | null>;
-  onPointStart: (pointId: string, clientX: number) => void;
+  onPointStart: (pointId: string) => void;
   onPointStep: (pointId: string, delta: number) => void;
 }) {
   const stackOffsets = useMemo(() => {
@@ -240,7 +240,8 @@ function NumberLine({
               }}
               onPointerDown={(event) => {
                 event.preventDefault();
-                onPointStart(point.id, event.clientX);
+                event.currentTarget.setPointerCapture(event.pointerId);
+                onPointStart(point.id);
               }}
               className={`absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border-2 bg-white font-mono text-[11px] font-black text-[#071024] shadow-[0_10px_20px_rgba(26,38,80,0.13)] transition active:cursor-grabbing ${
                 isActive ? "scale-110 border-[#352cff]" : "border-white"
@@ -304,7 +305,7 @@ function DatasetPanel({
   activePointId: string | null;
   trackRef: RefObject<HTMLDivElement | null>;
   onSelectPreset: (preset: SpreadPreset) => void;
-  onPointStart: (pointId: string, clientX: number) => void;
+  onPointStart: (pointId: string) => void;
   onPointStep: (pointId: string, delta: number) => void;
 }) {
   return (
@@ -402,6 +403,13 @@ function DeviationTile({ row, isLargest }: { row: DeviationRow; isLargest: boole
 }
 
 function DeviationPanel({ analysis }: { analysis: SpreadAnalysis }) {
+  const dominanceHeading =
+    analysis.variance < 70
+      ? "No term dominates yet."
+      : analysis.variance < 320
+        ? "Edge terms matter most."
+        : "Far points dominate.";
+
   return (
     <Panel className="p-5 sm:p-6">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -427,7 +435,7 @@ function DeviationPanel({ analysis }: { analysis: SpreadAnalysis }) {
             Biggest Squared Term
           </p>
           <p className="mt-4 text-[28px] leading-none font-black text-[#071024]">
-            Far points dominate.
+            {dominanceHeading}
           </p>
           <p className="mt-3 text-[15px] leading-[1.45] text-[#263a68]">
             {analysis.story.variance}
@@ -626,17 +634,8 @@ export function VarianceStandardDeviationPlayground() {
     setActivePointId(null);
   }
 
-  function handlePointStart(pointId: string, clientX: number) {
+  function handlePointStart(pointId: string) {
     setActivePointId(pointId);
-    const rect = trackRef.current?.getBoundingClientRect();
-
-    if (!rect) {
-      return;
-    }
-
-    const nextValue = clampValue(clientXToPercentValue(clientX, rect));
-
-    setPoints((currentPoints) => movePoint(currentPoints, pointId, nextValue));
   }
 
   function handlePointStep(pointId: string, delta: number) {

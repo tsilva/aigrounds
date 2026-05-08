@@ -167,11 +167,22 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "variance-standard-deviation": {
     intro:
       "Work through three spread experiments. Predict how distances from the mean behave, then connect deviations, variance, and standard deviation.",
+    openingMessage:
+      "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- The mean is the average and marks the center of this lab.\n- A deviation is a value's distance from the mean. Negative means left of the mean; positive means right of it.\n- Squared deviation turns each distance positive and makes far-away values count much more.\n- Variance averages the squared deviations. Standard deviation takes the square root, so it is back in the original units.\n\nFirst prediction: if most points sit near the mean, what should happen to variance and standard deviation? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Defines deviation as distance from the mean, including direction before squaring.",
+      "Explains that small deviations make small squared deviations.",
+      "Explains that squaring makes far-away values count much more.",
+      "Connects variance to the average of squared deviations.",
+      "Connects standard deviation to a typical distance from the mean in original units.",
+      "Recognizes that standard deviation can change while the mean stays fixed.",
+    ],
     steps: [
       {
         title: "Start with short deviations",
         experiment:
-          "Choose Tight. Look at the deviation bars and the variance formula rows.",
+          "Choose Tight. Look at the deviation bars, the Watch Each Deviation cards, and the formula totals.",
         predictionQuestion:
           "If most points sit near the mean, what should happen to variance and standard deviation?",
         observationPrompt:
@@ -203,11 +214,11 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Watch squaring amplify edges",
         experiment:
-          "Choose Wide, then nudge an edge point farther from 50. Compare deviation with squared deviation.",
+          "Choose Wide, then nudge point A left or point G right. Compare that point's deviation with its squared deviation in the Watch Each Deviation cards.",
         predictionQuestion:
           "What should squaring do to a point that is very far from the mean?",
         observationPrompt:
-          "Which row dominated the variance calculation?",
+          "Which point or card dominated the variance calculation?",
         observationOptions: [
           "Far points dominated",
           "Squared terms grew fast",
@@ -383,15 +394,20 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "probability-rules": {
     intro:
       "Work through three sample-space experiments. Predict which grid cells count, switch the rule view, then connect the colored region to the formula.",
+    masteryCriteria: [
+      "Explains probability as counted outcomes divided by the 36-outcome sample space.",
+      "Recognizes that an intersection counts only cells that satisfy both A and B.",
+      "Explains that a union subtracts the overlap because A plus B counts those cells twice.",
+    ],
     steps: [
       {
         title: "Count a single event",
         experiment:
-          "Set A to Sum is 7. Look at the highlighted cells and the A count in the sample-space grid.",
+          "Set A to Sum is 7 and choose the Event A view. Look at the ringed cells and the A count in the sample-space grid.",
         predictionQuestion:
           "Out of 36 dice outcomes, how many cells do you expect Sum is 7 to count?",
         observationPrompt:
-          "What did the grid make visible about probability as counting?",
+          "What did the ringed grid cells make visible about probability as counting?",
         observationOptions: [
           "Only matching cells counted",
           "The denominator stayed 36",
@@ -403,7 +419,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Find overlap",
         experiment:
-          "Choose an intersection view for A and B. Compare A, B, and A and B on the grid.",
+          "Choose the A and B intersection view. Compare the colored A cells, B cells, and ringed overlap cells on the grid.",
         predictionQuestion:
           "What must be true for an outcome to land in the overlap?",
         observationPrompt:
@@ -419,7 +435,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Subtract double-counting",
         experiment:
-          "Switch to the union view. Watch the formula include A plus B minus the overlap.",
+          "Switch to the A or B union view. Watch the formula include A plus B minus the overlap.",
         predictionQuestion:
           "Why should the union formula subtract the overlap once?",
         observationPrompt:
@@ -441,9 +457,9 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Filter the denominator",
         experiment:
-          "Choose Dependent. Compare P(B), P(B given A), and the highlighted A group in the 100-person grid.",
+          "Start on Dependent, then select B given A. Compare P(B), P(B given A), and the highlighted A group in the 100-person grid.",
         predictionQuestion:
-          "When we ask for P(B given A), which people should be in the denominator?",
+          "When you select B given A, which people should be in the denominator?",
         observationPrompt:
           "What changed when the grid filtered down to A first?",
         observationOptions: [
@@ -457,7 +473,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Check independence",
         experiment:
-          "Choose Independent. Compare P(B given A) with P(B).",
+          "Choose Independent while B given A is selected. Compare P(B given A) with P(B).",
         predictionQuestion:
           "If A and B are independent, should filtering by A change the chance of B?",
         observationPrompt:
@@ -473,7 +489,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Watch base rates",
         experiment:
-          "Choose Base-rate shift. Compare the conditional rate with the joint count in the grid.",
+          "Choose Base-rate shift while B given A is selected. Compare the conditional rate with the joint count in the grid.",
         predictionQuestion:
           "Can a conditional probability jump even when the total number of true cases is small?",
         observationPrompt:

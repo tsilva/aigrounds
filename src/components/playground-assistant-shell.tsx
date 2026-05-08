@@ -1162,7 +1162,7 @@ export function PlaygroundAssistantShell({
         <button
           type="button"
           onClick={() => setIsAssistantOpen(true)}
-          className="fixed right-4 bottom-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 p-2 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none xl:px-5 xl:py-3"
+          className="fixed top-4 right-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 p-2 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none xl:px-5 xl:py-3"
           aria-expanded={isAssistantOpen}
           aria-controls="playground-assistant-panel"
           aria-label="Open chat"

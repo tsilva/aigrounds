@@ -413,7 +413,11 @@ function SimulatorPanel({
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <FactPill
-              label="Expected value"
+              label={
+                analysis.mode === "categorical"
+                  ? "Target probability"
+                  : "Expected value"
+              }
               value={formatMetric(analysis.expectedValue)}
             />
             <FactPill label="Variance" value={formatMetric(analysis.variance)} />
@@ -505,12 +509,6 @@ export function BernoulliCategoricalBinomialPlayground() {
               tells the story.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex h-12 shrink-0 items-center justify-center rounded-[8px] border border-[#cbc8ff] bg-white/80 px-5 text-[15px] font-black text-[#2924ff] shadow-[0_12px_28px_rgba(61,54,255,0.05)]"
-          >
-            ? What are distributions?
-          </button>
         </header>
 
         <div className="grid gap-4">

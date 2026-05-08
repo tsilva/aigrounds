@@ -74,7 +74,10 @@ export function analyzeRangeQuartiles(
   const outlierPointIds = points
     .filter((point) => point.value < lowerFence || point.value > upperFence)
     .map((point) => point.id);
-  const nonOutlierPoints = points.filter((point) => point.role !== "outlier");
+  const outlierPointIdSet = new Set(outlierPointIds);
+  const nonOutlierPoints = points.filter(
+    (point) => !outlierPointIdSet.has(point.id),
+  );
   const withoutOutlier = fiveNumberSummary(
     (nonOutlierPoints.length > 0 ? nonOutlierPoints : points).map(
       (point) => point.value,
@@ -90,7 +93,7 @@ export function analyzeRangeQuartiles(
   const percentileRank = (atOrBelow / summary.count) * 100;
   const rangeJump = summary.range - withoutOutlier.range;
   const iqrShift = summary.iqr - withoutOutlier.iqr;
-  const hasMarkedOutlier = nonOutlierPoints.length < points.length;
+  const hasMarkedOutlier = outlierPointIds.length > 0;
 
   return {
     ...summary,

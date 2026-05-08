@@ -10,7 +10,6 @@ import {
 import {
   arrivalScenarios,
   defaultScenario,
-  rareEventExample,
   type ArrivalScenario,
 } from "./scenario";
 
@@ -682,25 +681,11 @@ function RunPanel({ analysis }: { analysis: ArrivalAnalysis }) {
     <Panel className="p-5">
       <div className="flex flex-wrap items-center gap-3">
         <LessonTitle>5. Run Arrivals</LessonTitle>
-        <div className="ml-auto flex gap-2">
-          {["Run", "Pause", "Step", "Reset"].map((label, index) => (
-            <button
-              type="button"
-              key={label}
-              className={`h-9 rounded-[8px] border px-4 text-[13px] font-bold transition ${
-                index === 0
-                  ? "border-[#5636f5] bg-[#4a27e8] text-white shadow-[0_10px_18px_rgba(70,39,232,0.18)]"
-                  : "border-[#d8e0f3] bg-white text-[#071024] hover:bg-[#f7f8ff]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
       </div>
       <p className="mt-4 text-[13px] text-[#263a68]">
-        Simulated arrivals in the last window ({analysis.windowMinutes} minutes,{" "}
-        {analysis.eventMarks.length} events)
+        Deterministic sample arrivals for the current window (
+        {analysis.windowMinutes} minutes, {analysis.eventMarks.length} events).
+        Change p or T to regenerate this window.
       </p>
       <div className="mt-2 overflow-x-auto rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] px-3 py-2">
         <Timeline analysis={analysis} compact />
@@ -766,8 +751,11 @@ function MiniRunMetric({
   );
 }
 
-function RareEventPanel() {
-  const exact = 1 - Math.exp(-rareEventExample.expectedCount);
+function RareEventPanel({ analysis }: { analysis: ArrivalAnalysis }) {
+  const exact = analysis.atLeastOneProbability;
+  const approximation = Math.min(1, analysis.expectedCount);
+  const approximationGap = Math.abs(exact - approximation);
+  const isTiny = analysis.expectedCount <= 0.1;
 
   return (
     <Panel className="p-5">
@@ -787,23 +775,23 @@ function RareEventPanel() {
         </div>
         <div className="p-4 text-center">
           <p className="text-[12px] font-black text-[#263a68]">
-            Rare setting example
+            Current setting
           </p>
           <p className="mt-2 font-mono text-[13px] text-[#263a68]">
-            λ = {formatDecimal(rareEventExample.lambdaPerMinute, 2)}/min, T ={" "}
-            {rareEventExample.windowMinutes} min, λT ={" "}
-            {formatDecimal(rareEventExample.expectedCount, 2)}
+            λ = {formatDecimal(analysis.lambdaPerMinute, 2)}/min, T ={" "}
+            {analysis.windowMinutes} min, λT ={" "}
+            {formatDecimal(analysis.expectedCount, 2)}
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <MiniMetric
               label="Exact"
               value={formatPercent(exact)}
-              detail="1 - e^-0.05"
+              detail="1 - e^-λT"
               tone="amber"
             />
             <MiniMetric
               label="Approx"
-              value={formatPercent(rareEventExample.expectedCount)}
+              value={formatPercent(approximation)}
               detail="λT"
               tone="green"
             />
@@ -811,8 +799,13 @@ function RareEventPanel() {
         </div>
       </div>
       <div className="mt-4 rounded-[8px] border border-[#bce6ca] bg-[#eefaf2] px-4 py-3 text-[13px] leading-[1.4] text-[#126b35]">
-        When λT is tiny, P(at least one) is almost λT. As λT grows, use
-        1 - e^-λT.
+        {isTiny
+          ? `λT is tiny here, so the shortcut is close. Difference: ${formatPercent(
+              approximationGap,
+            )}.`
+          : `λT is not tiny here, so use the exact formula. Shortcut difference: ${formatPercent(
+              approximationGap,
+            )}.`}
       </div>
     </Panel>
   );
@@ -871,7 +864,7 @@ export function WaitingArrivalDistributionsPlayground() {
               }
             />
             <RunPanel analysis={analysis} />
-            <RareEventPanel />
+            <RareEventPanel analysis={analysis} />
           </div>
         </div>
       </div>

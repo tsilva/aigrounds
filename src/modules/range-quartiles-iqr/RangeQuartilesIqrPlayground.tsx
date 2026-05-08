@@ -132,6 +132,7 @@ function FactPill({ label, value }: { label: string; value: string }) {
 
 function NumberLine({
   points,
+  outlierPointIds,
   activePointId,
   selectedPointId,
   trackRef,
@@ -140,6 +141,7 @@ function NumberLine({
   onSelectPoint,
 }: {
   points: RangePoint[];
+  outlierPointIds: string[];
   activePointId: string | null;
   selectedPointId: string;
   trackRef: RefObject<HTMLDivElement | null>;
@@ -149,9 +151,7 @@ function NumberLine({
 }) {
   const stackOffsets = useStackedPointLayout(points);
   const sortedPoints = sortedPointsFor(points);
-  const outlierIds = new Set(
-    points.filter((point) => point.role === "outlier").map((point) => point.id),
-  );
+  const outlierIds = new Set(outlierPointIds);
 
   return (
     <div className="mt-6 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
@@ -230,7 +230,7 @@ function NumberLine({
             className={`rounded-full border px-2.5 py-1 font-mono text-[12px] font-black transition ${
               selectedPointId === point.id
                 ? "border-[#352cff] bg-[#f2f0ff] text-[#2924ff]"
-                : point.role === "outlier"
+                : outlierIds.has(point.id)
                   ? "border-[#fecaca] bg-[#fff1f1] text-[#b91c1c]"
                   : "border-[#dfe4f4] bg-white text-[#263a68]"
             }`}
@@ -267,8 +267,9 @@ function DatasetPanel({
   onSelectPoint: (pointId: string) => void;
 }) {
   const { lowerHalf, upperHalf } = middleHalves(analysis.sortedValues);
-  const markedOutlierPoints = points.filter(
-    (point) => point.role === "outlier",
+  const outlierPointIdSet = new Set(analysis.outlierPointIds);
+  const markedOutlierPoints = points.filter((point) =>
+    outlierPointIdSet.has(point.id),
   );
   const medianPoint =
     analysis.sortedPoints[Math.floor(analysis.sortedPoints.length / 2)];
@@ -294,6 +295,7 @@ function DatasetPanel({
           </div>
           <NumberLine
             points={points}
+            outlierPointIds={analysis.outlierPointIds}
             activePointId={activePointId}
             selectedPointId={selectedPointId}
             trackRef={trackRef}
@@ -465,7 +467,10 @@ function SummaryPanel({
   analysis: RangeQuartileAnalysis;
   points: RangePoint[];
 }) {
-  const outlierPoints = points.filter((point) => point.role === "outlier");
+  const outlierPointIdSet = new Set(analysis.outlierPointIds);
+  const outlierPoints = points.filter((point) =>
+    outlierPointIdSet.has(point.id),
+  );
 
   return (
     <Panel className="p-5 sm:p-6">

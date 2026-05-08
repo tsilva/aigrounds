@@ -12,7 +12,11 @@ import {
 import {
   getPlaygroundMetadataFromPathname,
 } from "@/lib/playground-metadata";
-import { type TutorStep } from "@/lib/tutor-plans";
+import {
+  getTutorOpeningMessage,
+  isTypedPredictionTutorPlan,
+  type TutorStep,
+} from "@/lib/tutor-plans";
 import {
   isChatStreamEvent,
   type ChatRole,
@@ -42,14 +46,6 @@ type ScreenshotAction = {
 };
 
 type TutorPhase = "predict" | "observe" | "reflect" | "readyNext" | "complete";
-
-type QuickReply = {
-  label: string;
-  message: string;
-  requestPhase: TutorRequestPhase;
-  nextPhase: TutorPhase;
-  nextStepIndex?: number;
-};
 
 type PlaygroundAssistantShellProps = {
   children: ReactNode;
@@ -647,10 +643,7 @@ export function PlaygroundAssistantShell({
       return;
     }
 
-    if (
-      tutorPlan?.requireTypedPredictionToStart &&
-      currentTutorStep
-    ) {
+    if (tutorPlan && currentTutorStep && isTypedPredictionTutorPlan(tutorPlan)) {
       const previousTutorState = {
         isTutorActive,
         tutorPhase,
@@ -767,41 +760,6 @@ export function PlaygroundAssistantShell({
       setToolStatus(null);
       textareaRef.current?.focus();
     }
-  }
-
-  function handleQuickReply(reply: QuickReply) {
-    if (!tutorPlan) {
-      return;
-    }
-
-    const nextStepIndex = reply.nextStepIndex ?? tutorStepIndex;
-    const requestStep = tutorPlan.steps[nextStepIndex];
-
-    if (!requestStep || isSending) {
-      return;
-    }
-
-    const previousTutorState = {
-      isTutorActive,
-      tutorPhase,
-      tutorStepIndex,
-    };
-
-    setIsTutorActive(true);
-    setTutorStepIndex(nextStepIndex);
-    setTutorPhase(reply.nextPhase);
-    void sendChatMessage(
-      reply.message,
-      tutorContextFromStep(requestStep, nextStepIndex, reply.requestPhase),
-    ).then((didSend) => {
-      if (didSend) {
-        return;
-      }
-
-      setIsTutorActive(previousTutorState.isTutorActive);
-      setTutorStepIndex(previousTutorState.tutorStepIndex);
-      setTutorPhase(previousTutorState.tutorPhase);
-    });
   }
 
   async function streamAssistantResponse(
@@ -982,128 +940,6 @@ export function PlaygroundAssistantShell({
     isAssistantOpen && !isDesktop
       ? "min-h-0 min-w-0 overflow-y-auto"
       : "min-w-0";
-  const quickReplies = useMemo<QuickReply[]>(() => {
-    if (!tutorPlan) {
-      return [];
-    }
-
-    if (!isTutorActive) {
-      if (tutorPlan.requireTypedPredictionToStart) {
-        return [];
-      }
-
-      return [
-        {
-          label: "Guide me",
-          message: `Guide me through ${playgroundName} one experiment at a time. Start with the first experiment and ask me to predict what will happen.`,
-          requestPhase: "start",
-          nextPhase: "predict",
-          nextStepIndex: 0,
-        },
-      ];
-    }
-
-    const step = tutorPlan.steps[tutorStepIndex];
-
-    if (!step) {
-      return [];
-    }
-
-    if (tutorPlan.requireTypedPredictionToStart) {
-      return [];
-    }
-
-    if (tutorPhase === "predict") {
-      return [
-        {
-          label: "I made a prediction",
-          message:
-            "I made my prediction. Remind me of the exact controls to use and what to watch for, but do not explain the result yet.",
-          requestPhase: "observe",
-          nextPhase: "observe",
-        },
-        {
-          label: "Give me a hint",
-          message:
-            "Give me a small hint for this prediction without revealing the answer.",
-          requestPhase: "predict",
-          nextPhase: "predict",
-        },
-      ];
-    }
-
-    if (tutorPhase === "observe") {
-      return [
-        {
-          label: "I tried it",
-          message:
-            "I tried the experiment. Use the screenshot tool if helpful, then ask what I observed before giving the full explanation.",
-          requestPhase: "reflect",
-          nextPhase: "reflect",
-        },
-        {
-          label: "I am stuck",
-          message:
-            "I am stuck on this experiment. Use the screenshot tool if helpful and give me one concrete next action.",
-          requestPhase: "observe",
-          nextPhase: "observe",
-        },
-      ];
-    }
-
-    if (tutorPhase === "reflect") {
-      return step.observationOptions.map((option: string) => ({
-        label: option,
-        message: `What I noticed: ${option}. Connect that observation to the lesson and ask what I learned.`,
-        requestPhase: "reflect",
-        nextPhase: "readyNext",
-      }));
-    }
-
-    if (tutorPhase === "readyNext") {
-      const nextStepIndex = tutorStepIndex + 1;
-
-      if (nextStepIndex >= tutorPlan.steps.length) {
-        return [
-          {
-            label: "Finish summary",
-            message:
-              "Wrap up the guided lab. Ask me to explain the main lesson in my own words.",
-            requestPhase: "complete",
-            nextPhase: "complete",
-            nextStepIndex: tutorStepIndex,
-          },
-        ];
-      }
-
-      return [
-        {
-          label: "Next experiment",
-          message:
-            "Move me to the next experiment. Give one concrete action and ask me to predict what will happen.",
-          requestPhase: "next",
-          nextPhase: "predict",
-          nextStepIndex,
-        },
-        {
-          label: "Review this one",
-          message:
-            "Review this experiment once more in plain language and ask me one quick check question.",
-          requestPhase: "reflect",
-          nextPhase: "readyNext",
-        },
-      ];
-    }
-
-    return [
-      {
-        label: "Quiz me",
-        message: `Quiz me on the ${playgroundName} guided experiments, one question at a time.`,
-        requestPhase: "complete",
-        nextPhase: "complete",
-      },
-    ];
-  }, [isTutorActive, playgroundName, tutorPhase, tutorPlan, tutorStepIndex]);
   const tutorProgress =
     isTutorActive && tutorPlan && currentTutorStep
       ? `Guide ${tutorStepIndex + 1}/${tutorPlan.steps.length}: ${
@@ -1120,7 +956,9 @@ export function PlaygroundAssistantShell({
       message.id === "welcome"
         ? {
             ...message,
-            content: tutorPlan?.openingMessage ?? welcomeMessage.content,
+            content: tutorPlan
+              ? getTutorOpeningMessage(tutorPlan)
+              : welcomeMessage.content,
           }
         : message,
     );
@@ -1132,7 +970,6 @@ export function PlaygroundAssistantShell({
       isSending={isSending}
       messages={scopedMessages}
       playgroundName={playgroundName}
-      quickReplies={quickReplies}
       screenshotActions={screenshotActions.filter(
         (action) => action.pathname === pathname,
       )}
@@ -1142,7 +979,6 @@ export function PlaygroundAssistantShell({
       onDraftChange={setDraft}
       onClose={() => setIsAssistantOpen(false)}
       onSubmit={submitMessage}
-      onQuickReply={handleQuickReply}
     />
   );
 
@@ -1197,14 +1033,12 @@ function ChatPanel({
   isSending,
   messages,
   playgroundName,
-  quickReplies,
   screenshotActions,
   textareaRef,
   toolStatus,
   tutorProgress,
   onDraftChange,
   onClose,
-  onQuickReply,
   onSubmit,
 }: {
   draft: string;
@@ -1212,14 +1046,12 @@ function ChatPanel({
   isSending: boolean;
   messages: ChatMessage[];
   playgroundName: string;
-  quickReplies: QuickReply[];
   screenshotActions: ScreenshotAction[];
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   toolStatus: string | null;
   tutorProgress?: string;
   onDraftChange: (value: string) => void;
   onClose: () => void;
-  onQuickReply: (reply: QuickReply) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   const [expandedScreenshotId, setExpandedScreenshotId] = useState<
@@ -1397,21 +1229,6 @@ function ChatPanel({
           <p className="mb-3 rounded-[10px] border border-rose-200 bg-rose-50 px-3 py-2 text-sm leading-5 text-rose-700">
             {error}
           </p>
-        ) : null}
-        {quickReplies.length > 0 ? (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {quickReplies.map((reply) => (
-              <button
-                key={`${reply.requestPhase}-${reply.label}`}
-                type="button"
-                disabled={isSending}
-                onClick={() => onQuickReply(reply)}
-                className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
-              >
-                {reply.label}
-              </button>
-            ))}
-          </div>
         ) : null}
         <label className="block">
           <span className="sr-only">Message assistant</span>

@@ -25,6 +25,39 @@ const nodePositions: Record<MoveId, { x: number; y: number }> = {
   d4: { x: 640, y: 270 },
 };
 
+const problemMoveLabels: Record<SearchProblemId, Record<MoveId, string>> = {
+  "tic-tac-toe": {
+    a1: "corner",
+    b2: "block",
+    c3: "fork",
+    d4: "edge",
+  },
+  nim: {
+    a1: "take 1",
+    b2: "take 2",
+    c3: "take 3",
+    d4: "split",
+  },
+  "grid-route": {
+    a1: "up",
+    b2: "right",
+    c3: "down",
+    d4: "detour",
+  },
+};
+
+function searchStateForProblem(problemId: SearchProblemId): SearchState {
+  const labels = problemMoveLabels[problemId];
+
+  return {
+    ...initialSearchState,
+    moves: initialSearchState.moves.map((move) => ({
+      ...move,
+      label: labels[move.id],
+    })),
+  };
+}
+
 function Panel({
   children,
   className = "",
@@ -108,28 +141,6 @@ function StepIcon() {
         stroke="currentColor"
         strokeLinejoin="round"
         strokeWidth="2.2"
-      />
-    </svg>
-  );
-}
-
-function QuestionIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M9.7 9.4a2.5 2.5 0 1 1 4 2c-.9.6-1.6 1.2-1.6 2.3M12 17.2h.01"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
       />
     </svg>
   );
@@ -614,10 +625,26 @@ function BackpropPanel({
   previousState: SearchState | null;
   explorationConstant: number;
 }) {
+  if (!previousState) {
+    const lastMove = state.moves.find((move) => move.id === state.lastMoveId);
+
+    return (
+      <Panel className="p-5 sm:p-6">
+        <LessonTitle>5. Backpropagate</LessonTitle>
+        <p className="mt-3 text-[15px] leading-[1.4] text-[#263a68]">
+          Press Step to run one rollout. This panel will then show exactly which
+          move and root counters changed.
+        </p>
+        <div className="mt-4 rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] px-4 py-3 text-[13px] font-bold text-[#263a68]">
+          Last completed rollout: {lastMove?.label ?? "none"}. The next row is
+          not previewed until you run it.
+        </div>
+      </Panel>
+    );
+  }
+
   const beforeState = previousState ?? state;
-  const afterState = previousState
-    ? state
-    : stepSearch(state, explorationConstant);
+  const afterState = state;
   const beforeAnalysis = analyzeSearch(beforeState, explorationConstant);
   const moveId = previousState ? state.lastMoveId : beforeAnalysis.selectedMove.id;
   const beforeMove = beforeState.moves.find((move) => move.id === moveId);
@@ -836,7 +863,9 @@ export function MonteCarloTreeSearchPlayground() {
   const [activeProblemId, setActiveProblemId] =
     useState<SearchProblemId>("tic-tac-toe");
   const [explorationConstant, setExplorationConstant] = useState(1.4);
-  const [searchState, setSearchState] = useState<SearchState>(initialSearchState);
+  const [searchState, setSearchState] = useState<SearchState>(() =>
+    searchStateForProblem("tic-tac-toe"),
+  );
   const [previousState, setPreviousState] = useState<SearchState | null>(null);
   const [budget, setBudget] = useState(65);
   const [isRunning, setIsRunning] = useState(false);
@@ -857,7 +886,15 @@ export function MonteCarloTreeSearchPlayground() {
   }
 
   function resetSearch() {
-    setSearchState(initialSearchState);
+    setSearchState(searchStateForProblem(activeProblemId));
+    setPreviousState(null);
+    setBudget(65);
+    setIsRunning(false);
+  }
+
+  function handleSelectProblem(problemId: SearchProblemId) {
+    setActiveProblemId(problemId);
+    setSearchState(searchStateForProblem(problemId));
     setPreviousState(null);
     setBudget(65);
     setIsRunning(false);
@@ -904,19 +941,12 @@ export function MonteCarloTreeSearchPlayground() {
               Choose by confidence plus curiosity.
             </p>
           </div>
-          <button
-            type="button"
-            className="flex w-fit items-center gap-2 rounded-[8px] border border-[#aebcff] bg-white px-4 py-2 text-[14px] font-black text-[#2450ff] transition hover:bg-[#f8f9ff]"
-          >
-            <QuestionIcon />
-            How It Works
-          </button>
         </header>
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)_minmax(360px,0.92fr)]">
           <ProblemPanel
             activeProblemId={activeProblemId}
-            onSelectProblem={setActiveProblemId}
+            onSelectProblem={handleSelectProblem}
           />
           <FormulaPanel
             explorationConstant={explorationConstant}

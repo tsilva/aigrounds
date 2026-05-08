@@ -177,7 +177,7 @@ function ThresholdSlider({
         <div>
           <LessonTitle>2. Move The Threshold</LessonTitle>
           <p className="mt-3 text-[15px] leading-[1.4] text-[#263a68]">
-            Scores on the left of the cutoff are predicted positive. Everything
+            Scores at or above the cutoff are predicted positive. Everything
             below the cutoff becomes predicted negative.
           </p>
         </div>

@@ -117,7 +117,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Read the full span",
         experiment:
-          "Choose Compact. Compare the minimum, maximum, range bar, and box plot whiskers.",
+          "Use the starting Compact dataset. Compare the minimum, maximum, range bar, and box plot whiskers.",
         predictionQuestion:
           "If the smallest and largest values are close together, what should happen to the range?",
         observationPrompt:

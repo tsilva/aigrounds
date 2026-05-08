@@ -623,6 +623,7 @@ function ChancePanel({
           <div className="mt-2 grid grid-cols-[44px_1fr_44px] overflow-hidden rounded-[8px] border border-[#d8e0f3]">
             <button
               type="button"
+              aria-label="Decrease window length"
               onClick={() => onChangeWindow(analysis.windowMinutes - 1)}
               className="h-10 bg-white text-[20px] font-bold text-[#352cff] hover:bg-[#f7f8ff]"
             >
@@ -633,6 +634,7 @@ function ChancePanel({
             </div>
             <button
               type="button"
+              aria-label="Increase window length"
               onClick={() => onChangeWindow(analysis.windowMinutes + 1)}
               className="h-10 bg-white text-[20px] font-bold text-[#352cff] hover:bg-[#f7f8ff]"
             >
@@ -839,12 +841,9 @@ export function WaitingArrivalDistributionsPlayground() {
               how many arrive.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex h-12 shrink-0 items-center justify-center rounded-[8px] border border-[#d9d3ff] bg-white px-6 text-[14px] font-black text-[#2429ff] shadow-[0_10px_30px_rgba(46,43,140,0.06)]"
-          >
+          <div className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-[8px] border border-[#d9d3ff] bg-white px-6 text-[14px] font-black text-[#2429ff] shadow-[0_10px_30px_rgba(46,43,140,0.06)]">
             ? What are Waiting & Arrival Distributions?
-          </button>
+          </div>
         </header>
 
         <div className="space-y-4">

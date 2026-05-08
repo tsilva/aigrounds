@@ -240,7 +240,7 @@ function LossChart({
   return (
     <div className="min-w-0 overflow-hidden rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-3 sm:p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <LessonTitle>2. Watch One Update</LessonTitle>
+        <LessonTitle>3. Watch One Update</LessonTitle>
         <div className="grid gap-2 sm:grid-cols-3">
           <FactPill label="Position" value={`θ ${formatSigned(analysis.theta)}`} />
           <FactPill
@@ -574,7 +574,7 @@ function ControlsPanel({
 }) {
   return (
     <Panel className="p-5 sm:p-6">
-      <LessonTitle>3. Tune The Update</LessonTitle>
+      <LessonTitle>2. Tune The Update</LessonTitle>
       <div className="mt-5 grid gap-6">
         <Slider
           id="learning-rate"
@@ -640,6 +640,10 @@ function MicroscopePanel({
   const analysis = analyzeDescent(state, learningRate, momentum);
   const rateTerm = -learningRate * analysis.gradient;
   const momentumTerm = momentum * state.velocity;
+  const formattedMomentumTerm =
+    Math.abs(momentumTerm) < 0.005
+      ? "+0.00"
+      : formatSigned(momentumTerm, 2);
 
   return (
     <Panel className="p-5 sm:p-6">
@@ -648,15 +652,12 @@ function MicroscopePanel({
         <p>
           θₙ₊₁ ={" "}
           <span className="text-[#2f39ff]">{formatNumber(state.theta, 2)}</span>
-        </p>
-        <p>
           {" "}
-          + <span className="text-[#ff3b2f]">
+          <span className="text-[#ff3b2f]">
             {formatSigned(rateTerm, 2)}
           </span>{" "}
-          +{" "}
           <span className="text-[#16a34a]">
-            {formatSigned(momentumTerm, 2)}
+            {formattedMomentumTerm}
           </span>
         </p>
         <p className="border-t border-[#d6dcf0] pt-2">
@@ -676,8 +677,8 @@ function MicroscopePanel({
           stretches the step.
         </div>
         <div className="rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2 text-[14px] leading-[1.35] text-[#263a68]">
-          <span className="font-black text-[#16a34a]">Momentum</span> carries
-          yesterday&apos;s shove.
+          <span className="font-black text-[#16a34a]">Momentum</span>{" "}
+          carries yesterday&apos;s shove.
         </div>
       </div>
       <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-[#fbfbff] px-4 py-3 text-[15px] leading-[1.35] font-bold text-[#2924ff]">

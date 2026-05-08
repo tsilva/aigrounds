@@ -159,7 +159,22 @@ function makeSummary(
     return `${queryToken.label} mostly keeps its own value, so the output stays close to its current meaning.`;
   }
 
+  const topTokenDominantLabel =
+    attentionDimensions.find(
+      (dimension) => dimension.id === dominantDimensionFor(topToken.value),
+    )?.label ?? dominantLabel;
+
+  if (topTokenDominantLabel !== dominantLabel) {
+    return `${queryToken.label} blends several tokens, so the output leans toward ${dominantLabel} even though ${topToken.label} has the strongest single weight.`;
+  }
+
   return `${topToken.label} pulls ${queryToken.label} toward ${dominantLabel}.`;
+}
+
+function dominantDimensionFor(vector: AttentionVector) {
+  return attentionDimensions.reduce((best, dimension) =>
+    vector[dimension.id] > vector[best.id] ? dimension : best,
+  ).id;
 }
 
 function clamp(value: number, min: number, max: number) {

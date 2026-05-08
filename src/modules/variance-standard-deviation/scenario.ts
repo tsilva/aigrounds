@@ -35,7 +35,7 @@ export const spreadPresets: SpreadPreset[] = [
   },
 ];
 
-export const initialSpreadPreset = spreadPresets[1] ?? spreadPresets[0]!;
+export const initialSpreadPreset = spreadPresets[0]!;
 
 export function pointsForPreset(preset: SpreadPreset): DataPoint[] {
   return makePoints(preset.values);

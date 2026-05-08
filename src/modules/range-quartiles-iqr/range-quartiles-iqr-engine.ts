@@ -90,6 +90,7 @@ export function analyzeRangeQuartiles(
   const percentileRank = (atOrBelow / summary.count) * 100;
   const rangeJump = summary.range - withoutOutlier.range;
   const iqrShift = summary.iqr - withoutOutlier.iqr;
+  const hasMarkedOutlier = nonOutlierPoints.length < points.length;
 
   return {
     ...summary,
@@ -110,8 +111,8 @@ export function analyzeRangeQuartiles(
     rangeJump,
     iqrShift,
     story: {
-      range: rangeStory(rangeJump),
-      iqr: iqrStory(iqrShift),
+      range: rangeStory(summary.range, rangeJump, hasMarkedOutlier),
+      iqr: iqrStory(summary.iqr, summary.range, iqrShift, hasMarkedOutlier),
       selected: `${atOrBelow} of ${summary.count} values are at or below ${selectedPoint.label}.`,
     },
   };
@@ -132,13 +133,18 @@ export function movePoint(
   );
 }
 
-export function makeRangePoints(values: number[]): RangePoint[] {
+export function makeRangePoints(
+  values: number[],
+  outlierIndexes: number[] = [],
+): RangePoint[] {
+  const outlierIndexSet = new Set(outlierIndexes);
+
   return values.map((value, index) => ({
     id: `point-${index + 1}`,
     label: String.fromCharCode(65 + index),
     value: clampValue(value),
     color: pointColors[index % pointColors.length] ?? "#352cff",
-    role: index === values.length - 1 ? "outlier" : "regular",
+    role: outlierIndexSet.has(index) ? "outlier" : "regular",
   }));
 }
 
@@ -191,28 +197,45 @@ function medianValue(sortedValues: number[]) {
   return ((sortedValues[middle - 1] ?? 0) + (sortedValues[middle] ?? 0)) / 2;
 }
 
-function rangeStory(rangeJump: number) {
-  if (rangeJump > 20) {
+function rangeStory(
+  range: number,
+  rangeJump: number,
+  hasMarkedOutlier: boolean,
+) {
+  if (hasMarkedOutlier && rangeJump > 20) {
     return "The full span is being stretched by one extreme value.";
   }
 
-  if (rangeJump > 5) {
+  if (hasMarkedOutlier && rangeJump > 5) {
     return "The full span notices the outlier immediately.";
   }
 
-  return "The full span is close to the non-outlier spread.";
-}
-
-function iqrStory(iqrShift: number) {
-  if (Math.abs(iqrShift) <= 3) {
-    return "The middle 50% barely moved, so the IQR stayed stable.";
+  if (range <= 40) {
+    return "The full span is short because min and max are close.";
   }
 
-  if (iqrShift > 0) {
+  return "The full span is wide because the values cover more of the scale.";
+}
+
+function iqrStory(
+  iqr: number,
+  range: number,
+  iqrShift: number,
+  hasMarkedOutlier: boolean,
+) {
+  if (hasMarkedOutlier && Math.abs(iqrShift) <= 3 && range - iqr > 30) {
+    return "The middle 50% stayed much shorter than the full span.";
+  }
+
+  if (iqr >= 45) {
     return "The middle 50% widened because the center values spread apart.";
   }
 
-  return "The middle 50% tightened because the center values moved together.";
+  if (iqr <= 25) {
+    return "The middle 50% is compact, so the box stays narrow.";
+  }
+
+  return "The middle 50% sits between Q1 and Q3.";
 }
 
 const pointColors = [

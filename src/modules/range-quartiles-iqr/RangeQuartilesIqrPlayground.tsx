@@ -143,7 +143,7 @@ function NumberLine({
   activePointId: string | null;
   selectedPointId: string;
   trackRef: RefObject<HTMLDivElement | null>;
-  onPointStart: (pointId: string, clientX: number) => void;
+  onPointStart: (pointId: string) => void;
   onPointStep: (pointId: string, delta: number) => void;
   onSelectPoint: (pointId: string) => void;
 }) {
@@ -198,7 +198,7 @@ function NumberLine({
               }}
               onPointerDown={(event) => {
                 event.preventDefault();
-                onPointStart(point.id, event.clientX);
+                onPointStart(point.id);
               }}
               className={`absolute z-10 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border-2 bg-white font-mono text-[12px] font-black text-[#071024] shadow-[0_10px_20px_rgba(26,38,80,0.13)] transition active:cursor-grabbing ${
                 isActive || isSelected
@@ -262,12 +262,14 @@ function DatasetPanel({
   selectedPointId: string;
   trackRef: RefObject<HTMLDivElement | null>;
   onSelectPreset: (preset: RangePreset) => void;
-  onPointStart: (pointId: string, clientX: number) => void;
+  onPointStart: (pointId: string) => void;
   onPointStep: (pointId: string, delta: number) => void;
   onSelectPoint: (pointId: string) => void;
 }) {
   const { lowerHalf, upperHalf } = middleHalves(analysis.sortedValues);
-  const outlierCount = points.filter((point) => point.role === "outlier").length;
+  const markedOutlierPoints = points.filter(
+    (point) => point.role === "outlier",
+  );
 
   return (
     <Panel className="p-5 sm:p-6">
@@ -314,13 +316,19 @@ function DatasetPanel({
               value={`${lowerHalf.join(", ")} | ${upperHalf.join(", ")}`}
             />
             <FactPill
-              label="Outliers"
-              value={outlierCount > 0 ? `${outlierCount} tracked` : "none"}
+              label="Marked far point"
+              value={
+                markedOutlierPoints.length > 0
+                  ? markedOutlierPoints
+                      .map((point) => `${point.label}:${point.value}`)
+                      .join(", ")
+                  : "none"
+              }
             />
           </div>
           <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
-            Drag the far-right point left and right. Range moves with it; IQR
-            only moves when the middle half changes.
+            Drag a dot, or select it and use arrow keys. Range follows the
+            edges; IQR changes when Q1 or Q3 moves.
           </div>
         </div>
       </div>
@@ -740,18 +748,9 @@ export function RangeQuartilesIqrPlayground() {
     setActivePointId(null);
   }
 
-  function handlePointStart(pointId: string, clientX: number) {
+  function handlePointStart(pointId: string) {
     setActivePointId(pointId);
     setSelectedPointId(pointId);
-    const rect = trackRef.current?.getBoundingClientRect();
-
-    if (!rect) {
-      return;
-    }
-
-    const nextValue = clampValue(clientXToPercentValue(clientX, rect));
-
-    setPoints((currentPoints) => movePoint(currentPoints, pointId, nextValue));
   }
 
   function handlePointStep(pointId: string, delta: number) {

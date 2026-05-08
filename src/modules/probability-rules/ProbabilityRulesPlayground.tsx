@@ -24,6 +24,39 @@ const initialSimulation: SimulationState = {
   hits: 0,
 };
 
+const ruleViewDetails: Record<
+  RuleView,
+  {
+    label: string;
+    helper: string;
+  }
+> = {
+  a: {
+    label: "Event A",
+    helper: "count all A cells",
+  },
+  "not-a": {
+    label: "Not A",
+    helper: "outside A",
+  },
+  intersection: {
+    label: "A and B",
+    helper: "overlap only",
+  },
+  union: {
+    label: "A or B",
+    helper: "either event",
+  },
+  "a-only": {
+    label: "A not B",
+    helper: "A without overlap",
+  },
+  "b-only": {
+    label: "B not A",
+    helper: "B without overlap",
+  },
+};
+
 function Panel({
   children,
   className = "",
@@ -206,13 +239,19 @@ function RuleViewButton({
     <button
       type="button"
       onClick={onSelect}
-      className={`h-10 rounded-[8px] border px-3 font-mono text-[12px] font-black transition ${
+      aria-label={`Show ${ruleViewDetails[view].label}: ${ruleViewDetails[view].helper}`}
+      className={`min-h-[52px] rounded-[8px] border px-3 py-2 text-left transition ${
         isSelected
           ? "border-[#5636f5] bg-[#352cff] text-white shadow-[0_10px_18px_rgba(53,44,255,0.18)]"
           : "border-[#d8e0f0] bg-white text-[#263a68] hover:border-[#b9c4de]"
       }`}
     >
-      {ruleLabels[view]}
+      <span className="block font-mono text-[13px] leading-none font-black">
+        {ruleLabels[view]}
+      </span>
+      <span className="mt-1 block text-[12px] leading-tight font-black">
+        {ruleViewDetails[view].label}
+      </span>
     </button>
   );
 }
@@ -245,6 +284,10 @@ function SimulationPanel({
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>4. Simulate Rolls</LessonTitle>
+      <p className="mt-4 text-[15px] leading-[1.45] text-[#263a68]">
+        Expected comes from the counted grid. Observed appears after you run
+        simulated rolls.
+      </p>
       <div className="mt-4 flex flex-wrap gap-3">
         {[100, 1000].map((count) => (
           <button
@@ -268,6 +311,7 @@ function SimulationPanel({
         <ProbabilityBar
           label="Observed"
           value={simulation.observed}
+          valueLabel={simulation.rolls === 0 ? "Run rolls first" : undefined}
           width={observedWidth}
           color="bg-[#17a65a]"
         />
@@ -284,11 +328,13 @@ function SimulationPanel({
 function ProbabilityBar({
   label,
   value,
+  valueLabel,
   width,
   color,
 }: {
   label: string;
   value: number;
+  valueLabel?: string;
   width: string;
   color: string;
 }) {
@@ -297,7 +343,7 @@ function ProbabilityBar({
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[13px] font-black text-[#071024]">{label}</p>
         <p className="font-mono text-[13px] font-black text-[#071024]">
-          {value.toFixed(3)}
+          {valueLabel ?? value.toFixed(3)}
         </p>
       </div>
       <div className="mt-2 h-4 overflow-hidden rounded-full border border-[#dfe4f4] bg-[#f2f5fb]">
@@ -310,7 +356,7 @@ function ProbabilityBar({
 export function ProbabilityRulesPlayground() {
   const [eventA, setEventA] = useState<EventRuleId>("sum-seven");
   const [eventB, setEventB] = useState<EventRuleId>("first-even");
-  const [view, setView] = useState<RuleView>("union");
+  const [view, setView] = useState<RuleView>("a");
   const [simulation, setSimulation] =
     useState<SimulationState>(initialSimulation);
   const analysis = useMemo(
@@ -422,8 +468,9 @@ export function ProbabilityRulesPlayground() {
             <div className="min-w-0">
               <LessonTitle>2. See The Sample Space</LessonTitle>
               <p className="mt-4 max-w-[820px] text-[16px] leading-[1.45] text-[#16264e]">
-                The highlighted cells are the outcomes currently counted by the
-                selected rule.
+                Color shows whether each outcome belongs to A, B, both, or
+                neither. The ringed cells are counted now for{" "}
+                {ruleViewDetails[view].label}.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -452,7 +499,7 @@ export function ProbabilityRulesPlayground() {
               label="A ∩ B"
             />
             <LegendSwatch
-              className="border-[#352cff] bg-white"
+              className="border-[#352cff] bg-white ring-2 ring-[#352cff] ring-offset-1"
               label="counted now"
             />
           </div>

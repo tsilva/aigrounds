@@ -185,11 +185,32 @@ function Histogram({
   bins,
   maxBinCount,
   outlierPercent,
+  mean,
+  median,
 }: {
   bins: HistogramBin[];
   maxBinCount: number;
   outlierPercent: number;
+  mean: number;
+  median: number;
 }) {
+  const markers = [
+    {
+      id: "mean",
+      label: "mean",
+      value: mean,
+      color: "#ef4444",
+      offsetClassName: "top-0 -translate-x-full",
+    },
+    {
+      id: "median",
+      label: "median",
+      value: median,
+      color: "#16a34a",
+      offsetClassName: "top-5 translate-x-1",
+    },
+  ];
+
   return (
     <div className="rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
       <div className="relative h-[300px] overflow-hidden rounded-[10px] bg-white px-4 pb-10 pt-8">
@@ -216,6 +237,24 @@ function Histogram({
         >
           outlier
         </div>
+
+        {markers.map((marker) => (
+          <div
+            key={marker.id}
+            className="absolute top-9 bottom-10 w-0.5"
+            style={{
+              left: `calc(1rem + (100% - 2rem) * ${marker.value / 100})`,
+              backgroundColor: marker.color,
+            }}
+          >
+            <span
+              className={`absolute rounded-full bg-white px-2 py-0.5 font-mono text-[10px] font-black whitespace-nowrap ${marker.offsetClassName}`}
+              style={{ color: marker.color, border: `1px solid ${marker.color}` }}
+            >
+              {marker.label}
+            </span>
+          </div>
+        ))}
 
         <div className="absolute right-4 bottom-10 left-4 flex h-[216px] gap-1.5">
           {bins.map((bin) => {
@@ -252,6 +291,62 @@ function Histogram({
   );
 }
 
+function BoxPlot({ summary }: { summary: FiveNumberSummary }) {
+  const labels = [
+    { label: "min", value: summary.min },
+    { label: "Q1", value: summary.q1 },
+    { label: "median", value: summary.median },
+    { label: "Q3", value: summary.q3 },
+    { label: "max", value: summary.max },
+  ];
+
+  return (
+    <div className="rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-[13px] font-black text-[#52628a] uppercase">
+          Box plot
+        </p>
+        <p className="text-[13px] leading-[1.35] text-[#52628a]">
+          Middle box = IQR; whisker = full range.
+        </p>
+      </div>
+      <div className="relative h-24 rounded-[10px] bg-white px-4">
+        <div className="absolute right-4 left-4 top-1/2 h-px bg-[#a8b4ce]" />
+        <div
+          className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-[#ef4444]"
+          style={{
+            left: `calc(1rem + (100% - 2rem) * ${summary.min / 100})`,
+            width: `calc((100% - 2rem) * ${Math.max(summary.range, 1) / 100})`,
+          }}
+        />
+        <div
+          className="absolute top-1/2 h-9 -translate-y-1/2 rounded-[7px] border-2 border-[#352cff] bg-[#eef0ff]"
+          style={{
+            left: `calc(1rem + (100% - 2rem) * ${summary.q1 / 100})`,
+            width: `calc((100% - 2rem) * ${Math.max(summary.iqr, 1) / 100})`,
+          }}
+        />
+        <div
+          className="absolute top-1/2 h-12 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#071024]"
+          style={{
+            left: `calc(1rem + (100% - 2rem) * ${summary.median / 100})`,
+          }}
+        />
+        {labels.map((item) => (
+          <div
+            key={item.label}
+            className="absolute bottom-2 -translate-x-1/2 text-center font-mono text-[10px] font-black text-[#52628a]"
+            style={{ left: `calc(1rem + (100% - 2rem) * ${item.value / 100})` }}
+          >
+            <span className="block uppercase">{item.label}</span>
+            <span className="block text-[#071024]">{formatValue(item.value)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WatchShapePanel({
   activePreset,
   outlierValue,
@@ -283,7 +378,12 @@ function WatchShapePanel({
               bins={analysis.histogram}
               maxBinCount={analysis.maxBinCount}
               outlierPercent={analysis.outlierPercent}
+              mean={analysis.mean}
+              median={analysis.median}
             />
+          </div>
+          <div className="mt-4">
+            <BoxPlot summary={analysis} />
           </div>
         </div>
 

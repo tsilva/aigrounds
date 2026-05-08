@@ -236,7 +236,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Disambiguate bank",
         experiment:
-          "Choose River Bank and keep bank selected. Compare the attention weights for river and bank.",
+          "Choose River Bank, select bank as the query token, and compare the attention weights for river and bank.",
         predictionQuestion:
           "Which token should bank attend to if the sentence is about a river?",
         observationPrompt:
@@ -268,9 +268,9 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Sharpen the lookup",
         experiment:
-          "Move Focus Sharpness from spread to sharp. Compare entropy, top weight, and the connection diagram.",
+          "Click Low, then click High in Focus Sharpness. Compare entropy, top weight, and the connection diagram.",
         predictionQuestion:
-          "What should happen when softmax focus becomes sharper?",
+          "What should happen when softmax focus changes from low to high?",
         observationPrompt:
           "How did the weights change as sharpness increased?",
         observationOptions: [

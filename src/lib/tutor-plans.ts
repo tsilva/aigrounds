@@ -34,6 +34,25 @@ export type TutorPlan = {
   steps: TutorStep[];
 };
 
+export function isTypedPredictionTutorPlan(plan: TutorPlan) {
+  return plan.requireTypedPredictionToStart ?? true;
+}
+
+export function getTutorOpeningMessage(plan: TutorPlan) {
+  if (plan.openingMessage) {
+    return plan.openingMessage;
+  }
+
+  const firstStep = plan.steps[0];
+
+  return [
+    plan.intro,
+    firstStep
+      ? `First prediction: ${firstStep.predictionQuestion} Reply with your prediction first. Then I will tell you exactly what to try.`
+      : "Reply with what you want to understand first, and I will guide one small experiment at a time.",
+  ].join("\n\n");
+}
+
 export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "mean-median-mode": {
     intro:
@@ -286,6 +305,15 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "shape-skew-outliers": {
     intro:
       "Work through three distribution-shape experiments. Predict the shape first, move the outlier, then decide which summary is trustworthy.",
+    openingMessage:
+      "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Shape is the visible pattern of a dataset: piles, gaps, clusters, and tails.\n- Skew means one tail stretches farther than the main pile. Right skew stretches toward larger values.\n- An outlier is a far-away value that can pull summaries like mean and range.\n- Robust summaries, such as median and IQR, are designed to move less when one value is extreme.\n\nFirst prediction: where do you expect most values to sit when a distribution is right-skewed? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Identifies skew by the direction of the long tail.",
+      "Explains why a histogram can reveal piles, gaps, and clusters that one center hides.",
+      "Explains why outliers pull mean and range more than median and IQR.",
+      "Chooses median or IQR when one extreme value would make mean or range misleading.",
+    ],
     steps: [
       {
         title: "Read a skewed tail",
@@ -306,7 +334,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Move the outlier",
         experiment:
-          "Drag the outlier slider from Center to High tail. Watch mean, median, range, and IQR.",
+          "Click Center under Outlier position, then move the outlier slider toward High tail. Watch mean, median, range, and IQR.",
         predictionQuestion:
           "Which summaries should react most when one value moves far into the tail?",
         observationPrompt:
@@ -403,7 +431,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Count a single event",
         experiment:
-          "Set A to Sum is 7 and choose the Event A view. Look at the ringed cells and the A count in the sample-space grid.",
+          "Set A to Sum is 7 and choose the Event A view. Look at the ringed cells in the sample-space grid and the Current Count panel.",
         predictionQuestion:
           "Out of 36 dice outcomes, how many cells do you expect Sum is 7 to count?",
         observationPrompt:
@@ -527,7 +555,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Build the positive denominator",
         experiment:
-          "Raise Sensitivity and compare True positives with False positives in the Bayes denominator.",
+          "Lower Sensitivity, then raise it again. Compare True positives with False positives in the Bayes denominator.",
         predictionQuestion:
           "What else besides true positives appears in the denominator after a positive result?",
         observationPrompt:
@@ -543,7 +571,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Let false alarms compete",
         experiment:
-          "Increase the False-positive rate, then switch to Fraud Alert and compare the false alarm share.",
+          "Switch to Fraud Alert, then increase the False-positive rate and compare the false alarm share.",
         predictionQuestion:
           "What should happen to certainty after a positive signal when false alarms become more common?",
         observationPrompt:

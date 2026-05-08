@@ -668,8 +668,8 @@ function MicroscopePanel({
       </div>
       <div className="mt-4 grid gap-3">
         <div className="rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2 text-[14px] leading-[1.35] text-[#263a68]">
-          <span className="font-black text-[#ff3b2f]">Gradient</span> points
-          downhill.
+          <span className="font-black text-[#ff3b2f]">Negative gradient</span>{" "}
+          points downhill.
         </div>
         <div className="rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2 text-[14px] leading-[1.35] text-[#263a68]">
           <span className="font-black text-[#352cff]">Learning rate</span>{" "}

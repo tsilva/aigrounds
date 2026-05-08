@@ -529,7 +529,7 @@ function TakeawayPanel({ analysis }: { analysis: AttentionAnalysis }) {
 export function TransformerAttentionPlayground() {
   const [scenarioId, setScenarioId] =
     useState<AttentionScenarioId>("river-bank");
-  const [queryTokenId, setQueryTokenId] = useState("the");
+  const [queryTokenId, setQueryTokenId] = useState("bank");
   const [sharpness, setSharpness] = useState(initialSharpness);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const scenario =

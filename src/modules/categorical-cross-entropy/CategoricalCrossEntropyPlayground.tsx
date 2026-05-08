@@ -5,7 +5,6 @@ import {
   adjustProbability,
   analyzeLoss,
   categoricalCrossEntropyLoss,
-  setTrueClassDistribution,
 } from "./cross-entropy-engine";
 import {
   crossEntropyLessons,
@@ -742,6 +741,11 @@ function LossMeter({
   label: string;
 }) {
   const meterPosition = Math.min(100, (loss / maxTeachingLoss) * 100);
+  const isHighLoss = loss >= 1.2;
+  const lossColor = isHighLoss ? "#ff2626" : loss >= 0.6 ? "#c78a00" : "#19a64b";
+  const noteClassName = isHighLoss
+    ? "mt-3 flex items-center gap-4 rounded-[8px] border border-[#ffc7c7] bg-[#fff1f1] px-4 py-2.5 text-[14px] leading-[1.2] text-[#ba1a1a]"
+    : "mt-3 flex items-center gap-4 rounded-[8px] border border-[#c8ead7] bg-[#f1fbf7] px-4 py-2.5 text-[14px] leading-[1.2] text-[#078033]";
 
   return (
     <div>
@@ -749,7 +753,10 @@ function LossMeter({
         <h3 className="text-[14px] font-bold text-[#0b1531]">
           {title}
         </h3>
-        <p className="text-[42px] leading-none font-black tracking-[-0.04em] text-[#19a64b]">
+        <p
+          className="text-[42px] leading-none font-black tracking-[-0.04em]"
+          style={{ color: lossColor }}
+        >
           {formatLoss(loss)}
         </p>
       </div>
@@ -772,7 +779,7 @@ function LossMeter({
           (Bad)
         </span>
       </div>
-      <div className="mt-3 flex items-center gap-4 rounded-[8px] border border-[#c8ead7] bg-[#f1fbf7] px-4 py-2.5 text-[14px] leading-[1.2] text-[#078033]">
+      <div className={noteClassName}>
         <CheckIcon />
         <p>{label}</p>
       </div>
@@ -889,9 +896,6 @@ export function CategoricalCrossEntropyPlayground() {
     }
 
     setTrueClassIds([nextClassId]);
-    setProbabilities((current) =>
-      setTrueClassDistribution(lesson.classes, current, nextClassId),
-    );
   }
 
   function updateProbability(classId: string, value: number) {

@@ -502,27 +502,35 @@ function FormulaPanel({ analysis }: { analysis: SpreadAnalysis }) {
   );
 }
 
-function MiniSpread({ preset }: { preset: SpreadPreset }) {
-  const analysis = analyzeSpread(pointsForPreset(preset));
-  const color =
-    preset.id === "tight"
-      ? "#16a34a"
-      : preset.id === "balanced"
-        ? "#f59e0b"
-        : "#ef4444";
-
+function MiniSpread({
+  label,
+  description,
+  analysis,
+  color,
+}: {
+  label: string;
+  description: string;
+  analysis: SpreadAnalysis;
+  color: string;
+}) {
   return (
     <div className="rounded-[10px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-[13px] font-black text-[#52628a] uppercase">
-            {preset.label}
+            {label}
+          </p>
+          <p className="mt-1 text-[14px] leading-[1.35] text-[#263a68]">
+            {description}
           </p>
           <p className="mt-1 text-[14px] leading-[1.35] text-[#263a68]">
             mean = {analysis.mean.toFixed(1)}
           </p>
         </div>
-        <p className="font-mono text-[26px] leading-none font-black" style={{ color }}>
+        <p
+          className="font-mono text-[26px] leading-none font-black"
+          style={{ color }}
+        >
           {analysis.standardDeviation.toFixed(1)}
         </p>
       </div>
@@ -547,17 +555,43 @@ function MiniSpread({ preset }: { preset: SpreadPreset }) {
   );
 }
 
-function ComparePanel() {
+function PresetMiniSpread({ preset }: { preset: SpreadPreset }) {
+  const analysis = analyzeSpread(pointsForPreset(preset));
+  const color =
+    preset.id === "tight"
+      ? "#16a34a"
+      : preset.id === "balanced"
+        ? "#f59e0b"
+        : "#ef4444";
+
+  return (
+    <MiniSpread
+      label={preset.label}
+      description="reference preset"
+      analysis={analysis}
+      color={color}
+    />
+  );
+}
+
+function ComparePanel({ analysis }: { analysis: SpreadAnalysis }) {
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>4. Compare The Spread</LessonTitle>
       <p className="mt-4 max-w-[860px] text-[16px] leading-[1.45] text-[#16264e]">
-        These datasets share the same mean. Standard deviation separates the
-        clustered story from the wide one.
+        Your current data stays in the comparison so dragging a point changes
+        this panel too. The reference presets show how the same center can hide
+        very different spread.
       </p>
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+      <div className="mt-5 grid gap-4 lg:grid-cols-4">
+        <MiniSpread
+          label="Current data"
+          description="live after your drags"
+          analysis={analysis}
+          color="#352cff"
+        />
         {spreadPresets.map((preset) => (
-          <MiniSpread key={preset.id} preset={preset} />
+          <PresetMiniSpread key={preset.id} preset={preset} />
         ))}
       </div>
     </Panel>
@@ -678,7 +712,7 @@ export function VarianceStandardDeviationPlayground() {
         />
         <DeviationPanel analysis={analysis} />
         <FormulaPanel analysis={analysis} />
-        <ComparePanel />
+        <ComparePanel analysis={analysis} />
         <TakeawayPanel />
       </div>
     </main>

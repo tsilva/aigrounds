@@ -271,7 +271,7 @@ function FormulaPanel({ analysis }: { analysis: ComparisonAnalysis }) {
           </div>
         </div>
         <div className="min-w-0">
-          <LessonTitle>Same Average, Different Ride</LessonTitle>
+          <LessonTitle>Average Versus Ride</LessonTitle>
           <div className="mt-4 overflow-hidden rounded-[10px] border border-[#dfe4f4]">
             <div className="grid grid-cols-[0.85fr_1fr_1fr_1fr] bg-[#f7f8ff] text-[11px] font-black tracking-[0.03em] text-[#52628a] uppercase">
               <span className="p-3">Bet</span>

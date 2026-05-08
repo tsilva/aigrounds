@@ -31,15 +31,9 @@ export const arrivalScenarios: ArrivalScenario[] = [
     title: "Rare Defects",
     subtitle: "Manufacturing defects",
     icon: "warning",
-    pPerSecond: 0.0015,
-    windowMinutes: 10,
+    pPerSecond: 0.001,
+    windowMinutes: 1,
   },
 ];
 
 export const defaultScenario = arrivalScenarios[0];
-
-export const rareEventExample = {
-  lambdaPerMinute: 0.01,
-  windowMinutes: 5,
-  expectedCount: 0.05,
-};

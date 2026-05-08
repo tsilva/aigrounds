@@ -1230,24 +1230,33 @@ function ChatPanel({
             {error}
           </p>
         ) : null}
-        <label className="block">
-          <span className="sr-only">Message assistant</span>
-          <textarea
-            ref={textareaRef}
-            value={draft}
-            onChange={(event) => onDraftChange(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.altKey) {
-                event.preventDefault();
-                event.currentTarget.form?.requestSubmit();
-              }
-            }}
-            placeholder="Ask next. Enter submits."
-            rows={1}
-            className="assistant-textarea-scrollbarless h-10 max-h-32 min-h-10 w-full resize-none overflow-y-auto rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
-            disabled={isSending}
-          />
-        </label>
+        <div className="flex items-end gap-2">
+          <label className="min-w-0 flex-1">
+            <span className="sr-only">Message assistant</span>
+            <textarea
+              ref={textareaRef}
+              value={draft}
+              onChange={(event) => onDraftChange(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.altKey) {
+                  event.preventDefault();
+                  event.currentTarget.form?.requestSubmit();
+                }
+              }}
+              placeholder="Ask or answer the guide..."
+              rows={1}
+              className="assistant-textarea-scrollbarless h-10 max-h-32 min-h-10 w-full resize-none overflow-y-auto rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:text-slate-400"
+              disabled={isSending}
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={isSending || !draft.trim()}
+            className="inline-flex h-10 shrink-0 items-center justify-center rounded-[14px] bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 focus:ring-4 focus:ring-indigo-100 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+          >
+            Send
+          </button>
+        </div>
       </form>
     </section>
   );

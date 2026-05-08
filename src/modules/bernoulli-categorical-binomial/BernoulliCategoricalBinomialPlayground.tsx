@@ -197,9 +197,13 @@ function FormulaPanel({ mode }: { mode: DistributionMode }) {
 }
 
 function SliderControl({
+  label,
+  valueAriaLabel,
   value,
   onChange,
 }: {
+  label: string;
+  valueAriaLabel: string;
   value: number;
   onChange: (value: number) => void;
 }) {
@@ -209,14 +213,14 @@ function SliderControl({
     <label className="block rounded-[10px] border border-[#dbe2f2] bg-[#fbfbff] px-4 py-3">
       <span className="flex items-baseline justify-between gap-3">
         <span className="text-[13px] font-black text-[#071024]">
-          Success probability p
+          {label}
         </span>
         <input
           type="number"
           min={0.05}
           max={0.95}
           step={0.01}
-          aria-label="Success probability value"
+          aria-label={valueAriaLabel}
           value={formatProbability(value)}
           onChange={(event) =>
             onChange(clampProbability(Number(event.target.value)))
@@ -397,13 +401,27 @@ function SimulatorPanel({
   onChangeP: (value: number) => void;
   onChangeTrials: (value: number) => void;
 }) {
+  const probabilityLabel =
+    analysis.mode === "categorical"
+      ? "Class A probability p"
+      : "Success probability p";
+  const probabilityValueLabel =
+    analysis.mode === "categorical"
+      ? "Class A probability value"
+      : "Success probability value";
+
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>3. Move The Mass</LessonTitle>
       <div className="mt-4 grid gap-6 xl:grid-cols-[minmax(300px,0.78fr)_minmax(0,1.22fr)]">
         <div className="min-w-0">
           <div className="grid gap-3">
-            <SliderControl value={p} onChange={onChangeP} />
+            <SliderControl
+              label={probabilityLabel}
+              valueAriaLabel={probabilityValueLabel}
+              value={p}
+              onChange={onChangeP}
+            />
             <TrialStepper
               value={trials}
               isActive={analysis.mode === "binomial"}

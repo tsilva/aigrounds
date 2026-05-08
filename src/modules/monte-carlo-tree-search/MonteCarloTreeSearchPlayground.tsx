@@ -82,10 +82,22 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function FactPill({ label, value }: { label: string; value: string }) {
+function FactPill({
+  label,
+  value,
+  preserveLabelCase = false,
+}: {
+  label: string;
+  value: string;
+  preserveLabelCase?: boolean;
+}) {
   return (
     <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
-      <p className="text-[11px] font-black tracking-[0.03em] text-[#7180a5] uppercase">
+      <p
+        className={`text-[11px] font-black tracking-[0.03em] text-[#7180a5] ${
+          preserveLabelCase ? "" : "uppercase"
+        }`}
+      >
         {label}
       </p>
       <p className="mt-1 truncate font-mono text-[13px] font-bold text-[#071024]">
@@ -274,7 +286,7 @@ function FormulaPanel({
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
         <FactPill label="Q" value="win rate" />
         <FactPill label="N" value="parent visits" />
-        <FactPill label="n" value="child visits" />
+        <FactPill label="n" value="child visits" preserveLabelCase />
       </div>
     </Panel>
   );

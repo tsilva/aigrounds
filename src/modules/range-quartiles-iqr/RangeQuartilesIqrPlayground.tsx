@@ -270,6 +270,8 @@ function DatasetPanel({
   const markedOutlierPoints = points.filter(
     (point) => point.role === "outlier",
   );
+  const medianPoint =
+    analysis.sortedPoints[Math.floor(analysis.sortedPoints.length / 2)];
 
   return (
     <Panel className="p-5 sm:p-6">
@@ -312,8 +314,18 @@ function DatasetPanel({
               value={analysis.sortedValues.join(", ")}
             />
             <FactPill
-              label="Middle halves"
-              value={`${lowerHalf.join(", ")} | ${upperHalf.join(", ")}`}
+              label="Quartile halves"
+              value={`lower: ${lowerHalf.join(", ")} | upper: ${upperHalf.join(
+                ", ",
+              )}`}
+            />
+            <FactPill
+              label="Median held out"
+              value={
+                medianPoint
+                  ? `${medianPoint.label}:${formatValue(medianPoint.value)}`
+                  : "none"
+              }
             />
             <FactPill
               label="Marked far point"
@@ -327,8 +339,8 @@ function DatasetPanel({
             />
           </div>
           <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
-            Drag a dot, or select it and use arrow keys. Range follows the
-            edges; IQR changes when Q1 or Q3 moves.
+            Q1 comes from the lower half, Q3 from the upper half. Drag a dot,
+            or select it and use arrow keys.
           </div>
         </div>
       </div>
@@ -462,7 +474,7 @@ function SummaryPanel({
           <LessonTitle>2. Read The Five-Number Summary</LessonTitle>
           <p className="mt-4 max-w-[860px] text-[16px] leading-[1.45] text-[#16264e]">
             The box plot compresses the sorted data into min, Q1, median, Q3,
-            and max.
+            and max. With 9 values, the median sits between the two halves.
           </p>
           <div className="mt-5">
             <BoxPlot summary={analysis} outlierPoints={outlierPoints} />

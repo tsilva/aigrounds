@@ -17,7 +17,7 @@ export const rangePresets: RangePreset[] = [
     id: "steady",
     label: "Compact",
     shortLabel: "Tight middle",
-    description: "Most values sit close together, so range and IQR agree.",
+    description: "Most values sit close together, so range and IQR stay modest.",
     values: [22, 27, 31, 35, 39, 43, 47, 52, 58],
   },
   {
@@ -37,7 +37,7 @@ export const rangePresets: RangePreset[] = [
   },
 ];
 
-export const initialRangePreset = rangePresets[2] ?? rangePresets[0]!;
+export const initialRangePreset = rangePresets[0]!;
 
 export function pointsForPreset(preset: RangePreset): RangePoint[] {
   return makeRangePoints(preset.values, preset.outlierIndexes);

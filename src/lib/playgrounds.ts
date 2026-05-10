@@ -16,6 +16,7 @@ import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/Soft
 import { TransformerAttentionPlayground } from "@/modules/transformer-attention/TransformerAttentionPlayground";
 import { VarianceStandardDeviationPlayground } from "@/modules/variance-standard-deviation/VarianceStandardDeviationPlayground";
 import { WaitingArrivalDistributionsPlayground } from "@/modules/waiting-arrival-distributions/WaitingArrivalDistributionsPlayground";
+import { ZeroKnowledgeProofsPlayground } from "@/modules/zero-knowledge-proofs/ZeroKnowledgeProofsPlayground";
 import {
   activePlaygroundMetadata,
   dashboardLessonPlanOrder,
@@ -49,6 +50,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "gradient-descent": GradientDescentPlayground,
   "monte-carlo-tree-search": MonteCarloTreeSearchPlayground,
   "transformer-attention": TransformerAttentionPlayground,
+  "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
 };
 
 export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.map(

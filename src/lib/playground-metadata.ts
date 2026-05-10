@@ -475,6 +475,32 @@ export const activePlaygroundMetadata = [
       badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
     },
   },
+  {
+    slug: "zero-knowledge-proofs",
+    title: "Zero Knowledge Proofs Lab",
+    tag: "cryptography",
+    kicker:
+      "Open one random edge and watch confidence grow while the secret coloring stays hidden.",
+    summary:
+      "Run a graph-coloring proof where a prover commits hidden colors, the verifier challenges one edge, and repeated fresh shuffles prove local checks without revealing the full coloring.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Provers",
+      "Verifiers",
+      "Commitments",
+      "Zero knowledge",
+    ],
+    learningGoals: [
+      "Understand a proof round as commit, challenge, open, and verify.",
+      "See how repeated random edge checks reduce a cheating prover's chance of escaping.",
+      "Recognize why fresh hidden shuffles keep local openings from revealing the secret coloring.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["zero-knowledge-proofs"],
+    theme: {
+      badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
+    },
+  },
 ] satisfies PlaygroundMetadata[];
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
@@ -757,14 +783,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Rearrange tokens and inspect how positions change the representation.",
     concepts: ["Tokens", "Context windows", "Position"],
-  },
-  {
-    slug: "zero-knowledge-proofs",
-    title: "Zero Knowledge Proofs Lab",
-    tag: "cryptography",
-    summary:
-      "Run an interactive proof where a verifier gains confidence without seeing the secret.",
-    concepts: ["Provers", "Verifiers", "Commitment"],
   },
 ];
 

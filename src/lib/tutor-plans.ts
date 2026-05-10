@@ -15,7 +15,8 @@ type TutorPlanSlug =
   | "monte-carlo-tree-search"
   | "confusion-matrix-thresholds"
   | "overfitting"
-  | "transformer-attention";
+  | "transformer-attention"
+  | "zero-knowledge-proofs";
 
 export type TutorStep = {
   title: string;
@@ -1031,6 +1032,69 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Overfitting lowers training error by memorizing noise, but that extra wiggle can hurt future examples.",
+      },
+    ],
+  },
+  "zero-knowledge-proofs": {
+    intro:
+      "Work through three proof experiments. Predict what the verifier learns, open one edge, then connect repeated checks to cheating risk and secrecy.",
+    openingMessage:
+      "No prior cryptography knowledge needed. We will build the idea by predicting, trying one small proof round, and explaining what changed.\n\n- The prover claims to know a valid coloring of the graph.\n- A commitment hides each node color until the verifier asks to open one edge.\n- The verifier learns only whether the two opened endpoint colors differ.\n- A fresh hidden shuffle each round keeps many local openings from revealing the full coloring.\n\nFirst prediction: after opening just one edge, what should the verifier learn: the whole coloring, or only whether that edge is valid? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Describes the commit, challenge, open, verify round structure.",
+      "Explains why one opened edge proves only a local color-difference check.",
+      "Connects repeated random challenges to a shrinking cheating escape probability.",
+      "Explains why a fresh hidden color shuffle protects the original secret coloring.",
+    ],
+    steps: [
+      {
+        title: "Open one edge",
+        experiment:
+          "Use Honest prover. Press Next challenge once and watch the graph, opened endpoints, and transcript row.",
+        predictionQuestion:
+          "After opening one challenged edge, what should the verifier learn?",
+        observationPrompt:
+          "What became visible, and what stayed hidden after the edge opened?",
+        observationOptions: [
+          "Only one edge opened",
+          "The full coloring stayed hidden",
+          "I am not sure",
+        ],
+        takeaway:
+          "A single round reveals a local check: the two endpoint colors differ, while the rest of the coloring remains committed and hidden.",
+      },
+      {
+        title: "Try the cheating prover",
+        experiment:
+          "Switch to Cheating prover and press Next challenge until a caught edge appears. Compare the verdict with the transcript.",
+        predictionQuestion:
+          "What should happen when the verifier randomly asks for a bad same-color edge?",
+        observationPrompt:
+          "How did the verdict change when the challenged edge was one of the bad edges?",
+        observationOptions: [
+          "The prover was caught",
+          "Same-color endpoints failed",
+          "I am not sure",
+        ],
+        takeaway:
+          "A cheating prover can pass some edge challenges, but any bad same-color edge exposes the lie immediately.",
+      },
+      {
+        title: "Raise the round count",
+        experiment:
+          "Move the rounds slider from a low value to a high value. Watch the formula and cheater escape chart.",
+        predictionQuestion:
+          "What should happen to the cheater's escape chance as random rounds increase?",
+        observationPrompt:
+          "What changed in the formula and chart as k increased?",
+        observationOptions: [
+          "Escape probability dropped",
+          "Each round multiplied the risk",
+          "I am not sure",
+        ],
+        takeaway:
+          "Repeated independent challenges make cheating risk shrink quickly, while fresh shuffles keep the original coloring private.",
       },
     ],
   },

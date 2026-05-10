@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 53,
+  "lessonPlanTitle": "Zero Knowledge Proofs Lab",
+  "slug": "zero-knowledge-proofs",
+  "modulePath": "src/modules/zero-knowledge-proofs",
+  "acceptedMockup": "src/modules/zero-knowledge-proofs/design/accepted-mockup.png",
+  "prompt": "src/modules/zero-knowledge-proofs/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e11ea-c0e0-7f10-b72c-af152b4ff21c/ig_031f2911cbf3b98e016a009c98adc48190b0f42d58b86dc955.png"
+}

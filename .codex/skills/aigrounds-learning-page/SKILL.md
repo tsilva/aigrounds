@@ -46,6 +46,9 @@ begins.
 - Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
 - Do not show a generated mockup if it violates the reference structure. Regenerate it first.
 - In a parallel batch, do not dispatch implementation subagents until the user has explicitly accepted the final mockup for every lesson in the batch.
+- When a dashboard lesson is implemented, it must not remain marked
+  `coming-soon`: remove its `upcomingPlaygrounds` entry in the same change that
+  adds active metadata and component registration.
 
 ## Workflow
 
@@ -152,9 +155,12 @@ begins.
    - Put scenario/example data in a separate scenario file when it helps readability.
    - Register the module in `src/lib/playgrounds.ts`.
    - Move the implemented lesson from `upcomingPlaygrounds` to
-     `activePlaygroundMetadata`, keep its slug in `dashboardLessonPlanOrder`, and
-     link the finished playground through the landing page so users can open it
-     from `/`.
+     `activePlaygroundMetadata`: add the active metadata, delete the matching
+     upcoming object, keep the slug in `dashboardLessonPlanOrder`, and link the
+     finished playground through the landing page so users can open it from `/`.
+   - Before verification, search the metadata for the implemented slug and
+     confirm it appears in `activePlaygroundMetadata` and
+     `dashboardLessonPlanOrder`, but no longer appears in `upcomingPlaygrounds`.
    - Use `presentation: "immersive"` when the page should own the full viewport like the cross entropy page.
    - Update `README.md` for significant new playgrounds.
 
@@ -162,7 +168,8 @@ begins.
    - Run `pnpm build`.
    - Start or reuse `pnpm dev`.
    - Use the official Browser Use plugin for browser verification and screenshots.
-   - Check the home page has a working link/card for the new playground.
+   - Check the home page has a working link/card for the new playground and no
+     `coming soon` badge on the implemented lesson card.
    - Check desktop and mobile widths for text overflow, layout collisions, and broken interactions.
    - Exercise the primary interaction at low, middle, and high settings. Confirm it updates at least two teaching surfaces, such as a chart plus metrics or a formula plus narration.
    - Inspect browser screenshots for SVG/canvas overflow, clipped controls, cramped numeric pills, and visualizations escaping their plot bounds.

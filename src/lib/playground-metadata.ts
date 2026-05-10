@@ -758,6 +758,14 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
       "Rearrange tokens and inspect how positions change the representation.",
     concepts: ["Tokens", "Context windows", "Position"],
   },
+  {
+    slug: "zero-knowledge-proofs",
+    title: "Zero Knowledge Proofs Lab",
+    tag: "cryptography",
+    summary:
+      "Run an interactive proof where a verifier gains confidence without seeing the secret.",
+    concepts: ["Provers", "Verifiers", "Commitment"],
+  },
 ];
 
 export const dashboardLessonPlanOrder = [
@@ -813,6 +821,7 @@ export const dashboardLessonPlanOrder = [
   "backpropagation-inspector",
   "token-context-position",
   "transformer-attention",
+  "zero-knowledge-proofs",
 ] as const;
 
 function getPlaygroundMetadata(slug: string) {

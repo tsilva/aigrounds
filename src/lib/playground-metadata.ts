@@ -450,6 +450,58 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "matrix-multiplication",
+    title: "Matrix Multiplication Lab",
+    tag: "linear algebra",
+    kicker:
+      "Highlight one output cell and watch a row-column dot product build it term by term.",
+    summary:
+      "Choose compatible matrix shapes, select output cells, and step through the multiply-add terms that turn rows of A and columns of B into the product matrix C.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Matrix shapes",
+      "Dot products",
+      "Linear algebra",
+      "Multiply-adds",
+    ],
+    learningGoals: [
+      "Understand when two matrix shapes are compatible for multiplication.",
+      "Compute one output cell as a row of A dotted with a column of B.",
+      "Recognize why (m x n) times (n x p) produces an (m x p) matrix.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["matrix-multiplication"],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+  },
+  {
+    slug: "byte-pair-encoding",
+    title: "Byte Pair Encoding Lab",
+    tag: "tokenization",
+    kicker:
+      "Spend merge budget and watch frequent character pairs become reusable tokens.",
+    summary:
+      "Choose a tiny training corpus, step through BPE merges, and compare how learned subword chunks reduce token count while growing the vocabulary.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Tokenization",
+      "Subword tokens",
+      "Pair frequency",
+      "Vocabulary tradeoffs",
+    ],
+    learningGoals: [
+      "Understand BPE as repeated merging of frequent adjacent pieces.",
+      "See why more merge steps reduce token count while increasing vocabulary size.",
+      "Recognize why learned tokens transfer best to text that repeats training patterns.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["byte-pair-encoding"],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+  },
+  {
     slug: "transformer-attention",
     title: "Transformer Attention",
     tag: "transformers",
@@ -473,6 +525,32 @@ export const activePlaygroundMetadata = [
     tutorPlan: playgroundTutorPlans["transformer-attention"],
     theme: {
       badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
+    },
+  },
+  {
+    slug: "linear-quantization-int4",
+    title: "Linear Quantization (INT4) Lab",
+    tag: "compression",
+    kicker:
+      "Turn real weights into 16 reusable integer codes and see what memory savings cost.",
+    summary:
+      "Choose a block of values, tune the quantization range, inspect one value as it snaps to an INT4 code, and compare rounding, clipping, and 8x storage savings.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Linear quantization",
+      "INT4 codes",
+      "Scale and zero point",
+      "Rounding and clipping error",
+    ],
+    learningGoals: [
+      "Understand how scale and zero point map a real value onto one of 16 INT4 codes.",
+      "See why dequantized values are approximate shelf centers rather than the original decimals.",
+      "Recognize the range tradeoff between smaller steps, more clipping, and memory savings.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["linear-quantization-int4"],
+    theme: {
+      badgeClassName: "border-emerald-300 bg-emerald-100 text-emerald-950",
     },
   },
   {
@@ -817,6 +895,7 @@ export const dashboardLessonPlanOrder = [
   "roc-precision-recall-curves",
   "feature-scaling",
   "distance-metrics",
+  "matrix-multiplication",
   "vector-geometry-similarity",
   "projection-foundations",
   "pca-principal-components",
@@ -837,8 +916,10 @@ export const dashboardLessonPlanOrder = [
   "monte-carlo-tree-search",
   "neural-network-forward-pass",
   "backpropagation-inspector",
+  "byte-pair-encoding",
   "token-context-position",
   "transformer-attention",
+  "linear-quantization-int4",
   "zero-knowledge-proofs",
 ] as const;
 

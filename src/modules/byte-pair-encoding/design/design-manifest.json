@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Byte Pair Encoding Lab",
+  "slug": "byte-pair-encoding",
+  "modulePath": "src/modules/byte-pair-encoding",
+  "acceptedMockup": "src/modules/byte-pair-encoding/design/accepted-mockup.png",
+  "prompt": "src/modules/byte-pair-encoding/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e16c6-f9f0-75c1-a7b3-770b762121ee/ig_08d873f34323fd25016a01bdfc995481919128d875118236af.png"
+}

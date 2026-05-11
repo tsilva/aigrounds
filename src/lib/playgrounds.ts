@@ -1,11 +1,14 @@
 import { type ComponentType } from "react";
 import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
 import { BernoulliCategoricalBinomialPlayground } from "@/modules/bernoulli-categorical-binomial/BernoulliCategoricalBinomialPlayground";
+import { BytePairEncodingPlayground } from "@/modules/byte-pair-encoding/BytePairEncodingPlayground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { ConditionalProbabilityPlayground } from "@/modules/conditional-probability/ConditionalProbabilityPlayground";
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
 import { ExpectedValueRiskPlayground } from "@/modules/expected-value-risk/ExpectedValueRiskPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
+import { LinearQuantizationInt4Playground } from "@/modules/linear-quantization-int4/LinearQuantizationInt4Playground";
+import { MatrixMultiplicationPlayground } from "@/modules/matrix-multiplication/MatrixMultiplicationPlayground";
 import { MeanMedianModePlayground } from "@/modules/mean-median-mode/MeanMedianModePlayground";
 import { MonteCarloTreeSearchPlayground } from "@/modules/monte-carlo-tree-search/MonteCarloTreeSearchPlayground";
 import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
@@ -49,7 +52,10 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "categorical-cross-entropy": CategoricalCrossEntropyPlayground,
   "gradient-descent": GradientDescentPlayground,
   "monte-carlo-tree-search": MonteCarloTreeSearchPlayground,
+  "matrix-multiplication": MatrixMultiplicationPlayground,
+  "byte-pair-encoding": BytePairEncodingPlayground,
   "transformer-attention": TransformerAttentionPlayground,
+  "linear-quantization-int4": LinearQuantizationInt4Playground,
   "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
 };
 

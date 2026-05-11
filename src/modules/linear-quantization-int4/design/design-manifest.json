@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Linear Quantization (INT4) Lab",
+  "slug": "linear-quantization-int4",
+  "modulePath": "src/modules/linear-quantization-int4",
+  "acceptedMockup": "src/modules/linear-quantization-int4/design/accepted-mockup.png",
+  "prompt": "src/modules/linear-quantization-int4/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e16a3-5990-74e1-8b29-968ea64df991/ig_0ea0ce8e197a248b016a01c0311b3881918d66c62942694afb.png"
+}

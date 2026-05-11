@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Matrix Multiplication Lab",
+  "slug": "matrix-multiplication",
+  "modulePath": "src/modules/matrix-multiplication",
+  "acceptedMockup": "src/modules/matrix-multiplication/design/accepted-mockup.png",
+  "prompt": "src/modules/matrix-multiplication/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e16c7-577a-7f42-9542-8c175536255b/ig_0a0d8c264ccaf56a016a01bd7191248191aeed1886d73e3be1.png"
+}

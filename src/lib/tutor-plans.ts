@@ -15,7 +15,10 @@ type TutorPlanSlug =
   | "monte-carlo-tree-search"
   | "confusion-matrix-thresholds"
   | "overfitting"
+  | "matrix-multiplication"
+  | "byte-pair-encoding"
   | "transformer-attention"
+  | "linear-quantization-int4"
   | "zero-knowledge-proofs";
 
 export type TutorStep = {
@@ -300,6 +303,70 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Sharper attention concentrates the weighted lookup, while softer attention blends more tokens together.",
+      },
+    ],
+  },
+  "byte-pair-encoding": {
+    intro:
+      "Work through three tokenization experiments. Predict which pair will merge, spend merge budget, then compare how learned chunks transfer to new text.",
+    openingMessage:
+      "No tokenizer background needed. We will build the idea by predicting, trying one small merge budget, and explaining what changed.\n\n- BPE starts with small symbols, shown here as characters plus a word-end marker.\n- Each merge creates one new token from a frequent adjacent pair.\n- More merges usually reduce token count, but they also grow the vocabulary.\n- Learned tokens help most when new text repeats patterns from the training text.\n\nFirst prediction: after the corpus has learned l + o and lo + w, which examples should compress more: words related to low/new, or an unrelated string like xyz? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains BPE as repeated adjacent-pair merging.",
+      "Connects merge budget to lower token count and larger vocabulary.",
+      "Uses the pair-frequency table to predict likely next merges.",
+      "Recognizes that learned subword tokens transfer best to repeated patterns.",
+      "Explains why rare or unseen strings may remain character-like.",
+    ],
+    steps: [
+      {
+        title: "Predict reusable chunks",
+        experiment:
+          "Use the Repetition corpus with 4 merge steps. Compare lowest newer, glow tower, and xyz in the Compare Texts panel.",
+        predictionQuestion:
+          "Which examples should compress more: words related to low/new, or an unrelated string like xyz?",
+        observationPrompt:
+          "What happened to the token counts for related and unrelated text?",
+        observationOptions: [
+          "Repeated patterns compressed more",
+          "The unrelated string stayed split",
+          "I am not sure",
+        ],
+        takeaway:
+          "BPE helps when new text reuses pieces that were frequent in the training corpus.",
+      },
+      {
+        title: "Spend more merges",
+        experiment:
+          "Move Merge steps from 0 to 8. Watch the token chips, vocabulary size, and tradeoff chart update together.",
+        predictionQuestion:
+          "What should happen to token count and vocabulary size as merge steps increase?",
+        observationPrompt:
+          "How did the two tradeoff lines move as you spent more merges?",
+        observationOptions: [
+          "Token count went down",
+          "Vocabulary size went up",
+          "I am not sure",
+        ],
+        takeaway:
+          "Each merge can make text shorter, but every new merged piece also adds to the vocabulary.",
+      },
+      {
+        title: "Read the next pair",
+        experiment:
+          "Set Merge steps to 4 and inspect Next pair candidates. Then step forward once and see which token appears.",
+        predictionQuestion:
+          "What should the next merge come from: a frequent candidate pair or a rare pair?",
+        observationPrompt:
+          "How did the highlighted candidate table explain the next token?",
+        observationOptions: [
+          "A high-frequency adjacent pair merged",
+          "The timeline added one token",
+          "I am not sure",
+        ],
+        takeaway:
+          "BPE training repeatedly asks which adjacent pair is most worth turning into a reusable token.",
       },
     ],
   },
@@ -1032,6 +1099,134 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Overfitting lowers training error by memorizing noise, but that extra wiggle can hurt future examples.",
+      },
+    ],
+  },
+  "matrix-multiplication": {
+    intro:
+      "Work through three matrix multiplication experiments. Predict which shapes work, pick one output cell, then connect every product cell to a row-column dot product.",
+    openingMessage:
+      "No prior linear algebra knowledge needed. We will build matrix multiplication by predicting, trying one small output cell, and explaining the pattern.\n\n- Matrix shape is rows x columns.\n- A product A x B works only when A's columns match B's rows.\n- Each output cell C[i,j] comes from row i of A dotted with column j of B.\n- The shared inner dimension tells how many multiply-add terms each output cell uses.\n\nFirst prediction: for a 2 x 3 matrix times a 3 x 2 matrix, what shape should the output have? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Reads matrix shape as rows x columns.",
+      "Explains why A columns must match B rows before multiplication is possible.",
+      "Computes one output cell as a row-column dot product.",
+      "Connects the shared inner dimension to the number of multiply-add terms.",
+      "Predicts the output shape (m x p) from (m x n) times (n x p).",
+    ],
+    steps: [
+      {
+        title: "Check the shapes",
+        experiment:
+          "Choose 2x3 x 3x2. Compare the A shape, B shape, shared inner dimension, and output C shape in the Set The Shapes panel.",
+        predictionQuestion:
+          "For a 2 x 3 matrix times a 3 x 2 matrix, what shape should the output have?",
+        observationPrompt:
+          "What matched, and what did the output shape keep from A and B?",
+        observationOptions: [
+          "The inner dimensions matched",
+          "The output kept A rows and B columns",
+          "I am not sure",
+        ],
+        takeaway:
+          "In (m x n) times (n x p), the two n values must match and the output shape is m x p.",
+      },
+      {
+        title: "Compute one cell",
+        experiment:
+          "Select C[1,2]. Step through k = 1, k = 2, and k = 3 in Watch The Dot Product.",
+        predictionQuestion:
+          "Which values should multiply together for C[1,2]: a row with a column, two rows, or two columns?",
+        observationPrompt:
+          "How did k move through the highlighted row and column?",
+        observationOptions: [
+          "k moved across A's row",
+          "k moved down B's column",
+          "I am not sure",
+        ],
+        takeaway:
+          "One output cell pairs values from a row of A and a column of B, multiplies each pair, then adds the products.",
+      },
+      {
+        title: "Repeat across C",
+        experiment:
+          "Click several cells in the Full Product panel and compare their formula chips.",
+        predictionQuestion:
+          "What should change when you move from C[1,2] to C[2,1]?",
+        observationPrompt:
+          "Which part of the dot product changed for each output cell?",
+        observationOptions: [
+          "The selected row changed",
+          "The selected column changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Every C cell repeats the same rule with a different row i and column j.",
+      },
+    ],
+  },
+  "linear-quantization-int4": {
+    intro:
+      "Work through three quantization experiments. Predict how a real value snaps to an INT4 code, then change the range and inspect the memory tradeoff.",
+    openingMessage:
+      "No prior model-compression knowledge needed. We will build INT4 linear quantization by predicting, trying one small value, and explaining what changed.\n\n- INT4 has 4 bits, so it can store only 16 integer codes: 0 through 15.\n- Linear quantization shares one scale and zero point across a block of values.\n- Dequantization maps the code back to an approximate real value.\n- The range controls two costs: rounding error inside the range and clipping outside it.\n\nFirst prediction: if x = +0.053 gets stored with a scale of 0.0200 and zero point 8, which code should it land on? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains why 4 bits create 16 possible codes.",
+      "Uses scale and zero point to connect a real value to an integer code.",
+      "Distinguishes rounding error from clipping error.",
+      "Explains why a tighter range can reduce step size while increasing clipping.",
+      "Connects two INT4 codes per byte to the 8x memory saving versus FP32.",
+    ],
+    steps: [
+      {
+        title: "Snap one value",
+        experiment:
+          "Use the LLM weights block. Inspect x = +0.053 in Map Real Value To Code and compare the green x marker with the blue dequantized marker.",
+        predictionQuestion:
+          "If x = +0.053 uses scale 0.0200 and zero point 8, which INT4 code should it land on?",
+        observationPrompt:
+          "What happened to the original value after it snapped to a code?",
+        observationOptions: [
+          "It landed on q = 11",
+          "It came back as an approximate value",
+          "I am not sure",
+        ],
+        takeaway:
+          "Quantization stores the code, not the original decimal. Dequantization reconstructs the shelf center, so a small rounding error remains.",
+      },
+      {
+        title: "Change the range",
+        experiment:
+          "Switch between Auto, Tighter, and Wider in Tune The Range. Watch the scale, clipped percent, and shelf spacing.",
+        predictionQuestion:
+          "What should happen when the range gets tighter around the same block?",
+        observationPrompt:
+          "Which changed more clearly: step size, clipping, or both?",
+        observationOptions: [
+          "The step size changed",
+          "The clipped share changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "The range decides how far 16 codes must stretch. A narrower span can make smaller steps, but values outside the span clip to the ends.",
+      },
+      {
+        title: "Pack the code",
+        experiment:
+          "Move the Inspect And Pack slider. Compare the code, 4-bit nibble, and packed byte.",
+        predictionQuestion:
+          "Why can INT4 fit two stored values into one byte?",
+        observationPrompt:
+          "What did the nibble and packed-byte view show?",
+        observationOptions: [
+          "Each value used 4 bits",
+          "Two 4-bit codes made one byte",
+          "I am not sure",
+        ],
+        takeaway:
+          "FP32 uses 32 bits per value, while INT4 uses 4 bits per value. That is the source of the 8x storage reduction before scale metadata overhead.",
       },
     ],
   },

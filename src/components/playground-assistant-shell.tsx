@@ -450,6 +450,13 @@ function imageFromSource(source: string) {
   });
 }
 
+function isLessonCompletedMessage(message: ChatMessage) {
+  return (
+    message.role === "assistant" &&
+    message.content.trimStart().toLowerCase().startsWith("lesson finished.")
+  );
+}
+
 function tutorContextFromStep(
   step: TutorStep,
   stepIndex: number,
@@ -1195,7 +1202,12 @@ function ChatPanel({
               }
             >
               {item.message.role === "assistant" ? (
-                <MarkdownMessage content={item.message.content} />
+                <>
+                  <MarkdownMessage content={item.message.content} />
+                  {isLessonCompletedMessage(item.message) ? (
+                    <LessonCompletedBadge />
+                  ) : null}
+                </>
               ) : (
                 item.message.content
               )}
@@ -1259,6 +1271,18 @@ function ChatPanel({
         </div>
       </form>
     </section>
+  );
+}
+
+function LessonCompletedBadge() {
+  return (
+    <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-emerald-700">
+      <span
+        aria-hidden="true"
+        className="h-2 w-2 rounded-full bg-emerald-500"
+      />
+      <span>Lesson completed</span>
+    </div>
   );
 }
 

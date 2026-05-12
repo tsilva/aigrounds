@@ -134,7 +134,7 @@ function membershipTone(membership: OutcomeMembership) {
   if (membership.inA && membership.inB) {
     return {
       className:
-        "border-[#8053ff] bg-[#efeaff] text-[#24115f] shadow-[inset_0_0_0_2px_rgba(128,83,255,0.18)]",
+        "border-[#8053ff] bg-[#f0eaff] text-[#24115f] shadow-[inset_0_0_0_2px_rgba(128,83,255,0.18)]",
       label: "A ∩ B",
     };
   }
@@ -214,7 +214,9 @@ function Row({
           <div
             key={membership.outcome.id}
             className={`relative grid h-14 place-items-center rounded-[8px] border font-mono text-[13px] font-black transition ${tone.className} ${
-              membership.inView ? "ring-2 ring-[#352cff] ring-offset-2" : ""
+              membership.inView
+                ? "after:pointer-events-none after:absolute after:inset-[-4px] after:rounded-[11px] after:border-2 after:border-[#111827] after:shadow-[0_0_0_2px_rgba(255,255,255,0.95)] after:content-['']"
+                : ""
             }`}
             title={tone.label}
           >
@@ -499,7 +501,7 @@ export function ProbabilityRulesPlayground() {
               label="A ∩ B"
             />
             <LegendSwatch
-              className="border-[#352cff] bg-white ring-2 ring-[#352cff] ring-offset-1"
+              className="border-white bg-white ring-2 ring-[#111827] ring-offset-1 ring-offset-white"
               label="counted now"
             />
           </div>

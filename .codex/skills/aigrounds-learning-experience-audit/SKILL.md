@@ -45,6 +45,9 @@ Play as someone with no topic knowledge:
 1. Prepare.
    - Inspect the target module, scenario, engine, metadata, tutor plan, and
      assistant shell when relevant.
+   - Inventory primary visible controls, teaching surfaces, stated learning
+     goals, and tutor-plan steps. Track them as:
+     `control / surface -> guide coverage -> learning goal -> expected observation`.
    - Start or reuse `pnpm dev`.
    - Open the target route in Browser Use.
    - Record the initial visible state, console warnings/errors, and viewport.
@@ -58,6 +61,12 @@ Play as someone with no topic knowledge:
      providing useful next steps.
    - Track whether each guide instruction can be completed using visible UI
      labels and current page state.
+   - Track whether each primary visible control is exercised by the guide. Flag
+     controls that are never used unless the UI or guide clearly marks them
+     optional or exploratory.
+   - For every displayed formula parameter or key numeric value, check whether
+     the guide teaches where it comes from. Flag values treated as magic
+     constants when the learning goals imply understanding them.
    - Note whether the learner could explain the topic at the end using only
      what the guide and playground taught.
 
@@ -83,8 +92,13 @@ Play as someone with no topic knowledge:
 
 - Initial state matches the first guide question.
 - Guide instructions name controls that are visible and uniquely identifiable.
+- Primary visible controls are either used by the guide or clearly marked
+  optional/exploratory.
 - Page helper text changes with the selected experiment.
 - Every learner action visibly updates at least two teaching surfaces.
+- Displayed derived values such as scale, zero point, thresholds,
+  probabilities, losses, gradients, or scores are explained when they are part
+  of the learning goals.
 - Numeric formulas, markers, pills, and narration agree.
 - The guide does not use stale screenshots before the learner performs a new
   action.
@@ -100,6 +114,8 @@ Report:
 - route or lesson audited,
 - browser and viewport coverage,
 - AI Guide path coverage,
+- coverage mismatches between visible controls, tutor-plan steps, stated
+  learning goals, and final mastery checks,
 - enumerated problems found, ordered by severity,
 - reproduction evidence for each problem,
 - commands run,

@@ -543,8 +543,10 @@ export const activePlaygroundMetadata = [
       "Rounding and clipping error",
     ],
     learningGoals: [
+      "Derive scale and zero point from a block's min/max range.",
       "Understand how scale and zero point map a real value onto one of 16 INT4 codes.",
       "See why dequantized values are approximate shelf centers rather than the original decimals.",
+      "Compare why different blocks use different ranges while the 16-code INT4 budget stays fixed.",
       "Recognize the range tradeoff between smaller steps, more clipping, and memory savings.",
     ],
     presentation: "immersive",
@@ -583,6 +585,14 @@ export const activePlaygroundMetadata = [
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
   {
+    slug: "law-large-numbers-simulation",
+    title: "Law of Large Numbers Simulator",
+    tag: "probability",
+    summary:
+      "Run short and long simulations to see noisy outcomes settle toward expected value.",
+    concepts: ["Expected value", "Long-run averages", "Simulation"],
+  },
+  {
     slug: "pdf-cdf-probability-area",
     title: "PDF, CDF & Probability Area Lab",
     tag: "probability",
@@ -607,6 +617,14 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Sampling", "Sample size", "Sampling variability"],
   },
   {
+    slug: "central-limit-theorem",
+    title: "Central Limit Theorem Lab",
+    tag: "inference",
+    summary:
+      "Sample from strange populations and watch sample means form a predictable bell shape.",
+    concepts: ["Sample means", "Sampling distributions", "Normal approximation"],
+  },
+  {
     slug: "sampling-bias",
     title: "Sampling Bias Lab",
     tag: "inference",
@@ -615,12 +633,20 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Selection bias", "Nonresponse bias", "Survivorship bias"],
   },
   {
-    slug: "standard-error-margin-of-error",
-    title: "Standard Error & Margin of Error Lab",
+    slug: "sampling-distributions-standard-error",
+    title: "Sampling Distributions & Standard Error",
     tag: "inference",
     summary:
-      "Watch uncertainty shrink as sample size grows and estimates form a sampling distribution.",
-    concepts: ["Standard error", "Margin of error", "Sampling distributions"],
+      "Repeat samples and watch estimate-to-estimate spread become standard error.",
+    concepts: ["Sampling distributions", "Standard error", "Estimate spread"],
+  },
+  {
+    slug: "margin-of-error-sample-size",
+    title: "Margin of Error & Sample Size Lab",
+    tag: "inference",
+    summary:
+      "Change sample size and confidence level to see interval width expand or shrink.",
+    concepts: ["Margin of error", "Sample size", "Confidence level"],
   },
   {
     slug: "confidence-intervals",
@@ -639,12 +665,20 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Null hypothesis", "P-values", "Significance"],
   },
   {
-    slug: "errors-power-effect-size",
-    title: "Errors, Power & Effect Size Lab",
+    slug: "type-i-type-ii-errors",
+    title: "Type I & Type II Errors Lab",
     tag: "inference",
     summary:
-      "Show why not significant does not always mean no effect.",
-    concepts: ["Type I error", "Type II error", "Power"],
+      "Move a decision cutoff and compare false alarms with missed real effects.",
+    concepts: ["Type I error", "Type II error", "Decision thresholds"],
+  },
+  {
+    slug: "power-effect-size-sample-size",
+    title: "Power, Effect Size & Sample Size Lab",
+    tag: "inference",
+    summary:
+      "Adjust effect size and sample size to see when real effects become detectable.",
+    concepts: ["Power", "Effect size", "Sample size"],
   },
   {
     slug: "covariance-correlation",
@@ -679,6 +713,14 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Slope", "Intercept", "Residuals"],
   },
   {
+    slug: "least-squares-loss-landscape",
+    title: "Least Squares Loss Landscape",
+    tag: "regression",
+    summary:
+      "Move slope and intercept across a loss surface to see why one line minimizes squared residuals.",
+    concepts: ["Squared error", "Loss surfaces", "Best fit"],
+  },
+  {
     slug: "r-squared-residual-diagnostics",
     title: "R Squared & Residual Diagnostics",
     tag: "regression",
@@ -695,6 +737,14 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Train/test split", "Validation sets", "Data leakage"],
   },
   {
+    slug: "bias-variance-tradeoff",
+    title: "Bias-Variance Tradeoff Lab",
+    tag: "generalization",
+    summary:
+      "Tune model flexibility and see underfitting, useful fit, and overfitting as bias and variance move.",
+    concepts: ["Bias", "Variance", "Model flexibility"],
+  },
+  {
     slug: "classification-metrics-foundations",
     title: "Classification Metrics Foundations",
     tag: "evaluation",
@@ -703,12 +753,20 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Accuracy", "Specificity", "Class imbalance"],
   },
   {
-    slug: "roc-precision-recall-curves",
-    title: "ROC vs Precision-Recall Curves",
+    slug: "roc-auc-thresholds",
+    title: "ROC, AUC & Thresholds Lab",
     tag: "evaluation",
     summary:
-      "Trace both curves while moving a threshold across classifier scores.",
-    concepts: ["ROC curves", "Precision-recall curves", "Thresholds"],
+      "Move a threshold across classifier scores and trace true-positive versus false-positive rates.",
+    concepts: ["ROC curves", "AUC", "Thresholds"],
+  },
+  {
+    slug: "precision-recall-curves-imbalance",
+    title: "Precision-Recall Curves & Imbalance",
+    tag: "evaluation",
+    summary:
+      "Change class balance and trace why precision-recall curves reveal rare-positive tradeoffs.",
+    concepts: ["Precision-recall curves", "Class imbalance", "Rare positives"],
   },
   {
     slug: "feature-scaling",
@@ -743,12 +801,20 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Class scores", "Logits", "Decision margins"],
   },
   {
-    slug: "log-loss-calibration",
-    title: "Log Loss & Calibration Lab",
+    slug: "log-loss-confidence-penalties",
+    title: "Log Loss Confidence Penalties",
     tag: "loss",
     summary:
-      "Compare predicted probabilities against observed frequencies.",
-    concepts: ["Log loss", "Calibration", "Confidence"],
+      "Move probability mass onto and away from the true class to see confident mistakes get punished.",
+    concepts: ["Log loss", "Confidence", "Prediction penalties"],
+  },
+  {
+    slug: "calibration-reliability-diagrams",
+    title: "Calibration & Reliability Diagrams",
+    tag: "evaluation",
+    summary:
+      "Compare predicted confidence bins with observed frequencies to spot overconfidence.",
+    concepts: ["Calibration", "Reliability diagrams", "Observed frequency"],
   },
   {
     slug: "kl-divergence",
@@ -839,12 +905,28 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Exploration", "Exploitation", "UCB"],
   },
   {
+    slug: "activation-functions",
+    title: "Activation Functions Lab",
+    tag: "neural networks",
+    summary:
+      "Move input signals through ReLU, sigmoid, and tanh to see how neurons reshape values.",
+    concepts: ["ReLU", "Sigmoid", "Tanh"],
+  },
+  {
     slug: "neural-network-forward-pass",
     title: "Neural Network Forward Pass Lab",
     tag: "neural networks",
     summary:
       "Move weights in a tiny network and watch inputs become class scores.",
     concepts: ["Layers", "Weights", "Activations"],
+  },
+  {
+    slug: "computational-graphs-chain-rule",
+    title: "Computational Graphs & Chain Rule",
+    tag: "neural networks",
+    summary:
+      "Trace local derivatives through a small graph before sending credit backward.",
+    concepts: ["Computational graphs", "Chain rule", "Local derivatives"],
   },
   {
     slug: "backpropagation-inspector",
@@ -879,12 +961,20 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
   },
   {
-    slug: "token-context-position",
-    title: "Token Context & Position Lab",
+    slug: "context-windows-attention-masks",
+    title: "Context Windows & Attention Masks",
     tag: "transformers",
     summary:
-      "Rearrange tokens and inspect how positions change the representation.",
-    concepts: ["Tokens", "Context windows", "Position"],
+      "Slide a context window and apply masks to see which tokens can attend to which past text.",
+    concepts: ["Context windows", "Attention masks", "Token visibility"],
+  },
+  {
+    slug: "positional-encoding-token-order",
+    title: "Positional Encoding & Token Order",
+    tag: "transformers",
+    summary:
+      "Rearrange tokens and compare position signals that let attention recover word order.",
+    concepts: ["Token order", "Position encodings", "Sequence representations"],
   },
 ];
 
@@ -896,27 +986,34 @@ export const dashboardLessonPlanOrder = [
   "probability-rules",
   "conditional-probability",
   "bayes-rule",
-  "bernoulli-categorical-binomial",
   "expected-value-risk",
+  "law-large-numbers-simulation",
+  "bernoulli-categorical-binomial",
   "waiting-arrival-distributions",
   "pdf-cdf-probability-area",
   "normal-distribution-z-scores",
   "sampling-sample-size",
+  "central-limit-theorem",
   "sampling-bias",
-  "standard-error-margin-of-error",
+  "sampling-distributions-standard-error",
+  "margin-of-error-sample-size",
   "confidence-intervals",
   "hypothesis-testing-basics",
-  "errors-power-effect-size",
+  "type-i-type-ii-errors",
+  "power-effect-size-sample-size",
   "covariance-correlation",
   "correlation-shape-outliers",
   "simpsons-paradox-confounding",
   "linear-regression-line-fitting",
+  "least-squares-loss-landscape",
   "r-squared-residual-diagnostics",
   "train-test-generalization",
   "overfitting",
+  "bias-variance-tradeoff",
   "classification-metrics-foundations",
   "confusion-matrix-thresholds",
-  "roc-precision-recall-curves",
+  "roc-auc-thresholds",
+  "precision-recall-curves-imbalance",
   "feature-scaling",
   "distance-metrics",
   "matrix-multiplication",
@@ -930,7 +1027,8 @@ export const dashboardLessonPlanOrder = [
   "class-score-logits",
   "softmax-temperature",
   "categorical-cross-entropy",
-  "log-loss-calibration",
+  "log-loss-confidence-penalties",
+  "calibration-reliability-diagrams",
   "kl-divergence",
   "contrastive-loss",
   "gradient-descent",
@@ -938,13 +1036,16 @@ export const dashboardLessonPlanOrder = [
   "k-means-clustering",
   "exploration-exploitation",
   "monte-carlo-tree-search",
+  "activation-functions",
   "neural-network-forward-pass",
+  "computational-graphs-chain-rule",
   "backpropagation-inspector",
   "batch-normalization",
   "layer-normalization",
   "rms-normalization",
   "byte-pair-encoding",
-  "token-context-position",
+  "context-windows-attention-masks",
+  "positional-encoding-token-order",
   "transformer-attention",
   "linear-quantization-int4",
   "zero-knowledge-proofs",

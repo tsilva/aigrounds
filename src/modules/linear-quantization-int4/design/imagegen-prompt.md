@@ -1,6 +1,6 @@
 # Accepted Imagegen Prompt
 
-Create the final polished high-fidelity AI Grounds UI mockup for "Linear Quantization (INT4) Lab". Use the same composition as a clean educational web app screenshot: white page, no logo, no nav, no sidebar, no marketing hero. Huge black title top left. Dark-blue subtitle: "Turn real weights into 16 reusable integer codes, then see what memory savings cost." Pale outlined help button top right: "How does INT4 quantization work?" Compact numbered panels with pale blue borders, white backgrounds, blue section numbers. No decorative background. No nested cards. 16:9 desktop screenshot.
+Create the final polished high-fidelity AI Grounds UI mockup for "Linear Quantization (INT4) Lab". Use the same composition as a clean educational web app screenshot: white page, no logo, no nav, no sidebar, no marketing hero. Huge black title top left. Dark-blue subtitle: "Turn real weights into 16 reusable integer codes, then see what memory savings cost." Compact numbered panels with pale blue borders, white backgrounds, blue section numbers. No decorative background. No nested cards. 16:9 desktop screenshot.
 
 Use this consistent example everywhere: affine unsigned INT4 with min=-0.16, max=+0.14, scale s=0.0200, zero point z=8. Selected x=+0.053 maps to q=11, dequantized x-hat=+0.060, error +0.007. INT4 has 4 bits, 16 codes, stores two values per byte.
 

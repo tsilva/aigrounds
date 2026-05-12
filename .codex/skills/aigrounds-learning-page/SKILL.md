@@ -41,6 +41,9 @@ begins.
 - A design is not ready to show if any chart, timeline, formula, probability,
   metric, label, control range, or visible state is internally inconsistent or
   likely to teach the wrong idea.
+- A lesson is not ready to implement or ship until its visible controls,
+  tutor-plan steps, learning goals, and expected observations are reconciled in
+  a coverage matrix.
 - Keep the page as simple as possible while making the concept interactive and memorable.
 - Match the existing AI Grounds design system; the canonical reference screenshot is `assets/cross-entropy-design-reference.png`.
 - Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
@@ -150,6 +153,21 @@ begins.
      directory.
 
 4. Implement after acceptance.
+   - Before or while implementing the tutor plan, create a concise coverage
+     matrix:
+     `visible control / surface -> tutor step -> learning goal -> expected learner observation`.
+   - Every primary visible learner control must be either exercised by the AI
+     Guide, explicitly marked optional/exploratory in the UI or tutor plan, or
+     removed/simplified.
+   - Every learning goal must have at least one guide step that asks the learner
+     to observe or explain it.
+   - If the UI includes scenario or example selectors, the tutor plan must use
+     more than one scenario unless the extra scenarios are intentionally marked
+     optional.
+   - If the lesson displays derived parameters such as scale, zero point,
+     threshold, probability, loss, gradient, or score, the tutor plan must teach
+     how at least one displayed value is produced, not only ask the learner to
+     use it.
    - Add a self-contained module under `src/modules/{slug}/`.
    - Put pure concept logic in `{slug}-engine.ts` when there is meaningful algorithmic state.
    - Put scenario/example data in a separate scenario file when it helps readability.
@@ -170,6 +188,9 @@ begins.
    - Use the official Browser Use plugin for browser verification and screenshots.
    - Check the home page has a working link/card for the new playground and no
      `coming soon` badge on the implemented lesson card.
+   - Re-check the coverage matrix against the rendered UI and tutor plan. Flag
+     or fix any primary control, derived value, or learning goal that the guide
+     can skip while still reaching lesson completion.
    - Check desktop and mobile widths for text overflow, layout collisions, and broken interactions.
    - Exercise the primary interaction at low, middle, and high settings. Confirm it updates at least two teaching surfaces, such as a chart plus metrics or a formula plus narration.
    - Inspect browser screenshots for SVG/canvas overflow, clipped controls, cramped numeric pills, and visualizations escaping their plot bounds.

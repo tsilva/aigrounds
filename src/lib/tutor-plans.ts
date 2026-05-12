@@ -1168,15 +1168,17 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   },
   "linear-quantization-int4": {
     intro:
-      "Work through three quantization experiments. Predict how a real value snaps to an INT4 code, then change the range and inspect the memory tradeoff.",
+      "Work through five quantization experiments. Predict how a real value snaps to an INT4 code, derive scale and zero point, compare blocks, tune the range, and inspect the memory tradeoff.",
     openingMessage:
-      "No prior model-compression knowledge needed. We will build INT4 linear quantization by predicting, trying one small value, and explaining what changed.\n\n- INT4 has 4 bits, so it can store only 16 integer codes: 0 through 15.\n- Linear quantization shares one scale and zero point across a block of values.\n- Dequantization maps the code back to an approximate real value.\n- The range controls two costs: rounding error inside the range and clipping outside it.\n\nFirst prediction: if x = +0.053 gets stored with a scale of 0.0200 and zero point 8, which code should it land on? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior model-compression knowledge needed. We will build INT4 linear quantization by predicting, trying one small value, and explaining what changed.\n\n- INT4 has 4 bits, so it can store only 16 integer codes: 0 through 15.\n- Linear quantization shares one scale and zero point across a block of values.\n- Scale is the real-value step between adjacent INT4 codes: (max - min) / 15.\n- Zero point is the code that represents real zero: round(-min / scale).\n- Dequantization maps the code back to an approximate real value.\n- The range controls two costs: rounding error inside the range and clipping outside it.\n\nFirst prediction: if x = +0.053 gets stored with a scale of 0.0200 and zero point 8, which code should it land on? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
     masteryCriteria: [
       "Explains why 4 bits create 16 possible codes.",
+      "Derives scale from the block range and zero point from the real zero position.",
       "Uses scale and zero point to connect a real value to an integer code.",
       "Distinguishes rounding error from clipping error.",
       "Explains why a tighter range can reduce step size while increasing clipping.",
+      "Compares why LLM weights, activation values, and tiny sensor weights use different ranges and scales.",
       "Connects two INT4 codes per byte to the 8x memory saving versus FP32.",
     ],
     steps: [
@@ -1197,6 +1199,22 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
           "Quantization stores the code, not the original decimal. Dequantization reconstructs the shelf center, so a small rounding error remains.",
       },
       {
+        title: "Derive the shared map",
+        experiment:
+          "Stay on LLM weights. In Map Real Value To Code, read the endpoints -0.16 and +0.14, then compare them with the status strip scale 0.0200 and zero point 8. Compute scale = (max - min) / 15 and zero point = round(-min / scale).",
+        predictionQuestion:
+          "For LLM weights, min = -0.16 and max = +0.14 are spread across 16 codes. What do you think scale measures: the whole range, one code step, or the stored code?",
+        observationPrompt:
+          "Using scale = (max - min) / 15 and zero point = round(-min / scale), what scale and zero point do you get?",
+        observationOptions: [
+          "scale = 0.0200 and zero point = 8",
+          "scale is the whole range",
+          "I am not sure",
+        ],
+        takeaway:
+          "The 16 INT4 codes create 15 gaps from code 0 to code 15, so scale is the range width divided by 15. The zero point chooses which code stands for real zero.",
+      },
+      {
         title: "Change the range",
         experiment:
           "Switch between Auto, Tighter, and Wider in Tune The Range. Watch the scale, clipped percent, and shelf spacing.",
@@ -1211,6 +1229,22 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "The range decides how far 16 codes must stretch. A narrower span can make smaller steps, but values outside the span clip to the ends.",
+      },
+      {
+        title: "Compare three blocks",
+        experiment:
+          "Click Activation values, then Tiny sensor model, then compare them with LLM weights. Watch the selected x value, min/max range, scale, zero point, selected code, and clipped percent.",
+        predictionQuestion:
+          "What should change when you quantize a different block: the 16-code budget, the block range and scale, or both?",
+        observationPrompt:
+          "After clicking Activation values and Tiny sensor model, what changed across the blocks and what stayed fixed?",
+        observationOptions: [
+          "The range and scale changed",
+          "The 16-code budget stayed fixed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Each block gets its own shared range, scale, and zero point because its values live in a different numeric span. The INT4 budget stays fixed at 16 codes.",
       },
       {
         title: "Pack the code",

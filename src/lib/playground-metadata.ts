@@ -556,6 +556,60 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "batch-normalization",
+    title: "Batch Normalization Lab",
+    tag: "neural networks",
+    kicker:
+      "Change mini-batch statistics and watch activations recentered, rescaled, and reshaped.",
+    summary:
+      "Choose shifted, wide, centered, or outlier mini-batches, inspect how BatchNorm computes z values, then tune gamma and beta before comparing training with inference statistics.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Mini-batches",
+      "Activation statistics",
+      "Batch normalization",
+      "Scale and shift",
+    ],
+    learningGoals: [
+      "See how BatchNorm uses mini-batch mean and standard deviation during training.",
+      "Connect the normalization formula to the displayed z values for one activation.",
+      "Understand how learned gamma and beta restore output scale and center.",
+      "Distinguish training-time batch statistics from inference-time running statistics.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["batch-normalization"],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+  },
+  {
+    slug: "layer-normalization",
+    title: "Layer Normalization Lab",
+    tag: "neural networks",
+    kicker:
+      "Select one token row and watch its hidden features normalize from their own statistics.",
+    summary:
+      "Adjust a token's hidden activations, inspect the per-token mean and variance, then tune learned gamma and beta while comparing LayerNorm's row-wise statistics with BatchNorm's batch-wise axis.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Hidden features",
+      "Per-token statistics",
+      "Layer normalization",
+      "Scale and shift",
+    ],
+    learningGoals: [
+      "See how LayerNorm computes mean and variance across the features inside one token.",
+      "Connect the normalization formula to displayed z-score values.",
+      "Understand how gamma and beta restore useful feature scale after normalization.",
+      "Distinguish LayerNorm's per-token statistics from BatchNorm's batch statistics.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["layer-normalization"],
+    theme: {
+      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+  },
+  {
     slug: "zero-knowledge-proofs",
     title: "Zero Knowledge Proofs Lab",
     tag: "cryptography",
@@ -935,22 +989,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Trace how one loss value sends credit assignment back through weights.",
     concepts: ["Backpropagation", "Gradients", "Credit assignment"],
-  },
-  {
-    slug: "batch-normalization",
-    title: "Batch Normalization Lab",
-    tag: "neural networks",
-    summary:
-      "Change mini-batch statistics and watch activations recentered and rescaled during training.",
-    concepts: ["Mini-batches", "Activation statistics", "Scale and shift"],
-  },
-  {
-    slug: "layer-normalization",
-    title: "Layer Normalization Lab",
-    tag: "neural networks",
-    summary:
-      "Compare examples one at a time and see how each layer normalizes its own hidden features.",
-    concepts: ["Hidden features", "Per-example statistics", "Stabilization"],
   },
   {
     slug: "rms-normalization",

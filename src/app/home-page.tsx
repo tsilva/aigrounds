@@ -171,7 +171,11 @@ function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
 
   if (playground.href) {
     return (
-      <Link href={playground.href} className={liveTileClassName}>
+      <Link
+        href={playground.href}
+        prefetch={false}
+        className={liveTileClassName}
+      >
         {content}
       </Link>
     );

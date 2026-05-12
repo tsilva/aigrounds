@@ -19,7 +19,9 @@ type TutorPlanSlug =
   | "byte-pair-encoding"
   | "transformer-attention"
   | "linear-quantization-int4"
-  | "zero-knowledge-proofs";
+  | "zero-knowledge-proofs"
+  | "batch-normalization"
+  | "layer-normalization";
 
 export type TutorStep = {
   title: string;
@@ -1106,7 +1108,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
     intro:
       "Work through three matrix multiplication experiments. Predict which shapes work, pick one output cell, then connect every product cell to a row-column dot product.",
     openingMessage:
-      "No prior linear algebra knowledge needed. We will build matrix multiplication by predicting, trying one small output cell, and explaining the pattern.\n\n- Matrix shape is rows x columns.\n- A product A x B works only when A's columns match B's rows.\n- Each output cell C[i,j] comes from row i of A dotted with column j of B.\n- The shared inner dimension tells how many multiply-add terms each output cell uses.\n\nFirst prediction: for a 2 x 3 matrix times a 3 x 2 matrix, what shape should the output have? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior linear algebra knowledge needed. We will build matrix multiplication by predicting, trying one small output cell, and explaining the pattern.\n\n- Matrix shape is rows x columns.\n- A product A x B works only when A's columns match B's rows.\n- Each output cell C[i,j] comes from row i of A dotted with column j of B.\n- The shared inner dimension tells how many multiply-add terms each output cell uses.\n- What is Matmul? is optional help if the word matmul is new.\n- The other shape presets are optional practice after the guide.\n\nFirst prediction: for a 2 x 2 matrix times a 2 x 3 matrix, what shape should the output have? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
     masteryCriteria: [
       "Reads matrix shape as rows x columns.",
@@ -1119,11 +1121,11 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Check the shapes",
         experiment:
-          "Choose 2x3 x 3x2. Compare the A shape, B shape, shared inner dimension, and output C shape in the Set The Shapes panel.",
+          "Open What is Matmul? once if the word matmul is new. Then choose 2x2 x 2x3 in 1. Set The Shapes. Compare the A shape, B shape, shared inner dimension, output C shape, and the locked incompatible example.",
         predictionQuestion:
-          "For a 2 x 3 matrix times a 3 x 2 matrix, what shape should the output have?",
+          "For a 2 x 2 matrix times a 2 x 3 matrix, what shape should the output have?",
         observationPrompt:
-          "What matched, and what did the output shape keep from A and B?",
+          "What matched, what did the output shape keep from A and B, and why is the locked red example blocked?",
         observationOptions: [
           "The inner dimensions matched",
           "The output kept A rows and B columns",
@@ -1135,7 +1137,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Compute one cell",
         experiment:
-          "Select C[1,2]. Step through k = 1, k = 2, and k = 3 in Watch The Dot Product.",
+          "In 2. Pick One Output Cell, select C[1,2]. Step through k = 1 and k = 2 in 3. Watch The Dot Product. Watch each product reveal and the running sum grow.",
         predictionQuestion:
           "Which values should multiply together for C[1,2]: a row with a column, two rows, or two columns?",
         observationPrompt:
@@ -1151,7 +1153,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Repeat across C",
         experiment:
-          "Click several cells in the Full Product panel and compare their formula chips.",
+          "In 4. See The Full Product, click the formula chip for C[1,2], then click the formula chip for C[2,1]. Compare the formula chips and the repeated A/B highlights inside that same panel.",
         predictionQuestion:
           "What should change when you move from C[1,2] to C[2,1]?",
         observationPrompt:
@@ -1324,6 +1326,182 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Repeated independent challenges make cheating risk shrink quickly, while fresh shuffles keep the original coloring private.",
+      },
+    ],
+  },
+  "batch-normalization": {
+    intro:
+      "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, inspect one value, tune gamma and beta, then compare training with inference.",
+    openingMessage:
+      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean μ and standard deviation σ.\n- It normalizes each activation with z = (x - μ) / sqrt(variance + ε), so the batch is centered and scaled.\n- Learned γ and β then stretch and shift the normalized values, keeping the layer expressive.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: in the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains that BatchNorm computes mean and standard deviation from a mini-batch during training.",
+      "Connects z = (x - μ) / sqrt(variance + ε) to recentering and rescaling activations.",
+      "Uses one displayed x value to explain how a normalized z value is produced.",
+      "Explains how γ changes output spread and β changes output center.",
+      "Distinguishes training-time batch statistics from inference-time running statistics.",
+    ],
+    steps: [
+      {
+        title: "Center a shifted batch",
+        experiment:
+          "Use the Shifted scenario with batch size 8. Compare the raw x strip, μ_batch and σ_batch pills, and the normalized z strip.",
+        predictionQuestion:
+          "In the Shifted scenario, what should happen after normalization: stay shifted right, center near zero, or all become equal?",
+        observationPrompt:
+          "What happened to the center and spread after the raw activations became z values?",
+        observationOptions: [
+          "The z values centered near zero",
+          "The spread became about one standard deviation",
+          "I am not sure",
+        ],
+        takeaway:
+          "BatchNorm uses the batch mean and spread to turn a shifted activation cloud into a centered, scaled signal.",
+      },
+      {
+        title: "Inspect one activation",
+        experiment:
+          "Click one raw dot or z-value chip. Read the formula line that substitutes x, μ, and variance into z = (x - μ) / sqrt(variance + ε).",
+        predictionQuestion:
+          "If an activation is above the batch mean, should its z value be negative, near zero, or positive?",
+        observationPrompt:
+          "How did the selected x value become its displayed z value?",
+        observationOptions: [
+          "Subtracting μ made the direction visible",
+          "Dividing by σ scaled the distance",
+          "I am not sure",
+        ],
+        takeaway:
+          "A z value is the activation's signed distance from the batch mean, measured in batch-standard-deviation units.",
+      },
+      {
+        title: "Give expressiveness back",
+        experiment:
+          "Move γ below and above 1.00, then move β left and right. Watch the output y strip plus mean(y) and std(y).",
+        predictionQuestion:
+          "Which parameter should stretch the output spread, and which should move the output center?",
+        observationPrompt:
+          "What changed when γ moved, and what changed when β moved?",
+        observationOptions: [
+          "γ changed the spread",
+          "β moved the center",
+          "I am not sure",
+        ],
+        takeaway:
+          "Normalization stabilizes the signal, then γ and β let the layer learn the output scale and offset it needs.",
+      },
+      {
+        title: "Switch to inference",
+        experiment:
+          "Toggle from Training to Inference. Compare the using μ/σ pills with the Training path and Inference path table.",
+        predictionQuestion:
+          "At inference time, should BatchNorm use the current example batch or saved running statistics?",
+        observationPrompt:
+          "Which statistics did the playground use after you switched to Inference?",
+        observationOptions: [
+          "It used saved running statistics",
+          "The output changed because μ and σ changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Training uses the current mini-batch. Inference uses saved running estimates so predictions stay stable when examples arrive one at a time.",
+      },
+    ],
+  },
+  "layer-normalization": {
+    intro:
+      "Work through four LayerNorm experiments. Predict which values contribute to one token's statistics, change hidden features, inspect the z-score calculation, then tune gamma and beta.",
+    openingMessage:
+      "No prior normalization knowledge needed. We will build LayerNorm with one token row at a time.\n\n- A token has several hidden feature activations.\n- LayerNorm computes the mean and variance across the features inside that one token.\n- It turns those features into z-scores with x_hat = (x - mean) / sqrt(variance + epsilon).\n- Learned gamma and beta then scale and shift each feature so the layer stays expressive.\n- Unlike BatchNorm, the current token's stats do not depend on other examples or tokens in the batch.\n\nFirst prediction: for the selected cat token, which values should decide the mean and variance: cat's four features, the same feature across all tokens, or the whole table? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains that LayerNorm computes mean and variance across features within one token.",
+      "Connects the displayed mean, variance, and standard deviation to the selected token's hidden vector.",
+      "Uses the formula to explain how a raw feature becomes a normalized z-score.",
+      "Explains that gamma scales and beta shifts each normalized feature after stabilization.",
+      "Distinguishes LayerNorm's row-wise statistics from BatchNorm's column-wise batch statistics.",
+    ],
+    steps: [
+      {
+        title: "Find the contributing row",
+        experiment:
+          "Keep cat selected. Compare the highlighted cat row with the Current selection panel and the formula values.",
+        predictionQuestion:
+          "For the selected cat token, which values should decide the mean and variance: cat's four features, the same feature across all tokens, or the whole table?",
+        observationPrompt:
+          "Which values did the formula use to compute cat's mean and variance?",
+        observationOptions: [
+          "Only cat's four feature values",
+          "The other token rows stayed out of the stats",
+          "I am not sure",
+        ],
+        takeaway:
+          "LayerNorm normalizes one token at a time, so the selected row's hidden features provide that token's statistics.",
+      },
+      {
+        title: "Move one hidden feature",
+        experiment:
+          "Drag x1 for the selected token toward -2, then toward +2. Watch the feature grid, mean, variance, raw bars, and normalized bars.",
+        predictionQuestion:
+          "If one feature moves far from the other three, what should happen to the variance?",
+        observationPrompt:
+          "What changed in the formula and charts when x1 moved?",
+        observationOptions: [
+          "The mean and variance updated",
+          "The normalized bars recentered around zero",
+          "I am not sure",
+        ],
+        takeaway:
+          "Changing one hidden feature changes the selected token's row statistics, and the z-score chart recenters the row around zero.",
+      },
+      {
+        title: "Read one z-score",
+        experiment:
+          "Use the formula panel to explain x_hat_i = (x_i - mean) / sqrt(variance + epsilon) for one displayed feature.",
+        predictionQuestion:
+          "If a feature is below the selected token's mean, should its normalized value be negative, near zero, or positive?",
+        observationPrompt:
+          "How did subtracting the mean and dividing by the standard deviation create the z-score?",
+        observationOptions: [
+          "Below-mean features became negative",
+          "Dividing by standard deviation scaled the distance",
+          "I am not sure",
+        ],
+        takeaway:
+          "A LayerNorm z-score is the feature's signed distance from that token's mean in that token's own standard-deviation units.",
+      },
+      {
+        title: "Restore useful feature sizes",
+        experiment:
+          "Move one gamma slider and one beta slider. Watch the output y bars and the y vector while the normalized checks stay focused on x_hat.",
+        predictionQuestion:
+          "Which learned parameter should stretch a normalized feature, and which should shift it?",
+        observationPrompt:
+          "What did gamma change, and what did beta change?",
+        observationOptions: [
+          "Gamma stretched the feature",
+          "Beta shifted the feature",
+          "I am not sure",
+        ],
+        takeaway:
+          "LayerNorm stabilizes hidden activations first; gamma and beta then let the model recover useful scale and offset feature by feature.",
+      },
+      {
+        title: "Compare the axis",
+        experiment:
+          "Look at the Compare the Axis panel. Compare the LayerNorm highlighted row with the BatchNorm highlighted column.",
+        predictionQuestion:
+          "Which normalization depends on the other examples or tokens in a batch?",
+        observationPrompt:
+          "How did the highlighted row and column explain the difference?",
+        observationOptions: [
+          "LayerNorm used one token row",
+          "BatchNorm used one feature column across the batch",
+          "I am not sure",
+        ],
+        takeaway:
+          "LayerNorm's statistics come from features inside the current token, while BatchNorm's statistics come from matching features across the batch.",
       },
     ],
   },

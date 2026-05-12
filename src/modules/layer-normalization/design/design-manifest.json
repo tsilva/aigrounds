@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 63,
+  "lessonPlanTitle": "Layer Normalization Lab",
+  "slug": "layer-normalization",
+  "modulePath": "src/modules/layer-normalization",
+  "acceptedMockup": "src/modules/layer-normalization/design/accepted-mockup.png",
+  "prompt": "src/modules/layer-normalization/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e1c60-f68e-7a02-a864-9228f36a34c6/ig_0d293b2a9bb22f76016a032d9ba1808191a4b5621ca2e198b4.png"
+}

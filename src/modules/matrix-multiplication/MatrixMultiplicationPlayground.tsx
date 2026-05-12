@@ -207,6 +207,10 @@ function ShapeSelector({
               );
             })}
           </div>
+          <p className="mt-3 text-[13px] leading-[1.35] font-semibold text-[#52658e]">
+            The guide starts with 2x2 x 2x3. Use the other presets as optional
+            practice once the rule clicks.
+          </p>
         </div>
 
         <ShapeSummary analysis={analysis} />
@@ -330,7 +334,7 @@ function MatrixGrid({
                 aria-label={`Select ${formatCellName({
                   row: rowIndex,
                   col: columnIndex,
-                })}`}
+                })} in ${label}`}
               >
                 {value}
               </button>
@@ -432,9 +436,13 @@ function DotProductPanel({
   onSelectStep: (step: number) => void;
 }) {
   const finalTotal = terms.at(-1)?.runningTotal ?? 0;
-  const formula = `${formatCellName(cell)} = ${terms
+  const revealedTerms = terms.slice(0, activeStep + 1);
+  const visibleTotal = revealedTerms.at(-1)?.runningTotal ?? 0;
+  const formula = `${formatCellName(cell)} = ${revealedTerms
     .map((term) => formatTerm(term.left, term.right))
-    .join(" + ")} = ${finalTotal}`;
+    .join(" + ")}${activeStep < terms.length - 1 ? " + ..." : ""} = ${
+    activeStep < terms.length - 1 ? `${visibleTotal} so far` : finalTotal
+  }`;
 
   return (
     <Panel className="p-5 sm:p-6">
@@ -483,6 +491,7 @@ function DotProductPanel({
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         {terms.map((term) => {
           const isActive = term.index === activeStep;
+          const isRevealed = term.index <= activeStep;
 
           return (
             <button
@@ -496,7 +505,9 @@ function DotProductPanel({
               }`}
             >
               <span className="block font-mono text-[17px] font-black">
-                {formatTerm(term.left, term.right)} = {term.product}
+                {isRevealed
+                  ? `${formatTerm(term.left, term.right)} = ${term.product}`
+                  : `Reveal k = ${term.index + 1}`}
               </span>
               <span
                 className={`mt-1 block font-serif text-[13px] italic ${
@@ -514,7 +525,7 @@ function DotProductPanel({
         <span className="text-[15px] font-semibold text-[#16264e]">
           Running sum:
         </span>
-        {terms.map((term, index) => (
+        {revealedTerms.map((term, index) => (
           <div key={term.index} className="flex items-center gap-3">
             {index > 0 ? (
               <span className="font-mono text-[18px] text-[#172b5e]">-&gt;</span>
@@ -532,9 +543,14 @@ function DotProductPanel({
             </span>
           </div>
         ))}
+        {activeStep < terms.length - 1 ? (
+          <span className="rounded-[8px] border border-dashed border-[#c8d2e6] px-4 py-2 font-mono text-[15px] font-black text-[#52658e]">
+            ...
+          </span>
+        ) : null}
       </div>
 
-      <div className="mt-4 rounded-[8px] border border-[#8bd9a8] bg-[#f4fff8] px-4 py-3 text-center font-mono text-[16px] font-black text-[#071024] sm:text-[18px]">
+      <div className="mt-4 rounded-[8px] border border-[#8bd9a8] bg-[#f4fff8] px-4 py-3 text-center font-mono text-[16px] font-black break-words text-[#071024] sm:text-[18px]">
         {formula}
       </div>
       <div className="mt-3 flex items-center gap-3 rounded-[8px] border border-[#d8e0f3] bg-[#fbfcff] px-4 py-2 text-[14px] font-semibold text-[#075ee7]">
@@ -566,40 +582,56 @@ function FullProductPanel({
     <Panel className="p-5 sm:p-6">
       <LessonTitle>4. See The Full Product</LessonTitle>
       <p className="mt-4 text-[15px] leading-[1.45] text-[#16264e]">
-        Each cell is a row-column dot product.
+        Each formula chip is a row-column dot product.
       </p>
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(190px,0.6fr)_minmax(0,1fr)] lg:items-start">
-        <MatrixGrid
-          label={`C = A x B (${product.length}x${product[0]?.length ?? 0})`}
-          matrix={product}
-          role="product"
-          selectedCell={selectedCell}
-          selectedRow={selectedCell.row}
-          selectedCol={selectedCell.col}
-          onSelectCell={onSelectCell}
-        />
-        <div className="grid gap-3 sm:grid-cols-2">
-          {cells.map((cell) => {
-            const isSelected =
-              selectedCell.row === cell.row && selectedCell.col === cell.col;
+      <div className="mt-5 grid gap-5">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <MatrixGrid
+            label={`A row ${selectedCell.row + 1}`}
+            matrix={left}
+            role="left"
+            selectedRow={selectedCell.row}
+          />
+          <MatrixGrid
+            label={`B column ${selectedCell.col + 1}`}
+            matrix={right}
+            role="right"
+            selectedCol={selectedCell.col}
+          />
+        </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(190px,0.6fr)_minmax(0,1fr)] lg:items-start">
+          <MatrixGrid
+            label={`C = A x B (${product.length}x${product[0]?.length ?? 0})`}
+            matrix={product}
+            role="product"
+            selectedCell={selectedCell}
+            selectedRow={selectedCell.row}
+            selectedCol={selectedCell.col}
+            onSelectCell={onSelectCell}
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {cells.map((cell) => {
+              const isSelected =
+                selectedCell.row === cell.row && selectedCell.col === cell.col;
 
-            return (
-              <button
-                key={`${cell.row}-${cell.col}`}
-                type="button"
-                onClick={() => onSelectCell(cell)}
-                className={`min-w-0 rounded-[8px] border px-3 py-3 text-left font-mono text-[13px] font-bold leading-[1.35] transition ${
-                  isSelected
-                    ? "border-[#069247] bg-[#f1fff6] text-[#071024]"
-                    : product[cell.row][cell.col] < 0
-                      ? "border-[#ffc3bc] bg-[#fffafa] text-[#071024] hover:border-[#f5988e]"
-                      : "border-[#d8e0f3] bg-white text-[#071024] hover:border-[#b9c4de]"
-                }`}
-              >
-                {formatEquationForCell({ left, right, cell })}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={`${cell.row}-${cell.col}`}
+                  type="button"
+                  onClick={() => onSelectCell(cell)}
+                  className={`min-w-0 rounded-[8px] border px-3 py-3 text-left font-mono text-[13px] font-bold leading-[1.35] break-words transition ${
+                    isSelected
+                      ? "border-[#069247] bg-[#f1fff6] text-[#071024]"
+                      : product[cell.row][cell.col] < 0
+                        ? "border-[#ffc3bc] bg-[#fffafa] text-[#071024] hover:border-[#f5988e]"
+                        : "border-[#d8e0f3] bg-white text-[#071024] hover:border-[#b9c4de]"
+                  }`}
+                >
+                  {formatEquationForCell({ left, right, cell })}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
       <div className="mt-5 flex items-center gap-3 rounded-[8px] border border-[#d8e0f3] bg-[#fbfcff] px-4 py-3 text-[15px] font-semibold text-[#142755]">
@@ -615,7 +647,7 @@ function RulePanel() {
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>5. The Rule</LessonTitle>
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:items-center">
+      <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] 2xl:items-center">
         <div>
           <p className="text-[15px] font-semibold text-[#16264e]">
             Matrix multiplication rule:
@@ -670,7 +702,7 @@ export function MatrixMultiplicationPlayground() {
   const [selectedCell, setSelectedCell] = useState<CellPosition>(
     matrixShapePresets[0].defaultCell,
   );
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [showHelp, setShowHelp] = useState(false);
 
   const activePreset =
@@ -696,12 +728,12 @@ export function MatrixMultiplicationPlayground() {
   function handlePresetSelect(preset: MatrixShapePreset) {
     setActivePresetId(preset.id);
     setSelectedCell(preset.defaultCell);
-    setActiveStep(Math.min(1, Math.max(preset.left[0].length - 1, 0)));
+    setActiveStep(0);
   }
 
   function handleCellSelect(cell: CellPosition) {
     setSelectedCell(cell);
-    setActiveStep(Math.min(activeStep, Math.max(terms.length - 1, 0)));
+    setActiveStep(0);
   }
 
   return (
@@ -742,7 +774,7 @@ export function MatrixMultiplicationPlayground() {
             onSelectPreset={handlePresetSelect}
           />
           {analysis.product ? (
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(420px,0.9fr)]">
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.45fr)_minmax(420px,0.9fr)]">
               <MatrixSelectionPanel
                 preset={activePreset}
                 product={product}
@@ -758,7 +790,7 @@ export function MatrixMultiplicationPlayground() {
             </div>
           ) : null}
           {analysis.product ? (
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)]">
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)]">
               <FullProductPanel
                 left={activePreset.left}
                 right={activePreset.right}

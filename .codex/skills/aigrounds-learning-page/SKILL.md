@@ -32,6 +32,10 @@ begins.
 - After the user accepts a visual design, persist the accepted mockup and prompt
   in the lesson module's design artifacts before implementing the module.
 - Iterate the imagegen design with the user until they clearly accept it.
+- Never end the turn immediately after an imagegen call. Treat every generated
+  image as an unapproved draft until you have located the generated PNG,
+  inspected it, written a defect ledger, and either regenerated it or marked it
+  approval-ready.
 - Before showing any proposed design to the user, run a rigorous
   evaluate-redesign loop: generate a design, inspect it, name every material
   reference, teaching, numeric, visual, or interaction defect, then regenerate
@@ -48,6 +52,9 @@ begins.
 - Match the existing AI Grounds design system; the canonical reference screenshot is `assets/cross-entropy-design-reference.png`.
 - Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
 - Do not show a generated mockup if it violates the reference structure. Regenerate it first.
+- Do not ask the user to approve a mockup in the same assistant message that
+  follows the imagegen tool call. First run the artifact inspection and defect
+  ledger steps below.
 - In a parallel batch, do not dispatch implementation subagents until the user has explicitly accepted the final mockup for every lesson in the batch.
 - When a dashboard lesson is implemented, it must not remain marked
   `coming-soon`: remove its `upcomingPlaygrounds` entry in the same change that
@@ -76,8 +83,26 @@ begins.
      - Content is a centered dense lesson page, not a landing page.
      - Lesson sections are numbered compact panels with pale blue borders.
      - Controls and formulas live inside those panels; avoid decorative chrome.
+   - Before calling imagegen, tell the user the generated image is a draft that
+     will be reviewed before approval. Do not ask for approval yet.
    - Use imagegen to create a high-fidelity mockup of the page.
    - Base the prompt on the design system below and the inspected reference screenshot. Include the required invariants explicitly in the prompt, especially the absence of logo/nav/site chrome.
+   - Immediately after imagegen returns, do not stop or hand control back. Locate
+     the generated PNG path, inspect it with the available image-viewing tool,
+     and complete this review ledger in your own working context before any
+     approval request:
+
+     ```text
+     Design draft N review
+     - Reference fidelity:
+     - Learning quality:
+     - Interaction coverage:
+     - Numeric/model consistency:
+     - Visual correctness:
+     - Simplicity:
+     - Decision: regenerate because ... / approval-ready because ...
+     ```
+
    - After imagegen returns, visually compare the mockup to the reference before considering it for presentation. Check for:
      - unwanted logo/nav/sidebar/marketing hero elements,
      - missing numbered lesson panels,
@@ -114,10 +139,16 @@ begins.
    - If the mockup fails any reference, learning, interaction, numeric/model, or
      visual-correctness check, generate another design pass with a stricter
      prompt that names exactly what to add, remove, simplify, or correct.
+     When regenerating, briefly tell the user the concrete defects found in the
+     previous draft so they can audit the loop.
    - Continue evaluating and redesigning until the latest mockup has no material
      issue worth fixing. If a remaining tradeoff is unavoidable rather than a
      fixable defect, name the tradeoff when asking the user for approval.
-   - Show only the best self-reviewed design to the user and ask whether to revise or approve it for implementation. Do not implement until the user explicitly approves.
+   - Show only the best self-reviewed design to the user and ask whether to
+     revise or approve it for implementation. Include a concise "review passed"
+     note that names the strongest checks, such as exact numeric consistency,
+     reference fidelity, and interaction coverage. Do not implement until the
+     user explicitly approves.
    - If the user requests changes, generate an updated mockup before coding.
 
 3. Persist the accepted design.

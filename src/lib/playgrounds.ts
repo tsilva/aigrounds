@@ -1,5 +1,6 @@
 import { type ComponentType } from "react";
 import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
+import { BatchNormalizationPlayground } from "@/modules/batch-normalization/BatchNormalizationPlayground";
 import { BernoulliCategoricalBinomialPlayground } from "@/modules/bernoulli-categorical-binomial/BernoulliCategoricalBinomialPlayground";
 import { BytePairEncodingPlayground } from "@/modules/byte-pair-encoding/BytePairEncodingPlayground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
@@ -7,6 +8,7 @@ import { ConditionalProbabilityPlayground } from "@/modules/conditional-probabil
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
 import { ExpectedValueRiskPlayground } from "@/modules/expected-value-risk/ExpectedValueRiskPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
+import { LayerNormalizationPlayground } from "@/modules/layer-normalization/LayerNormalizationPlayground";
 import { LinearQuantizationInt4Playground } from "@/modules/linear-quantization-int4/LinearQuantizationInt4Playground";
 import { MatrixMultiplicationPlayground } from "@/modules/matrix-multiplication/MatrixMultiplicationPlayground";
 import { MeanMedianModePlayground } from "@/modules/mean-median-mode/MeanMedianModePlayground";
@@ -57,6 +59,8 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
   "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
+  "batch-normalization": BatchNormalizationPlayground,
+  "layer-normalization": LayerNormalizationPlayground,
 };
 
 export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.map(

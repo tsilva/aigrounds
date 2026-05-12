@@ -108,6 +108,8 @@ const jsonLd = {
   },
 };
 
+const shouldLoadVercelAnalytics = process.env.VERCEL === "1";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -126,7 +128,7 @@ export default function RootLayout({
       >
         <GoogleAnalytics />
         {children}
-        <Analytics />
+        {shouldLoadVercelAnalytics ? <Analytics /> : null}
       </body>
     </html>
   );

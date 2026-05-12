@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 62,
+  "lessonPlanTitle": "Batch Normalization Lab",
+  "slug": "batch-normalization",
+  "modulePath": "src/modules/batch-normalization",
+  "acceptedMockup": "src/modules/batch-normalization/design/accepted-mockup.png",
+  "prompt": "src/modules/batch-normalization/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/private/tmp/batch-normalization-lab-mockup.png"
+}

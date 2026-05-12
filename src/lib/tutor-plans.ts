@@ -1331,9 +1331,9 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   },
   "batch-normalization": {
     intro:
-      "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, inspect one value, tune gamma and beta, then compare training with inference.",
+      "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, switch from a centered batch to a shifted batch, inspect one value, tune gamma and beta, then compare training with inference.",
     openingMessage:
-      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean μ and standard deviation σ.\n- It normalizes each activation with z = (x - μ) / sqrt(variance + ε), so the batch is centered and scaled.\n- Learned γ and β then stretch and shift the normalized values, keeping the layer expressive.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: in the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean μ and standard deviation σ.\n- It normalizes each activation with z = (x - μ) / sqrt(variance + ε), so the batch is centered and scaled.\n- The playground shows var used = σ_used² so the formula number is not a mystery.\n- Learned γ and β then stretch and shift the normalized values, keeping the layer expressive.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: the page starts on a Centered batch. When you switch to the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
     masteryCriteria: [
       "Explains that BatchNorm computes mean and standard deviation from a mini-batch during training.",
@@ -1346,7 +1346,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Center a shifted batch",
         experiment:
-          "Use the Shifted scenario with batch size 8. Compare the raw x strip, μ_batch and σ_batch pills, and the normalized z strip.",
+          "Notice the page starts on the Centered scenario with batch size 6. Switch to the Shifted scenario and set batch size to 8. Compare the raw x strip, μ_batch and σ_batch pills, and the normalized z strip. Wide and Outlier are optional stress-test scenarios after the guide.",
         predictionQuestion:
           "In the Shifted scenario, what should happen after normalization: stay shifted right, center near zero, or all become equal?",
         observationPrompt:
@@ -1362,7 +1362,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Inspect one activation",
         experiment:
-          "Click one raw dot or z-value chip. Read the formula line that substitutes x, μ, and variance into z = (x - μ) / sqrt(variance + ε).",
+          "Click one raw dot or z-value chip. Read the formula line that substitutes x, μ, and var used into z = (x - μ) / sqrt(variance + ε). Also read the var used pill; it is σ_used².",
         predictionQuestion:
           "If an activation is above the batch mean, should its z value be negative, near zero, or positive?",
         observationPrompt:
@@ -1394,7 +1394,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Switch to inference",
         experiment:
-          "Toggle from Training to Inference. Compare the using μ/σ pills with the Training path and Inference path table.",
+          "Toggle from Training to Inference. Compare the using μ/σ pills with the Training path and Inference path table. The momentum pill is fixed context for how running stats update during training; this step focuses on which stats are used.",
         predictionQuestion:
           "At inference time, should BatchNorm use the current example batch or saved running statistics?",
         observationPrompt:

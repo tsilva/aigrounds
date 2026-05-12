@@ -251,6 +251,7 @@ function LinearMap({ analysis }: { analysis: QuantizationAnalysis }) {
   );
   const errorStart = Math.min(realPercent, dequantPercent);
   const errorWidth = Math.max(2, Math.abs(dequantPercent - realPercent));
+  const stackedLabels = Math.abs(realPercent - dequantPercent) < 10;
 
   return (
     <Panel className="p-4 sm:p-5">
@@ -267,52 +268,54 @@ function LinearMap({ analysis }: { analysis: QuantizationAnalysis }) {
               <span>0</span>
               <span>{formatSigned(analysis.max, 2)}</span>
             </div>
-            <div className="relative h-14">
-              <div className="absolute top-5 right-0 left-0 h-[2px] bg-[#071854]" />
+            <div className="relative h-24">
+              <div className="absolute top-10 right-0 left-0 h-[2px] bg-[#071854]" />
               {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((tick) => (
                 <span
                   key={tick}
-                  className="absolute top-[17px] h-3 w-[1px] bg-[#071854]"
+                  className="absolute top-[37px] h-3 w-[1px] bg-[#071854]"
                   style={{ left: `${tick * 12.5}%` }}
                 />
               ))}
               <span
-                className="absolute top-1 h-9 border-l border-dashed border-[#159947]"
+                className="absolute top-3 h-16 border-l border-dashed border-[#159947]"
                 style={{ left: `${realPercent}%` }}
               />
               <span
-                className="absolute top-4 h-5 border-l border-dashed border-[#1735ff]"
+                className="absolute top-7 h-12 border-l border-dashed border-[#1735ff]"
                 style={{ left: `${dequantPercent}%` }}
               />
               <span
-                className="absolute top-[13px] h-4 w-4 -translate-x-1/2 rounded-full bg-[#159947]"
+                className="absolute top-[33px] z-10 h-4 w-4 -translate-x-1/2 rounded-full bg-[#159947]"
                 style={{ left: `${realPercent}%` }}
               />
               <span
-                className="absolute top-[13px] h-4 w-4 -translate-x-1/2 rounded-full bg-[#1735ff]"
+                className="absolute top-[33px] z-10 h-4 w-4 -translate-x-1/2 rounded-full bg-[#1735ff]"
                 style={{ left: `${dequantPercent}%` }}
               />
               <span
-                className="absolute -top-4 -translate-x-1/2 rounded-[5px] border border-[#93d4a9] bg-[#f1fff5] px-2 py-0.5 font-mono text-[12px] font-black text-[#08702b]"
+                className="absolute top-0 z-20 -translate-x-1/2 rounded-[5px] border border-[#93d4a9] bg-[#f1fff5] px-2 py-0.5 font-mono text-[12px] font-black text-[#08702b]"
                 style={{ left: `${realPercent}%` }}
               >
                 x = {formatSigned(analysis.selectedValue, 3)}
               </span>
               <span
-                className="absolute -top-4 -translate-x-1/2 rounded-[5px] border border-[#aebcff] bg-white px-2 py-0.5 font-mono text-[12px] font-black text-[#1735ff]"
+                className={`absolute z-20 -translate-x-1/2 rounded-[5px] border border-[#aebcff] bg-white px-2 py-0.5 font-mono text-[12px] font-black text-[#1735ff] ${
+                  stackedLabels ? "top-7" : "top-0"
+                }`}
                 style={{ left: `${dequantPercent}%` }}
               >
                 x_hat = {formatSigned(analysis.selected.dequantized, 3)}
               </span>
               <span
-                className="absolute top-9 h-3 border-t-2 border-r-2 border-l-2 border-[#ff5a1f]"
+                className="absolute top-16 h-3 border-t-2 border-r-2 border-l-2 border-[#ff5a1f]"
                 style={{
                   left: `${errorStart}%`,
                   width: `${errorWidth}%`,
                 }}
               />
               <span
-                className="absolute top-[48px] -translate-x-1/2 font-mono text-[12px] font-black text-[#ff4a00]"
+                className="absolute top-[76px] -translate-x-1/2 font-mono text-[12px] font-black text-[#ff4a00]"
                 style={{ left: `${errorStart + errorWidth / 2}%` }}
               >
                 error {formatSigned(analysis.selected.error, 3)}
@@ -444,6 +447,8 @@ function ShelfLadder({ analysis }: { analysis: QuantizationAnalysis }) {
 }
 
 function QuantizedHistogram({ analysis }: { analysis: QuantizationAnalysis }) {
+  const axisLabels = new Set([0, 4, 8, analysis.selected.code, 15]);
+
   return (
     <div className="min-w-0">
       <p className="text-center text-[13px] font-black text-[#071854]">
@@ -465,12 +470,20 @@ function QuantizedHistogram({ analysis }: { analysis: QuantizationAnalysis }) {
           />
         ))}
       </div>
-      <div className="mt-2 flex justify-between font-mono text-[12px] font-bold text-[#071854]">
-        <span>0</span>
-        <span>4</span>
-        <span>8</span>
-        <span className="text-[#08702b]">11</span>
-        <span>15</span>
+      <div
+        className="mt-2 grid font-mono text-[12px] font-bold text-[#071854]"
+        style={{ gridTemplateColumns: `repeat(${int4CodeCount}, minmax(0, 1fr))` }}
+      >
+        {Array.from({ length: int4CodeCount }, (_, code) => (
+          <span
+            key={code}
+            className={`text-center ${
+              code === analysis.selected.code ? "text-[#08702b]" : ""
+            }`}
+          >
+            {axisLabels.has(code) ? code : ""}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -673,7 +686,7 @@ function InspectPanel({
   return (
     <Panel className="p-4 sm:p-5">
       <LessonTitle>5. Inspect And Pack</LessonTitle>
-      <div className="mt-4 grid gap-5 xl:grid-cols-[minmax(0,1fr)_430px]">
+      <div className="mt-4 grid gap-5 min-[1700px]:grid-cols-[minmax(0,1fr)_430px]">
         <div className="min-w-0">
           <div className="flex items-center justify-between gap-4">
             <label
@@ -733,11 +746,11 @@ function InspectPanel({
           <p className="text-center text-[13px] font-black text-[#071854]">
             Pack two codes per byte
           </p>
-          <div className="mt-4 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-center">
             <NibbleCard label="first code" code={analysis.selected.code} bits={firstNibble} />
-            <span className="text-center text-[22px] font-black text-[#071854]">+</span>
+            <span className="hidden text-center text-[22px] font-black text-[#071854] sm:block">+</span>
             <NibbleCard label="second code" code={secondCode} bits={secondNibble} />
-            <span className="text-center text-[22px] font-black text-[#071854]">=</span>
+            <span className="hidden text-center text-[22px] font-black text-[#071854] sm:block">=</span>
             <div className="rounded-[9px] border border-[#dce4f7] bg-white px-3 py-4 text-center">
               <p className="text-[11px] font-black text-[#071854]">byte</p>
               <p className="mt-2 font-mono text-[27px] font-black text-[#6d2dff]">
@@ -832,7 +845,7 @@ export function LinearQuantizationInt4Playground() {
           />
           <LinearMap analysis={analysis} />
           <ErrorPanel analysis={analysis} />
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)]">
+          <div className="grid gap-3 2xl:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)]">
             <RangePanel
               analysis={analysis}
               activePreset={rangePreset}

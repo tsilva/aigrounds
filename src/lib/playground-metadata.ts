@@ -803,8 +803,8 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     title: "Classification Metrics Foundations",
     tag: "evaluation",
     summary:
-      "Build confusion-matrix intuition before tuning a decision threshold.",
-    concepts: ["Accuracy", "Specificity", "Class imbalance"],
+      "Build confusion-matrix intuition before tuning a decision threshold or reading benchmark scores.",
+    concepts: ["Accuracy", "Precision", "Recall", "F1"],
   },
   {
     slug: "roc-auc-thresholds",
@@ -867,8 +867,8 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     title: "Calibration & Reliability Diagrams",
     tag: "evaluation",
     summary:
-      "Compare predicted confidence bins with observed frequencies to spot overconfidence.",
-    concepts: ["Calibration", "Reliability diagrams", "Observed frequency"],
+      "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
+    concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
   },
   {
     slug: "kl-divergence",
@@ -925,6 +925,14 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Move a query point and watch retrieved items reorder.",
     concepts: ["Embeddings", "Query vectors", "Nearest-neighbor retrieval"],
+  },
+  {
+    slug: "retrieval-ranking-metrics",
+    title: "Retrieval Ranking Metrics Lab",
+    tag: "retrieval",
+    summary:
+      "Reorder search results and watch recall@k, precision@k, MRR, and nDCG respond to relevant items moving up or down.",
+    concepts: ["Recall@k", "Precision@k", "MRR", "nDCG"],
   },
   {
     slug: "contrastive-loss",
@@ -999,6 +1007,14 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
   },
   {
+    slug: "llm-loss-perplexity",
+    title: "LLM Loss & Perplexity Lab",
+    tag: "llm evaluation",
+    summary:
+      "Step through next-token predictions and watch token loss, average cross entropy, perplexity, and bits per token update across a sequence.",
+    concepts: ["Next-token prediction", "NLL", "Perplexity", "Bits per token"],
+  },
+  {
     slug: "context-windows-attention-masks",
     title: "Context Windows & Attention Masks",
     tag: "transformers",
@@ -1013,6 +1029,54 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Rearrange tokens and compare position signals that let attention recover word order.",
     concepts: ["Token order", "Position encodings", "Sequence representations"],
+  },
+  {
+    slug: "reference-answer-metrics",
+    title: "Reference Answer Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Compare generated answers with references and see why exact match, token F1, BLEU, ROUGE, and semantic similarity can disagree.",
+    concepts: ["Exact match", "Token F1", "BLEU", "ROUGE"],
+  },
+  {
+    slug: "benchmark-scores-pass-k",
+    title: "Benchmark Scores & Pass@k Lab",
+    tag: "llm evaluation",
+    summary:
+      "Run sampled benchmark attempts and watch accuracy, pass@k, majority vote, variance, and contamination change the score story.",
+    concepts: ["Benchmark accuracy", "Pass@k", "Variance", "Contamination"],
+  },
+  {
+    slug: "preference-judge-metrics",
+    title: "Preference & Judge Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Compare two model answers with rubrics and judge votes to see how win rates, pairwise ratings, and evaluator bias shape rankings.",
+    concepts: ["Win rate", "Rubrics", "Judge bias", "Agreement"],
+  },
+  {
+    slug: "rag-groundedness-metrics",
+    title: "RAG Groundedness Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Connect retrieved context to an answer and inspect context relevance, faithfulness, citation support, and answer completeness.",
+    concepts: ["Context relevance", "Faithfulness", "Citation support", "Completeness"],
+  },
+  {
+    slug: "safety-refusal-robustness-metrics",
+    title: "Safety, Refusal & Robustness Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Vary prompts and policies to compare harmful-compliance rate, false-refusal rate, jailbreak success, and robustness across prompt variants.",
+    concepts: ["Harmful compliance", "False refusal", "Jailbreak success", "Robustness"],
+  },
+  {
+    slug: "llm-app-ops-metrics",
+    title: "LLM App Ops Metrics Lab",
+    tag: "llm systems",
+    summary:
+      "Tune request patterns and streaming behavior to compare latency, time to first token, throughput, cost, and cache hit rate.",
+    concepts: ["Latency", "TTFT", "Throughput", "Cost per request"],
   },
 ];
 
@@ -1061,6 +1125,7 @@ export const dashboardLessonPlanOrder = [
   "t-sne-neighborhood-map",
   "umap-manifold-projection",
   "embedding-retrieval",
+  "retrieval-ranking-metrics",
   "entropy-information",
   "class-score-logits",
   "softmax-temperature",
@@ -1082,9 +1147,16 @@ export const dashboardLessonPlanOrder = [
   "layer-normalization",
   "rms-normalization",
   "byte-pair-encoding",
+  "llm-loss-perplexity",
   "context-windows-attention-masks",
   "positional-encoding-token-order",
   "transformer-attention",
+  "reference-answer-metrics",
+  "benchmark-scores-pass-k",
+  "preference-judge-metrics",
+  "rag-groundedness-metrics",
+  "safety-refusal-robustness-metrics",
+  "llm-app-ops-metrics",
   "linear-quantization-int4",
   "zero-knowledge-proofs",
 ] as const;

@@ -342,6 +342,21 @@ function buildOpenRouterMessages(
   return messages;
 }
 
+function shouldOfferScreenshotTool(
+  tutor?: TutorContext,
+  screenshot?: PlaygroundScreenshot,
+) {
+  if (screenshot) {
+    return false;
+  }
+
+  if (tutor?.mode === "guide" && tutor.phase === "observe") {
+    return false;
+  }
+
+  return true;
+}
+
 async function parseOpenRouterResponse(response: Response) {
   const responseText = await response.text();
 
@@ -553,6 +568,7 @@ export async function POST(request: Request) {
     body.tutor,
     screenshot,
   );
+  const offerScreenshotTool = shouldOfferScreenshotTool(body.tutor, screenshot);
 
   const response = await fetch(OPENROUTER_ENDPOINT, {
     method: "POST",
@@ -567,7 +583,7 @@ export async function POST(request: Request) {
       model: process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL,
       messages,
       max_completion_tokens: MAX_COMPLETION_TOKENS,
-      ...(screenshot
+      ...(!offerScreenshotTool
         ? {
             tool_choice: "none",
           }

@@ -52,7 +52,7 @@ export function analyzeBatchNormalization({
   const rawValues = values.slice(0, batchSize);
   const batchMean = mean(rawValues);
   const batchVariance = variance(rawValues, batchMean);
-  const batchStd = Math.sqrt(batchVariance + epsilon);
+  const batchStd = Math.sqrt(batchVariance);
   const normalizationMean = mode === "training" ? batchMean : runningMean;
   const normalizationStd = mode === "training" ? batchStd : runningStd;
   const normalizedValues = rawValues.map(

@@ -855,6 +855,30 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Backpropagation", "Gradients", "Credit assignment"],
   },
   {
+    slug: "batch-normalization",
+    title: "Batch Normalization Lab",
+    tag: "neural networks",
+    summary:
+      "Change mini-batch statistics and watch activations recentered and rescaled during training.",
+    concepts: ["Mini-batches", "Activation statistics", "Scale and shift"],
+  },
+  {
+    slug: "layer-normalization",
+    title: "Layer Normalization Lab",
+    tag: "neural networks",
+    summary:
+      "Compare examples one at a time and see how each layer normalizes its own hidden features.",
+    concepts: ["Hidden features", "Per-example statistics", "Stabilization"],
+  },
+  {
+    slug: "rms-normalization",
+    title: "RMSNorm Lab",
+    tag: "transformers",
+    summary:
+      "Remove mean-centering and watch root-mean-square scaling keep transformer activations controlled.",
+    concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
+  },
+  {
     slug: "token-context-position",
     title: "Token Context & Position Lab",
     tag: "transformers",
@@ -916,6 +940,9 @@ export const dashboardLessonPlanOrder = [
   "monte-carlo-tree-search",
   "neural-network-forward-pass",
   "backpropagation-inspector",
+  "batch-normalization",
+  "layer-normalization",
+  "rms-normalization",
   "byte-pair-encoding",
   "token-context-position",
   "transformer-attention",

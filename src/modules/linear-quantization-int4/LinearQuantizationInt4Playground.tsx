@@ -131,21 +131,6 @@ function CheckIcon() {
   );
 }
 
-function QuestionIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
-      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" />
-      <path
-        d="M9.8 9.2a2.4 2.4 0 0 1 4.5 1.1c0 1.8-2 2.1-2 3.6M12 17.2h.01"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
 function ScenarioIcon({ icon }: { icon: QuantizationScenario["icon"] }) {
   if (icon === "wave") {
     return <WaveIcon />;
@@ -599,7 +584,14 @@ function RangePanel({
                 : "bg-white text-[#071854] hover:bg-[#f4f7ff]"
             }`}
           >
-            {preset.label}
+            <span className="block">{preset.label}</span>
+            <span
+              className={`mt-0.5 block text-[10px] font-bold ${
+                preset.id === activePreset ? "text-white/80" : "text-[#52648f]"
+              }`}
+            >
+              {preset.helper}
+            </span>
           </button>
         ))}
       </div>
@@ -613,16 +605,54 @@ function RangePanel({
           <span>{formatSigned(analysis.min, 2)}</span>
           <span>{formatSigned(analysis.max, 2)}</span>
         </div>
-        <div className="mt-4 flex items-center justify-between text-[13px] font-black">
-          <span className="text-[#1735ff]">smaller step</span>
-          <span className="h-[2px] flex-1 bg-[linear-gradient(90deg,#1735ff,#ff5a1f)] mx-3" />
-          <span className="text-[#ff4a00]">more clipping</span>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div
+            className={`rounded-[8px] border px-3 py-3 ${
+              activePreset === "tighter"
+                ? "border-[#1735ff] bg-white"
+                : "border-[#dce4f7] bg-white/70"
+            }`}
+          >
+            <p className="text-[12px] font-black text-[#1735ff]">
+              Tighter range
+            </p>
+            <p className="mt-1 text-[12px] font-bold text-[#263a68]">
+              Smaller scale, closer shelves, more clipping.
+            </p>
+          </div>
+          <div
+            className={`rounded-[8px] border px-3 py-3 ${
+              activePreset === "wider"
+                ? "border-[#159947] bg-white"
+                : "border-[#dce4f7] bg-white/70"
+            }`}
+          >
+            <p className="text-[12px] font-black text-[#08702b]">
+              Wider range
+            </p>
+            <p className="mt-1 text-[12px] font-bold text-[#263a68]">
+              Larger scale, farther shelves, less clipping.
+            </p>
+          </div>
         </div>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <MetricTile label="Min" value={formatSigned(analysis.min, 2)} helper="range low" />
-        <MetricTile label="Max" value={formatSigned(analysis.max, 2)} helper="range high" />
-        <MetricTile label="Scale s" value={formatScale(analysis.scale)} helper="step size" tone="green" />
+        <MetricTile
+          label="Min"
+          value={formatSigned(analysis.min, 2)}
+          helper="range low"
+        />
+        <MetricTile
+          label="Max"
+          value={formatSigned(analysis.max, 2)}
+          helper="range high"
+        />
+        <MetricTile
+          label="Scale s"
+          value={formatScale(analysis.scale)}
+          helper="step size"
+          tone="green"
+        />
       </div>
     </Panel>
   );
@@ -682,6 +712,20 @@ function InspectPanel({
       tone: "green" as const,
     },
   ];
+  const updateSelectedValue = (value: number) => {
+    const boundedValue = Math.min(sliderMax, Math.max(sliderMin, value));
+
+    onSelectedValueChange(Number(boundedValue.toFixed(3)));
+  };
+  const updateSelectedValueFromPointer = (
+    event: React.PointerEvent<HTMLInputElement>,
+  ) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const ratio =
+      bounds.width > 0 ? (event.clientX - bounds.left) / bounds.width : 0;
+
+    updateSelectedValue(sliderMin + ratio * (sliderMax - sliderMin));
+  };
 
   return (
     <Panel className="p-4 sm:p-5">
@@ -707,7 +751,22 @@ function InspectPanel({
             max={sliderMax}
             step="0.001"
             value={selectedValue}
-            onChange={(event) => onSelectedValueChange(Number(event.target.value))}
+            onInput={(event) =>
+              updateSelectedValue(Number(event.currentTarget.value))
+            }
+            onChange={(event) =>
+              updateSelectedValue(Number(event.currentTarget.value))
+            }
+            onPointerDown={updateSelectedValueFromPointer}
+            onPointerMove={(event) => {
+              if (event.buttons === 1) {
+                updateSelectedValueFromPointer(event);
+              }
+            }}
+            onPointerUp={updateSelectedValueFromPointer}
+            onKeyUp={(event) =>
+              updateSelectedValue(Number(event.currentTarget.value))
+            }
             className="mt-3 h-2 w-full accent-[#1735ff]"
           />
           <div className="mt-4 grid gap-2 sm:grid-cols-5">
@@ -828,13 +887,6 @@ export function LinearQuantizationInt4Playground() {
               memory savings cost.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex w-fit shrink-0 items-center gap-3 rounded-[8px] border border-[#9db0ff] bg-white px-5 py-3 text-[15px] font-black text-[#052cff] shadow-[0_8px_22px_rgba(26,38,80,0.04)]"
-          >
-            <QuestionIcon />
-            How does INT4 quantization work?
-          </button>
         </header>
 
         <div className="mt-5 space-y-3">

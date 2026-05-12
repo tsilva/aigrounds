@@ -1,13 +1,14 @@
 ---
 name: aigrounds-learning-experience-audit
-description: Use when reviewing and improving an existing AI Grounds learning playground from a beginner learner perspective, especially when the user asks to play through a playground, use the AI Guide, find learning or UX flaws, implement improvements, and loop until the learning experience is excellent. Applies to AI Grounds playground UI, tutor plans, assistant behavior, responsive layout, copy, interactions, and validation.
+description: Use when auditing an existing AI Grounds lesson from a beginner learner perspective, especially when the user asks to play through a playground, use the AI Guide, follow its instructions, and enumerate learning or UX problems without fixing them. Applies to AI Grounds playground UI, tutor plans, assistant behavior, responsive layout, copy, interactions, and validation.
 ---
 
 # AI Grounds Learning Experience Audit
 
 Use this skill to behave like a first-time learner, not a code reviewer first.
-The goal is to improve the actual learning loop: guide prompt -> learner action
--> visible playground feedback -> explanation -> next experiment.
+The goal is to verify whether a learner who knows nothing about the topic can
+learn it by following the AI Guide, interacting with the playground exactly as
+instructed, and observing the resulting feedback.
 
 ## Inputs
 
@@ -19,12 +20,13 @@ The goal is to improve the actual learning loop: guide prompt -> learner action
 
 - Use the official Browser Use plugin for browser testing.
 - Start or reuse `pnpm dev` and test the real rendered app.
-- Do not stop after one fix. Repeat playtest -> flaw list -> improvement list
-  -> implementation -> verification until no material beginner-learning flaw
-  remains.
+- Do not fix issues during an audit. The deliverable is a complete,
+  evidence-backed problem list.
 - Treat AI Guide and playground UI as one teaching system. A good page can still
   fail if the guide asks for actions that do not match the visible state.
-- Preserve unrelated user changes. Inspect `git status --short` before edits.
+- Preserve unrelated user changes. Inspect `git status --short` before browser
+  or code inspection so local context is understood.
+- Do not judge from code alone. Use the rendered app and the AI Guide flow.
 
 ## Beginner Persona
 
@@ -36,8 +38,9 @@ Play as someone with no topic knowledge:
 - If a term appears before it is explained, count that as friction.
 - If the UI says to watch a surface, verify that surface is visible, readable,
   and changes after the action.
+- Do not use code knowledge to infer what the learner "should" understand.
 
-## Review Loop
+## Audit Workflow
 
 1. Prepare.
    - Inspect the target module, scenario, engine, metadata, tutor plan, and
@@ -46,14 +49,17 @@ Play as someone with no topic knowledge:
    - Open the target route in Browser Use.
    - Record the initial visible state, console warnings/errors, and viewport.
 
-2. Play through as a beginner.
+2. Play through with the AI Guide.
    - Open the AI Guide.
    - Answer predictions with plausible novice language.
    - Perform the exact controls the guide requests.
    - After each action, inspect DOM and screenshot evidence.
-   - Continue through the full guided path, including final mastery or summary.
-   - Also test direct UI interaction without the guide when that exposes the
-     same concept.
+   - Continue until the guide reaches a final mastery check, summary, or stops
+     providing useful next steps.
+   - Track whether each guide instruction can be completed using visible UI
+     labels and current page state.
+   - Note whether the learner could explain the topic at the end using only
+     what the guide and playground taught.
 
 3. Identify flaws.
    - List concrete flaws, not vague preferences.
@@ -62,42 +68,16 @@ Play as someone with no topic knowledge:
      text, or missing feedback.
    - Prioritize flaws that can cause wrong learning, failed action, or learner
      uncertainty.
+   - If useful, mention the smallest likely area to investigate, but do not
+     patch files or run implementation verification.
 
-4. Suggest improvements.
-   - For each flaw, propose the smallest app change that removes it.
-   - Prefer aligning existing copy, state, tutor plan, layout, and controls over
-     redesigning the page.
-   - Do not introduce a new abstraction unless multiple playgrounds need the
-     same fix.
-
-5. Implement.
-   - Patch only the files needed for the identified flaws.
-   - Common files:
-     - Module UI: `src/modules/{slug}/*Playground.tsx`
-     - Module logic: `src/modules/{slug}/*-engine.ts`
-     - Scenarios: `src/modules/{slug}/scenario.ts`
-     - Tutor flow: `src/lib/tutor-plans.ts`
-     - Assistant behavior: `src/app/api/chat/route.ts`
-     - Assistant shell/layout: `src/components/playground-assistant-shell.tsx`
-   - Keep copy short, concrete, and beginner-readable.
-
-6. Verify.
-   - Run `pnpm lint`, `pnpm check:cycles`, and `pnpm build`.
-   - If `pnpm build` fails only because Next.js cannot fetch Google fonts in the
-     sandbox, rerun with approved network access.
-   - Reload the target route in Browser Use.
-   - Retest the exact failed actions and at least one full representative guide
-     path.
+4. Sanity-check the audit.
+   - Replay any uncertain guide step before reporting it as a flaw.
    - Check console errors/warnings.
-   - Test the current in-app browser width plus a narrow/mobile layout when the
-     assistant or controls can affect layout.
-
-7. Loop.
-   - Start another browser pass after verification.
-   - Ask: "If I knew nothing, what still blocks or misleads me?"
-   - Continue only while there is a material flaw with a practical fix.
-   - Stop when the guide, visible state, controls, feedback, and summary form a
-     coherent beginner learning path.
+   - Test a narrow/mobile layout when the assistant or controls can affect
+     whether the learner can follow the guide.
+   - Stop after the audit has enough evidence to enumerate all material
+     beginner-learning problems found in the pass.
 
 ## Flaw Checklist
 
@@ -117,12 +97,14 @@ Play as someone with no topic knowledge:
 
 Report:
 
-- loops completed,
-- flaws found and fixed,
-- files changed,
+- route or lesson audited,
+- browser and viewport coverage,
+- AI Guide path coverage,
+- enumerated problems found, ordered by severity,
+- reproduction evidence for each problem,
 - commands run,
-- browser verification evidence,
-- any remaining risk or reason for stopping.
+- any audit limits or remaining risk.
 
-Keep the final concise, but include enough detail for a reviewer to understand
-why the learning path is now clean.
+Do not claim the lesson is fixed. Keep the final concise, but include enough
+detail for a reviewer to understand exactly where the beginner learning path
+breaks down.

@@ -562,7 +562,7 @@ export const activePlaygroundMetadata = [
     kicker:
       "Change mini-batch statistics and watch activations recentered, rescaled, and reshaped.",
     summary:
-      "Choose shifted, wide, centered, or outlier mini-batches, inspect how BatchNorm computes z values, then tune gamma and beta before comparing training with inference statistics.",
+      "Choose shifted, wide, centered, or outlier mini-batches, inspect how BatchNorm computes normalized values, then tune scale and shift before comparing training with inference statistics.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Mini-batches",
@@ -572,8 +572,8 @@ export const activePlaygroundMetadata = [
     ],
     learningGoals: [
       "See how BatchNorm uses mini-batch mean and standard deviation during training.",
-      "Connect the normalization formula to the displayed z values for one activation.",
-      "Understand how learned gamma and beta restore output scale and center.",
+      "Connect the normalization formula to the displayed normalized value for one activation.",
+      "Understand how learned scale and shift restore output size and center.",
       "Distinguish training-time batch statistics from inference-time running statistics.",
     ],
     presentation: "immersive",

@@ -8,6 +8,7 @@ import { ConditionalProbabilityPlayground } from "@/modules/conditional-probabil
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
 import { ExpectedValueRiskPlayground } from "@/modules/expected-value-risk/ExpectedValueRiskPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
+import { KlDivergencePlayground } from "@/modules/kl-divergence/KlDivergencePlayground";
 import { LayerNormalizationPlayground } from "@/modules/layer-normalization/LayerNormalizationPlayground";
 import { LinearQuantizationInt4Playground } from "@/modules/linear-quantization-int4/LinearQuantizationInt4Playground";
 import { MatrixMultiplicationPlayground } from "@/modules/matrix-multiplication/MatrixMultiplicationPlayground";
@@ -52,6 +53,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "confusion-matrix-thresholds": ConfusionMatrixThresholdsPlayground,
   "softmax-temperature": SoftmaxTemperaturePlayground,
   "categorical-cross-entropy": CategoricalCrossEntropyPlayground,
+  "kl-divergence": KlDivergencePlayground,
   "gradient-descent": GradientDescentPlayground,
   "monte-carlo-tree-search": MonteCarloTreeSearchPlayground,
   "matrix-multiplication": MatrixMultiplicationPlayground,

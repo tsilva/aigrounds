@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 51,
+  "lessonPlanTitle": "KL Divergence Intuition Lab",
+  "slug": "kl-divergence",
+  "modulePath": "src/modules/kl-divergence",
+  "acceptedMockup": "src/modules/kl-divergence/design/accepted-mockup.png",
+  "prompt": "src/modules/kl-divergence/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e20e8-92ce-7113-89f0-c783ee534e0f/ig_0b9a11acd7a02c6d016a045e5ac3908191a739b5f17b385c4a.png"
+}

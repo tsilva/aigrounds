@@ -34,6 +34,7 @@ export type TutorStep = {
 
 export type TutorPlan = {
   intro: string;
+  whyItMatters: string;
   openingMessage?: string;
   requireTypedPredictionToStart?: boolean;
   masteryCriteria?: string[];
@@ -45,13 +46,16 @@ export function isTypedPredictionTutorPlan(plan: TutorPlan) {
 }
 
 export function getTutorOpeningMessage(plan: TutorPlan) {
+  const motivation = ["Why this exists:", plan.whyItMatters].join("\n\n");
+
   if (plan.openingMessage) {
-    return plan.openingMessage;
+    return [motivation, plan.openingMessage].join("\n\n");
   }
 
   const firstStep = plan.steps[0];
 
   return [
+    motivation,
     plan.intro,
     firstStep
       ? `First prediction: ${firstStep.predictionQuestion} Reply with your prediction first. Then I will tell you exactly what to try.`
@@ -63,6 +67,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "mean-median-mode": {
     intro:
       "Work through three small experiments. Predict first, change the data, observe the summaries, then explain which measure of typical stayed useful.",
+    whyItMatters:
+      "Typical values exist because raw lists are hard to compare at a glance. Mean, median, and mode give compact center summaries, and choosing the right one helps avoid being fooled by repeats or outliers.",
     openingMessage:
       "No prior statistics knowledge needed. We will build three ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Mean is the average: add all values, then divide by how many values there are.\n- Median is the middle value after sorting the data.\n- Mode is the most common value. A dataset can have no mode, one mode, or more than one mode.\n- Outliers are far-away values that can pull some summaries more than others.\n\nFirst prediction: when the values are fairly even, which typical value do you expect to best describe the middle: mean, median, or mode? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -128,6 +134,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "range-quartiles-iqr": {
     intro:
       "Work through three spread experiments. Predict what will stretch, change one view, then connect the box plot to the five-number summary.",
+    whyItMatters:
+      "Spread summaries exist because a center value alone can hide whether data is tightly packed or scattered. Range, quartiles, and IQR make variability visible, which helps compare groups and spot outlier-resistant patterns.",
     openingMessage:
       "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Range is the full span: maximum minus minimum.\n- Quartiles come from sorted data. Q1 is around the lower quarter, the median is the middle, and Q3 is around the upper quarter.\n- IQR is Q3 minus Q1, so it measures the width of the middle 50%.\n- A box plot draws the five-number summary: min, Q1, median, Q3, and max.\n\nFirst prediction: if the smallest and largest values are close together, what should happen to the range? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -192,6 +200,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "variance-standard-deviation": {
     intro:
       "Work through three spread experiments. Predict how distances from the mean behave, then connect deviations, variance, and standard deviation.",
+    whyItMatters:
+      "Variance and standard deviation exist because we often need one number for how far values usually sit from the mean. They are useful for judging consistency, comparing noise, and seeing when two datasets with the same average behave very differently.",
     openingMessage:
       "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- The mean is the average and marks the center of this lab.\n- A deviation is a value's distance from the mean. Negative means left of the mean; positive means right of it.\n- Squared deviation turns each distance positive and makes far-away values count much more.\n- Variance averages the squared deviations. Standard deviation takes the square root, so it is back in the original units.\n\nFirst prediction: if most points sit near the mean, what should happen to variance and standard deviation? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -257,6 +267,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "transformer-attention": {
     intro:
       "Work through three attention experiments. Pick the ambiguous token, predict which context word should matter, then change sharpness and inspect the value mix.",
+    whyItMatters:
+      "Attention exists because a token often needs surrounding context before its meaning is clear. It is useful because the model can choose which earlier tokens to read from, making words, facts, and relationships available where they are needed.",
     steps: [
       {
         title: "Disambiguate bank",
@@ -311,6 +323,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "byte-pair-encoding": {
     intro:
       "Work through three tokenization experiments. Predict which pair will merge, spend merge budget, then compare how learned chunks transfer to new text.",
+    whyItMatters:
+      "BPE exists because models need a practical way to turn messy text into reusable pieces without storing every possible word. It is useful because common chunks compress text, handle new words, and keep vocabulary size manageable.",
     openingMessage:
       "No tokenizer background needed. We will build the idea by predicting, trying one small merge budget, and explaining what changed.\n\n- BPE starts with small symbols, shown here as characters plus a word-end marker.\n- Each merge creates one new token from a frequent adjacent pair.\n- More merges usually reduce token count, but they also grow the vocabulary.\n- Learned tokens help most when new text repeats patterns from the training text.\n\nFirst prediction: after the corpus has learned l + o and lo + w, which examples should compress more: words related to low/new, or an unrelated string like xyz? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -375,6 +389,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "shape-skew-outliers": {
     intro:
       "Work through three distribution-shape experiments. Predict the shape first, move the outlier, then decide which summary is trustworthy.",
+    whyItMatters:
+      "Distribution shape exists as a concept because summary numbers can hide piles, tails, gaps, and unusual values. It is useful because shape tells you whether a center or spread statistic is trustworthy for the story in the data.",
     openingMessage:
       "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Shape is the visible pattern of a dataset: piles, gaps, clusters, and tails.\n- Skew means one tail stretches farther than the main pile. Right skew stretches toward larger values.\n- An outlier is a far-away value that can pull summaries like mean and range.\n- Robust summaries, such as median and IQR, are designed to move less when one value is extreme.\n\nFirst prediction: where do you expect most values to sit when a distribution is right-skewed? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -438,6 +454,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "categorical-cross-entropy": {
     intro:
       "Work through three loss experiments. Predict which probability matters, change the target or prediction, then connect surprise to loss.",
+    whyItMatters:
+      "Cross entropy exists because classifiers need a training signal that rewards probability on the true answer and punishes confident mistakes. It is useful because it turns prediction quality into a smooth number that models can optimize.",
     steps: [
       {
         title: "Reward the true outcome",
@@ -492,6 +510,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "probability-rules": {
     intro:
       "Work through three sample-space experiments. Predict which grid cells count, switch the rule view, then connect the colored region to the formula.",
+    whyItMatters:
+      "Probability rules exist because real questions combine events with and, or, and not. They are useful because they keep counts honest, especially when outcomes overlap and naive adding would double-count.",
     masteryCriteria: [
       "Explains probability as counted outcomes divided by the 36-outcome sample space.",
       "Recognizes that an intersection counts only cells that satisfy both A and B.",
@@ -551,6 +571,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "conditional-probability": {
     intro:
       "Work through three filtering experiments. Predict how the denominator changes, switch scenarios, then decide whether the events are independent.",
+    whyItMatters:
+      "Conditional probability exists because new information changes the group you are reasoning about. It is useful for updating rates after a filter, comparing groups fairly, and deciding whether one event actually changes another.",
     steps: [
       {
         title: "Filter the denominator",
@@ -605,6 +627,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "bayes-rule": {
     intro:
       "Work through three evidence experiments. Predict the posterior, move the rates, then connect the positive-result denominator to true and false positives.",
+    whyItMatters:
+      "Bayes' rule exists because evidence only makes sense relative to the base rate and possible false alarms. It is useful for turning signals into updated beliefs without ignoring rare-event traps.",
     steps: [
       {
         title: "Start from the prior",
@@ -659,6 +683,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "softmax-temperature": {
     intro:
       "Work through three softmax experiments. Predict the ranking and confidence, change logits or temperature, then explain what temperature actually controls.",
+    whyItMatters:
+      "Softmax temperature exists because raw model scores need to become probabilities with controllable confidence. It is useful for making predictions sharper or more exploratory without changing the underlying score ranking.",
     steps: [
       {
         title: "Convert logits to probabilities",
@@ -713,6 +739,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "gradient-descent": {
     intro:
       "Work through four tiny experiments. Predict first, change the controls, observe the graph, then explain what you learned.",
+    whyItMatters:
+      "Gradient descent exists because many models have too many parameters to tune by hand. It is useful because it uses local slope information to repeatedly lower loss and learn from data.",
     steps: [
       {
         title: "Make descent crawl",
@@ -783,6 +811,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "expected-value-risk": {
     intro:
       "Work through three payoff experiments. Predict which bet should win on average, move the sliders, then compare expected value with the outcome swings.",
+    whyItMatters:
+      "Expected value exists because uncertain choices need an average long-run yardstick. It is useful for comparing options, but pairing it with risk shows when a good average still comes with painful swings.",
     steps: [
       {
         title: "Weight the outcomes",
@@ -837,6 +867,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "bernoulli-categorical-binomial": {
     intro:
       "Work through three probability-mass experiments. Predict which outcome gets mass, change p or n, then connect the visible shape to the question being asked.",
+    whyItMatters:
+      "These distributions exist because different random processes ask different questions: one yes/no outcome, one class choice, or a count of repeated successes. They are useful because matching the distribution to the question keeps probability calculations meaningful.",
     steps: [
       {
         title: "Start with one yes/no trial",
@@ -891,6 +923,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "waiting-arrival-distributions": {
     intro:
       "Work through three arrival experiments. Predict how one event chance changes waits and counts, then connect the tick model to the Poisson rate view.",
+    whyItMatters:
+      "Waiting and arrival distributions exist because many systems are about when events happen and how many arrive. They are useful for planning capacity, estimating rare-event risk, and translating a rate into wait-time or count predictions.",
     steps: [
       {
         title: "Split one rate into two questions",
@@ -945,6 +979,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "monte-carlo-tree-search": {
     intro:
       "Work through three search experiments. Predict which move gets the next rollout, change the exploration pressure, then connect the result to the counters that flow back up the tree.",
+    whyItMatters:
+      "MCTS exists because some decision spaces are too large to search completely. It is useful because it spends simulations where they matter, balancing promising moves with uncertain moves that still need evidence.",
     steps: [
       {
         title: "Choose by UCB",
@@ -999,6 +1035,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "confusion-matrix-thresholds": {
     intro:
       "Work through three threshold experiments. Predict which mistakes change, move the cutoff, then connect the confusion matrix to precision and recall.",
+    whyItMatters:
+      "Thresholds and confusion matrices exist because model scores become real decisions with different mistake costs. They are useful for choosing a cutoff that matches the job, such as catching more positives or avoiding false alarms.",
     steps: [
       {
         title: "Lower the cutoff",
@@ -1053,6 +1091,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   overfitting: {
     intro:
       "Work through three generalization experiments. Predict how complexity affects train and test loss, then find the useful middle.",
+    whyItMatters:
+      "Overfitting exists as a warning because a model can memorize training data while failing on new examples. It is useful to study because real models only matter if they generalize beyond what they already saw.",
     steps: [
       {
         title: "Underfit with too little shape",
@@ -1107,6 +1147,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "matrix-multiplication": {
     intro:
       "Work through three matrix multiplication experiments. Predict which shapes work, pick one output cell, then connect every product cell to a row-column dot product.",
+    whyItMatters:
+      "Matrix multiplication exists because many linear transformations can be expressed as rows meeting columns. It is useful because neural networks, graphics, statistics, and data pipelines all rely on this compact way to combine many numbers at once.",
     openingMessage:
       "No prior linear algebra knowledge needed. We will build matrix multiplication by predicting, trying one small output cell, and explaining the pattern.\n\n- Matrix shape is rows x columns.\n- A product A x B works only when A's columns match B's rows.\n- Each output cell C[i,j] comes from row i of A dotted with column j of B.\n- The shared inner dimension tells how many multiply-add terms each output cell uses.\n- What is Matmul? is optional help if the word matmul is new.\n- The other shape presets are optional practice after the guide.\n\nFirst prediction: for a 2 x 2 matrix times a 2 x 3 matrix, what shape should the output have? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -1171,6 +1213,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "linear-quantization-int4": {
     intro:
       "Work through five quantization experiments. Predict how a real value snaps to an INT4 code, derive scale and zero point, compare blocks, tune the range, and inspect the memory tradeoff.",
+    whyItMatters:
+      "Quantization exists because full-precision numbers are expensive to store and move. INT4 quantization is useful because it can shrink models dramatically, making inference cheaper and faster while tracking the accuracy cost.",
     openingMessage:
       "No prior model-compression knowledge needed. We will build INT4 linear quantization by predicting, trying one small value, and explaining what changed.\n\n- INT4 has 4 bits, so it can store only 16 integer codes: 0 through 15.\n- Linear quantization shares one scale and zero point across a block of values.\n- Scale is the real-value step between adjacent INT4 codes: (max - min) / 15.\n- Zero point is the code that represents real zero: round(-min / scale).\n- Dequantization maps the code back to an approximate real value.\n- The range controls two costs: rounding error inside the range and clipping outside it.\n\nFirst prediction: if x = +0.053 gets stored with a scale of 0.0200 and zero point 8, which code should it land on? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -1269,6 +1313,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "zero-knowledge-proofs": {
     intro:
       "Work through three proof experiments. Predict what the verifier learns, open one edge, then connect repeated checks to cheating risk and secrecy.",
+    whyItMatters:
+      "Zero-knowledge proofs exist because sometimes you need to prove a claim without revealing the secret behind it. They are useful for privacy-preserving verification, where trust comes from checks rather than exposing private data.",
     openingMessage:
       "No prior cryptography knowledge needed. We will build the idea by predicting, trying one small proof round, and explaining what changed.\n\n- The prover claims to know a valid coloring of the graph.\n- A commitment hides each node color until the verifier asks to open one edge.\n- The verifier learns only whether the two opened endpoint colors differ.\n- A fresh hidden shuffle each round keeps many local openings from revealing the full coloring.\n\nFirst prediction: after opening just one edge, what should the verifier learn: the whole coloring, or only whether that edge is valid? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
@@ -1332,21 +1378,23 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "batch-normalization": {
     intro:
       "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, switch from a centered batch to a shifted batch, inspect one value, tune gamma and beta, then compare training with inference.",
+    whyItMatters:
+      "BatchNorm exists because neural-network activations can drift and change scale during training, making optimization harder. It is useful because it stabilizes layer inputs while still letting the model learn the scale and shift it needs.",
     openingMessage:
-      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean μ and standard deviation σ.\n- It normalizes each activation with z = (x - μ) / sqrt(variance + ε), so the batch is centered and scaled.\n- The playground shows var used = σ_used² so the formula number is not a mystery.\n- Learned γ and β then stretch and shift the normalized values, keeping the layer expressive.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: the page starts on a Centered batch. When you switch to the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean mu and standard deviation sigma.\n- It normalizes each activation with z = (x - mu) / sqrt(variance + epsilon), so the batch is centered and scaled.\n- The playground shows var used = sigma_used squared so the formula number is not a mystery.\n- Learned gamma and beta then stretch and shift the normalized values, keeping the layer expressive.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: the page starts on a Centered batch. When you switch to the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
     masteryCriteria: [
       "Explains that BatchNorm computes mean and standard deviation from a mini-batch during training.",
-      "Connects z = (x - μ) / sqrt(variance + ε) to recentering and rescaling activations.",
+      "Connects z = (x - mu) / sqrt(variance + epsilon) to recentering and rescaling activations.",
       "Uses one displayed x value to explain how a normalized z value is produced.",
-      "Explains how γ changes output spread and β changes output center.",
+      "Explains how gamma changes output spread and beta changes output center.",
       "Distinguishes training-time batch statistics from inference-time running statistics.",
     ],
     steps: [
       {
         title: "Center a shifted batch",
         experiment:
-          "Notice the page starts on the Centered scenario with batch size 6. Switch to the Shifted scenario and set batch size to 8. Compare the raw x strip, μ_batch and σ_batch pills, and the normalized z strip. Wide and Outlier are optional stress-test scenarios after the guide.",
+          "Notice the page starts on the Centered scenario with batch size 6. Switch to the Shifted scenario and set batch size to 8. Compare the raw x strip, batch mu and batch sigma pills, and the normalized z strip. Wide and Outlier are optional stress-test scenarios after the guide.",
         predictionQuestion:
           "In the Shifted scenario, what should happen after normalization: stay shifted right, center near zero, or all become equal?",
         observationPrompt:
@@ -1362,14 +1410,14 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Inspect one activation",
         experiment:
-          "Click one raw dot or z-value chip. Read the formula line that substitutes x, μ, and var used into z = (x - μ) / sqrt(variance + ε). Also read the var used pill; it is σ_used².",
+          "Click one raw dot or z-value chip. Read the formula line that substitutes x, mu, and var used into z = (x - mu) / sqrt(variance + epsilon). Also read the var used pill; it is sigma_used squared.",
         predictionQuestion:
           "If an activation is above the batch mean, should its z value be negative, near zero, or positive?",
         observationPrompt:
           "How did the selected x value become its displayed z value?",
         observationOptions: [
-          "Subtracting μ made the direction visible",
-          "Dividing by σ scaled the distance",
+          "Subtracting mu made the direction visible",
+          "Dividing by sigma scaled the distance",
           "I am not sure",
         ],
         takeaway:
@@ -1378,30 +1426,30 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Give expressiveness back",
         experiment:
-          "Move γ below and above 1.00, then move β left and right. Watch the output y strip plus mean(y) and std(y).",
+          "Move gamma below and above 1.00, then move beta left and right. Watch the output y strip plus mean(y) and std(y).",
         predictionQuestion:
           "Which parameter should stretch the output spread, and which should move the output center?",
         observationPrompt:
-          "What changed when γ moved, and what changed when β moved?",
+          "What changed when gamma moved, and what changed when beta moved?",
         observationOptions: [
-          "γ changed the spread",
-          "β moved the center",
+          "gamma changed the spread",
+          "beta moved the center",
           "I am not sure",
         ],
         takeaway:
-          "Normalization stabilizes the signal, then γ and β let the layer learn the output scale and offset it needs.",
+          "Normalization stabilizes the signal, then gamma and beta let the layer learn the output scale and offset it needs.",
       },
       {
         title: "Switch to inference",
         experiment:
-          "Toggle from Training to Inference. Compare the using μ/σ pills with the Training path and Inference path table. The momentum pill is fixed context for how running stats update during training; this step focuses on which stats are used.",
+          "Toggle from Training to Inference. Compare the using mu/sigma pills with the Training path and Inference path table. The momentum pill is fixed context for how running stats update during training; this step focuses on which stats are used.",
         predictionQuestion:
           "At inference time, should BatchNorm use the current example batch or saved running statistics?",
         observationPrompt:
           "Which statistics did the playground use after you switched to Inference?",
         observationOptions: [
           "It used saved running statistics",
-          "The output changed because μ and σ changed",
+          "The output changed because mu and sigma changed",
           "I am not sure",
         ],
         takeaway:
@@ -1412,6 +1460,8 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   "layer-normalization": {
     intro:
       "Work through four LayerNorm experiments. Predict which values contribute to one token's statistics, change hidden features, inspect the z-score calculation, then tune gamma and beta.",
+    whyItMatters:
+      "LayerNorm exists because sequence models need stable hidden activations without depending on other examples in the batch. It is useful because each token can normalize its own features, which works well for transformers and variable batch sizes.",
     openingMessage:
       "No prior normalization knowledge needed. We will build LayerNorm with one token row at a time.\n\n- A token has several hidden feature activations.\n- LayerNorm computes the mean and variance across the features inside that one token.\n- It turns those features into z-scores with x_hat = (x - mean) / sqrt(variance + epsilon).\n- Learned gamma and beta then scale and shift each feature so the layer stays expressive.\n- Unlike BatchNorm, the current token's stats do not depend on other examples or tokens in the batch.\n\nFirst prediction: for the selected cat token, which values should decide the mean and variance: cat's four features, the same feature across all tokens, or the whole table? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,

@@ -356,19 +356,19 @@ function ComparisonTable({
         <div className="border-r border-[#c8d5f6] px-4 py-3">
           <p>Source: this mini-batch</p>
           <p className="mt-3 font-mono text-[15px] font-black">
-            μ = {formatValue(analysisMean)}
+            mu = {formatValue(analysisMean)}
           </p>
           <p className="font-mono text-[15px] font-black">
-            σ = {formatValue(analysisStd)}
+            sigma = {formatValue(analysisStd)}
           </p>
         </div>
         <div className="px-4 py-3">
           <p>Source: saved training stats</p>
           <p className="mt-3 font-mono text-[15px] font-black">
-            μ = {formatValue(runningMean)}
+            mu = {formatValue(runningMean)}
           </p>
           <p className="font-mono text-[15px] font-black">
-            σ = {formatValue(runningStd)}
+            sigma = {formatValue(runningStd)}
           </p>
         </div>
       </div>
@@ -438,7 +438,7 @@ export function BatchNormalizationPlayground() {
             Batch Normalization Lab
           </h1>
           <p className="mt-2 max-w-[58rem] text-[18px] leading-tight font-medium text-[#30446f] sm:text-[22px]">
-            Normalize a mini-batch, then learn scale (γ) and shift (β).
+            Normalize a mini-batch, then learn scale (gamma) and shift (beta).
           </p>
         </header>
 
@@ -476,15 +476,15 @@ export function BatchNormalizationPlayground() {
                   (_, index) => rawDomain.min + index,
                 )}
                 center={analysis.mean}
-                centerLabel={`μ = ${formatValue(analysis.mean)}`}
+                centerLabel={`mu = ${formatValue(analysis.mean)}`}
                 activeIndex={safeActiveIndex}
                 onSelectIndex={setActiveIndex}
                 valueLabelMode="active"
               />
               <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
-                <StatPill label="μ_batch" value={formatValue(analysis.mean)} />
-                <StatPill label="σ_batch" value={formatValue(analysis.std)} />
-                <StatPill label="ε" value={formatValue(epsilon, 3)} />
+                <StatPill label="batch mu" value={formatValue(analysis.mean)} />
+                <StatPill label="batch sigma" value={formatValue(analysis.std)} />
+                <StatPill label="epsilon" value={formatValue(epsilon, 3)} />
               </div>
             </div>
           </Panel>
@@ -505,13 +505,13 @@ export function BatchNormalizationPlayground() {
                     max={rawDomain.max}
                     ticks={[rawDomain.min, analysis.mean, rawDomain.max]}
                     center={analysis.mean}
-                    centerLabel={`μ=${formatValue(analysis.mean)}`}
+                    centerLabel={`mu=${formatValue(analysis.mean)}`}
                     activeIndex={safeActiveIndex}
                     onSelectIndex={setActiveIndex}
                     valueLabelMode="none"
                   />
                   <div className="hidden text-center text-[34px] font-black text-[#071024] md:block">
-                    →
+                    to
                   </div>
                   <DotStrip
                     title="Normalized z (centered)"
@@ -536,21 +536,21 @@ export function BatchNormalizationPlayground() {
                   <div className="rounded-[8px] border border-[#c8d5f6] bg-[#f7f9ff] px-3 py-2 font-mono text-[12px] font-bold text-[#071024]">
                     {formatValue(selectedZ)} = ({formatValue(selectedRaw)} -{" "}
                     {formatValue(analysis.normalizationMean)}) / sqrt(
-                    {formatValue(formulaVariance)} + ε)
+                    {formatValue(formulaVariance)} + epsilon)
                   </div>
                 </div>
               </div>
               <div className="grid gap-2 sm:grid-cols-3 2xl:grid-cols-1">
                 <StatPill
                   label="mean(z)"
-                  value={`≈ ${formatValue(
+                  value={`approx ${formatValue(
                     analysis.normalizedValues.reduce((a, b) => a + b, 0) /
                       analysis.normalizedValues.length,
                   )}`}
                 />
                 <StatPill
                   label="std(z)"
-                  value={`≈ ${formatValue(
+                  value={`approx ${formatValue(
                     Math.sqrt(
                       analysis.normalizedValues.reduce(
                         (total, value) => total + value ** 2,
@@ -561,14 +561,14 @@ export function BatchNormalizationPlayground() {
                 />
                 <StatPill
                   label="var used"
-                  value={`${formatValue(formulaVariance)} = σ_used²`}
+                  value={`${formatValue(formulaVariance)} = sigma_used squared`}
                 />
               </div>
             </div>
           </Panel>
 
           <Panel className="p-5 sm:p-6">
-            <LessonTitle>3. Let The Layer Learn γ And β</LessonTitle>
+            <LessonTitle>3. Let The Layer Learn Gamma And Beta</LessonTitle>
             <div className="mt-4 grid gap-6 2xl:grid-cols-[330px_340px_minmax(0,1fr)_170px] 2xl:items-center">
               <FormulaBox>
                 y = gamma * z + beta
@@ -580,7 +580,7 @@ export function BatchNormalizationPlayground() {
               </FormulaBox>
               <div className="space-y-4">
                 <SliderControl
-                  label="γ (scale)"
+                  label="gamma (scale)"
                   value={gamma}
                   min={0.5}
                   max={2}
@@ -590,7 +590,7 @@ export function BatchNormalizationPlayground() {
                   onChange={setGamma}
                 />
                 <SliderControl
-                  label="β (shift)"
+                  label="beta (shift)"
                   value={beta}
                   min={-2}
                   max={2}
@@ -600,7 +600,7 @@ export function BatchNormalizationPlayground() {
                   onChange={setBeta}
                 />
                 <p className="text-[12px] leading-snug font-semibold text-[#526183]">
-                  γ changes spread; β moves every y value left or right.
+                  gamma changes spread; beta moves every y value left or right.
                 </p>
               </div>
               <div className="min-w-0">
@@ -614,7 +614,7 @@ export function BatchNormalizationPlayground() {
                     (_, index) => outputDomain.min + index,
                   )}
                   center={analysis.outputMean}
-                  centerLabel={`μy=${formatValue(analysis.outputMean)}`}
+                  centerLabel={`mean y=${formatValue(analysis.outputMean)}`}
                   activeIndex={safeActiveIndex}
                   onSelectIndex={setActiveIndex}
                   valueLabelMode="none"
@@ -627,10 +627,10 @@ export function BatchNormalizationPlayground() {
                 />
               </div>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-                <StatPill label="mean(y)" value={`≈ ${formatValue(analysis.outputMean)}`} />
-                <StatPill label="std(y)" value={`≈ ${formatValue(analysis.outputStd)}`} />
+                <StatPill label="mean(y)" value={`approx ${formatValue(analysis.outputMean)}`} />
+                <StatPill label="std(y)" value={`approx ${formatValue(analysis.outputStd)}`} />
                 <p className="rounded-[7px] border border-[#c8d5f6] bg-[#f7f9ff] px-3 py-2 text-center text-[13px] font-bold text-[#30446f] sm:col-span-2 2xl:col-span-1">
-                  γ stretches; β shifts.
+                  gamma stretches; beta shifts.
                 </p>
               </div>
             </div>
@@ -649,11 +649,11 @@ export function BatchNormalizationPlayground() {
               />
               <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
                 <StatPill
-                  label="using μ"
+                  label="using mu"
                   value={formatValue(analysis.normalizationMean)}
                 />
                 <StatPill
-                  label="using σ"
+                  label="using sigma"
                   value={formatValue(analysis.normalizationStd)}
                 />
                 <StatPill label="momentum" value="0.10" />
@@ -664,7 +664,7 @@ export function BatchNormalizationPlayground() {
               </div>
             </div>
             <div className="mt-5 rounded-[8px] border border-[#9db3ff] bg-[#f5f7ff] px-4 py-3 text-center font-mono text-[14px] font-black text-[#1638ff] sm:text-[16px]">
-              Takeaway: Normalize for stable signal; γ and β keep expressiveness.
+              Takeaway: Normalize for stable signal; gamma and beta keep expressiveness.
             </div>
           </Panel>
         </div>

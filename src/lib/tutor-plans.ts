@@ -1377,30 +1377,30 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   },
   "batch-normalization": {
     intro:
-      "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, switch from a centered batch to a shifted batch, inspect one value, tune gamma and beta, then compare training with inference.",
+      "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, switch from a centered batch to a shifted batch, inspect one value, tune scale and shift, then compare training with inference.",
     whyItMatters:
       "BatchNorm exists because neural-network activations can drift and change scale during training, making optimization harder. It is useful because it stabilizes layer inputs while still letting the model learn the scale and shift it needs.",
     openingMessage:
-      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean mu and standard deviation sigma.\n- It normalizes each activation with z = (x - mu) / sqrt(variance + epsilon), so the batch is centered and scaled.\n- The playground shows var used = sigma_used squared so the formula number is not a mystery.\n- Learned gamma and beta then stretch and shift the normalized values, keeping the layer expressive.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: the page starts on a Centered batch. When you switch to the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean and standard deviation.\n- It normalizes each activation with normalized = (x - mean) / sqrt(variance + epsilon), so the batch is centered and scaled.\n- The playground shows variance used = std used squared so the formula number is not a mystery.\n- Learned scale and shift then stretch and move the normalized values, keeping the layer expressive.\n- Vocabulary: papers often write mean as mu, std as sigma, scale as gamma, and shift as beta. This lab uses the plain names first.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: the page starts on a Centered batch. When you switch to the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
     masteryCriteria: [
       "Explains that BatchNorm computes mean and standard deviation from a mini-batch during training.",
-      "Connects z = (x - mu) / sqrt(variance + epsilon) to recentering and rescaling activations.",
-      "Uses one displayed x value to explain how a normalized z value is produced.",
-      "Explains how gamma changes output spread and beta changes output center.",
+      "Connects normalized = (x - mean) / sqrt(variance + epsilon) to recentering and rescaling activations.",
+      "Uses one displayed x value to explain how a normalized value is produced.",
+      "Explains how scale changes output spread and shift changes output center.",
       "Distinguishes training-time batch statistics from inference-time running statistics.",
     ],
     steps: [
       {
         title: "Center a shifted batch",
         experiment:
-          "Notice the page starts on the Centered scenario with batch size 6. Switch to the Shifted scenario and set batch size to 8. Compare the raw x strip, batch mu and batch sigma pills, and the normalized z strip. Wide and Outlier are optional stress-test scenarios after the guide.",
+          "Notice the page starts on the Centered scenario with batch size 6. Switch to the Shifted scenario and set batch size to 8. Compare the raw x strip, batch mean and batch std pills, and the normalized value strip. Wide and Outlier are optional stress-test scenarios after the guide.",
         predictionQuestion:
           "In the Shifted scenario, what should happen after normalization: stay shifted right, center near zero, or all become equal?",
         observationPrompt:
-          "What happened to the center and spread after the raw activations became z values?",
+          "What happened to the center and spread after the raw activations became normalized values?",
         observationOptions: [
-          "The z values centered near zero",
+          "The normalized values centered near zero",
           "The spread became about one standard deviation",
           "I am not sure",
         ],
@@ -1410,46 +1410,46 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Inspect one activation",
         experiment:
-          "Click one raw dot or z-value chip. Read the formula line that substitutes x, mu, and var used into z = (x - mu) / sqrt(variance + epsilon). Also read the var used pill; it is sigma_used squared.",
+          "Click one raw dot or normalized-value chip. Read the formula line that substitutes x, mean, and variance used into normalized = (x - mean) / sqrt(variance + epsilon). Also read the variance used pill; it is std used squared.",
         predictionQuestion:
-          "If an activation is above the batch mean, should its z value be negative, near zero, or positive?",
+          "If an activation is above the batch mean, should its normalized value be negative, near zero, or positive?",
         observationPrompt:
-          "How did the selected x value become its displayed z value?",
+          "How did the selected x value become its displayed normalized value?",
         observationOptions: [
-          "Subtracting mu made the direction visible",
-          "Dividing by sigma scaled the distance",
+          "Subtracting the mean made the direction visible",
+          "Dividing by std scaled the distance",
           "I am not sure",
         ],
         takeaway:
-          "A z value is the activation's signed distance from the batch mean, measured in batch-standard-deviation units.",
+          "A normalized value is the activation's signed distance from the batch mean, measured in batch-standard-deviation units.",
       },
       {
         title: "Give expressiveness back",
         experiment:
-          "Move gamma below and above 1.00, then move beta left and right. Watch the output y strip plus mean(y) and std(y).",
+          "Move scale below and above 1.00, then move shift left and right. Watch the output y strip plus mean(y) and std(y).",
         predictionQuestion:
           "Which parameter should stretch the output spread, and which should move the output center?",
         observationPrompt:
-          "What changed when gamma moved, and what changed when beta moved?",
+          "What changed when scale moved, and what changed when shift moved?",
         observationOptions: [
-          "gamma changed the spread",
-          "beta moved the center",
+          "Scale changed the spread",
+          "Shift moved the center",
           "I am not sure",
         ],
         takeaway:
-          "Normalization stabilizes the signal, then gamma and beta let the layer learn the output scale and offset it needs.",
+          "Normalization stabilizes the signal, then scale and shift let the layer learn the output size and offset it needs.",
       },
       {
         title: "Switch to inference",
         experiment:
-          "Toggle from Training to Inference. Compare the using mu/sigma pills with the Training path and Inference path table. The momentum pill is fixed context for how running stats update during training; this step focuses on which stats are used.",
+          "Toggle from Training to Inference. Compare the using mean/std pills with the Training path and Inference path table. The momentum pill is fixed context for how running stats update during training; this step focuses on which stats are used.",
         predictionQuestion:
           "At inference time, should BatchNorm use the current example batch or saved running statistics?",
         observationPrompt:
           "Which statistics did the playground use after you switched to Inference?",
         observationOptions: [
           "It used saved running statistics",
-          "The output changed because mu and sigma changed",
+          "The output changed because mean and std changed",
           "I am not sure",
         ],
         takeaway:

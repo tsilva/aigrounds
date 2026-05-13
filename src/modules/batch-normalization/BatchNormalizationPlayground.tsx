@@ -356,19 +356,19 @@ function ComparisonTable({
         <div className="border-r border-[#c8d5f6] px-4 py-3">
           <p>Source: this mini-batch</p>
           <p className="mt-3 font-mono text-[15px] font-black">
-            mu = {formatValue(analysisMean)}
+            mean = {formatValue(analysisMean)}
           </p>
           <p className="font-mono text-[15px] font-black">
-            sigma = {formatValue(analysisStd)}
+            std = {formatValue(analysisStd)}
           </p>
         </div>
         <div className="px-4 py-3">
           <p>Source: saved training stats</p>
           <p className="mt-3 font-mono text-[15px] font-black">
-            mu = {formatValue(runningMean)}
+            mean = {formatValue(runningMean)}
           </p>
           <p className="font-mono text-[15px] font-black">
-            sigma = {formatValue(runningStd)}
+            std = {formatValue(runningStd)}
           </p>
         </div>
       </div>
@@ -438,7 +438,7 @@ export function BatchNormalizationPlayground() {
             Batch Normalization Lab
           </h1>
           <p className="mt-2 max-w-[58rem] text-[18px] leading-tight font-medium text-[#30446f] sm:text-[22px]">
-            Normalize a mini-batch, then learn scale (gamma) and shift (beta).
+            Normalize a mini-batch, then learn scale and shift.
           </p>
         </header>
 
@@ -476,14 +476,14 @@ export function BatchNormalizationPlayground() {
                   (_, index) => rawDomain.min + index,
                 )}
                 center={analysis.mean}
-                centerLabel={`mu = ${formatValue(analysis.mean)}`}
+                centerLabel={`mean = ${formatValue(analysis.mean)}`}
                 activeIndex={safeActiveIndex}
                 onSelectIndex={setActiveIndex}
                 valueLabelMode="active"
               />
               <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
-                <StatPill label="batch mu" value={formatValue(analysis.mean)} />
-                <StatPill label="batch sigma" value={formatValue(analysis.std)} />
+                <StatPill label="batch mean" value={formatValue(analysis.mean)} />
+                <StatPill label="batch std" value={formatValue(analysis.std)} />
                 <StatPill label="epsilon" value={formatValue(epsilon, 3)} />
               </div>
             </div>
@@ -493,8 +493,8 @@ export function BatchNormalizationPlayground() {
             <LessonTitle>2. Normalize With Batch Stats</LessonTitle>
             <div className="mt-4 grid gap-6 2xl:grid-cols-[330px_minmax(0,1fr)_170px] 2xl:items-center">
               <FormulaBox>
-                z = (x - mu) /<br />
-                sqrt(var + epsilon)
+                normalized = (x - mean) /<br />
+                sqrt(variance + epsilon)
               </FormulaBox>
               <div className="min-w-0">
                 <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_40px_minmax(0,1fr)]">
@@ -505,7 +505,7 @@ export function BatchNormalizationPlayground() {
                     max={rawDomain.max}
                     ticks={[rawDomain.min, analysis.mean, rawDomain.max]}
                     center={analysis.mean}
-                    centerLabel={`mu=${formatValue(analysis.mean)}`}
+                    centerLabel={`mean=${formatValue(analysis.mean)}`}
                     activeIndex={safeActiveIndex}
                     onSelectIndex={setActiveIndex}
                     valueLabelMode="none"
@@ -514,13 +514,13 @@ export function BatchNormalizationPlayground() {
                     to
                   </div>
                   <DotStrip
-                    title="Normalized z (centered)"
+                    title="Normalized values (centered)"
                     values={analysis.normalizedValues}
                     min={-2.5}
                     max={2.5}
                     ticks={[-2, -1, 0, 1, 2]}
                     center={0}
-                    centerLabel="z=0"
+                    centerLabel="0"
                     activeIndex={safeActiveIndex}
                     onSelectIndex={setActiveIndex}
                     valueLabelMode="none"
@@ -528,28 +528,28 @@ export function BatchNormalizationPlayground() {
                 </div>
                 <div className="mt-2 grid gap-2 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
                   <ValueChips
-                    label="z values"
+                    label="normalized values"
                     values={analysis.normalizedValues}
                     activeIndex={safeActiveIndex}
                     onSelectIndex={setActiveIndex}
                   />
                   <div className="rounded-[8px] border border-[#c8d5f6] bg-[#f7f9ff] px-3 py-2 font-mono text-[12px] font-bold text-[#071024]">
                     {formatValue(selectedZ)} = ({formatValue(selectedRaw)} -{" "}
-                    {formatValue(analysis.normalizationMean)}) / sqrt(
+                    mean={formatValue(analysis.normalizationMean)}) / sqrt(
                     {formatValue(formulaVariance)} + epsilon)
                   </div>
                 </div>
               </div>
               <div className="grid gap-2 sm:grid-cols-3 2xl:grid-cols-1">
                 <StatPill
-                  label="mean(z)"
+                  label="normalized mean"
                   value={`approx ${formatValue(
                     analysis.normalizedValues.reduce((a, b) => a + b, 0) /
                       analysis.normalizedValues.length,
                   )}`}
                 />
                 <StatPill
-                  label="std(z)"
+                  label="normalized std"
                   value={`approx ${formatValue(
                     Math.sqrt(
                       analysis.normalizedValues.reduce(
@@ -560,18 +560,18 @@ export function BatchNormalizationPlayground() {
                   )}`}
                 />
                 <StatPill
-                  label="var used"
-                  value={`${formatValue(formulaVariance)} = sigma_used squared`}
+                  label="variance used"
+                  value={`${formatValue(formulaVariance)} = std used squared`}
                 />
               </div>
             </div>
           </Panel>
 
           <Panel className="p-5 sm:p-6">
-            <LessonTitle>3. Let The Layer Learn Gamma And Beta</LessonTitle>
+            <LessonTitle>3. Let The Layer Learn Scale And Shift</LessonTitle>
             <div className="mt-4 grid gap-6 2xl:grid-cols-[330px_340px_minmax(0,1fr)_170px] 2xl:items-center">
               <FormulaBox>
-                y = gamma * z + beta
+                y = scale * normalized + shift
                 <br />
                 <span className="text-[13px] text-[#30446f]">
                   {formatValue(selectedY)} = {formatValue(gamma)} *{" "}
@@ -580,7 +580,7 @@ export function BatchNormalizationPlayground() {
               </FormulaBox>
               <div className="space-y-4">
                 <SliderControl
-                  label="gamma (scale)"
+                  label="Scale"
                   value={gamma}
                   min={0.5}
                   max={2}
@@ -590,7 +590,7 @@ export function BatchNormalizationPlayground() {
                   onChange={setGamma}
                 />
                 <SliderControl
-                  label="beta (shift)"
+                  label="Shift"
                   value={beta}
                   min={-2}
                   max={2}
@@ -600,12 +600,12 @@ export function BatchNormalizationPlayground() {
                   onChange={setBeta}
                 />
                 <p className="text-[12px] leading-snug font-semibold text-[#526183]">
-                  gamma changes spread; beta moves every y value left or right.
+                  Scale changes spread; shift moves every y value left or right.
                 </p>
               </div>
               <div className="min-w-0">
                 <DotStrip
-                  title="Output y (after affine)"
+                  title="Output y (after scale + shift)"
                   values={analysis.outputValues}
                   min={outputDomain.min}
                   max={outputDomain.max}
@@ -630,7 +630,7 @@ export function BatchNormalizationPlayground() {
                 <StatPill label="mean(y)" value={`approx ${formatValue(analysis.outputMean)}`} />
                 <StatPill label="std(y)" value={`approx ${formatValue(analysis.outputStd)}`} />
                 <p className="rounded-[7px] border border-[#c8d5f6] bg-[#f7f9ff] px-3 py-2 text-center text-[13px] font-bold text-[#30446f] sm:col-span-2 2xl:col-span-1">
-                  gamma stretches; beta shifts.
+                  Scale stretches; shift moves.
                 </p>
               </div>
             </div>
@@ -649,11 +649,11 @@ export function BatchNormalizationPlayground() {
               />
               <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
                 <StatPill
-                  label="using mu"
+                  label="using mean"
                   value={formatValue(analysis.normalizationMean)}
                 />
                 <StatPill
-                  label="using sigma"
+                  label="using std"
                   value={formatValue(analysis.normalizationStd)}
                 />
                 <StatPill label="momentum" value="0.10" />
@@ -664,7 +664,11 @@ export function BatchNormalizationPlayground() {
               </div>
             </div>
             <div className="mt-5 rounded-[8px] border border-[#9db3ff] bg-[#f5f7ff] px-4 py-3 text-center font-mono text-[14px] font-black text-[#1638ff] sm:text-[16px]">
-              Takeaway: Normalize for stable signal; gamma and beta keep expressiveness.
+              Takeaway: Normalize for stable signal; scale and shift keep expressiveness.
+            </div>
+            <div className="mt-3 rounded-[8px] border border-[#c8d5f6] bg-white px-4 py-3 text-[13px] leading-snug font-semibold text-[#30446f]">
+              Vocabulary: papers often write mean as mu, std as sigma, scale as
+              gamma, and shift as beta. This lab uses the plain names first.
             </div>
           </Panel>
         </div>

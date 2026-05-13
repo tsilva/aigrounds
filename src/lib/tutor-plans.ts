@@ -4,6 +4,7 @@ type TutorPlanSlug =
   | "variance-standard-deviation"
   | "shape-skew-outliers"
   | "categorical-cross-entropy"
+  | "kl-divergence"
   | "probability-rules"
   | "conditional-probability"
   | "bayes-rule"
@@ -504,6 +505,69 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Multi-label cross entropy applies a binary loss to each label, so several labels can be true at once.",
+      },
+    ],
+  },
+  "kl-divergence": {
+    intro:
+      "Work through three mismatch experiments. Predict which buckets will matter, reshape Q, then flip direction to see why KL is not a symmetric distance.",
+    whyItMatters:
+      "KL divergence appears whenever one distribution approximates another: language model targets, variational inference, distillation, retrieval scores, and calibration checks. It is useful because it turns distribution mismatch into a training signal while preserving which distribution is treated as the reference.",
+    masteryCriteria: [
+      "Defines KL divergence as a directional comparison between a reference distribution and an approximation.",
+      "Explains that each term is weighted by the source distribution in the selected direction.",
+      "Connects a large positive contribution to missing probability mass where the source distribution is high.",
+      "Recognizes that some bucket contributions can be negative while the total KL remains nonnegative.",
+      "Explains why DKL(P || Q) and DKL(Q || P) can differ for the same two distributions.",
+    ],
+    steps: [
+      {
+        title: "Miss the high-probability bucket",
+        experiment:
+          "Use the Peaked reference with DKL(P || Q) selected. Move Q_A lower, then higher, and compare the contribution table, contribution bars, and total score.",
+        predictionQuestion:
+          "What should happen to KL when Q gives too little probability to a bucket where P is high?",
+        observationPrompt:
+          "Which visible term explained most of the total mismatch?",
+        observationOptions: [
+          "Bucket A created the largest positive contribution",
+          "The total score changed with the Q_A slider",
+          "I am not sure",
+        ],
+        takeaway:
+          "In DKL(P || Q), mistakes where P is large dominate because P supplies the weight in every term.",
+      },
+      {
+        title: "Change what the reference cares about",
+        experiment:
+          "Switch from Peaked to Rare event. Keep the same Q shape for a moment, then compare which bucket dominates the contribution chart.",
+        predictionQuestion:
+          "If P puts even more mass on A, which mismatch should become more expensive?",
+        observationPrompt:
+          "What changed when the reference shape became more concentrated?",
+        observationOptions: [
+          "A became even more important",
+          "Low-P buckets mattered less",
+          "I am not sure",
+        ],
+        takeaway:
+          "KL is not just comparing bar heights; it asks where the reference distribution expects probability mass to be.",
+      },
+      {
+        title: "Flip the weighting",
+        experiment:
+          "Use the same P and Q bars, then switch between DKL(P || Q) and DKL(Q || P). Watch the formula labels, contribution chart, and score.",
+        predictionQuestion:
+          "Should flipping the direction keep the same KL number?",
+        observationPrompt:
+          "What changed when the bars stayed the same but the direction flipped?",
+        observationOptions: [
+          "The score changed",
+          "The contribution weights changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "KL divergence is directional because the left-hand distribution weights the log-ratio terms.",
       },
     ],
   },

@@ -398,6 +398,32 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "kl-divergence",
+    title: "KL Divergence Intuition Lab",
+    tag: "loss",
+    kicker:
+      "Move probability mass between buckets and watch directional distribution mismatch change.",
+    summary:
+      "Choose a reference distribution, reshape an approximation, inspect per-bucket KL terms, and flip DKL(P || Q) into DKL(Q || P) to see why the direction matters.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "KL divergence",
+      "Reference distributions",
+      "Approximation",
+      "Directional mismatch",
+    ],
+    learningGoals: [
+      "Understand KL divergence as a directional comparison between a reference distribution and an approximation.",
+      "See how source-weighted log-ratio terms make high-probability reference buckets expensive to miss.",
+      "Recognize why DKL(P || Q) and DKL(Q || P) can differ for the same two distributions.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["kl-divergence"],
+    theme: {
+      badgeClassName: "border-purple-300 bg-purple-100 text-purple-950",
+    },
+  },
+  {
     slug: "gradient-descent",
     title: "Gradient Descent Playground",
     tag: "optimization",
@@ -869,14 +895,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
-  },
-  {
-    slug: "kl-divergence",
-    title: "KL Divergence Intuition Lab",
-    tag: "loss",
-    summary:
-      "Move probability mass between buckets and watch directional mismatch change.",
-    concepts: ["KL divergence", "Reference distributions", "Approximation"],
   },
   {
     slug: "vector-geometry-similarity",

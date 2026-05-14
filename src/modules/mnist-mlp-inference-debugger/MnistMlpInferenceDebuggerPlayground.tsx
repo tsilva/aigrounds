@@ -22,6 +22,13 @@ type SelectedNeuron = {
   neuronIndex: number;
 };
 
+type EdgeScore = {
+  key: string;
+  sourceIndex: number;
+  targetIndex: number;
+  magnitude: number;
+};
+
 const fallbackArchitecture = [784, 128, 64, 32, 10];
 const digitLabels = Array.from({ length: 10 }, (_, index) => index);
 const preprocessingOptions: Array<{
@@ -519,6 +526,10 @@ function NetworkPanel({
   debug,
   selectedNeuron,
   onSelectNeuron,
+  contributionThreshold,
+  onContributionThresholdChange,
+  topKEdges,
+  onTopKEdgesChange,
 }: {
   model: MlpModel | null;
   modelInput: Float32Array;
@@ -526,6 +537,10 @@ function NetworkPanel({
   debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
   onSelectNeuron: (selection: SelectedNeuron) => void;
+  contributionThreshold: number;
+  onContributionThresholdChange: (threshold: number) => void;
+  topKEdges: number;
+  onTopKEdgesChange: (count: number) => void;
 }) {
   const layerSizes = model
     ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
@@ -543,6 +558,60 @@ function NetworkPanel({
     indices: layerIndex === layerSizes.length - 1 ? digitLabels : sampleIndices(size, 6),
   }));
   const canSelectHiddenNeuron = Boolean(model);
+  const visibleEdgeKeys = useMemo(() => {
+    const keys = new Set<string>();
+
+    if (!model) {
+      return keys;
+    }
+
+    const limit = Math.max(1, Math.min(20, topKEdges));
+
+    displayLayers.slice(1).forEach((targetLayer, targetDisplayIndex) => {
+      const sourceLayer = displayLayers[targetDisplayIndex];
+      const denseLayer = model.layers[targetDisplayIndex];
+      const scoredEdges: EdgeScore[] = [];
+
+      sourceLayer.indices.forEach((sourceIndex) => {
+        targetLayer.indices.forEach((targetIndex) => {
+          const weight =
+            denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
+          const activation =
+            targetDisplayIndex === 0
+              ? modelInput[sourceIndex] ?? 0
+              : debug?.activations[targetDisplayIndex - 1]?.[sourceIndex] ?? 0;
+          const magnitude = Math.abs(weight * activation);
+
+          if (magnitude >= contributionThreshold) {
+            scoredEdges.push({
+              key: `${targetDisplayIndex}-${sourceIndex}-${targetIndex}`,
+              sourceIndex,
+              targetIndex,
+              magnitude,
+            });
+          }
+        });
+      });
+
+      sourceLayer.indices.forEach((sourceIndex) => {
+        scoredEdges
+          .filter((edge) => edge.sourceIndex === sourceIndex)
+          .sort((left, right) => right.magnitude - left.magnitude)
+          .slice(0, limit)
+          .forEach((edge) => keys.add(edge.key));
+      });
+
+      targetLayer.indices.forEach((targetIndex) => {
+        scoredEdges
+          .filter((edge) => edge.targetIndex === targetIndex)
+          .sort((left, right) => right.magnitude - left.magnitude)
+          .slice(0, limit)
+          .forEach((edge) => keys.add(edge.key));
+      });
+    });
+
+    return keys;
+  }, [contributionThreshold, debug, displayLayers, model, modelInput, topKEdges]);
 
   return (
     <Panel className="p-5">
@@ -596,6 +665,12 @@ function NetworkPanel({
 
                 return sourceLayer.indices.flatMap((sourceIndex, sourcePosition) =>
                   targetLayer.indices.map((targetIndex, targetPosition) => {
+                    const edgeKey = `${targetDisplayIndex}-${sourceIndex}-${targetIndex}`;
+
+                    if (!visibleEdgeKeys.has(edgeKey)) {
+                      return null;
+                    }
+
                     const sourceY = nodeY(sourcePosition, sourceLayer.indices.length);
                     const targetY = nodeY(targetPosition, targetLayer.indices.length);
                     const weight =
@@ -608,7 +683,7 @@ function NetworkPanel({
 
                     return (
                       <path
-                        key={`${targetDisplayIndex}-${sourceIndex}-${targetIndex}`}
+                        key={edgeKey}
                         d={`M ${sourceX + 15} ${sourceY} C ${sourceX + 75} ${sourceY}, ${targetX - 75} ${targetY}, ${targetX - 15} ${targetY}`}
                         fill="none"
                         stroke={weight >= 0 ? "#185cff" : "#ff1e76"}
@@ -709,16 +784,44 @@ function NetworkPanel({
             Contribution threshold
           </span>
           <div className="mt-2 grid grid-cols-[1fr_auto] gap-4">
-            <input type="range" min="0" max="1" step="0.01" value="0.02" readOnly className="accent-[#4b23ff]" />
-            <span className="font-mono text-[14px] font-black text-[#071854]">0.02</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={contributionThreshold}
+              disabled={!model}
+              className="accent-[#4b23ff] disabled:opacity-45"
+              onChange={(event) =>
+                onContributionThresholdChange(Number(event.currentTarget.value))
+              }
+            />
+            <span className="font-mono text-[14px] font-black text-[#071854]">
+              {contributionThreshold.toFixed(2)}
+            </span>
           </div>
         </label>
-        <div className="rounded-[8px] border border-[#dce4f2] bg-white px-3 py-2 text-[13px] font-bold text-[#263a6f]">
-          Top-K edges per neuron
-          <p className="mt-1 font-mono text-[#071854]">20</p>
-        </div>
+        <label className="rounded-[8px] border border-[#dce4f2] bg-white px-3 py-2 text-[13px] font-bold text-[#263a6f]">
+          Top-K edges per displayed neuron
+          <div className="mt-2 grid grid-cols-[1fr_auto] gap-3">
+            <input
+              type="range"
+              min="1"
+              max="20"
+              step="1"
+              value={topKEdges}
+              disabled={!model}
+              className="accent-[#4b23ff] disabled:opacity-45"
+              onChange={(event) => onTopKEdgesChange(Number(event.currentTarget.value))}
+            />
+            <span className="font-mono text-[14px] font-black text-[#071854]">
+              {topKEdges}
+            </span>
+          </div>
+        </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
-          Edge intensity uses |activation x weight|. Node glow uses |activation|.
+          Threshold hides weak |activation x weight| edges. Top-K keeps the strongest
+          incoming/outgoing edges per displayed neuron.
         </p>
       </div>
     </Panel>
@@ -1025,8 +1128,11 @@ export function MnistMlpInferenceDebuggerPlayground() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [model, setModel] = useState<MlpModel | null>(null);
   const [input, setInput] = useState(() => new Float32Array(784));
+  const [inputRevision, setInputRevision] = useState(0);
   const [preprocessingMode, setPreprocessingMode] =
     useState<MnistPreprocessingMode>("mnist-standard");
+  const [contributionThreshold, setContributionThreshold] = useState(0.02);
+  const [topKEdges, setTopKEdges] = useState(20);
   const [debug, setDebug] = useState<ForwardDebug | null>(null);
   const [runState, setRunState] = useState<RunState>("idle");
   const [message, setMessage] = useState("Drop a dense MNIST ONNX model to begin.");
@@ -1083,6 +1189,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
 
   const handleInputChange = useCallback((nextInput: Float32Array) => {
     setInput(new Float32Array(nextInput));
+    setInputRevision((revision) => revision + 1);
   }, []);
 
   async function loadFile(file: File) {
@@ -1120,7 +1227,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
     }
 
     return undefined;
-  }, [modelInput, model, runInference]);
+  }, [inputRevision, model, runInference]);
 
   return (
     <main
@@ -1224,6 +1331,10 @@ export function MnistMlpInferenceDebuggerPlayground() {
             debug={debug}
             selectedNeuron={selectedNeuron}
             onSelectNeuron={setSelectedNeuron}
+            contributionThreshold={contributionThreshold}
+            onContributionThresholdChange={setContributionThreshold}
+            topKEdges={topKEdges}
+            onTopKEdgesChange={setTopKEdges}
           />
           <OutputPanel debug={debug} />
         </div>

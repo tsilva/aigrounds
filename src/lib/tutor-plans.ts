@@ -20,6 +20,7 @@ type TutorPlanSlug =
   | "byte-pair-encoding"
   | "transformer-attention"
   | "linear-quantization-int4"
+  | "mnist-mlp-inference-debugger"
   | "zero-knowledge-proofs"
   | "batch-normalization"
   | "layer-normalization";
@@ -1616,6 +1617,72 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "LayerNorm's statistics come from features inside the current token, while BatchNorm's statistics come from matching features across the batch.",
+      },
+    ],
+  },
+  "mnist-mlp-inference-debugger": {
+    intro:
+      "Work through one uploaded MNIST classifier. Predict what the drawn digit should produce, run the forward pass on WebGPU, then inspect the strongest probabilities, neuron contributions, and saliency pixels.",
+    whyItMatters:
+      "A neural network inference is more useful when you can inspect the computation instead of only seeing the final class. This lab connects an uploaded model file, GPU execution, hidden activations, softmax confidence, and input saliency in one browser-side pass.",
+    openingMessage:
+      "Upload a supported ONNX MNIST MLP first. The lab expects a 28x28 input and dense Gemm or MatMul layers ending in 10 digit logits.\n\nFirst prediction: draw a digit and predict which class should get the largest softmax probability. Reply with your prediction first. Then run inference and compare it with the output bars.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains that a 28x28 drawing becomes 784 input values.",
+      "Recognizes that each dense layer computes weighted sums before an activation.",
+      "Connects softmax probabilities to the final 10 digit logits.",
+      "Uses contribution colors to distinguish positive and negative evidence.",
+      "Uses the saliency map to identify pixels that support or oppose the predicted class.",
+    ],
+    steps: [
+      {
+        title: "Load and run the model",
+        experiment:
+          "Upload an ONNX MLP classifier, draw a digit, then press Run if inference has not already started.",
+        predictionQuestion:
+          "Which digit do you expect the classifier to predict from the current drawing?",
+        observationPrompt:
+          "What changed in the output panel after the WebGPU run?",
+        observationOptions: [
+          "One softmax bar dominated",
+          "The predicted class matched my drawing",
+          "I am not sure",
+        ],
+        takeaway:
+          "The uploaded graph turns 784 pixel values into 10 logits, and softmax converts those logits into comparable class probabilities.",
+      },
+      {
+        title: "Inspect a hidden neuron",
+        experiment:
+          "Click a hidden neuron in the network view and compare its activation with the top upstream contributors.",
+        predictionQuestion:
+          "Do you expect positive or negative weighted inputs to dominate this neuron?",
+        observationPrompt:
+          "Which upstream values most changed the selected neuron's activation?",
+        observationOptions: [
+          "Large positive contributors pushed it up",
+          "Large negative contributors pushed it down",
+          "I am not sure",
+        ],
+        takeaway:
+          "A hidden activation is a weighted sum passed through an activation function, so both the incoming activation and the weight sign matter.",
+      },
+      {
+        title: "Read saliency as evidence",
+        experiment:
+          "Compare the input drawing with the saliency map after inference. Look for blue and pink regions over the digit strokes.",
+        predictionQuestion:
+          "Which pixels should most support the predicted class?",
+        observationPrompt:
+          "Where did the model find positive and negative evidence in the drawing?",
+        observationOptions: [
+          "Blue pixels lined up with useful strokes",
+          "Pink pixels opposed the chosen digit",
+          "I am not sure",
+        ],
+        takeaway:
+          "Saliency estimates how changing each input pixel would move the predicted class score, so it helps debug what the classifier used as evidence.",
       },
     ],
   },

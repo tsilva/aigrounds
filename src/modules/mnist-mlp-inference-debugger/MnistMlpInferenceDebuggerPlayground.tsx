@@ -162,6 +162,18 @@ function sampleIndices(size: number, count: number) {
   );
 }
 
+function sampleIndicesWithPinned(size: number, count: number, pinned: number | null) {
+  const indices = sampleIndices(size, count);
+
+  if (pinned === null || pinned < 0 || pinned >= size || indices.includes(pinned)) {
+    return indices;
+  }
+
+  indices[Math.floor(indices.length / 2)] = pinned;
+
+  return Array.from(new Set(indices)).sort((left, right) => left - right);
+}
+
 function drawDefaultDigit(canvas: HTMLCanvasElement) {
   const context = canvas.getContext("2d");
 
@@ -547,6 +559,40 @@ function NetworkPanel({
     : fallbackArchitecture;
   const width = 900;
   const height = 330;
+  const inputGridX = 34;
+  const inputGridY = 76;
+  const inputGridSize = 132;
+  const inputCellSize = inputGridSize / 28;
+  const firstNonInputX = layerSizes.length <= 3 ? 450 : 320;
+  const lastLayerX = width - 52;
+  const inputEdgeIndices = useMemo(
+    () =>
+      Array.from({ length: Math.min(784, rawInput.length) }, (_, index) => ({
+        index,
+        value: rawInput[index] ?? 0,
+      }))
+        .filter((item) => item.value > 0.025)
+        .sort((left, right) => right.value - left.value)
+        .slice(0, 64)
+        .map((item) => item.index),
+    [rawInput],
+  );
+  const inputEdgeIndexSet = useMemo(() => new Set(inputEdgeIndices), [inputEdgeIndices]);
+  const layerX = (layerIndex: number) => {
+    if (layerIndex === 0) {
+      return inputGridX + inputGridSize / 2;
+    }
+
+    return (
+      firstNonInputX +
+      ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
+        Math.max(1, layerSizes.length - 2)
+    );
+  };
+  const inputPixelPoint = (pixelIndex: number) => ({
+    x: inputGridX + (pixelIndex % 28) * inputCellSize + inputCellSize / 2,
+    y: inputGridY + Math.floor(pixelIndex / 28) * inputCellSize + inputCellSize / 2,
+  });
   const displayLayers = layerSizes.map((size, layerIndex) => ({
     size,
     label:
@@ -555,7 +601,18 @@ function NetworkPanel({
         : layerIndex === layerSizes.length - 1
           ? "Output"
           : `Hidden Layer ${layerIndex}`,
-    indices: layerIndex === layerSizes.length - 1 ? digitLabels : sampleIndices(size, 6),
+    indices:
+      layerIndex === 0
+        ? inputEdgeIndices
+        : layerIndex === layerSizes.length - 1
+          ? digitLabels
+          : sampleIndicesWithPinned(
+              size,
+              6,
+              selectedNeuron.layerIndex === layerIndex - 1
+                ? selectedNeuron.neuronIndex
+                : null,
+            ),
   }));
   const canSelectHiddenNeuron = Boolean(model);
   const visibleEdgeKeys = useMemo(() => {
@@ -631,7 +688,7 @@ function NetworkPanel({
           className="min-w-[820px]"
         >
           {displayLayers.map((layer, layerIndex) => {
-            const x = 52 + (layerIndex * (width - 110)) / (displayLayers.length - 1);
+            const x = layerX(layerIndex);
             return (
               <g key={layer.label}>
                 <text
@@ -654,14 +711,61 @@ function NetworkPanel({
             );
           })}
 
+          <g aria-label="Full 28 by 28 input pixel grid">
+            <rect
+              x={inputGridX - 1}
+              y={inputGridY - 1}
+              width={inputGridSize + 2}
+              height={inputGridSize + 2}
+              rx={5}
+              fill="#fff"
+              stroke="#dce4f2"
+            />
+            {Array.from({ length: 784 }, (_, pixelIndex) => {
+              const value = rawInput[pixelIndex] ?? 0;
+              const shade = Math.round(255 - value * 255);
+              const column = pixelIndex % 28;
+              const row = Math.floor(pixelIndex / 28);
+              const isEdgeSource = inputEdgeIndexSet.has(pixelIndex);
+
+              return (
+                <rect
+                  key={pixelIndex}
+                  x={inputGridX + column * inputCellSize}
+                  y={inputGridY + row * inputCellSize}
+                  width={inputCellSize}
+                  height={inputCellSize}
+                  fill={`rgb(${shade}, ${shade}, ${shade})`}
+                  stroke={isEdgeSource ? "#4b23ff" : "#edf1f8"}
+                  strokeOpacity={isEdgeSource ? 0.85 : 0.6}
+                  strokeWidth={isEdgeSource ? 0.5 : 0.25}
+                />
+              );
+            })}
+            <text
+              x={inputGridX + inputGridSize / 2}
+              y={inputGridY + inputGridSize + 20}
+              textAnchor="middle"
+              className="fill-[#50608a] text-[11px] font-black"
+            >
+              full 28x28 pixels
+            </text>
+            <text
+              x={inputGridX + inputGridSize / 2}
+              y={inputGridY + inputGridSize + 36}
+              textAnchor="middle"
+              className="fill-[#50608a] font-mono text-[11px] font-black"
+            >
+              {inputEdgeIndices.length} active edge sources
+            </text>
+          </g>
+
           {model
             ? displayLayers.slice(1).flatMap((targetLayer, targetDisplayIndex) => {
                 const sourceLayer = displayLayers[targetDisplayIndex];
                 const denseLayer = model.layers[targetDisplayIndex];
-                const sourceX =
-                  52 + (targetDisplayIndex * (width - 110)) / (displayLayers.length - 1);
-                const targetX =
-                  52 + ((targetDisplayIndex + 1) * (width - 110)) / (displayLayers.length - 1);
+                const sourceX = layerX(targetDisplayIndex);
+                const targetX = layerX(targetDisplayIndex + 1);
 
                 return sourceLayer.indices.flatMap((sourceIndex, sourcePosition) =>
                   targetLayer.indices.map((targetIndex, targetPosition) => {
@@ -671,8 +775,14 @@ function NetworkPanel({
                       return null;
                     }
 
-                    const sourceY = nodeY(sourcePosition, sourceLayer.indices.length);
+                    const sourcePoint =
+                      targetDisplayIndex === 0 ? inputPixelPoint(sourceIndex) : null;
+                    const sourceY =
+                      sourcePoint?.y ?? nodeY(sourcePosition, sourceLayer.indices.length);
                     const targetY = nodeY(targetPosition, targetLayer.indices.length);
+                    const sourceAnchorX =
+                      targetDisplayIndex === 0 ? inputGridX + inputGridSize : sourceX + 15;
+                    const targetAnchorX = targetX - 15;
                     const weight =
                       denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
                     const activation =
@@ -684,7 +794,7 @@ function NetworkPanel({
                     return (
                       <path
                         key={edgeKey}
-                        d={`M ${sourceX + 15} ${sourceY} C ${sourceX + 75} ${sourceY}, ${targetX - 75} ${targetY}, ${targetX - 15} ${targetY}`}
+                        d={`M ${sourceAnchorX} ${sourceY} C ${sourceAnchorX + 70} ${sourceY}, ${targetAnchorX - 70} ${targetY}, ${targetAnchorX} ${targetY}`}
                         fill="none"
                         stroke={weight >= 0 ? "#185cff" : "#ff1e76"}
                         strokeOpacity={0.08 + strength}
@@ -697,7 +807,11 @@ function NetworkPanel({
             : null}
 
           {displayLayers.map((layer, layerIndex) => {
-            const x = 52 + (layerIndex * (width - 110)) / (displayLayers.length - 1);
+            if (layerIndex === 0) {
+              return null;
+            }
+
+            const x = layerX(layerIndex);
             return layer.indices.map((nodeIndex, position) => {
               const y = nodeY(position, layer.indices.length);
               const isInput = layerIndex === 0;
@@ -712,21 +826,6 @@ function NetworkPanel({
                 !isOutput &&
                 selectedNeuron.layerIndex === denseIndex &&
                 selectedNeuron.neuronIndex === nodeIndex;
-
-              if (isInput) {
-                return (
-                  <rect
-                    key={`${layerIndex}-${nodeIndex}`}
-                    x={x - 8}
-                    y={y - 8}
-                    width={16}
-                    height={16}
-                    rx={2}
-                    fill={`rgb(${235 - activation * 200}, ${238 - activation * 200}, ${244 - activation * 200})`}
-                    stroke="#071854"
-                  />
-                );
-              }
 
               return (
                 <g
@@ -802,7 +901,7 @@ function NetworkPanel({
           </div>
         </label>
         <label className="rounded-[8px] border border-[#dce4f2] bg-white px-3 py-2 text-[13px] font-bold text-[#263a6f]">
-          Top-K edges per displayed neuron
+          Top-K edges per displayed pixel/neuron
           <div className="mt-2 grid grid-cols-[1fr_auto] gap-3">
             <input
               type="range"
@@ -820,8 +919,8 @@ function NetworkPanel({
           </div>
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
-          Threshold hides weak |activation x weight| edges. Top-K keeps the strongest
-          incoming/outgoing edges per displayed neuron.
+          The input layer shows every pixel. Edges start from active pixels, then
+          Top-K keeps the strongest paths for each displayed pixel/neuron.
         </p>
       </div>
     </Panel>

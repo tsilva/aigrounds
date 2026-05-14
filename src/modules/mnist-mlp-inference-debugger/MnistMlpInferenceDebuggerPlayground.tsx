@@ -641,9 +641,14 @@ function NetworkPanel({
       const sourceLayer = displayLayers[targetDisplayIndex];
       const denseLayer = model.layers[targetDisplayIndex];
       const scoredEdges: EdgeScore[] = [];
+      const isOutputLayer = targetDisplayIndex === model.layers.length - 1;
+      const targetIndices =
+        isOutputLayer && debug?.predictedClass !== undefined
+          ? targetLayer.indices.filter((targetIndex) => targetIndex === debug.predictedClass)
+          : targetLayer.indices;
 
       sourceLayer.indices.forEach((sourceIndex) => {
-        targetLayer.indices.forEach((targetIndex) => {
+        targetIndices.forEach((targetIndex) => {
           const weight =
             denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
           const activation =
@@ -671,7 +676,7 @@ function NetworkPanel({
           .forEach((edge) => keys.add(edge.key));
       });
 
-      targetLayer.indices.forEach((targetIndex) => {
+      targetIndices.forEach((targetIndex) => {
         scoredEdges
           .filter((edge) => edge.targetIndex === targetIndex)
           .sort((left, right) => right.magnitude - left.magnitude)
@@ -739,6 +744,11 @@ function NetworkPanel({
                 return sourceLayer.indices.flatMap((sourceIndex, sourcePosition) =>
                   targetLayer.indices.map((targetIndex, targetPosition) => {
                     const edgeKey = `${targetDisplayIndex}-${sourceIndex}-${targetIndex}`;
+                    const isOutputLayer = targetDisplayIndex === model.layers.length - 1;
+
+                    if (isOutputLayer && debug?.predictedClass !== targetIndex) {
+                      return null;
+                    }
 
                     if (!visibleEdgeKeys.has(edgeKey)) {
                       return null;
@@ -917,6 +927,14 @@ function CanvasContributionOverlay({
     container: DOMRect;
     canvas: DOMRect;
     networkSvg: DOMRect;
+    networkTransform: {
+      a: number;
+      b: number;
+      c: number;
+      d: number;
+      e: number;
+      f: number;
+    } | null;
   } | null>(null);
   const layerSizes = model
     ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
@@ -981,6 +999,16 @@ function CanvasContributionOverlay({
         container: container.getBoundingClientRect(),
         canvas: canvas.getBoundingClientRect(),
         networkSvg: networkSvg.getBoundingClientRect(),
+        networkTransform: networkSvg.getScreenCTM()
+          ? {
+              a: networkSvg.getScreenCTM()?.a ?? 1,
+              b: networkSvg.getScreenCTM()?.b ?? 0,
+              c: networkSvg.getScreenCTM()?.c ?? 0,
+              d: networkSvg.getScreenCTM()?.d ?? 1,
+              e: networkSvg.getScreenCTM()?.e ?? 0,
+              f: networkSvg.getScreenCTM()?.f ?? 0,
+            }
+          : null,
       });
     }
 
@@ -1000,11 +1028,33 @@ function CanvasContributionOverlay({
 
   const width = geometry.container.width;
   const height = geometry.container.height;
-  const hiddenLayerX =
-    geometry.networkSvg.left -
-    geometry.container.left +
-    ((networkLayerX(1, layerSizes.length) - 15) / networkSvgWidth) *
-      geometry.networkSvg.width;
+  const svgPointToContainerPoint = (svgX: number, svgY: number) => {
+    if (geometry.networkTransform) {
+      const screenX =
+        geometry.networkTransform.a * svgX +
+        geometry.networkTransform.c * svgY +
+        geometry.networkTransform.e;
+      const screenY =
+        geometry.networkTransform.b * svgX +
+        geometry.networkTransform.d * svgY +
+        geometry.networkTransform.f;
+      return {
+        x: screenX - geometry.container.left,
+        y: screenY - geometry.container.top,
+      };
+    }
+
+    return {
+      x:
+        geometry.networkSvg.left -
+        geometry.container.left +
+        (svgX / networkSvgWidth) * geometry.networkSvg.width,
+      y:
+        geometry.networkSvg.top -
+        geometry.container.top +
+        (svgY / networkSvgHeight) * geometry.networkSvg.height,
+    };
+  };
   const canvasPixelPoint = (pixelIndex: number) => {
     const column = pixelIndex % 28;
     const row = Math.floor(pixelIndex / 28);
@@ -1022,15 +1072,15 @@ function CanvasContributionOverlay({
   };
   const hiddenNodePoint = (targetIndex: number) => {
     const position = Math.max(0, targetIndices.indexOf(targetIndex));
+    const radius =
+      selectedNeuron.layerIndex === 0 && selectedNeuron.neuronIndex === targetIndex
+        ? 17
+        : 14;
 
-    return {
-      x: hiddenLayerX,
-      y:
-        geometry.networkSvg.top -
-        geometry.container.top +
-        (nodeY(position, targetIndices.length) / networkSvgHeight) *
-          geometry.networkSvg.height,
-    };
+    return svgPointToContainerPoint(
+      networkLayerX(1, layerSizes.length) - radius,
+      nodeY(position, targetIndices.length),
+    );
   };
 
   return (

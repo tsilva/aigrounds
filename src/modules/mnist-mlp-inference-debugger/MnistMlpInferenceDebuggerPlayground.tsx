@@ -523,12 +523,8 @@ function NetworkPanel({
     : fallbackArchitecture;
   const width = 940;
   const height = 350;
-  const inputStripe = { x: 40, y: 76, width: 116, height: 168 };
-  const inputWrapRows = 56;
-  const inputWrapColumns = Math.ceil(784 / inputWrapRows);
-  const inputCellWidth = inputStripe.width / inputWrapColumns;
-  const inputCellHeight = inputStripe.height / inputWrapRows;
-  const firstNonInputX = layerSizes.length <= 3 ? 500 : 350;
+  const canvasEdgeSource = { x: 0, y: 74, width: 126, height: 178 };
+  const firstNonInputX = layerSizes.length <= 3 ? 500 : 310;
   const lastLayerX = width - 60;
   const inputEdgeIndices = useMemo(
     () =>
@@ -542,20 +538,19 @@ function NetworkPanel({
         .map((item) => item.index),
     [rawInput],
   );
-  const inputEdgeIndexSet = useMemo(() => new Set(inputEdgeIndices), [inputEdgeIndices]);
   const layerX = (layerIndex: number) =>
     layerIndex === 0
-      ? inputStripe.x + inputStripe.width / 2
+      ? canvasEdgeSource.x + canvasEdgeSource.width / 2
       : firstNonInputX +
         ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
           Math.max(1, layerSizes.length - 2);
-  const inputVectorPoint = (pixelIndex: number) => {
-    const column = Math.floor(pixelIndex / inputWrapRows);
-    const row = pixelIndex % inputWrapRows;
+  const inputCanvasPoint = (pixelIndex: number) => {
+    const column = pixelIndex % 28;
+    const row = Math.floor(pixelIndex / 28);
 
     return {
-      x: inputStripe.x + column * inputCellWidth + inputCellWidth,
-      y: inputStripe.y + row * inputCellHeight + inputCellHeight / 2,
+      x: canvasEdgeSource.x + ((column + 1) / 28) * canvasEdgeSource.width,
+      y: canvasEdgeSource.y + ((row + 0.5) / 28) * canvasEdgeSource.height,
     };
   };
   const displayLayers = layerSizes.map((size, layerIndex) => ({
@@ -676,67 +671,6 @@ function NetworkPanel({
             );
           })}
 
-          <g aria-label="784 pixels stacked as the input layer">
-            <rect
-              x={inputStripe.x}
-              y={inputStripe.y}
-              width={inputStripe.width}
-              height={inputStripe.height}
-              rx={8}
-              fill="#05070c"
-              stroke="#dce4f2"
-            />
-            {Array.from({ length: 784 }, (_, pixelIndex) => {
-              const value = rawInput[pixelIndex] ?? 0;
-              const active = inputEdgeIndexSet.has(pixelIndex);
-              const column = Math.floor(pixelIndex / inputWrapRows);
-              const row = pixelIndex % inputWrapRows;
-              const shade = Math.round(value * 255);
-
-              return (
-                <rect
-                  key={pixelIndex}
-                  x={inputStripe.x + column * inputCellWidth}
-                  y={inputStripe.y + row * inputCellHeight}
-                  width={inputCellWidth}
-                  height={inputCellHeight}
-                  fill={`rgb(${shade}, ${shade}, ${shade})`}
-                  stroke={active ? "#4b23ff" : "#1b2235"}
-                  strokeOpacity={active ? 0.95 : 0.75}
-                  strokeWidth={active ? 0.7 : 0.2}
-                />
-              );
-            })}
-            {inputEdgeIndices.map((pixelIndex) => (
-              <line
-                key={`active-${pixelIndex}`}
-                x1={inputVectorPoint(pixelIndex).x - 1}
-                x2={inputVectorPoint(pixelIndex).x + 8}
-                y1={inputVectorPoint(pixelIndex).y}
-                y2={inputVectorPoint(pixelIndex).y}
-                stroke="#4b23ff"
-                strokeOpacity={0.3 + Math.min(0.7, rawInput[pixelIndex] ?? 0)}
-                strokeWidth="1.2"
-              />
-            ))}
-            <text
-              x={inputStripe.x + inputStripe.width / 2}
-              y={inputStripe.y + inputStripe.height + 19}
-              textAnchor="middle"
-              className="fill-[#50608a] text-[11px] font-black"
-            >
-              784-vector wrap
-            </text>
-            <text
-              x={inputStripe.x + inputStripe.width / 2}
-              y={inputStripe.y + inputStripe.height + 35}
-              textAnchor="middle"
-              className="fill-[#50608a] font-mono text-[11px] font-black"
-            >
-              {inputEdgeIndices.length} active edge sources
-            </text>
-          </g>
-
           {model
             ? displayLayers.slice(1).flatMap((targetLayer, targetDisplayIndex) => {
                 const sourceLayer = displayLayers[targetDisplayIndex];
@@ -753,7 +687,7 @@ function NetworkPanel({
                     }
 
                     const inputSourcePoint =
-                      targetDisplayIndex === 0 ? inputVectorPoint(sourceIndex) : null;
+                      targetDisplayIndex === 0 ? inputCanvasPoint(sourceIndex) : null;
                     const sourceY =
                       inputSourcePoint?.y ?? nodeY(sourcePosition, sourceLayer.indices.length);
                     const targetY = nodeY(targetPosition, targetLayer.indices.length);
@@ -896,8 +830,8 @@ function NetworkPanel({
           </div>
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
-          The 784 inputs are wrapped into columns in vector order. Each
-          contribution edge starts from its exact pixel cell.
+          Contribution edges enter from the adjacent input canvas and preserve
+          each source pixel&apos;s 28x28 position.
         </p>
       </div>
     </Panel>

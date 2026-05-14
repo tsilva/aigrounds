@@ -535,6 +535,7 @@ function NetworkPanel({
   model,
   modelInput,
   rawInput,
+  preprocessingMode,
   debug,
   selectedNeuron,
   onSelectNeuron,
@@ -546,6 +547,7 @@ function NetworkPanel({
   model: MlpModel | null;
   modelInput: Float32Array;
   rawInput: Float32Array;
+  preprocessingMode: MnistPreprocessingMode;
   debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
   onSelectNeuron: (selection: SelectedNeuron) => void;
@@ -557,14 +559,20 @@ function NetworkPanel({
   const layerSizes = model
     ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
     : fallbackArchitecture;
-  const width = 900;
-  const height = 330;
+  const width = 1080;
+  const height = 350;
   const inputGridX = 34;
-  const inputGridY = 76;
-  const inputGridSize = 132;
+  const inputGridY = 92;
+  const inputGridSize = 104;
   const inputCellSize = inputGridSize / 28;
-  const firstNonInputX = layerSizes.length <= 3 ? 450 : 320;
-  const lastLayerX = width - 52;
+  const normalizeBox = { x: 168, y: 113, width: 122, height: 58 };
+  const flattenBox = { x: 340, y: 78, width: 58, height: 132 };
+  const firstNonInputX = layerSizes.length <= 3 ? 635 : 500;
+  const lastLayerX = width - 60;
+  const normalizeTitle =
+    preprocessingMode === "mnist-standard" ? "Normalize" : "Raw pass";
+  const normalizeDetail =
+    preprocessingMode === "mnist-standard" ? "(x - 0.1307) / 0.3081" : "keep 0..1 values";
   const inputEdgeIndices = useMemo(
     () =>
       Array.from({ length: Math.min(784, rawInput.length) }, (_, index) => ({
@@ -578,26 +586,19 @@ function NetworkPanel({
     [rawInput],
   );
   const inputEdgeIndexSet = useMemo(() => new Set(inputEdgeIndices), [inputEdgeIndices]);
-  const layerX = (layerIndex: number) => {
-    if (layerIndex === 0) {
-      return inputGridX + inputGridSize / 2;
-    }
-
-    return (
-      firstNonInputX +
-      ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
-        Math.max(1, layerSizes.length - 2)
-    );
-  };
-  const inputPixelPoint = (pixelIndex: number) => ({
-    x: inputGridX + (pixelIndex % 28) * inputCellSize + inputCellSize / 2,
-    y: inputGridY + Math.floor(pixelIndex / 28) * inputCellSize + inputCellSize / 2,
-  });
+  const layerX = (layerIndex: number) =>
+    layerIndex === 0
+      ? inputGridX + inputGridSize / 2
+      : firstNonInputX +
+        ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
+          Math.max(1, layerSizes.length - 2);
+  const flattenedPointY = (pixelIndex: number) =>
+    flattenBox.y + (pixelIndex / 783) * flattenBox.height;
   const displayLayers = layerSizes.map((size, layerIndex) => ({
     size,
     label:
       layerIndex === 0
-        ? "Input"
+        ? "Input image"
         : layerIndex === layerSizes.length - 1
           ? "Output"
           : `Hidden Layer ${layerIndex}`,
@@ -685,8 +686,20 @@ function NetworkPanel({
           viewBox={`0 0 ${width} ${height}`}
           role="img"
           aria-label="MLP network visualization"
-          className="min-w-[820px]"
+          className="min-w-[1040px]"
         >
+          <defs>
+            <marker
+              id="mnist-flow-arrow"
+              markerHeight="6"
+              markerWidth="7"
+              orient="auto"
+              refX="6"
+              refY="3"
+            >
+              <path d="M 0 0 L 7 3 L 0 6 Z" fill="#9aa8cf" />
+            </marker>
+          </defs>
           {displayLayers.map((layer, layerIndex) => {
             const x = layerX(layerIndex);
             return (
@@ -710,6 +723,21 @@ function NetworkPanel({
               </g>
             );
           })}
+
+          <path
+            d={`M ${inputGridX + inputGridSize + 10} ${inputGridY + inputGridSize / 2} H ${normalizeBox.x - 10}`}
+            fill="none"
+            markerEnd="url(#mnist-flow-arrow)"
+            stroke="#9aa8cf"
+            strokeWidth="2"
+          />
+          <path
+            d={`M ${normalizeBox.x + normalizeBox.width + 10} ${normalizeBox.y + normalizeBox.height / 2} H ${flattenBox.x - 10}`}
+            fill="none"
+            markerEnd="url(#mnist-flow-arrow)"
+            stroke="#9aa8cf"
+            strokeWidth="2"
+          />
 
           <g aria-label="Full 28 by 28 input pixel grid">
             <rect
@@ -748,11 +776,80 @@ function NetworkPanel({
               textAnchor="middle"
               className="fill-[#50608a] text-[11px] font-black"
             >
-              full 28x28 pixels
+              raw 28x28 input
+            </text>
+          </g>
+
+          <g aria-label="Input normalization step">
+            <rect
+              x={normalizeBox.x}
+              y={normalizeBox.y}
+              width={normalizeBox.width}
+              height={normalizeBox.height}
+              rx={8}
+              fill="#fbfcff"
+              stroke="#dce4f2"
+            />
+            <text
+              x={normalizeBox.x + normalizeBox.width / 2}
+              y={normalizeBox.y + 23}
+              textAnchor="middle"
+              className="fill-[#071854] text-[12px] font-black"
+            >
+              {normalizeTitle}
             </text>
             <text
-              x={inputGridX + inputGridSize / 2}
-              y={inputGridY + inputGridSize + 36}
+              x={normalizeBox.x + normalizeBox.width / 2}
+              y={normalizeBox.y + 42}
+              textAnchor="middle"
+              className="fill-[#50608a] font-mono text-[10px] font-black"
+            >
+              {normalizeDetail}
+            </text>
+          </g>
+
+          <g aria-label="Flattened vector stage">
+            <rect
+              x={flattenBox.x}
+              y={flattenBox.y}
+              width={flattenBox.width}
+              height={flattenBox.height}
+              rx={8}
+              fill="#fbfcff"
+              stroke="#dce4f2"
+            />
+            <line
+              x1={flattenBox.x + flattenBox.width / 2}
+              x2={flattenBox.x + flattenBox.width / 2}
+              y1={flattenBox.y + 10}
+              y2={flattenBox.y + flattenBox.height - 10}
+              stroke="#071854"
+              strokeOpacity="0.28"
+              strokeWidth="2"
+            />
+            {inputEdgeIndices.map((pixelIndex) => (
+              <line
+                key={pixelIndex}
+                x1={flattenBox.x + 11}
+                x2={flattenBox.x + flattenBox.width - 11}
+                y1={flattenedPointY(pixelIndex)}
+                y2={flattenedPointY(pixelIndex)}
+                stroke="#4b23ff"
+                strokeOpacity={0.3 + Math.min(0.7, rawInput[pixelIndex] ?? 0)}
+                strokeWidth="1.2"
+              />
+            ))}
+            <text
+              x={flattenBox.x + flattenBox.width / 2}
+              y={flattenBox.y + flattenBox.height + 19}
+              textAnchor="middle"
+              className="fill-[#50608a] text-[11px] font-black"
+            >
+              flatten
+            </text>
+            <text
+              x={flattenBox.x + flattenBox.width / 2}
+              y={flattenBox.y + flattenBox.height + 35}
               textAnchor="middle"
               className="fill-[#50608a] font-mono text-[11px] font-black"
             >
@@ -775,13 +872,15 @@ function NetworkPanel({
                       return null;
                     }
 
-                    const sourcePoint =
-                      targetDisplayIndex === 0 ? inputPixelPoint(sourceIndex) : null;
                     const sourceY =
-                      sourcePoint?.y ?? nodeY(sourcePosition, sourceLayer.indices.length);
+                      targetDisplayIndex === 0
+                        ? flattenedPointY(sourceIndex)
+                        : nodeY(sourcePosition, sourceLayer.indices.length);
                     const targetY = nodeY(targetPosition, targetLayer.indices.length);
                     const sourceAnchorX =
-                      targetDisplayIndex === 0 ? inputGridX + inputGridSize : sourceX + 15;
+                      targetDisplayIndex === 0
+                        ? flattenBox.x + flattenBox.width
+                        : sourceX + 15;
                     const targetAnchorX = targetX - 15;
                     const weight =
                       denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
@@ -919,8 +1018,8 @@ function NetworkPanel({
           </div>
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
-          The input layer shows every pixel. Edges start from active pixels, then
-          Top-K keeps the strongest paths for each displayed pixel/neuron.
+          Flow: raw pixels &rarr; preprocessing &rarr; flattened vector. Contribution edges
+          start after flatten and show the strongest active vector paths.
         </p>
       </div>
     </Panel>
@@ -1427,6 +1526,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
             model={model}
             modelInput={modelInput}
             rawInput={input}
+            preprocessingMode={preprocessingMode}
             debug={debug}
             selectedNeuron={selectedNeuron}
             onSelectNeuron={setSelectedNeuron}

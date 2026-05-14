@@ -187,6 +187,27 @@ function sampleIndicesWithPinned(size: number, count: number, pinned: number | n
   return Array.from(new Set(indices)).sort((left, right) => left - right);
 }
 
+function topActivationIndices(
+  activations: Float32Array | undefined,
+  size: number,
+  count: number,
+  pinned: number | null,
+) {
+  if (!activations) {
+    return sampleIndicesWithPinned(size, count, pinned);
+  }
+
+  const indices = Array.from({ length: size }, (_, index) => index)
+    .sort((left, right) => (activations[right] ?? 0) - (activations[left] ?? 0))
+    .slice(0, Math.min(count, size));
+
+  if (pinned !== null && pinned >= 0 && pinned < size && !indices.includes(pinned)) {
+    indices[Math.max(0, indices.length - 1)] = pinned;
+  }
+
+  return Array.from(new Set(indices)).sort((left, right) => left - right);
+}
+
 function inputEdgeSourceIndices(rawInput: Float32Array) {
   return Array.from({ length: Math.min(784, rawInput.length) }, (_, index) => ({
     index,
@@ -539,7 +560,8 @@ function NetworkPanel({
             ? inputEdgeIndices
             : layerIndex === layerSizes.length - 1
               ? digitLabels
-              : sampleIndicesWithPinned(
+              : topActivationIndices(
+                  debug?.activations[layerIndex - 1],
                   size,
                   6,
                   selectedNeuron.layerIndex === layerIndex - 1
@@ -549,6 +571,7 @@ function NetworkPanel({
       })),
     [
       inputEdgeIndices,
+      debug,
       layerSizes,
       selectedNeuron.layerIndex,
       selectedNeuron.neuronIndex,
@@ -825,6 +848,8 @@ function NetworkPanel({
           </div>
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
+          Hidden nodes are the top activated neurons for this inference, with
+          the selected neuron pinned.
           Contribution edges enter from the adjacent input canvas and preserve
           each source pixel&apos;s 28x28 position. Output edges are scoped to
           the current predicted class.
@@ -841,6 +866,7 @@ function CanvasContributionOverlay({
   model,
   modelInput,
   rawInput,
+  debug,
   selectedNeuron,
   contributionThreshold,
   topKEdges,
@@ -851,6 +877,7 @@ function CanvasContributionOverlay({
   model: MlpModel | null;
   modelInput: Float32Array;
   rawInput: Float32Array;
+  debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
   contributionThreshold: number;
   topKEdges: number;
@@ -875,12 +902,13 @@ function CanvasContributionOverlay({
   const targetIndices = useMemo(() => {
     const firstLayerSize = model?.layers[0]?.outputSize ?? fallbackArchitecture[1];
 
-    return sampleIndicesWithPinned(
+    return topActivationIndices(
+      debug?.activations[0],
       firstLayerSize,
       6,
       selectedNeuron.layerIndex === 0 ? selectedNeuron.neuronIndex : null,
     );
-  }, [model, selectedNeuron.layerIndex, selectedNeuron.neuronIndex]);
+  }, [debug, model, selectedNeuron.layerIndex, selectedNeuron.neuronIndex]);
   const edges = useMemo(() => {
     const firstLayer = model?.layers[0];
 
@@ -1656,6 +1684,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
             model={model}
             modelInput={modelInput}
             rawInput={input}
+            debug={debug}
             selectedNeuron={selectedNeuron}
             contributionThreshold={contributionThreshold}
             topKEdges={topKEdges}

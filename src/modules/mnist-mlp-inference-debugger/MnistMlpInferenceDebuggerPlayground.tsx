@@ -535,7 +535,6 @@ function NetworkPanel({
   model,
   modelInput,
   rawInput,
-  preprocessingMode,
   debug,
   selectedNeuron,
   onSelectNeuron,
@@ -547,7 +546,6 @@ function NetworkPanel({
   model: MlpModel | null;
   modelInput: Float32Array;
   rawInput: Float32Array;
-  preprocessingMode: MnistPreprocessingMode;
   debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
   onSelectNeuron: (selection: SelectedNeuron) => void;
@@ -559,20 +557,15 @@ function NetworkPanel({
   const layerSizes = model
     ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
     : fallbackArchitecture;
-  const width = 1080;
+  const width = 940;
   const height = 350;
   const inputGridX = 34;
   const inputGridY = 92;
   const inputGridSize = 104;
   const inputCellSize = inputGridSize / 28;
-  const normalizeBox = { x: 168, y: 113, width: 122, height: 58 };
-  const flattenBox = { x: 340, y: 78, width: 58, height: 132 };
-  const firstNonInputX = layerSizes.length <= 3 ? 635 : 500;
+  const flattenBox = { x: 190, y: 72, width: 48, height: 150 };
+  const firstNonInputX = layerSizes.length <= 3 ? 545 : 410;
   const lastLayerX = width - 60;
-  const normalizeTitle =
-    preprocessingMode === "mnist-standard" ? "Normalize" : "Raw pass";
-  const normalizeDetail =
-    preprocessingMode === "mnist-standard" ? "(x - 0.1307) / 0.3081" : "keep 0..1 values";
   const inputEdgeIndices = useMemo(
     () =>
       Array.from({ length: Math.min(784, rawInput.length) }, (_, index) => ({
@@ -588,7 +581,7 @@ function NetworkPanel({
   const inputEdgeIndexSet = useMemo(() => new Set(inputEdgeIndices), [inputEdgeIndices]);
   const layerX = (layerIndex: number) =>
     layerIndex === 0
-      ? inputGridX + inputGridSize / 2
+      ? flattenBox.x + flattenBox.width / 2
       : firstNonInputX +
         ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
           Math.max(1, layerSizes.length - 2);
@@ -598,7 +591,7 @@ function NetworkPanel({
     size,
     label:
       layerIndex === 0
-        ? "Input image"
+        ? "Input"
         : layerIndex === layerSizes.length - 1
           ? "Output"
           : `Hidden Layer ${layerIndex}`,
@@ -725,21 +718,14 @@ function NetworkPanel({
           })}
 
           <path
-            d={`M ${inputGridX + inputGridSize + 10} ${inputGridY + inputGridSize / 2} H ${normalizeBox.x - 10}`}
-            fill="none"
-            markerEnd="url(#mnist-flow-arrow)"
-            stroke="#9aa8cf"
-            strokeWidth="2"
-          />
-          <path
-            d={`M ${normalizeBox.x + normalizeBox.width + 10} ${normalizeBox.y + normalizeBox.height / 2} H ${flattenBox.x - 10}`}
+            d={`M ${inputGridX + inputGridSize + 10} ${inputGridY + inputGridSize / 2} H ${flattenBox.x - 12}`}
             fill="none"
             markerEnd="url(#mnist-flow-arrow)"
             stroke="#9aa8cf"
             strokeWidth="2"
           />
 
-          <g aria-label="Full 28 by 28 input pixel grid">
+          <g aria-label="28 by 28 pixel preview">
             <rect
               x={inputGridX - 1}
               y={inputGridY - 1}
@@ -751,7 +737,7 @@ function NetworkPanel({
             />
             {Array.from({ length: 784 }, (_, pixelIndex) => {
               const value = rawInput[pixelIndex] ?? 0;
-              const shade = Math.round(255 - value * 255);
+              const shade = Math.round(value * 255);
               const column = pixelIndex % 28;
               const row = Math.floor(pixelIndex / 28);
               const isEdgeSource = inputEdgeIndexSet.has(pixelIndex);
@@ -776,39 +762,11 @@ function NetworkPanel({
               textAnchor="middle"
               className="fill-[#50608a] text-[11px] font-black"
             >
-              raw 28x28 input
+              28x28 pixel preview
             </text>
           </g>
 
-          <g aria-label="Input normalization step">
-            <rect
-              x={normalizeBox.x}
-              y={normalizeBox.y}
-              width={normalizeBox.width}
-              height={normalizeBox.height}
-              rx={8}
-              fill="#fbfcff"
-              stroke="#dce4f2"
-            />
-            <text
-              x={normalizeBox.x + normalizeBox.width / 2}
-              y={normalizeBox.y + 23}
-              textAnchor="middle"
-              className="fill-[#071854] text-[12px] font-black"
-            >
-              {normalizeTitle}
-            </text>
-            <text
-              x={normalizeBox.x + normalizeBox.width / 2}
-              y={normalizeBox.y + 42}
-              textAnchor="middle"
-              className="fill-[#50608a] font-mono text-[10px] font-black"
-            >
-              {normalizeDetail}
-            </text>
-          </g>
-
-          <g aria-label="Flattened vector stage">
+          <g aria-label="784 pixels stacked as the input layer">
             <rect
               x={flattenBox.x}
               y={flattenBox.y}
@@ -818,20 +776,37 @@ function NetworkPanel({
               fill="#fbfcff"
               stroke="#dce4f2"
             />
+            {Array.from({ length: 784 }, (_, pixelIndex) => {
+              const value = rawInput[pixelIndex] ?? 0;
+              const active = inputEdgeIndexSet.has(pixelIndex);
+
+              return (
+                <line
+                  key={pixelIndex}
+                  x1={flattenBox.x + 10}
+                  x2={flattenBox.x + flattenBox.width - 10}
+                  y1={flattenedPointY(pixelIndex)}
+                  y2={flattenedPointY(pixelIndex)}
+                  stroke={active ? "#4b23ff" : "#9aa8cf"}
+                  strokeOpacity={active ? 0.78 : 0.16 + value * 0.28}
+                  strokeWidth={active ? 1.2 : 0.45}
+                />
+              );
+            })}
             <line
-              x1={flattenBox.x + flattenBox.width / 2}
-              x2={flattenBox.x + flattenBox.width / 2}
-              y1={flattenBox.y + 10}
-              y2={flattenBox.y + flattenBox.height - 10}
+              x1={flattenBox.x + flattenBox.width + 4}
+              x2={flattenBox.x + flattenBox.width + 4}
+              y1={flattenBox.y + 1}
+              y2={flattenBox.y + flattenBox.height - 1}
               stroke="#071854"
-              strokeOpacity="0.28"
-              strokeWidth="2"
+              strokeOpacity="0.24"
+              strokeWidth="1.5"
             />
             {inputEdgeIndices.map((pixelIndex) => (
               <line
-                key={pixelIndex}
-                x1={flattenBox.x + 11}
-                x2={flattenBox.x + flattenBox.width - 11}
+                key={`active-${pixelIndex}`}
+                x1={flattenBox.x + flattenBox.width - 6}
+                x2={flattenBox.x + flattenBox.width + 8}
                 y1={flattenedPointY(pixelIndex)}
                 y2={flattenedPointY(pixelIndex)}
                 stroke="#4b23ff"
@@ -845,7 +820,7 @@ function NetworkPanel({
               textAnchor="middle"
               className="fill-[#50608a] text-[11px] font-black"
             >
-              flatten
+              pixels stacked vertically
             </text>
             <text
               x={flattenBox.x + flattenBox.width / 2}
@@ -1018,8 +993,8 @@ function NetworkPanel({
           </div>
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
-          Flow: raw pixels &rarr; preprocessing &rarr; flattened vector. Contribution edges
-          start after flatten and show the strongest active vector paths.
+          The 28x28 preview is flattened into the 784-input stripe. Contribution
+          edges show the strongest active pixel paths into the MLP.
         </p>
       </div>
     </Panel>
@@ -1526,7 +1501,6 @@ export function MnistMlpInferenceDebuggerPlayground() {
             model={model}
             modelInput={modelInput}
             rawInput={input}
-            preprocessingMode={preprocessingMode}
             debug={debug}
             selectedNeuron={selectedNeuron}
             onSelectNeuron={setSelectedNeuron}

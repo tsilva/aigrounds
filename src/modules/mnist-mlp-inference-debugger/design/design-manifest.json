@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "MNIST MLP Inference Debugger",
+  "slug": "mnist-mlp-inference-debugger",
+  "modulePath": "src/modules/mnist-mlp-inference-debugger",
+  "acceptedMockup": null,
+  "prompt": "src/modules/mnist-mlp-inference-debugger/design/imagegen-prompt.md",
+  "sourceGeneratedImage": null
+}

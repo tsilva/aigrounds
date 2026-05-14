@@ -13,6 +13,7 @@ import { LayerNormalizationPlayground } from "@/modules/layer-normalization/Laye
 import { LinearQuantizationInt4Playground } from "@/modules/linear-quantization-int4/LinearQuantizationInt4Playground";
 import { MatrixMultiplicationPlayground } from "@/modules/matrix-multiplication/MatrixMultiplicationPlayground";
 import { MeanMedianModePlayground } from "@/modules/mean-median-mode/MeanMedianModePlayground";
+import { MnistMlpInferenceDebuggerPlayground } from "@/modules/mnist-mlp-inference-debugger/MnistMlpInferenceDebuggerPlayground";
 import { MonteCarloTreeSearchPlayground } from "@/modules/monte-carlo-tree-search/MonteCarloTreeSearchPlayground";
 import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
 import { ProbabilityRulesPlayground } from "@/modules/probability-rules/ProbabilityRulesPlayground";
@@ -60,6 +61,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "byte-pair-encoding": BytePairEncodingPlayground,
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
+  "mnist-mlp-inference-debugger": MnistMlpInferenceDebuggerPlayground,
   "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
   "batch-normalization": BatchNormalizationPlayground,
   "layer-normalization": LayerNormalizationPlayground,

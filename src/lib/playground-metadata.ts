@@ -636,6 +636,32 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "mnist-mlp-inference-debugger",
+    title: "MNIST MLP Inference Debugger",
+    tag: "neural networks",
+    kicker:
+      "Drop an ONNX MNIST classifier, draw one digit, and inspect the WebGPU forward pass.",
+    summary:
+      "Upload a dense MNIST MLP, run inference in the browser with WebGPU, then debug softmax probabilities, hidden activations, contribution signs, and input saliency for the drawn digit.",
+    estimatedDuration: "6 to 9 minutes",
+    concepts: [
+      "MLP inference",
+      "WebGPU",
+      "Softmax",
+      "Saliency",
+    ],
+    learningGoals: [
+      "See how a 28x28 digit becomes a 784-value MLP input.",
+      "Run dense neural network layers on WebGPU inside the browser.",
+      "Connect hidden activations, contribution signs, softmax confidence, and input saliency to one prediction.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["mnist-mlp-inference-debugger"],
+    theme: {
+      badgeClassName: "border-fuchsia-300 bg-fuchsia-100 text-fuchsia-950",
+    },
+  },
+  {
     slug: "zero-knowledge-proofs",
     title: "Zero Knowledge Proofs Lab",
     tag: "cryptography",
@@ -1159,6 +1185,7 @@ export const dashboardLessonPlanOrder = [
   "monte-carlo-tree-search",
   "activation-functions",
   "neural-network-forward-pass",
+  "mnist-mlp-inference-debugger",
   "computational-graphs-chain-rule",
   "backpropagation-inspector",
   "batch-normalization",

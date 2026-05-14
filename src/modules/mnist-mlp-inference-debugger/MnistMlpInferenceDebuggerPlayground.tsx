@@ -181,18 +181,20 @@ function drawDefaultDigit(canvas: HTMLCanvasElement) {
     return;
   }
 
-  context.fillStyle = "white";
+  const scale = canvas.width / 28;
+
+  context.fillStyle = "black";
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.lineCap = "round";
   context.lineJoin = "round";
-  context.strokeStyle = "black";
-  context.lineWidth = 24;
+  context.strokeStyle = "white";
+  context.lineWidth = Math.max(2.4, 2.4 * scale);
   context.beginPath();
-  context.moveTo(82, 64);
-  context.quadraticCurveTo(136, 52, 206, 50);
-  context.quadraticCurveTo(226, 51, 218, 72);
-  context.lineTo(150, 156);
-  context.quadraticCurveTo(132, 184, 127, 224);
+  context.moveTo(8.2 * scale, 6.4 * scale);
+  context.quadraticCurveTo(13.6 * scale, 5.2 * scale, 20.6 * scale, 5 * scale);
+  context.quadraticCurveTo(22.6 * scale, 5.1 * scale, 21.8 * scale, 7.2 * scale);
+  context.lineTo(15 * scale, 15.6 * scale);
+  context.quadraticCurveTo(13.2 * scale, 18.4 * scale, 12.7 * scale, 22.4 * scale);
   context.stroke();
 }
 
@@ -203,7 +205,7 @@ function clearCanvas(canvas: HTMLCanvasElement) {
     return;
   }
 
-  context.fillStyle = "white";
+  context.fillStyle = "black";
   context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -231,7 +233,7 @@ function extractMnistInput(canvas: HTMLCanvasElement) {
 
   for (let row = 0; row < 28; row += 1) {
     for (let column = 0; column < 28; column += 1) {
-      let darkness = 0;
+      let brightness = 0;
       let samples = 0;
       const xStart = Math.floor(column * cell);
       const xEnd = Math.floor((column + 1) * cell);
@@ -244,12 +246,12 @@ function extractMnistInput(canvas: HTMLCanvasElement) {
           const luminance =
             (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 3;
 
-          darkness += 1 - luminance / 255;
+          brightness += luminance / 255;
           samples += 1;
         }
       }
 
-      values.push(samples > 0 ? darkness / samples : 0);
+      values.push(samples > 0 ? brightness / samples : 0);
     }
   }
 
@@ -333,16 +335,10 @@ function centerInk(values: number[]) {
 }
 
 function InputPanel({
-  input,
   onInputChange,
-  onRun,
-  disabled,
   modelLoaded,
 }: {
-  input: Float32Array;
   onInputChange: (input: Float32Array) => void;
-  onRun: () => void;
-  disabled: boolean;
   modelLoaded: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -380,8 +376,8 @@ function InputPanel({
 
     context.lineCap = "round";
     context.lineJoin = "round";
-    context.lineWidth = activeTool === "erase" ? 28 : 22;
-    context.strokeStyle = activeTool === "erase" ? "white" : "black";
+    context.lineWidth = activeTool === "erase" ? 3.4 : 2.8;
+    context.strokeStyle = activeTool === "erase" ? "black" : "white";
     context.lineTo(x, y);
     context.stroke();
     context.beginPath();
@@ -420,17 +416,18 @@ function InputPanel({
         <div className="relative">
           <canvas
             ref={canvasRef}
-            width={280}
-            height={280}
+            width={28}
+            height={28}
             aria-label="Draw a digit"
             aria-disabled={!modelLoaded}
-            className={`aspect-square w-full touch-none rounded-[8px] bg-white ${
+            className={`aspect-square w-full touch-none rounded-[8px] border border-[#19254a] bg-black ${
               modelLoaded ? "cursor-crosshair" : "cursor-not-allowed opacity-55"
             }`}
             style={{
+              imageRendering: "pixelated",
               backgroundImage:
-                "linear-gradient(#edf1f8 1px, transparent 1px), linear-gradient(90deg, #edf1f8 1px, transparent 1px)",
-              backgroundSize: "14px 14px",
+                "linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px)",
+              backgroundSize: "10px 10px",
             }}
             onPointerDown={startDrawing}
             onPointerMove={(event) => {
@@ -494,39 +491,6 @@ function InputPanel({
           </button>
         </div>
       </div>
-
-      <div className="mt-5">
-        <div className="flex items-center justify-between text-[13px] font-black text-[#263a6f]">
-          <span>28x28 pixel preview</span>
-          <button
-            type="button"
-            onClick={onRun}
-            disabled={disabled}
-            className="rounded-[8px] border border-[#d8e0f3] px-3 py-1 text-[#251cff] transition enabled:hover:border-[#251cff] disabled:cursor-not-allowed disabled:text-[#92a0c1]"
-          >
-            Run
-          </button>
-        </div>
-        <div className="mt-3 grid grid-cols-[minmax(0,1fr)_42px_34px] items-center gap-4">
-          <div
-            className="grid aspect-[2/1] border border-[#131a2f] bg-black"
-            style={{ gridTemplateColumns: "repeat(28, minmax(0, 1fr))" }}
-          >
-            {Array.from(input).map((value, index) => (
-              <span
-                key={index}
-                style={{ backgroundColor: `rgb(${value * 255}, ${value * 255}, ${value * 255})` }}
-              />
-            ))}
-          </div>
-          <div className="h-full bg-[linear-gradient(180deg,#fff,#000)]" />
-          <div className="space-y-4 font-mono text-[13px] font-black text-[#263a6f]">
-            <p>1.0</p>
-            <p>0.5</p>
-            <p>0.0</p>
-          </div>
-        </div>
-      </div>
     </Panel>
   );
 }
@@ -559,12 +523,12 @@ function NetworkPanel({
     : fallbackArchitecture;
   const width = 940;
   const height = 350;
-  const inputGridX = 34;
-  const inputGridY = 92;
-  const inputGridSize = 104;
-  const inputCellSize = inputGridSize / 28;
-  const flattenBox = { x: 190, y: 72, width: 48, height: 150 };
-  const firstNonInputX = layerSizes.length <= 3 ? 545 : 410;
+  const inputStripe = { x: 40, y: 76, width: 116, height: 168 };
+  const inputWrapRows = 56;
+  const inputWrapColumns = Math.ceil(784 / inputWrapRows);
+  const inputCellWidth = inputStripe.width / inputWrapColumns;
+  const inputCellHeight = inputStripe.height / inputWrapRows;
+  const firstNonInputX = layerSizes.length <= 3 ? 500 : 350;
   const lastLayerX = width - 60;
   const inputEdgeIndices = useMemo(
     () =>
@@ -581,12 +545,19 @@ function NetworkPanel({
   const inputEdgeIndexSet = useMemo(() => new Set(inputEdgeIndices), [inputEdgeIndices]);
   const layerX = (layerIndex: number) =>
     layerIndex === 0
-      ? flattenBox.x + flattenBox.width / 2
+      ? inputStripe.x + inputStripe.width / 2
       : firstNonInputX +
         ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
           Math.max(1, layerSizes.length - 2);
-  const flattenedPointY = (pixelIndex: number) =>
-    flattenBox.y + (pixelIndex / 783) * flattenBox.height;
+  const inputVectorPoint = (pixelIndex: number) => {
+    const column = Math.floor(pixelIndex / inputWrapRows);
+    const row = pixelIndex % inputWrapRows;
+
+    return {
+      x: inputStripe.x + column * inputCellWidth + inputCellWidth,
+      y: inputStripe.y + row * inputCellHeight + inputCellHeight / 2,
+    };
+  };
   const displayLayers = layerSizes.map((size, layerIndex) => ({
     size,
     label:
@@ -679,20 +650,8 @@ function NetworkPanel({
           viewBox={`0 0 ${width} ${height}`}
           role="img"
           aria-label="MLP network visualization"
-          className="min-w-[1040px]"
+          className="min-w-[900px]"
         >
-          <defs>
-            <marker
-              id="mnist-flow-arrow"
-              markerHeight="6"
-              markerWidth="7"
-              orient="auto"
-              refX="6"
-              refY="3"
-            >
-              <path d="M 0 0 L 7 3 L 0 6 Z" fill="#9aa8cf" />
-            </marker>
-          </defs>
           {displayLayers.map((layer, layerIndex) => {
             const x = layerX(layerIndex);
             return (
@@ -717,114 +676,60 @@ function NetworkPanel({
             );
           })}
 
-          <path
-            d={`M ${inputGridX + inputGridSize + 10} ${inputGridY + inputGridSize / 2} H ${flattenBox.x - 12}`}
-            fill="none"
-            markerEnd="url(#mnist-flow-arrow)"
-            stroke="#9aa8cf"
-            strokeWidth="2"
-          />
-
-          <g aria-label="28 by 28 pixel preview">
-            <rect
-              x={inputGridX - 1}
-              y={inputGridY - 1}
-              width={inputGridSize + 2}
-              height={inputGridSize + 2}
-              rx={5}
-              fill="#fff"
-              stroke="#dce4f2"
-            />
-            {Array.from({ length: 784 }, (_, pixelIndex) => {
-              const value = rawInput[pixelIndex] ?? 0;
-              const shade = Math.round(value * 255);
-              const column = pixelIndex % 28;
-              const row = Math.floor(pixelIndex / 28);
-              const isEdgeSource = inputEdgeIndexSet.has(pixelIndex);
-
-              return (
-                <rect
-                  key={pixelIndex}
-                  x={inputGridX + column * inputCellSize}
-                  y={inputGridY + row * inputCellSize}
-                  width={inputCellSize}
-                  height={inputCellSize}
-                  fill={`rgb(${shade}, ${shade}, ${shade})`}
-                  stroke={isEdgeSource ? "#4b23ff" : "#edf1f8"}
-                  strokeOpacity={isEdgeSource ? 0.85 : 0.6}
-                  strokeWidth={isEdgeSource ? 0.5 : 0.25}
-                />
-              );
-            })}
-            <text
-              x={inputGridX + inputGridSize / 2}
-              y={inputGridY + inputGridSize + 20}
-              textAnchor="middle"
-              className="fill-[#50608a] text-[11px] font-black"
-            >
-              28x28 pixel preview
-            </text>
-          </g>
-
           <g aria-label="784 pixels stacked as the input layer">
             <rect
-              x={flattenBox.x}
-              y={flattenBox.y}
-              width={flattenBox.width}
-              height={flattenBox.height}
+              x={inputStripe.x}
+              y={inputStripe.y}
+              width={inputStripe.width}
+              height={inputStripe.height}
               rx={8}
-              fill="#fbfcff"
+              fill="#05070c"
               stroke="#dce4f2"
             />
             {Array.from({ length: 784 }, (_, pixelIndex) => {
               const value = rawInput[pixelIndex] ?? 0;
               const active = inputEdgeIndexSet.has(pixelIndex);
+              const column = Math.floor(pixelIndex / inputWrapRows);
+              const row = pixelIndex % inputWrapRows;
+              const shade = Math.round(value * 255);
 
               return (
-                <line
+                <rect
                   key={pixelIndex}
-                  x1={flattenBox.x + 10}
-                  x2={flattenBox.x + flattenBox.width - 10}
-                  y1={flattenedPointY(pixelIndex)}
-                  y2={flattenedPointY(pixelIndex)}
-                  stroke={active ? "#4b23ff" : "#9aa8cf"}
-                  strokeOpacity={active ? 0.78 : 0.16 + value * 0.28}
-                  strokeWidth={active ? 1.2 : 0.45}
+                  x={inputStripe.x + column * inputCellWidth}
+                  y={inputStripe.y + row * inputCellHeight}
+                  width={inputCellWidth}
+                  height={inputCellHeight}
+                  fill={`rgb(${shade}, ${shade}, ${shade})`}
+                  stroke={active ? "#4b23ff" : "#1b2235"}
+                  strokeOpacity={active ? 0.95 : 0.75}
+                  strokeWidth={active ? 0.7 : 0.2}
                 />
               );
             })}
-            <line
-              x1={flattenBox.x + flattenBox.width + 4}
-              x2={flattenBox.x + flattenBox.width + 4}
-              y1={flattenBox.y + 1}
-              y2={flattenBox.y + flattenBox.height - 1}
-              stroke="#071854"
-              strokeOpacity="0.24"
-              strokeWidth="1.5"
-            />
             {inputEdgeIndices.map((pixelIndex) => (
               <line
                 key={`active-${pixelIndex}`}
-                x1={flattenBox.x + flattenBox.width - 6}
-                x2={flattenBox.x + flattenBox.width + 8}
-                y1={flattenedPointY(pixelIndex)}
-                y2={flattenedPointY(pixelIndex)}
+                x1={inputVectorPoint(pixelIndex).x - 1}
+                x2={inputVectorPoint(pixelIndex).x + 8}
+                y1={inputVectorPoint(pixelIndex).y}
+                y2={inputVectorPoint(pixelIndex).y}
                 stroke="#4b23ff"
                 strokeOpacity={0.3 + Math.min(0.7, rawInput[pixelIndex] ?? 0)}
                 strokeWidth="1.2"
               />
             ))}
             <text
-              x={flattenBox.x + flattenBox.width / 2}
-              y={flattenBox.y + flattenBox.height + 19}
+              x={inputStripe.x + inputStripe.width / 2}
+              y={inputStripe.y + inputStripe.height + 19}
               textAnchor="middle"
               className="fill-[#50608a] text-[11px] font-black"
             >
-              pixels stacked vertically
+              784-vector wrap
             </text>
             <text
-              x={flattenBox.x + flattenBox.width / 2}
-              y={flattenBox.y + flattenBox.height + 35}
+              x={inputStripe.x + inputStripe.width / 2}
+              y={inputStripe.y + inputStripe.height + 35}
               textAnchor="middle"
               className="fill-[#50608a] font-mono text-[11px] font-black"
             >
@@ -847,15 +752,13 @@ function NetworkPanel({
                       return null;
                     }
 
+                    const inputSourcePoint =
+                      targetDisplayIndex === 0 ? inputVectorPoint(sourceIndex) : null;
                     const sourceY =
-                      targetDisplayIndex === 0
-                        ? flattenedPointY(sourceIndex)
-                        : nodeY(sourcePosition, sourceLayer.indices.length);
+                      inputSourcePoint?.y ?? nodeY(sourcePosition, sourceLayer.indices.length);
                     const targetY = nodeY(targetPosition, targetLayer.indices.length);
                     const sourceAnchorX =
-                      targetDisplayIndex === 0
-                        ? flattenBox.x + flattenBox.width
-                        : sourceX + 15;
+                      inputSourcePoint?.x ?? sourceX + 15;
                     const targetAnchorX = targetX - 15;
                     const weight =
                       denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
@@ -993,8 +896,8 @@ function NetworkPanel({
           </div>
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
-          The 28x28 preview is flattened into the 784-input stripe. Contribution
-          edges show the strongest active pixel paths into the MLP.
+          The 784 inputs are wrapped into columns in vector order. Each
+          contribution edge starts from its exact pixel cell.
         </p>
       </div>
     </Panel>
@@ -1491,10 +1394,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
 
         <div className="mt-4 grid gap-4 2xl:grid-cols-[390px_minmax(0,1fr)_390px]">
           <InputPanel
-            input={input}
             onInputChange={handleInputChange}
-            onRun={runInference}
-            disabled={!model || runState === "running"}
             modelLoaded={Boolean(model)}
           />
           <NetworkPanel

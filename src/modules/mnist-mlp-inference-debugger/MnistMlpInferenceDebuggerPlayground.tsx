@@ -273,25 +273,6 @@ function clearCanvas(canvas: HTMLCanvasElement) {
   context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function paintMnistInput(canvas: HTMLCanvasElement, values: Float32Array) {
-  const context = canvas.getContext("2d");
-
-  if (!context) {
-    return;
-  }
-
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  for (let row = 0; row < 28; row += 1) {
-    for (let column = 0; column < 28; column += 1) {
-      const value = Math.max(0, Math.min(1, values[row * 28 + column] ?? 0));
-      const shade = Math.round(value * 255);
-      context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
-      context.fillRect(column, row, 1, 1);
-    }
-  }
-}
-
 function getPointerPosition(event: React.PointerEvent<HTMLCanvasElement>) {
   const rect = event.currentTarget.getBoundingClientRect();
   const scaleX = event.currentTarget.width / rect.width;
@@ -338,83 +319,7 @@ function extractMnistInput(canvas: HTMLCanvasElement) {
     }
   }
 
-  return normalizeMnistInput(centerInk(values));
-}
-
-function centerInk(values: number[]) {
-  const threshold = 0.04;
-  let minX = 28;
-  let minY = 28;
-  let maxX = -1;
-  let maxY = -1;
-
-  for (let index = 0; index < values.length; index += 1) {
-    if ((values[index] ?? 0) <= threshold) {
-      continue;
-    }
-
-    const x = index % 28;
-    const y = Math.floor(index / 28);
-
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
-  }
-
-  if (maxX < minX || maxY < minY) {
-    return values;
-  }
-
-  const sourceWidth = maxX - minX + 1;
-  const sourceHeight = maxY - minY + 1;
-  const scale = Math.min(20 / sourceWidth, 20 / sourceHeight);
-  const scaledWidth = Math.max(1, Math.round(sourceWidth * scale));
-  const scaledHeight = Math.max(1, Math.round(sourceHeight * scale));
-  const scaled = new Array(scaledWidth * scaledHeight).fill(0);
-
-  for (let y = 0; y < scaledHeight; y += 1) {
-    for (let x = 0; x < scaledWidth; x += 1) {
-      const sourceX = minX + Math.min(sourceWidth - 1, Math.floor(x / scale));
-      const sourceY = minY + Math.min(sourceHeight - 1, Math.floor(y / scale));
-      scaled[y * scaledWidth + x] = values[sourceY * 28 + sourceX] ?? 0;
-    }
-  }
-
-  let mass = 0;
-  let weightedX = 0;
-  let weightedY = 0;
-
-  for (let y = 0; y < scaledHeight; y += 1) {
-    for (let x = 0; x < scaledWidth; x += 1) {
-      const value = scaled[y * scaledWidth + x] ?? 0;
-      mass += value;
-      weightedX += x * value;
-      weightedY += y * value;
-    }
-  }
-
-  const centerX = mass > 0 ? weightedX / mass : (scaledWidth - 1) / 2;
-  const centerY = mass > 0 ? weightedY / mass : (scaledHeight - 1) / 2;
-  const offsetX = Math.round(14 - centerX);
-  const offsetY = Math.round(14 - centerY);
-  const centered = new Array(784).fill(0);
-
-  for (let y = 0; y < scaledHeight; y += 1) {
-    for (let x = 0; x < scaledWidth; x += 1) {
-      const targetX = x + offsetX;
-      const targetY = y + offsetY;
-
-      if (targetX >= 0 && targetX < 28 && targetY >= 0 && targetY < 28) {
-        centered[targetY * 28 + targetX] = Math.max(
-          centered[targetY * 28 + targetX] ?? 0,
-          scaled[y * scaledWidth + x] ?? 0,
-        );
-      }
-    }
-  }
-
-  return centered;
+  return normalizeMnistInput(values);
 }
 
 function InputPanel({
@@ -433,9 +338,7 @@ function InputPanel({
     const canvas = canvasRef.current;
 
     if (canvas) {
-      const nextInput = extractMnistInput(canvas);
-      paintMnistInput(canvas, nextInput);
-      onInputChange(nextInput);
+      onInputChange(extractMnistInput(canvas));
     }
   }, [canvasRef, onInputChange]);
 
@@ -447,9 +350,7 @@ function InputPanel({
     }
 
     drawDefaultDigit(canvas);
-    const nextInput = extractMnistInput(canvas);
-    paintMnistInput(canvas, nextInput);
-    onInputChange(nextInput);
+    onInputChange(extractMnistInput(canvas));
   }, [canvasRef, onInputChange]);
 
   function draw(event: React.PointerEvent<HTMLCanvasElement>) {

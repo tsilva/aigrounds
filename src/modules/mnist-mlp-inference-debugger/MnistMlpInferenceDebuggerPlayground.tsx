@@ -39,7 +39,7 @@ type ContributionEdge = {
 
 const fallbackArchitecture = [784, 128, 64, 32, 10];
 const digitLabels = Array.from({ length: 10 }, (_, index) => index);
-const networkSvgWidth = 940;
+const networkSvgWidth = 820;
 const networkSvgHeight = 350;
 const preprocessingOptions: Array<{
   id: MnistPreprocessingMode;
@@ -200,7 +200,7 @@ function networkLayerX(layerIndex: number, layerCount: number) {
     return 64;
   }
 
-  const firstNonInputX = layerCount <= 3 ? 500 : 310;
+  const firstNonInputX = layerCount <= 3 ? 440 : 280;
   const lastLayerX = networkSvgWidth - 60;
 
   return (
@@ -271,6 +271,25 @@ function clearCanvas(canvas: HTMLCanvasElement) {
 
   context.fillStyle = "black";
   context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function paintMnistInput(canvas: HTMLCanvasElement, values: Float32Array) {
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    return;
+  }
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let row = 0; row < 28; row += 1) {
+    for (let column = 0; column < 28; column += 1) {
+      const value = Math.max(0, Math.min(1, values[row * 28 + column] ?? 0));
+      const shade = Math.round(value * 255);
+      context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+      context.fillRect(column, row, 1, 1);
+    }
+  }
 }
 
 function getPointerPosition(event: React.PointerEvent<HTMLCanvasElement>) {
@@ -414,7 +433,9 @@ function InputPanel({
     const canvas = canvasRef.current;
 
     if (canvas) {
-      onInputChange(extractMnistInput(canvas));
+      const nextInput = extractMnistInput(canvas);
+      paintMnistInput(canvas, nextInput);
+      onInputChange(nextInput);
     }
   }, [canvasRef, onInputChange]);
 
@@ -426,7 +447,9 @@ function InputPanel({
     }
 
     drawDefaultDigit(canvas);
-    onInputChange(extractMnistInput(canvas));
+    const nextInput = extractMnistInput(canvas);
+    paintMnistInput(canvas, nextInput);
+    onInputChange(nextInput);
   }, [canvasRef, onInputChange]);
 
   function draw(event: React.PointerEvent<HTMLCanvasElement>) {
@@ -548,7 +571,7 @@ function InputPanel({
 
               if (canvas) {
                 clearCanvas(canvas);
-                syncInput();
+                onInputChange(new Float32Array(784));
               }
             }}
           >
@@ -704,7 +727,7 @@ function NetworkPanel({
           viewBox={`0 0 ${width} ${height}`}
           role="img"
           aria-label="MLP network visualization"
-          className="min-w-[900px]"
+          className="min-w-[780px]"
         >
           {displayLayers.map((layer, layerIndex) => {
             const x = layerX(layerIndex);

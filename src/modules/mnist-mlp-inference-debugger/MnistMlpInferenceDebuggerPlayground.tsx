@@ -29,8 +29,18 @@ type EdgeScore = {
   magnitude: number;
 };
 
+type ContributionEdge = {
+  key: string;
+  sourceIndex: number;
+  targetIndex: number;
+  weight: number;
+  magnitude: number;
+};
+
 const fallbackArchitecture = [784, 128, 64, 32, 10];
 const digitLabels = Array.from({ length: 10 }, (_, index) => index);
+const networkSvgWidth = 940;
+const networkSvgHeight = 350;
 const preprocessingOptions: Array<{
   id: MnistPreprocessingMode;
   label: string;
@@ -172,6 +182,60 @@ function sampleIndicesWithPinned(size: number, count: number, pinned: number | n
   indices[Math.floor(indices.length / 2)] = pinned;
 
   return Array.from(new Set(indices)).sort((left, right) => left - right);
+}
+
+function inputEdgeSourceIndices(rawInput: Float32Array) {
+  return Array.from({ length: Math.min(784, rawInput.length) }, (_, index) => ({
+    index,
+    value: rawInput[index] ?? 0,
+  }))
+    .filter((item) => item.value > 0.025)
+    .sort((left, right) => right.value - left.value)
+    .slice(0, 64)
+    .map((item) => item.index);
+}
+
+function networkLayerX(layerIndex: number, layerCount: number) {
+  if (layerIndex === 0) {
+    return 64;
+  }
+
+  const firstNonInputX = layerCount <= 3 ? 500 : 310;
+  const lastLayerX = networkSvgWidth - 60;
+
+  return (
+    firstNonInputX +
+    ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
+      Math.max(1, layerCount - 2)
+  );
+}
+
+function selectVisibleContributionEdges(
+  scoredEdges: ContributionEdge[],
+  sourceIndices: number[],
+  targetIndices: number[],
+  topKEdges: number,
+) {
+  const keys = new Set<string>();
+  const limit = Math.max(1, Math.min(20, topKEdges));
+
+  sourceIndices.forEach((sourceIndex) => {
+    scoredEdges
+      .filter((edge) => edge.sourceIndex === sourceIndex)
+      .sort((left, right) => right.magnitude - left.magnitude)
+      .slice(0, limit)
+      .forEach((edge) => keys.add(edge.key));
+  });
+
+  targetIndices.forEach((targetIndex) => {
+    scoredEdges
+      .filter((edge) => edge.targetIndex === targetIndex)
+      .sort((left, right) => right.magnitude - left.magnitude)
+      .slice(0, limit)
+      .forEach((edge) => keys.add(edge.key));
+  });
+
+  return scoredEdges.filter((edge) => keys.has(edge.key));
 }
 
 function drawDefaultDigit(canvas: HTMLCanvasElement) {
@@ -335,13 +399,14 @@ function centerInk(values: number[]) {
 }
 
 function InputPanel({
+  canvasRef,
   onInputChange,
   modelLoaded,
 }: {
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   onInputChange: (input: Float32Array) => void;
   modelLoaded: boolean;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
   const [activeTool, setActiveTool] = useState<"draw" | "erase">("draw");
 
@@ -351,7 +416,7 @@ function InputPanel({
     if (canvas) {
       onInputChange(extractMnistInput(canvas));
     }
-  }, [onInputChange]);
+  }, [canvasRef, onInputChange]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -362,7 +427,7 @@ function InputPanel({
 
     drawDefaultDigit(canvas);
     onInputChange(extractMnistInput(canvas));
-  }, [onInputChange]);
+  }, [canvasRef, onInputChange]);
 
   function draw(event: React.PointerEvent<HTMLCanvasElement>) {
     const canvas = event.currentTarget;
@@ -496,6 +561,7 @@ function InputPanel({
 }
 
 function NetworkPanel({
+  svgRef,
   model,
   modelInput,
   rawInput,
@@ -507,6 +573,7 @@ function NetworkPanel({
   topKEdges,
   onTopKEdgesChange,
 }: {
+  svgRef: React.RefObject<SVGSVGElement | null>;
   model: MlpModel | null;
   modelInput: Float32Array;
   rawInput: Float32Array;
@@ -518,62 +585,48 @@ function NetworkPanel({
   topKEdges: number;
   onTopKEdgesChange: (count: number) => void;
 }) {
-  const layerSizes = model
-    ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
-    : fallbackArchitecture;
-  const width = 940;
-  const height = 350;
-  const canvasEdgeSource = { x: 0, y: 74, width: 126, height: 178 };
-  const firstNonInputX = layerSizes.length <= 3 ? 500 : 310;
-  const lastLayerX = width - 60;
-  const inputEdgeIndices = useMemo(
+  const layerSizes = useMemo(
     () =>
-      Array.from({ length: Math.min(784, rawInput.length) }, (_, index) => ({
-        index,
-        value: rawInput[index] ?? 0,
-      }))
-        .filter((item) => item.value > 0.025)
-        .sort((left, right) => right.value - left.value)
-        .slice(0, 64)
-        .map((item) => item.index),
-    [rawInput],
+      model
+        ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
+        : fallbackArchitecture,
+    [model],
   );
+  const width = networkSvgWidth;
+  const height = networkSvgHeight;
+  const inputEdgeIndices = useMemo(() => inputEdgeSourceIndices(rawInput), [rawInput]);
   const layerX = (layerIndex: number) =>
-    layerIndex === 0
-      ? canvasEdgeSource.x + canvasEdgeSource.width / 2
-      : firstNonInputX +
-        ((layerIndex - 1) * (lastLayerX - firstNonInputX)) /
-          Math.max(1, layerSizes.length - 2);
-  const inputCanvasPoint = (pixelIndex: number) => {
-    const column = pixelIndex % 28;
-    const row = Math.floor(pixelIndex / 28);
-
-    return {
-      x: canvasEdgeSource.x + ((column + 1) / 28) * canvasEdgeSource.width,
-      y: canvasEdgeSource.y + ((row + 0.5) / 28) * canvasEdgeSource.height,
-    };
-  };
-  const displayLayers = layerSizes.map((size, layerIndex) => ({
-    size,
-    label:
-      layerIndex === 0
-        ? "Input"
-        : layerIndex === layerSizes.length - 1
-          ? "Output"
-          : `Hidden Layer ${layerIndex}`,
-    indices:
-      layerIndex === 0
-        ? inputEdgeIndices
-        : layerIndex === layerSizes.length - 1
-          ? digitLabels
-          : sampleIndicesWithPinned(
-              size,
-              6,
-              selectedNeuron.layerIndex === layerIndex - 1
-                ? selectedNeuron.neuronIndex
-                : null,
-            ),
-  }));
+    networkLayerX(layerIndex, layerSizes.length);
+  const displayLayers = useMemo(
+    () =>
+      layerSizes.map((size, layerIndex) => ({
+        size,
+        label:
+          layerIndex === 0
+            ? "Input"
+            : layerIndex === layerSizes.length - 1
+              ? "Output"
+              : `Hidden Layer ${layerIndex}`,
+        indices:
+          layerIndex === 0
+            ? inputEdgeIndices
+            : layerIndex === layerSizes.length - 1
+              ? digitLabels
+              : sampleIndicesWithPinned(
+                  size,
+                  6,
+                  selectedNeuron.layerIndex === layerIndex - 1
+                    ? selectedNeuron.neuronIndex
+                    : null,
+                ),
+      })),
+    [
+      inputEdgeIndices,
+      layerSizes,
+      selectedNeuron.layerIndex,
+      selectedNeuron.neuronIndex,
+    ],
+  );
   const canSelectHiddenNeuron = Boolean(model);
   const visibleEdgeKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -642,6 +695,7 @@ function NetworkPanel({
       </div>
       <div className="mt-3 overflow-x-auto">
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${width} ${height}`}
           role="img"
           aria-label="MLP network visualization"
@@ -673,6 +727,10 @@ function NetworkPanel({
 
           {model
             ? displayLayers.slice(1).flatMap((targetLayer, targetDisplayIndex) => {
+                if (targetDisplayIndex === 0) {
+                  return [];
+                }
+
                 const sourceLayer = displayLayers[targetDisplayIndex];
                 const denseLayer = model.layers[targetDisplayIndex];
                 const sourceX = layerX(targetDisplayIndex);
@@ -686,13 +744,9 @@ function NetworkPanel({
                       return null;
                     }
 
-                    const inputSourcePoint =
-                      targetDisplayIndex === 0 ? inputCanvasPoint(sourceIndex) : null;
-                    const sourceY =
-                      inputSourcePoint?.y ?? nodeY(sourcePosition, sourceLayer.indices.length);
+                    const sourceY = nodeY(sourcePosition, sourceLayer.indices.length);
                     const targetY = nodeY(targetPosition, targetLayer.indices.length);
-                    const sourceAnchorX =
-                      inputSourcePoint?.x ?? sourceX + 15;
+                    const sourceAnchorX = sourceX + 15;
                     const targetAnchorX = targetX - 15;
                     const weight =
                       denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
@@ -835,6 +889,173 @@ function NetworkPanel({
         </p>
       </div>
     </Panel>
+  );
+}
+
+function CanvasContributionOverlay({
+  containerRef,
+  canvasRef,
+  networkSvgRef,
+  model,
+  modelInput,
+  rawInput,
+  selectedNeuron,
+  contributionThreshold,
+  topKEdges,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  networkSvgRef: React.RefObject<SVGSVGElement | null>;
+  model: MlpModel | null;
+  modelInput: Float32Array;
+  rawInput: Float32Array;
+  selectedNeuron: SelectedNeuron;
+  contributionThreshold: number;
+  topKEdges: number;
+}) {
+  const [geometry, setGeometry] = useState<{
+    container: DOMRect;
+    canvas: DOMRect;
+    networkSvg: DOMRect;
+  } | null>(null);
+  const layerSizes = model
+    ? [model.inputSize, ...model.layers.map((layer) => layer.outputSize)]
+    : fallbackArchitecture;
+  const inputIndices = useMemo(() => inputEdgeSourceIndices(rawInput), [rawInput]);
+  const targetIndices = useMemo(() => {
+    const firstLayerSize = model?.layers[0]?.outputSize ?? fallbackArchitecture[1];
+
+    return sampleIndicesWithPinned(
+      firstLayerSize,
+      6,
+      selectedNeuron.layerIndex === 0 ? selectedNeuron.neuronIndex : null,
+    );
+  }, [model, selectedNeuron.layerIndex, selectedNeuron.neuronIndex]);
+  const edges = useMemo(() => {
+    const firstLayer = model?.layers[0];
+
+    if (!firstLayer) {
+      return [];
+    }
+
+    const scoredEdges: ContributionEdge[] = [];
+
+    inputIndices.forEach((sourceIndex) => {
+      targetIndices.forEach((targetIndex) => {
+        const weight =
+          firstLayer.weights[sourceIndex * firstLayer.outputSize + targetIndex] ?? 0;
+        const magnitude = Math.abs((modelInput[sourceIndex] ?? 0) * weight);
+
+        if (magnitude >= contributionThreshold) {
+          scoredEdges.push({
+            key: `canvas-${sourceIndex}-${targetIndex}`,
+            sourceIndex,
+            targetIndex,
+            weight,
+            magnitude,
+          });
+        }
+      });
+    });
+
+    return selectVisibleContributionEdges(
+      scoredEdges,
+      inputIndices,
+      targetIndices,
+      topKEdges,
+    );
+  }, [contributionThreshold, inputIndices, model, modelInput, targetIndices, topKEdges]);
+
+  useEffect(() => {
+    function measure() {
+      const container = containerRef.current;
+      const canvas = canvasRef.current;
+      const networkSvg = networkSvgRef.current;
+
+      if (!container || !canvas || !networkSvg) {
+        setGeometry(null);
+        return;
+      }
+
+      setGeometry({
+        container: container.getBoundingClientRect(),
+        canvas: canvas.getBoundingClientRect(),
+        networkSvg: networkSvg.getBoundingClientRect(),
+      });
+    }
+
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
+
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [canvasRef, containerRef, networkSvgRef, rawInput, model]);
+
+  if (!geometry || edges.length === 0 || !model) {
+    return null;
+  }
+
+  const width = geometry.container.width;
+  const height = geometry.container.height;
+  const hiddenLayerX =
+    geometry.networkSvg.left -
+    geometry.container.left +
+    ((networkLayerX(1, layerSizes.length) - 15) / networkSvgWidth) *
+      geometry.networkSvg.width;
+  const canvasPixelPoint = (pixelIndex: number) => {
+    const column = pixelIndex % 28;
+    const row = Math.floor(pixelIndex / 28);
+
+    return {
+      x:
+        geometry.canvas.left -
+        geometry.container.left +
+        ((column + 1) / 28) * geometry.canvas.width,
+      y:
+        geometry.canvas.top -
+        geometry.container.top +
+        ((row + 0.5) / 28) * geometry.canvas.height,
+    };
+  };
+  const hiddenNodePoint = (targetIndex: number) => {
+    const position = Math.max(0, targetIndices.indexOf(targetIndex));
+
+    return {
+      x: hiddenLayerX,
+      y:
+        geometry.networkSvg.top -
+        geometry.container.top +
+        (nodeY(position, targetIndices.length) / networkSvgHeight) *
+          geometry.networkSvg.height,
+    };
+  };
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
+      viewBox={`0 0 ${width} ${height}`}
+    >
+      {edges.map((edge) => {
+        const source = canvasPixelPoint(edge.sourceIndex);
+        const target = hiddenNodePoint(edge.targetIndex);
+        const strength = Math.min(0.9, edge.magnitude * 1.6);
+
+        return (
+          <path
+            key={edge.key}
+            d={`M ${source.x} ${source.y} C ${source.x + 90} ${source.y}, ${target.x - 90} ${target.y}, ${target.x} ${target.y}`}
+            fill="none"
+            stroke={edge.weight >= 0 ? "#185cff" : "#ff1e76"}
+            strokeOpacity={0.12 + strength}
+            strokeWidth={0.75 + strength * 3.2}
+          />
+        );
+      })}
+    </svg>
   );
 }
 
@@ -1136,6 +1357,9 @@ function SaliencyMap({
 
 export function MnistMlpInferenceDebuggerPlayground() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const topRowRef = useRef<HTMLDivElement>(null);
+  const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
+  const networkSvgRef = useRef<SVGSVGElement>(null);
   const [model, setModel] = useState<MlpModel | null>(null);
   const [input, setInput] = useState(() => new Float32Array(784));
   const [inputRevision, setInputRevision] = useState(0);
@@ -1326,12 +1550,17 @@ export function MnistMlpInferenceDebuggerPlayground() {
           {message}
         </div>
 
-        <div className="mt-4 grid gap-4 2xl:grid-cols-[390px_minmax(0,1fr)_390px]">
+        <div
+          ref={topRowRef}
+          className="relative mt-4 grid gap-4 2xl:grid-cols-[390px_minmax(0,1fr)_390px]"
+        >
           <InputPanel
+            canvasRef={drawingCanvasRef}
             onInputChange={handleInputChange}
             modelLoaded={Boolean(model)}
           />
           <NetworkPanel
+            svgRef={networkSvgRef}
             model={model}
             modelInput={modelInput}
             rawInput={input}
@@ -1344,6 +1573,17 @@ export function MnistMlpInferenceDebuggerPlayground() {
             onTopKEdgesChange={setTopKEdges}
           />
           <OutputPanel debug={debug} />
+          <CanvasContributionOverlay
+            containerRef={topRowRef}
+            canvasRef={drawingCanvasRef}
+            networkSvgRef={networkSvgRef}
+            model={model}
+            modelInput={modelInput}
+            rawInput={input}
+            selectedNeuron={selectedNeuron}
+            contributionThreshold={contributionThreshold}
+            topKEdges={topKEdges}
+          />
         </div>
 
         <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(360px,0.86fr)_minmax(420px,1fr)_minmax(360px,0.9fr)]">

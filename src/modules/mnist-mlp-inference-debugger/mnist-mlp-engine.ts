@@ -448,6 +448,65 @@ function createDenseLayer({
   };
 }
 
+function getInitializer(
+  graph: ReturnType<typeof parseGraph>,
+  name: string | undefined,
+  nodeLabel: string,
+) {
+  const tensor = name ? graph.initializers.get(name) : undefined;
+
+  if (!tensor) {
+    throw new Error(`${nodeLabel} requires constant BatchNorm parameters.`);
+  }
+
+  return tensor;
+}
+
+function foldBatchNormalizationIntoDense({
+  layer,
+  scaleTensor,
+  biasTensor,
+  meanTensor,
+  varianceTensor,
+  epsilon,
+}: {
+  layer: DenseLayer & { outputName: string };
+  scaleTensor: TensorProto;
+  biasTensor: TensorProto;
+  meanTensor: TensorProto;
+  varianceTensor: TensorProto;
+  epsilon: number;
+}) {
+  const tensors = [scaleTensor, biasTensor, meanTensor, varianceTensor];
+
+  tensors.forEach((tensor) => {
+    if (tensor.dataType !== tensorDataFloat) {
+      throw new Error(`BatchNorm tensor ${tensor.name} is not float32.`);
+    }
+
+    if (tensor.floats.length !== layer.outputSize) {
+      throw new Error(
+        `BatchNorm tensor ${tensor.name} has ${tensor.floats.length} values, but ${layer.id} has ${layer.outputSize} outputs.`,
+      );
+    }
+  });
+
+  for (let outputIndex = 0; outputIndex < layer.outputSize; outputIndex += 1) {
+    const scale = scaleTensor.floats[outputIndex] ?? 1;
+    const offset = biasTensor.floats[outputIndex] ?? 0;
+    const mean = meanTensor.floats[outputIndex] ?? 0;
+    const variance = varianceTensor.floats[outputIndex] ?? 1;
+    const factor = scale / Math.sqrt(variance + epsilon);
+
+    for (let inputIndex = 0; inputIndex < layer.inputSize; inputIndex += 1) {
+      const weightIndex = inputIndex * layer.outputSize + outputIndex;
+      layer.weights[weightIndex] *= factor;
+    }
+
+    layer.bias[outputIndex] = (layer.bias[outputIndex] - mean) * factor + offset;
+  }
+}
+
 export function parseOnnxMlpModel(
   buffer: ArrayBuffer,
   fileName: string,
@@ -570,6 +629,30 @@ export function parseOnnxMlpModel(
           continue;
         }
       }
+    }
+
+    if (opType === "BatchNormalization") {
+      const lastLayer = layers.at(-1);
+      const inputName = resolve(node.inputs[0] ?? "");
+      const nodeLabel = node.name || node.outputs[0] || "BatchNormalization";
+
+      if (!lastLayer || inputName !== lastLayer.outputName) {
+        throw new Error(
+          `BatchNormalization node ${nodeLabel} is only supported directly after a dense layer.`,
+        );
+      }
+
+      foldBatchNormalizationIntoDense({
+        layer: lastLayer,
+        scaleTensor: getInitializer(graph, node.inputs[1], nodeLabel),
+        biasTensor: getInitializer(graph, node.inputs[2], nodeLabel),
+        meanTensor: getInitializer(graph, node.inputs[3], nodeLabel),
+        varianceTensor: getInitializer(graph, node.inputs[4], nodeLabel),
+        epsilon: getAttribute(node, "epsilon", 0.00001),
+      });
+      lastLayer.outputName = node.outputs[0];
+      tensorSizes.set(lastLayer.outputName, lastLayer.outputSize);
+      continue;
     }
 
     if (

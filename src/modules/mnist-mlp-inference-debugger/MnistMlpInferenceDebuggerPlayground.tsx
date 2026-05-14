@@ -5,11 +5,13 @@ import {
   computeInputSaliency,
   normalizeMnistInput,
   parseOnnxMlpModel,
+  preprocessMnistInput,
   runMlpCpu,
   runMlpWebGpu,
   softmax,
   topContributors,
   type ForwardDebug,
+  type MnistPreprocessingMode,
   type MlpModel,
 } from "./mnist-mlp-engine";
 
@@ -22,6 +24,13 @@ type SelectedNeuron = {
 
 const fallbackArchitecture = [784, 128, 64, 32, 10];
 const digitLabels = Array.from({ length: 10 }, (_, index) => index);
+const preprocessingOptions: Array<{
+  id: MnistPreprocessingMode;
+  label: string;
+}> = [
+  { id: "mnist-standard", label: "MNIST norm" },
+  { id: "raw", label: "Raw 0..1" },
+];
 
 function Panel({
   children,
@@ -225,7 +234,83 @@ function extractMnistInput(canvas: HTMLCanvasElement) {
     }
   }
 
-  return normalizeMnistInput(values);
+  return normalizeMnistInput(centerInk(values));
+}
+
+function centerInk(values: number[]) {
+  const threshold = 0.04;
+  let minX = 28;
+  let minY = 28;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let index = 0; index < values.length; index += 1) {
+    if ((values[index] ?? 0) <= threshold) {
+      continue;
+    }
+
+    const x = index % 28;
+    const y = Math.floor(index / 28);
+
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return values;
+  }
+
+  const sourceWidth = maxX - minX + 1;
+  const sourceHeight = maxY - minY + 1;
+  const scale = Math.min(20 / sourceWidth, 20 / sourceHeight);
+  const scaledWidth = Math.max(1, Math.round(sourceWidth * scale));
+  const scaledHeight = Math.max(1, Math.round(sourceHeight * scale));
+  const scaled = new Array(scaledWidth * scaledHeight).fill(0);
+
+  for (let y = 0; y < scaledHeight; y += 1) {
+    for (let x = 0; x < scaledWidth; x += 1) {
+      const sourceX = minX + Math.min(sourceWidth - 1, Math.floor(x / scale));
+      const sourceY = minY + Math.min(sourceHeight - 1, Math.floor(y / scale));
+      scaled[y * scaledWidth + x] = values[sourceY * 28 + sourceX] ?? 0;
+    }
+  }
+
+  let mass = 0;
+  let weightedX = 0;
+  let weightedY = 0;
+
+  for (let y = 0; y < scaledHeight; y += 1) {
+    for (let x = 0; x < scaledWidth; x += 1) {
+      const value = scaled[y * scaledWidth + x] ?? 0;
+      mass += value;
+      weightedX += x * value;
+      weightedY += y * value;
+    }
+  }
+
+  const centerX = mass > 0 ? weightedX / mass : (scaledWidth - 1) / 2;
+  const centerY = mass > 0 ? weightedY / mass : (scaledHeight - 1) / 2;
+  const offsetX = Math.round(14 - centerX);
+  const offsetY = Math.round(14 - centerY);
+  const centered = new Array(784).fill(0);
+
+  for (let y = 0; y < scaledHeight; y += 1) {
+    for (let x = 0; x < scaledWidth; x += 1) {
+      const targetX = x + offsetX;
+      const targetY = y + offsetY;
+
+      if (targetX >= 0 && targetX < 28 && targetY >= 0 && targetY < 28) {
+        centered[targetY * 28 + targetX] = Math.max(
+          centered[targetY * 28 + targetX] ?? 0,
+          scaled[y * scaledWidth + x] ?? 0,
+        );
+      }
+    }
+  }
+
+  return centered;
 }
 
 function InputPanel({
@@ -233,15 +318,17 @@ function InputPanel({
   onInputChange,
   onRun,
   disabled,
+  modelLoaded,
 }: {
   input: Float32Array;
   onInputChange: (input: Float32Array) => void;
   onRun: () => void;
   disabled: boolean;
+  modelLoaded: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
-  const erasingRef = useRef(false);
+  const [activeTool, setActiveTool] = useState<"draw" | "erase">("draw");
 
   const syncInput = useCallback(() => {
     const canvas = canvasRef.current;
@@ -274,8 +361,8 @@ function InputPanel({
 
     context.lineCap = "round";
     context.lineJoin = "round";
-    context.lineWidth = erasingRef.current ? 28 : 22;
-    context.strokeStyle = erasingRef.current ? "white" : "black";
+    context.lineWidth = activeTool === "erase" ? 28 : 22;
+    context.strokeStyle = activeTool === "erase" ? "white" : "black";
     context.lineTo(x, y);
     context.stroke();
     context.beginPath();
@@ -283,6 +370,10 @@ function InputPanel({
   }
 
   function startDrawing(event: React.PointerEvent<HTMLCanvasElement>) {
+    if (!modelLoaded) {
+      return;
+    }
+
     drawingRef.current = true;
     event.currentTarget.setPointerCapture(event.pointerId);
     const context = event.currentTarget.getContext("2d");
@@ -307,51 +398,70 @@ function InputPanel({
     <Panel className="p-5">
       <SectionTitle>Input</SectionTitle>
       <div className="mt-5 rounded-[9px] border border-[#dce4f2] bg-white p-4">
-        <canvas
-          ref={canvasRef}
-          width={280}
-          height={280}
-          aria-label="Draw a digit"
-          className="aspect-square w-full cursor-crosshair touch-none rounded-[8px] bg-white"
-          style={{
-            backgroundImage:
-              "linear-gradient(#edf1f8 1px, transparent 1px), linear-gradient(90deg, #edf1f8 1px, transparent 1px)",
-            backgroundSize: "14px 14px",
-          }}
-          onPointerDown={startDrawing}
-          onPointerMove={(event) => {
-            if (drawingRef.current) {
-              draw(event);
-            }
-          }}
-          onPointerUp={stopDrawing}
-          onPointerCancel={stopDrawing}
-        />
+        <div className="relative">
+          <canvas
+            ref={canvasRef}
+            width={280}
+            height={280}
+            aria-label="Draw a digit"
+            aria-disabled={!modelLoaded}
+            className={`aspect-square w-full touch-none rounded-[8px] bg-white ${
+              modelLoaded ? "cursor-crosshair" : "cursor-not-allowed opacity-55"
+            }`}
+            style={{
+              backgroundImage:
+                "linear-gradient(#edf1f8 1px, transparent 1px), linear-gradient(90deg, #edf1f8 1px, transparent 1px)",
+              backgroundSize: "14px 14px",
+            }}
+            onPointerDown={startDrawing}
+            onPointerMove={(event) => {
+              if (drawingRef.current) {
+                draw(event);
+              }
+            }}
+            onPointerUp={stopDrawing}
+            onPointerCancel={stopDrawing}
+          />
+          {!modelLoaded ? (
+            <div className="absolute inset-0 grid place-items-center rounded-[8px] border border-dashed border-[#b9c5e6] bg-white/72 px-5 text-center text-[14px] font-black text-[#263a6f]">
+              Upload a model to enable drawing and inference.
+            </div>
+          ) : null}
+        </div>
         <div className="mt-4 grid grid-cols-3 gap-3">
           <button
             type="button"
             aria-label="Draw mode"
-            className="grid h-12 place-items-center rounded-[8px] border border-[#5e3dff] bg-[#f9f7ff] text-[#3e21ff]"
-            onClick={() => {
-              erasingRef.current = false;
-            }}
+            disabled={!modelLoaded}
+            aria-pressed={activeTool === "draw"}
+            className={`grid h-12 place-items-center rounded-[8px] border transition disabled:cursor-not-allowed disabled:opacity-45 ${
+              activeTool === "draw"
+                ? "border-[#5e3dff] bg-[#f9f7ff] text-[#3e21ff]"
+                : "border-[#dce4f2] bg-white text-[#071854] hover:border-[#aab8dc]"
+            }`}
+            onClick={() => setActiveTool("draw")}
           >
             <PencilIcon />
           </button>
           <button
             type="button"
             aria-label="Erase mode"
-            className="grid h-12 place-items-center rounded-[8px] border border-[#dce4f2] bg-white text-[#071854] transition hover:border-[#aab8dc]"
-            onClick={() => {
-              erasingRef.current = true;
-            }}
+            disabled={!modelLoaded}
+            aria-pressed={activeTool === "erase"}
+            className={`grid h-12 place-items-center rounded-[8px] border transition disabled:cursor-not-allowed disabled:opacity-45 ${
+              activeTool === "erase"
+                ? "border-[#5e3dff] bg-[#f9f7ff] text-[#3e21ff]"
+                : "border-[#dce4f2] bg-white text-[#071854] hover:border-[#aab8dc]"
+            }`}
+            onClick={() => setActiveTool("erase")}
           >
             <EraserIcon />
           </button>
           <button
             type="button"
             aria-label="Clear drawing"
-            className="grid h-12 place-items-center rounded-[8px] border border-[#dce4f2] bg-white text-[#071854] transition hover:border-[#aab8dc]"
+            disabled={!modelLoaded}
+            className="grid h-12 place-items-center rounded-[8px] border border-[#dce4f2] bg-white text-[#071854] transition hover:border-[#aab8dc] disabled:cursor-not-allowed disabled:opacity-45"
             onClick={() => {
               const canvas = canvasRef.current;
 
@@ -404,13 +514,15 @@ function InputPanel({
 
 function NetworkPanel({
   model,
-  input,
+  modelInput,
+  rawInput,
   debug,
   selectedNeuron,
   onSelectNeuron,
 }: {
   model: MlpModel | null;
-  input: Float32Array;
+  modelInput: Float32Array;
+  rawInput: Float32Array;
   debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
   onSelectNeuron: (selection: SelectedNeuron) => void;
@@ -430,6 +542,7 @@ function NetworkPanel({
           : `Hidden Layer ${layerIndex}`,
     indices: layerIndex === layerSizes.length - 1 ? digitLabels : sampleIndices(size, 6),
   }));
+  const canSelectHiddenNeuron = Boolean(model);
 
   return (
     <Panel className="p-5">
@@ -489,7 +602,7 @@ function NetworkPanel({
                       denseLayer.weights[sourceIndex * denseLayer.outputSize + targetIndex] ?? 0;
                     const activation =
                       targetDisplayIndex === 0
-                        ? input[sourceIndex] ?? 0
+                        ? modelInput[sourceIndex] ?? 0
                         : debug?.activations[targetDisplayIndex - 1]?.[sourceIndex] ?? 0;
                     const strength = Math.min(0.9, Math.abs(weight * activation) * 1.6);
 
@@ -517,7 +630,7 @@ function NetworkPanel({
               const denseIndex = layerIndex - 1;
               const activation =
                 isInput
-                  ? input[nodeIndex] ?? 0
+                  ? rawInput[nodeIndex] ?? 0
                   : debug?.activations[denseIndex]?.[nodeIndex] ?? 0;
               const isSelected =
                 !isInput &&
@@ -543,14 +656,14 @@ function NetworkPanel({
               return (
                 <g
                   key={`${layerIndex}-${nodeIndex}`}
-                  role={!isOutput ? "button" : undefined}
-                  tabIndex={!isOutput ? 0 : undefined}
+                  role={!isOutput && canSelectHiddenNeuron ? "button" : undefined}
+                  tabIndex={!isOutput && canSelectHiddenNeuron ? 0 : undefined}
                   onClick={() => {
-                    if (!isOutput) {
+                    if (!isOutput && canSelectHiddenNeuron) {
                       onSelectNeuron({ layerIndex: denseIndex, neuronIndex: nodeIndex });
                     }
                   }}
-                  className={!isOutput ? "cursor-pointer" : ""}
+                  className={!isOutput && canSelectHiddenNeuron ? "cursor-pointer" : ""}
                 >
                   <circle
                     cx={x}
@@ -912,6 +1025,8 @@ export function MnistMlpInferenceDebuggerPlayground() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [model, setModel] = useState<MlpModel | null>(null);
   const [input, setInput] = useState(() => new Float32Array(784));
+  const [preprocessingMode, setPreprocessingMode] =
+    useState<MnistPreprocessingMode>("mnist-standard");
   const [debug, setDebug] = useState<ForwardDebug | null>(null);
   const [runState, setRunState] = useState<RunState>("idle");
   const [message, setMessage] = useState("Drop a dense MNIST ONNX model to begin.");
@@ -926,6 +1041,10 @@ export function MnistMlpInferenceDebuggerPlayground() {
   const activationName = model
     ? Array.from(new Set(model.layers.map((layer) => layer.activation).filter((item) => item !== "linear"))).join(", ") || "Linear"
     : "ReLU";
+  const modelInput = useMemo(
+    () => preprocessMnistInput(input, preprocessingMode),
+    [input, preprocessingMode],
+  );
 
   const runInference = useCallback(async () => {
     if (!model) {
@@ -936,8 +1055,8 @@ export function MnistMlpInferenceDebuggerPlayground() {
     setMessage("Running dense layers on WebGPU...");
 
     try {
-      const gpuLogits = await runMlpWebGpu(model, input);
-      const cpuDebug = runMlpCpu(model, input);
+      const gpuLogits = await runMlpWebGpu(model, modelInput);
+      const cpuDebug = runMlpCpu(model, modelInput);
       const gpuProbabilities = softmax(gpuLogits);
       let predictedClass = 0;
 
@@ -960,7 +1079,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
       setRunState("error");
       setMessage(error instanceof Error ? error.message : "Inference failed.");
     }
-  }, [input, model]);
+  }, [model, modelInput]);
 
   const handleInputChange = useCallback((nextInput: Float32Array) => {
     setInput(new Float32Array(nextInput));
@@ -1001,7 +1120,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
     }
 
     return undefined;
-  }, [input, model, runInference]);
+  }, [modelInput, model, runInference]);
 
   return (
     <main
@@ -1051,6 +1170,32 @@ export function MnistMlpInferenceDebuggerPlayground() {
             <ArchitecturePill label="File" value={model?.fileName ?? "mnist_mlp.onnx"} />
             <ArchitecturePill label="Architecture" value={architecture} />
             <ArchitecturePill label="Activation" value={activationName} />
+            <div className="min-w-[220px] rounded-[12px] border border-[#e2e7f4] bg-white px-5 py-3">
+              <p className="text-[12px] font-black text-[#7180a8]">
+                Preprocess
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {preprocessingOptions.map((option) => {
+                  const isActive = preprocessingMode === option.id;
+
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      aria-pressed={isActive}
+                      className={`rounded-[7px] border px-2 py-1.5 text-[12px] font-black transition ${
+                        isActive
+                          ? "border-[#381cff] bg-[#f5f2ff] text-[#381cff]"
+                          : "border-[#dce4f2] bg-white text-[#263a6f] hover:border-[#aab8dc]"
+                      }`}
+                      onClick={() => setPreprocessingMode(option.id)}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </header>
 
@@ -1070,10 +1215,12 @@ export function MnistMlpInferenceDebuggerPlayground() {
             onInputChange={handleInputChange}
             onRun={runInference}
             disabled={!model || runState === "running"}
+            modelLoaded={Boolean(model)}
           />
           <NetworkPanel
             model={model}
-            input={input}
+            modelInput={modelInput}
+            rawInput={input}
             debug={debug}
             selectedNeuron={selectedNeuron}
             onSelectNeuron={setSelectedNeuron}
@@ -1084,17 +1231,17 @@ export function MnistMlpInferenceDebuggerPlayground() {
         <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(360px,0.86fr)_minmax(420px,1fr)_minmax(360px,0.9fr)]">
           <NeuronDetails
             model={model}
-            input={input}
+            input={modelInput}
             debug={debug}
             selectedNeuron={selectedNeuron}
           />
           <ContributionMatrix
             model={model}
-            input={input}
+            input={modelInput}
             debug={debug}
             selectedNeuron={selectedNeuron}
           />
-          <SaliencyMap model={model} input={input} debug={debug} />
+          <SaliencyMap model={model} input={modelInput} debug={debug} />
         </div>
       </div>
     </main>

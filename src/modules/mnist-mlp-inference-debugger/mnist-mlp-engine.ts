@@ -989,7 +989,6 @@ export function preprocessMnistInput(
 export function computeInputSaliency(
   model: MlpModel,
   debug: ForwardDebug,
-  input: Float32Array,
 ) {
   let gradient = new Float32Array(model.outputSize);
   gradient[debug.predictedClass] = 1;
@@ -1020,9 +1019,7 @@ export function computeInputSaliency(
     gradient = gradInput;
   }
 
-  return new Float32Array(
-    Array.from(gradient, (value, index) => value * (input[index] + 0.08)),
-  );
+  return gradient;
 }
 
 export function topContributors(

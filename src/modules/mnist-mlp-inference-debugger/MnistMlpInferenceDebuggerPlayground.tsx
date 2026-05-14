@@ -41,6 +41,9 @@ const fallbackArchitecture = [784, 128, 64, 32, 10];
 const digitLabels = Array.from({ length: 10 }, (_, index) => index);
 const networkSvgWidth = 820;
 const networkSvgHeight = 350;
+const defaultModelFileName = "model.onnx";
+const defaultModelUrl =
+  "https://huggingface.co/tsilva/mnist-mlp-classifier/resolve/main/model.onnx";
 const preprocessingOptions: Array<{
   id: MnistPreprocessingMode;
   label: string;
@@ -197,10 +200,10 @@ function inputEdgeSourceIndices(rawInput: Float32Array) {
 
 function networkLayerX(layerIndex: number, layerCount: number) {
   if (layerIndex === 0) {
-    return 64;
+    return 0;
   }
 
-  const firstNonInputX = layerCount <= 3 ? 440 : 280;
+  const firstNonInputX = layerCount <= 3 ? 240 : 170;
   const lastLayerX = networkSvgWidth - 60;
 
   return (
@@ -631,6 +634,10 @@ function NetworkPanel({
           className="min-w-[780px]"
         >
           {displayLayers.map((layer, layerIndex) => {
+            if (layerIndex === 0) {
+              return null;
+            }
+
             const x = layerX(layerIndex);
             return (
               <g key={layer.label}>
@@ -819,7 +826,8 @@ function NetworkPanel({
         </label>
         <p className="text-[13px] leading-6 font-bold text-[#263a6f]">
           Contribution edges enter from the adjacent input canvas and preserve
-          each source pixel&apos;s 28x28 position.
+          each source pixel&apos;s 28x28 position. Output edges are scoped to
+          the current predicted class.
         </p>
       </div>
     </Panel>
@@ -1127,6 +1135,15 @@ function NeuronDetails({
     debug?.activations[selectedNeuron.layerIndex]?.[selectedNeuron.neuronIndex] ?? 0;
   const preActivation =
     debug?.preActivations[selectedNeuron.layerIndex]?.[selectedNeuron.neuronIndex] ?? 0;
+  const weightedSum =
+    layer && previousActivation
+      ? Array.from({ length: layer.inputSize }, (_, index) => {
+          const weight =
+            layer.weights[index * layer.outputSize + selectedNeuron.neuronIndex] ?? 0;
+          return (previousActivation[index] ?? 0) * weight;
+        }).reduce((sum, value) => sum + value, 0)
+      : 0;
+  const bias = layer?.bias[selectedNeuron.neuronIndex] ?? 0;
 
   return (
     <Panel className="p-5">
@@ -1143,7 +1160,7 @@ function NeuronDetails({
         </div>
       </div>
       <p className="mt-5 text-[13px] font-black text-[#263a6f]">
-        Top upstream contributors
+        Top upstream contributors by activation x weight
       </p>
       <div className="mt-3 overflow-hidden rounded-[8px] border border-[#e2e8f4]">
         <div className="grid grid-cols-4 bg-[#fbfcff] px-3 py-2 text-[12px] font-black text-[#50608a]">
@@ -1177,15 +1194,28 @@ function NeuronDetails({
           </div>
         )}
       </div>
-      <div className="mt-4 grid grid-cols-2 rounded-[10px] border border-[#dfe5f3] text-center">
-        <div className="border-r border-[#dfe5f3] px-4 py-4">
-          <p className="text-[12px] font-bold text-[#50608a]">Pre-activation (z)</p>
+      <div className="mt-4 grid grid-cols-2 rounded-[10px] border border-[#dfe5f3] text-center lg:grid-cols-4">
+        <div className="border-r border-b border-[#dfe5f3] px-3 py-4 lg:border-b-0">
+          <p className="text-[12px] font-bold text-[#50608a]">Weighted sum</p>
+          <p className="mt-2 font-mono text-[16px] font-black text-[#071854]">
+            {formatNumber(weightedSum)}
+          </p>
+        </div>
+        <div className="border-b border-[#dfe5f3] px-3 py-4 lg:border-r lg:border-b-0">
+          <p className="text-[12px] font-bold text-[#50608a]">Bias</p>
+          <p className="mt-2 font-mono text-[16px] font-black text-[#071854]">
+            {bias >= 0 ? "+" : ""}
+            {formatNumber(bias)}
+          </p>
+        </div>
+        <div className="border-r border-[#dfe5f3] px-3 py-4">
+          <p className="text-[12px] font-bold text-[#50608a]">z = sum + bias</p>
           <p className="mt-2 font-mono text-[16px] font-black text-[#071854]">
             {formatNumber(preActivation)}
           </p>
         </div>
-        <div className="px-4 py-4">
-          <p className="text-[12px] font-bold text-[#50608a]">Activation (a)</p>
+        <div className="px-3 py-4">
+          <p className="text-[12px] font-bold text-[#50608a]">a = activation(z)</p>
           <p className="mt-2 font-mono text-[16px] font-black text-[#071854]">
             {formatNumber(activation)}
           </p>
@@ -1212,7 +1242,13 @@ function ContributionMatrix({
       ? input
       : debug?.activations[selectedNeuron.layerIndex - 1] ?? null;
   const fromIndices = layer ? sampleIndices(layer.inputSize, Math.min(64, layer.inputSize)) : [];
-  const toIndices = layer ? sampleIndices(layer.outputSize, Math.min(32, layer.outputSize)) : [];
+  const toIndices = layer
+    ? sampleIndicesWithPinned(
+        layer.outputSize,
+        Math.min(32, layer.outputSize),
+        selectedNeuron.neuronIndex,
+      )
+    : [];
   const cells =
     layer && previousActivation
       ? toIndices.flatMap((toIndex) =>
@@ -1230,7 +1266,8 @@ function ContributionMatrix({
     <Panel className="p-5">
       <SectionTitle>B. Effective Contributions Matrix</SectionTitle>
       <p className="mt-4 text-[13px] font-bold text-[#263a6f]">
-        From previous layer to Hidden Layer {selectedNeuron.layerIndex + 1}
+        From previous layer to Hidden Layer {selectedNeuron.layerIndex + 1};
+        selected neuron row is outlined.
       </p>
       <div className="mt-5 overflow-x-auto">
         <div
@@ -1284,16 +1321,14 @@ function contributionColor(normalized: number) {
 
 function SaliencyMap({
   model,
-  input,
   debug,
 }: {
   model: MlpModel | null;
-  input: Float32Array;
   debug: ForwardDebug | null;
 }) {
   const saliency = useMemo(
-    () => (model && debug ? computeInputSaliency(model, debug, input) : new Float32Array(784)),
-    [debug, input, model],
+    () => (model && debug ? computeInputSaliency(model, debug) : new Float32Array(784)),
+    [debug, model],
   );
   const maxAbs = Math.max(0.0001, ...Array.from(saliency, Math.abs));
 
@@ -1301,7 +1336,7 @@ function SaliencyMap({
     <Panel className="p-5">
       <SectionTitle>C. Input Saliency Map</SectionTitle>
       <p className="mt-4 text-[13px] font-bold text-[#263a6f]">
-        Influence on predicted class {debug?.predictedClass ?? "-"}
+        Local score gradient for predicted class {debug?.predictedClass ?? "-"}
       </p>
       <div className="mt-5 grid grid-cols-[minmax(0,1fr)_50px] items-center gap-5">
         <div
@@ -1323,7 +1358,8 @@ function SaliencyMap({
         </div>
       </div>
       <p className="mt-4 text-[13px] font-bold text-[#50608a]">
-        Blue increases the predicted digit score; pink decreases it.
+        Blue means increasing that pixel raises the predicted class score;
+        pink lowers it.
       </p>
     </Panel>
   );
@@ -1334,6 +1370,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
   const topRowRef = useRef<HTMLDivElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const networkSvgRef = useRef<SVGSVGElement>(null);
+  const loadRequestRef = useRef(0);
   const [model, setModel] = useState<MlpModel | null>(null);
   const [input, setInput] = useState(() => new Float32Array(784));
   const [inputRevision, setInputRevision] = useState(0);
@@ -1400,30 +1437,95 @@ export function MnistMlpInferenceDebuggerPlayground() {
     setInputRevision((revision) => revision + 1);
   }, []);
 
+  const loadModelBuffer = useCallback(
+    async ({
+      buffer,
+      fileName,
+      loadingMessage,
+      successMessage,
+      errorMessage,
+      requestId,
+    }: {
+      buffer: Promise<ArrayBuffer>;
+      fileName: string;
+      loadingMessage: string;
+      successMessage: string;
+      errorMessage: string;
+      requestId?: number;
+    }) => {
+      const activeRequestId = requestId ?? loadRequestRef.current + 1;
+
+      loadRequestRef.current = activeRequestId;
+      setRunState("idle");
+      setMessage(loadingMessage);
+
+      try {
+        const parsedModel = parseOnnxMlpModel(await buffer, fileName);
+
+        if (loadRequestRef.current !== activeRequestId) {
+          return;
+        }
+
+        const hiddenLayerIndex = Math.max(0, Math.min(parsedModel.layers.length - 2, 2));
+        const hiddenLayer = parsedModel.layers[hiddenLayerIndex];
+
+        setModel(parsedModel);
+        setDebug(null);
+        setSelectedNeuron({
+          layerIndex: hiddenLayerIndex,
+          neuronIndex: Math.min(18, hiddenLayer.outputSize - 1),
+        });
+        setRunState("ready");
+        setMessage(successMessage);
+      } catch (error) {
+        if (loadRequestRef.current !== activeRequestId) {
+          return;
+        }
+
+        setModel(null);
+        setDebug(null);
+        setRunState("error");
+        setMessage(error instanceof Error ? error.message : errorMessage);
+      }
+    },
+    [],
+  );
+
   async function loadFile(file: File) {
     setRunState("idle");
-    setMessage("Reading ONNX graph...");
-
-    try {
-      const parsedModel = parseOnnxMlpModel(await file.arrayBuffer(), file.name);
-      const hiddenLayerIndex = Math.max(0, Math.min(parsedModel.layers.length - 2, 2));
-      const hiddenLayer = parsedModel.layers[hiddenLayerIndex];
-
-      setModel(parsedModel);
-      setDebug(null);
-      setSelectedNeuron({
-        layerIndex: hiddenLayerIndex,
-        neuronIndex: Math.min(18, hiddenLayer.outputSize - 1),
-      });
-      setRunState("ready");
-      setMessage("Model loaded. Run inference to inspect activations.");
-    } catch (error) {
-      setModel(null);
-      setDebug(null);
-      setRunState("error");
-      setMessage(error instanceof Error ? error.message : "Could not parse the ONNX file.");
-    }
+    await loadModelBuffer({
+      buffer: file.arrayBuffer(),
+      fileName: file.name,
+      loadingMessage: "Reading ONNX graph...",
+      successMessage: "Model loaded. Run inference to inspect activations.",
+      errorMessage: "Could not parse the ONNX file.",
+    });
   }
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const requestId = loadRequestRef.current + 1;
+    const buffer = fetch(defaultModelUrl, { signal: controller.signal }).then((response) => {
+      if (!response.ok) {
+        throw new Error(`Default model download failed (${response.status}).`);
+      }
+
+      return response.arrayBuffer();
+    });
+
+    void loadModelBuffer({
+      buffer,
+      fileName: defaultModelFileName,
+      loadingMessage: "Loading default MNIST model from Hugging Face...",
+      successMessage: "Default Hugging Face model loaded. Run inference to inspect activations.",
+      errorMessage: "Could not load the default Hugging Face model. Upload a local ONNX model instead.",
+      requestId,
+    });
+
+    return () => {
+      controller.abort();
+    };
+  }, [loadModelBuffer]);
 
   useEffect(() => {
     if (model) {
@@ -1457,7 +1559,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
               MNIST MLP Inference Debugger
             </h1>
             <p className="mt-2 text-[16px] font-bold text-[#6b779f] sm:text-[19px]">
-              Upload a model and inspect a single inference
+              Default model loads automatically; upload or drop another ONNX model anytime
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -1482,7 +1584,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
               <UploadIcon />
               Upload model
             </button>
-            <ArchitecturePill label="File" value={model?.fileName ?? "mnist_mlp.onnx"} />
+            <ArchitecturePill label="File" value={model?.fileName ?? defaultModelFileName} />
             <ArchitecturePill label="Architecture" value={architecture} />
             <ArchitecturePill label="Activation" value={activationName} />
             <div className="min-w-[220px] rounded-[12px] border border-[#e2e7f4] bg-white px-5 py-3">
@@ -1573,7 +1675,7 @@ export function MnistMlpInferenceDebuggerPlayground() {
             debug={debug}
             selectedNeuron={selectedNeuron}
           />
-          <SaliencyMap model={model} input={modelInput} debug={debug} />
+          <SaliencyMap model={model} debug={debug} />
         </div>
       </div>
     </main>

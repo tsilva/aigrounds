@@ -684,17 +684,19 @@ function OutputPanel({ debug }: { debug: ForwardDebug | null }) {
 
 function NeuronDetails({
   model,
+  input,
   debug,
   selectedNeuron,
 }: {
   model: MlpModel | null;
+  input: Float32Array;
   debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
 }) {
   const layer = model?.layers[selectedNeuron.layerIndex];
   const previousActivation =
     selectedNeuron.layerIndex === 0
-      ? null
+      ? input
       : debug?.activations[selectedNeuron.layerIndex - 1] ?? null;
   const contributors =
     layer && previousActivation
@@ -774,17 +776,19 @@ function NeuronDetails({
 
 function ContributionMatrix({
   model,
+  input,
   debug,
   selectedNeuron,
 }: {
   model: MlpModel | null;
+  input: Float32Array;
   debug: ForwardDebug | null;
   selectedNeuron: SelectedNeuron;
 }) {
   const layer = model?.layers[selectedNeuron.layerIndex];
   const previousActivation =
     selectedNeuron.layerIndex === 0
-      ? null
+      ? input
       : debug?.activations[selectedNeuron.layerIndex - 1] ?? null;
   const fromIndices = layer ? sampleIndices(layer.inputSize, Math.min(64, layer.inputSize)) : [];
   const toIndices = layer ? sampleIndices(layer.outputSize, Math.min(32, layer.outputSize)) : [];
@@ -1080,11 +1084,13 @@ export function MnistMlpInferenceDebuggerPlayground() {
         <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(360px,0.86fr)_minmax(420px,1fr)_minmax(360px,0.9fr)]">
           <NeuronDetails
             model={model}
+            input={input}
             debug={debug}
             selectedNeuron={selectedNeuron}
           />
           <ContributionMatrix
             model={model}
+            input={input}
             debug={debug}
             selectedNeuron={selectedNeuron}
           />

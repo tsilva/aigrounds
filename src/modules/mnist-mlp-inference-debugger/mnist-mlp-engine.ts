@@ -1,4 +1,5 @@
 export type DenseActivation = "linear" | "relu" | "sigmoid" | "tanh";
+export type MnistPreprocessingMode = "mnist-standard" | "raw";
 
 export type DenseLayer = {
   id: string;
@@ -885,6 +886,21 @@ export function normalizeMnistInput(values: number[]) {
   }
 
   return normalized;
+}
+
+export function preprocessMnistInput(
+  input: Float32Array,
+  mode: MnistPreprocessingMode,
+) {
+  const preprocessed = new Float32Array(784);
+
+  for (let index = 0; index < preprocessed.length; index += 1) {
+    const value = Math.min(1, Math.max(0, input[index] ?? 0));
+    preprocessed[index] =
+      mode === "mnist-standard" ? (value - 0.1307) / 0.3081 : value;
+  }
+
+  return preprocessed;
 }
 
 export function computeInputSaliency(

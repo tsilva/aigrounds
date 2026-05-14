@@ -126,7 +126,8 @@ class ProtoReader {
     }
 
     if (wire === 2) {
-      this.offset += this.readVarint();
+      const length = this.readVarint();
+      this.offset += length;
       return;
     }
 
@@ -135,7 +136,7 @@ class ProtoReader {
       return;
     }
 
-    throw new Error(`Unsupported protobuf wire type ${wire}.`);
+    throw new Error(`Unsupported protobuf wire type ${wire} at byte ${this.offset}.`);
   }
 }
 

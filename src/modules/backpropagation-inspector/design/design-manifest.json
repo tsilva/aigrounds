@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 63,
+  "lessonPlanTitle": "Backpropagation Inspector",
+  "slug": "backpropagation-inspector",
+  "modulePath": "src/modules/backpropagation-inspector",
+  "acceptedMockup": "src/modules/backpropagation-inspector/design/accepted-mockup.png",
+  "prompt": "src/modules/backpropagation-inspector/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e3020-e6b6-78d2-b92e-6d4e8856a5bc/ig_0994ca07535b0afb016a083baa53bc8191b625615b84402b4c.png"
+}

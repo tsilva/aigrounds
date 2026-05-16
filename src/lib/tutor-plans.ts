@@ -21,6 +21,7 @@ type TutorPlanSlug =
   | "transformer-attention"
   | "linear-quantization-int4"
   | "mnist-mlp-inference-debugger"
+  | "backpropagation-inspector"
   | "zero-knowledge-proofs"
   | "batch-normalization"
   | "layer-normalization";
@@ -1683,6 +1684,72 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Saliency estimates how changing each input pixel would move the predicted class score, so it helps debug what the classifier used as evidence.",
+      },
+    ],
+  },
+  "backpropagation-inspector": {
+    intro:
+      "Work through three backprop experiments. Predict the error direction, compare cached activations, inspect the gradient table, then change the learning rate to see how credit becomes an update.",
+    whyItMatters:
+      "Backpropagation is the mechanism that lets one loss value train many weights. It matters because each weight needs a local blame signal, not just a final wrong-or-right score.",
+    openingMessage:
+      "No prior backprop details needed. We will inspect one output layer with cached hidden activations.\n\n- The forward pass stores activations such as h1 and h2.\n- Binary cross entropy with a sigmoid output gives output delta = p - y.\n- Each output weight gradient is cached activation times downstream error.\n- A weight update moves opposite the gradient: w = w - eta * dL/dw.\n\nFirst prediction: in Case A, h1 is larger than h2. Which output weight do you expect to receive the bigger absolute update? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains output delta as p - y for sigmoid binary cross entropy.",
+      "Connects dL/dw_out to cached activation times downstream error.",
+      "Uses the gradient sign to explain why an output weight moves up or down.",
+      "Explains why larger cached activations create larger output-weight gradients when downstream error matches.",
+      "Shows how the learning rate scales gradient into an update without changing the gradient itself.",
+    ],
+    steps: [
+      {
+        title: "Trace one error backward",
+        experiment:
+          "Use Case A and keep Backward selected. Compare p, target y, dL/dz = p - y, and the two output-weight gradient rows.",
+        predictionQuestion:
+          "In Case A, h1 is larger than h2. Which output weight should receive the bigger absolute update?",
+        observationPrompt:
+          "How did cached activation size show up in the output-weight gradients?",
+        observationOptions: [
+          "w_out1 had the larger absolute gradient",
+          "Both gradients shared the same downstream error",
+          "I am not sure",
+        ],
+        takeaway:
+          "The same output error flows through both output weights, so the larger cached activation gets more credit.",
+      },
+      {
+        title: "Flip the target",
+        experiment:
+          "Choose Case B. Compare the graph, p - y value, gradient signs, and weight update table with Case A. Case C is an optional extra comparison after this step.",
+        predictionQuestion:
+          "If the target is 0 and the prediction is above 0, should p - y become positive or negative?",
+        observationPrompt:
+          "What changed in the signs of the gradients and updates after switching to Case B?",
+        observationOptions: [
+          "The output delta became positive",
+          "The update moved weights opposite the gradient",
+          "I am not sure",
+        ],
+        takeaway:
+          "Changing the target changes the error sign, and the gradient sign decides whether each weight should move up or down.",
+      },
+      {
+        title: "Scale credit into an update",
+        experiment:
+          "Move the learning-rate slider from 0.10 to 0.50, or use the eta preset buttons. Watch the gradient column, change column, and after column.",
+        predictionQuestion:
+          "When learning rate increases, should the gradients themselves change or only the update size?",
+        observationPrompt:
+          "Which table columns changed as learning rate moved?",
+        observationOptions: [
+          "The change and after columns moved",
+          "The gradient column stayed the same",
+          "I am not sure",
+        ],
+        takeaway:
+          "Backprop computes the gradient first. The learning rate only scales how much the optimizer moves the weight.",
       },
     ],
   },

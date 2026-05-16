@@ -1,5 +1,6 @@
 import { type ComponentType } from "react";
 import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
+import { BackpropagationInspectorPlayground } from "@/modules/backpropagation-inspector/BackpropagationInspectorPlayground";
 import { BatchNormalizationPlayground } from "@/modules/batch-normalization/BatchNormalizationPlayground";
 import { BernoulliCategoricalBinomialPlayground } from "@/modules/bernoulli-categorical-binomial/BernoulliCategoricalBinomialPlayground";
 import { BytePairEncodingPlayground } from "@/modules/byte-pair-encoding/BytePairEncodingPlayground";
@@ -62,6 +63,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
   "mnist-mlp-inference-debugger": MnistMlpInferenceDebuggerPlayground,
+  "backpropagation-inspector": BackpropagationInspectorPlayground,
   "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
   "batch-normalization": BatchNormalizationPlayground,
   "layer-normalization": LayerNormalizationPlayground,

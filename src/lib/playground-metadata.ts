@@ -662,6 +662,32 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "backpropagation-inspector",
+    title: "Backpropagation Inspector",
+    tag: "neural networks",
+    kicker:
+      "Trace one output error backward and see how cached activations assign credit to weights.",
+    summary:
+      "Pick a training case, inspect the sigmoid output delta, compare signed output-weight gradients, and scale those gradients into before/after updates with a learning-rate slider.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Backpropagation",
+      "Gradients",
+      "Credit assignment",
+      "Learning rate",
+    ],
+    learningGoals: [
+      "Explain output delta as p - y for sigmoid binary cross entropy.",
+      "Connect each output-weight gradient to cached activation times downstream error.",
+      "Use gradient sign and learning rate to explain a before/after weight update.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["backpropagation-inspector"],
+    theme: {
+      badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
+    },
+  },
+  {
     slug: "zero-knowledge-proofs",
     title: "Zero Knowledge Proofs Lab",
     tag: "cryptography",
@@ -1033,14 +1059,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Trace local derivatives through a small graph before sending credit backward.",
     concepts: ["Computational graphs", "Chain rule", "Local derivatives"],
-  },
-  {
-    slug: "backpropagation-inspector",
-    title: "Backpropagation Inspector",
-    tag: "neural networks",
-    summary:
-      "Trace how one loss value sends credit assignment back through weights.",
-    concepts: ["Backpropagation", "Gradients", "Credit assignment"],
   },
   {
     slug: "rms-normalization",

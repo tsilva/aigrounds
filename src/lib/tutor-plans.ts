@@ -1689,7 +1689,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   },
   "backpropagation-inspector": {
     intro:
-      "Work through three backprop experiments. Predict the error direction, compare cached activations, inspect the gradient table, then change the learning rate to see how credit becomes an update.",
+      "Work through four backprop experiments. Predict the error direction, compare cached activations, follow hidden-unit credit, inspect the gradient table, then change the learning rate to see how credit becomes an update.",
     whyItMatters:
       "Backpropagation is the mechanism that lets one loss value train many weights. It matters because each weight needs a local blame signal, not just a final wrong-or-right score.",
     openingMessage:
@@ -1698,6 +1698,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
     masteryCriteria: [
       "Explains output delta as p - y for sigmoid binary cross entropy.",
       "Connects dL/dw_out to cached activation times downstream error.",
+      "Recognizes dL/dh as hidden-unit credit that would keep flowing backward.",
       "Uses the gradient sign to explain why an output weight moves up or down.",
       "Explains why larger cached activations create larger output-weight gradients when downstream error matches.",
       "Shows how the learning rate scales gradient into an update without changing the gradient itself.",
@@ -1706,7 +1707,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Trace one error backward",
         experiment:
-          "Use Case A and keep Backward selected. Compare p, target y, dL/dz = p - y, and the two output-weight gradient rows.",
+          "Use Case A. Select Forward once to see the cached activations and prediction, then select Backward. Compare p, target y, dL/dz = p - y, and the two output-weight gradient rows.",
         predictionQuestion:
           "In Case A, h1 is larger than h2. Which output weight should receive the bigger absolute update?",
         observationPrompt:
@@ -1718,6 +1719,22 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "The same output error flows through both output weights, so the larger cached activation gets more credit.",
+      },
+      {
+        title: "Follow hidden-unit credit",
+        experiment:
+          "Stay on Case A with Backward selected. Compare the dL/dh1 and dL/dh2 rows. These are hidden-unit credit signals, not output-weight updates: each one is output weight times dL/dz.",
+        predictionQuestion:
+          "In Case A, dL/dz is negative and w_out2 is also negative. Should dL/dh2 be positive or negative?",
+        observationPrompt:
+          "Why did dL/dh1 and dL/dh2 end up with different signs?",
+        observationOptions: [
+          "w_out2 flipped the sign because it is negative",
+          "dL/dh rows are the signal that keeps flowing backward",
+          "I am not sure",
+        ],
+        takeaway:
+          "Backprop keeps moving one local step at a time: output-weight gradients use cached activation times error, while hidden-unit credit uses output weight times the same downstream error.",
       },
       {
         title: "Flip the target",
@@ -1738,7 +1755,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Scale credit into an update",
         experiment:
-          "Move the learning-rate slider from 0.10 to 0.50, or use the eta preset buttons. Watch the gradient column, change column, and after column.",
+          "Select Update. Use eta 0.10, then eta 0.50, or move the learning-rate slider between those values. Watch the gradient column, change column, and after column.",
         predictionQuestion:
           "When learning rate increases, should the gradients themselves change or only the update size?",
         observationPrompt:

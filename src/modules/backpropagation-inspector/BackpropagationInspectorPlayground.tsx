@@ -482,12 +482,16 @@ function GradientTable({ analysis }: { analysis: BackpropAnalysis }) {
     {
       label: "dL/dh1",
       value: formatSigned(analysis.hiddenCredit.h1),
-      how: `w_out1 * dL/dz`,
+      how: `w_out1 * dL/dz = ${formatFixed(
+        outputWeights.wOut1,
+      )} * ${formatSigned(analysis.outputDelta)}`,
     },
     {
       label: "dL/dh2",
       value: formatSigned(analysis.hiddenCredit.h2),
-      how: `w_out2 * dL/dz`,
+      how: `w_out2 * dL/dz = ${formatFixed(
+        outputWeights.wOut2,
+      )} * ${formatSigned(analysis.outputDelta)}`,
     },
   ];
 
@@ -503,17 +507,21 @@ function GradientTable({ analysis }: { analysis: BackpropAnalysis }) {
           key={row.label}
           className="grid grid-cols-[minmax(86px,1fr)_88px_minmax(130px,1.4fr)] border-t border-[#dbe4ff] text-[12px] sm:text-[13px]"
         >
-          <div className="px-3 py-2 font-mono font-bold text-[#172347]">
+          <div className="break-words px-3 py-2 font-mono font-bold text-[#172347]">
             {row.label}
           </div>
-          <div className="border-l border-[#dbe4ff] px-3 py-2 font-mono font-black text-[#ff1d37]">
+          <div className="break-words border-l border-[#dbe4ff] px-3 py-2 font-mono font-black text-[#ff1d37]">
             {row.value}
           </div>
-          <div className="border-l border-[#dbe4ff] px-3 py-2 font-mono font-bold text-[#25365f]">
+          <div className="break-words border-l border-[#dbe4ff] px-3 py-2 font-mono font-bold text-[#25365f]">
             {row.how}
           </div>
         </div>
       ))}
+      <div className="border-t border-[#dbe4ff] bg-[#fbfcff] px-3 py-2 text-[12px] leading-5 font-bold text-[#526183]">
+        dL/dw rows update output weights. dL/dh rows are the hidden-unit credit
+        signals that would keep flowing backward.
+      </div>
     </div>
   );
 }
@@ -526,29 +534,39 @@ function UpdateTable({ updates }: { updates: BackpropAnalysis["updates"] }) {
 
   return (
     <div className="min-w-0 overflow-hidden rounded-[8px] border border-[#dbe4ff] bg-white">
-      <div className="grid grid-cols-[minmax(76px,1fr)_repeat(4,minmax(76px,1fr))] bg-[#f7f9ff] text-center text-[11px] font-black text-[#59678c] uppercase">
-        <div className="px-2 py-2 text-left">Weight</div>
-        <div className="border-l border-[#dbe4ff] px-2 py-2">Before</div>
-        <div className="border-l border-[#dbe4ff] px-2 py-2">Gradient</div>
-        <div className="border-l border-[#dbe4ff] px-2 py-2">Change</div>
-        <div className="border-l border-[#dbe4ff] px-2 py-2">After</div>
+      <div className="grid grid-cols-[minmax(56px,1fr)_repeat(4,minmax(50px,1fr))] bg-[#f7f9ff] text-center text-[10px] font-black text-[#59678c] uppercase sm:grid-cols-[minmax(70px,1fr)_repeat(4,minmax(70px,1fr))] sm:text-[11px]">
+        <div className="px-1.5 py-2 text-left sm:px-2">Weight</div>
+        <div className="border-l border-[#dbe4ff] px-1.5 py-2 sm:px-2">
+          Before
+        </div>
+        <div className="border-l border-[#dbe4ff] px-1.5 py-2 sm:px-2">
+          Gradient
+        </div>
+        <div className="border-l border-[#dbe4ff] px-1.5 py-2 sm:px-2">
+          Change
+        </div>
+        <div className="border-l border-[#dbe4ff] px-1.5 py-2 sm:px-2">
+          After
+        </div>
       </div>
       {rows.map(({ label, update }) => (
         <div
           key={label}
-          className="grid grid-cols-[minmax(76px,1fr)_repeat(4,minmax(76px,1fr))] border-t border-[#dbe4ff] text-center font-mono text-[14px] font-black sm:text-[16px]"
+          className="grid grid-cols-[minmax(56px,1fr)_repeat(4,minmax(50px,1fr))] border-t border-[#dbe4ff] text-center font-mono text-[12px] font-black sm:grid-cols-[minmax(70px,1fr)_repeat(4,minmax(70px,1fr))] sm:text-[15px]"
         >
-          <div className="px-2 py-3 text-left text-[#071024]">{label}</div>
-          <div className="border-l border-[#dbe4ff] px-2 py-3 text-[#071024]">
+          <div className="px-1.5 py-3 text-left text-[#071024] sm:px-2">
+            {label}
+          </div>
+          <div className="border-l border-[#dbe4ff] px-1.5 py-3 text-[#071024] sm:px-2">
             {formatFixed(update.before)}
           </div>
-          <div className="border-l border-[#dbe4ff] px-2 py-3 text-[#ff1d37]">
+          <div className="border-l border-[#dbe4ff] px-1.5 py-3 text-[#ff1d37] sm:px-2">
             {formatSigned(update.gradient)}
           </div>
-          <div className="border-l border-[#dbe4ff] px-2 py-3 text-[#078036]">
+          <div className="border-l border-[#dbe4ff] px-1.5 py-3 text-[#078036] sm:px-2">
             {formatSigned(update.change)}
           </div>
-          <div className="border-l border-[#dbe4ff] px-2 py-3 text-[#1638ff]">
+          <div className="border-l border-[#dbe4ff] px-1.5 py-3 text-[#1638ff] sm:px-2">
             {formatFixed(update.after)}
           </div>
         </div>
@@ -695,7 +713,7 @@ export function BackpropagationInspectorPlayground() {
             </div>
           </Panel>
 
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,34rem),1fr))] gap-4">
             <Panel className="p-5 sm:p-6">
               <LessonTitle>2. Step The Signal Forward</LessonTitle>
               <p className="mt-3 text-[15px] leading-6 text-[#172347]">
@@ -727,8 +745,8 @@ export function BackpropagationInspectorPlayground() {
             </Panel>
 
             <Panel className="p-5 sm:p-6">
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-                <div>
+              <div className="flex flex-col gap-4 min-[1100px]:flex-row min-[1100px]:items-start min-[1100px]:justify-between">
+                <div className="min-w-0">
                   <LessonTitle>3. Send Credit Backward</LessonTitle>
                   <p className="mt-3 text-[15px] leading-6 text-[#172347]">
                     The output error flows backward through local derivatives.
@@ -755,7 +773,7 @@ export function BackpropagationInspectorPlayground() {
                   />
                 </div>
               </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.95fr)]">
+              <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(min(100%,23rem),1fr))] gap-4">
                 <div className="min-w-0">
                   <BackwardGraph analysis={analysis} phase={phase} />
                   <div className="mt-2">
@@ -770,7 +788,7 @@ export function BackpropagationInspectorPlayground() {
           </div>
 
           <Panel className="p-5 sm:p-6">
-            <div className="grid gap-5 xl:grid-cols-[minmax(260px,0.5fr)_minmax(0,1fr)_minmax(250px,0.48fr)]">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,21rem),1fr))] gap-5">
               <div className="min-w-0">
                 <LessonTitle>4. See The Update</LessonTitle>
                 <p className="mt-3 text-[15px] leading-6 text-[#172347]">

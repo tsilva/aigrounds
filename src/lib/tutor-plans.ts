@@ -21,6 +21,7 @@ type TutorPlanSlug =
   | "transformer-attention"
   | "linear-quantization-int4"
   | "mnist-mlp-inference-debugger"
+  | "autograd-graphs"
   | "backpropagation-inspector"
   | "zero-knowledge-proofs"
   | "batch-normalization"
@@ -1767,6 +1768,89 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Backprop computes the gradient first. The learning rate only scales how much the optimizer moves the weight.",
+      },
+    ],
+  },
+  "autograd-graphs": {
+    intro:
+      "Work through three autograd experiments. Predict the forward value, inspect how local derivatives send gradients backward, then change the formula and explain why shared paths add.",
+    whyItMatters:
+      "Autograd is how modern neural-network libraries turn ordinary formulas into trainable parameters. It matters because each parameter needs its own gradient, and those gradients come from the computation graph, not from a separate hand-written rule.",
+    openingMessage:
+      "No prior autograd details needed. We will trace tiny formulas as graphs.\n\n- The forward pass computes and caches values at each node.\n- The backward pass starts with output gradient 1 and moves opposite the arrows.\n- Each edge multiplies the incoming gradient by a local derivative.\n- If one parameter affects the output through multiple paths, the path gradients add.\n\nFirst prediction: for f(a,b)=a*b+b^2 at a=2 and b=3, which parameter should have the larger gradient: a or b? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains that autograd records a computation graph during the forward pass.",
+      "Connects node activations to cached values used during the backward pass.",
+      "Uses local derivatives to explain how a gradient message moves one edge backward.",
+      "Explains why b in a*b+b^2 receives two gradient contributions that add.",
+      "Interprets derivative charts as gradients for one parameter while the other values are held fixed.",
+      "Uses a one-step update preview to explain why parameters move opposite the gradient.",
+    ],
+    steps: [
+      {
+        title: "Follow the forward cache",
+        experiment:
+          "Use f(a,b)=a*b+b^2 with a=2 and b=3. Read the graph from left to right and compare the mul, square, add, and out node values.",
+        predictionQuestion:
+          "Before looking closely, what output do you expect from a*b+b^2 when a=2 and b=3?",
+        observationPrompt:
+          "Which cached forward values did the output combine?",
+        observationOptions: [
+          "mul was 6 and square was 9",
+          "add combined both paths into 15",
+          "I am not sure",
+        ],
+        takeaway:
+          "Autograd first records the exact operations and cached values, so backward gradients have a graph to follow.",
+      },
+      {
+        title: "Add shared-path gradients",
+        experiment:
+          "Stay on f(a,b)=a*b+b^2. Compare the badges near a and b, then read the chain-rule panel for b's two paths.",
+        predictionQuestion:
+          "Which parameter should get the larger gradient, a or b, and why?",
+        observationPrompt:
+          "How did b's two backward paths combine?",
+        observationOptions: [
+          "b received 2 from multiply",
+          "b received 6 from square",
+          "I am not sure",
+        ],
+        takeaway:
+          "A shared input can affect the output through multiple paths. Autograd sums those incoming contributions, so df/db becomes 2 + 6 = 8.",
+      },
+      {
+        title: "Compare another graph",
+        experiment:
+          "Choose the sigmoid formula, then the squared-error formula. Move one slider in each and compare the graph, derivative charts, and update preview.",
+        predictionQuestion:
+          "When the formula changes, should the graph structure and derivative curves stay the same or change?",
+        observationPrompt:
+          "What changed when the formula changed?",
+        observationOptions: [
+          "The operation nodes changed",
+          "The derivative curves changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Autograd follows the actual operations in the selected formula, so changing the formula changes both the graph and the gradients.",
+      },
+      {
+        title: "Use a gradient as an update",
+        experiment:
+          "Return to f(a,b)=a*b+b^2. Move b high and low, then compare df/db with the one-step gradient descent preview.",
+        predictionQuestion:
+          "If df/db gets larger, should the one-step update move b by a larger or smaller amount?",
+        observationPrompt:
+          "How did the preview use the gradient value?",
+        observationOptions: [
+          "The update moved opposite the gradient",
+          "A larger gradient made a larger step",
+          "I am not sure",
+        ],
+        takeaway:
+          "Autograd computes gradients; an optimizer turns them into parameter moves, usually by stepping opposite the gradient.",
       },
     ],
   },

@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 62,
+  "lessonPlanTitle": "Autograd Graphs",
+  "slug": "autograd-graphs",
+  "modulePath": "src/modules/autograd-graphs",
+  "acceptedMockup": "src/modules/autograd-graphs/design/accepted-mockup.png",
+  "prompt": "src/modules/autograd-graphs/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e3aec-4243-79e2-bd63-4d6c051ad62d/ig_03c963bddd5c97f1016a0b055c95208191a183865b989d2c9b.png"
+}

@@ -1,4 +1,5 @@
 import { type ComponentType } from "react";
+import { AutogradGraphsPlayground } from "@/modules/autograd-graphs/AutogradGraphsPlayground";
 import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
 import { BackpropagationInspectorPlayground } from "@/modules/backpropagation-inspector/BackpropagationInspectorPlayground";
 import { BatchNormalizationPlayground } from "@/modules/batch-normalization/BatchNormalizationPlayground";
@@ -63,6 +64,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
   "mnist-mlp-inference-debugger": MnistMlpInferenceDebuggerPlayground,
+  "autograd-graphs": AutogradGraphsPlayground,
   "backpropagation-inspector": BackpropagationInspectorPlayground,
   "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
   "batch-normalization": BatchNormalizationPlayground,

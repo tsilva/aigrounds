@@ -662,6 +662,33 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "autograd-graphs",
+    title: "Autograd Graphs",
+    tag: "neural networks",
+    kicker:
+      "Pick a formula and watch values flow forward while gradients return through the graph.",
+    summary:
+      "Choose a small formula, adjust its parameters, inspect forward activations and backward gradient badges, then compare function and derivative charts for each parameter.",
+    estimatedDuration: "6 to 8 minutes",
+    concepts: [
+      "Computation graphs",
+      "Autograd",
+      "Chain rule",
+      "Partial derivatives",
+    ],
+    learningGoals: [
+      "See how a formula becomes a directed computation graph during the forward pass.",
+      "Connect backward gradient messages to local derivatives and cached activations.",
+      "Recognize why gradients from multiple paths into the same parameter add together.",
+      "Compare function and derivative charts for each adjustable parameter.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["autograd-graphs"],
+    theme: {
+      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
+    },
+  },
+  {
     slug: "backpropagation-inspector",
     title: "Backpropagation Inspector",
     tag: "neural networks",
@@ -1053,14 +1080,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Layers", "Weights", "Activations"],
   },
   {
-    slug: "computational-graphs-chain-rule",
-    title: "Computational Graphs & Chain Rule",
-    tag: "neural networks",
-    summary:
-      "Trace local derivatives through a small graph before sending credit backward.",
-    concepts: ["Computational graphs", "Chain rule", "Local derivatives"],
-  },
-  {
     slug: "rms-normalization",
     title: "RMSNorm Lab",
     tag: "transformers",
@@ -1204,7 +1223,7 @@ export const dashboardLessonPlanOrder = [
   "activation-functions",
   "neural-network-forward-pass",
   "mnist-mlp-inference-debugger",
-  "computational-graphs-chain-rule",
+  "autograd-graphs",
   "backpropagation-inspector",
   "batch-normalization",
   "byte-pair-encoding",

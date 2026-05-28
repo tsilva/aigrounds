@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useMemo,
+  useState,
+} from "react";
 import { type ClassExample } from "./pytorch-image-augmentations-engine";
 import { classExamples } from "./scenario";
 
@@ -9,6 +14,7 @@ type TransformId =
   | "random-resized-crop"
   | "rotation"
   | "color-jitter"
+  | "rand-augment"
   | "gaussian-blur"
   | "random-erasing";
 
@@ -19,6 +25,8 @@ type TransformState = {
   cropMinArea: number;
   eraseMaxArea: number;
   enabled: Record<TransformId, boolean>;
+  randAugmentMagnitude: number;
+  randAugmentOps: number;
   rotationDegrees: number;
 };
 
@@ -37,51 +45,65 @@ type EraseSample = {
   y: number;
 };
 
+type RandAugmentOperation =
+  | "Rotate"
+  | "Brightness"
+  | "Contrast"
+  | "Saturation"
+  | "ShearX"
+  | "TranslateX";
+
+type RandAugmentSample = {
+  amount: number;
+  name: RandAugmentOperation;
+};
+
 type PipelineRun = {
   blurSigma: number;
   brightnessFactor: number;
   contrastFactor: number;
   crop: CropSample;
   erase: EraseSample;
+  randAugment: RandAugmentSample[];
   rotationDegrees: number;
   saturationFactor: number;
   version: number;
 };
 
-const transformOrder: TransformId[] = [
+const defaultTransformOrder: TransformId[] = [
   "random-resized-crop",
   "rotation",
   "color-jitter",
+  "rand-augment",
   "gaussian-blur",
   "random-erasing",
 ];
 
 const transformCopy: Record<
   TransformId,
-  { number: number; title: string; subtitle: string }
+  { title: string; subtitle: string }
 > = {
   "random-resized-crop": {
-    number: 1,
     title: "RandomResizedCrop",
     subtitle: "random crop and resize",
   },
   rotation: {
-    number: 2,
     title: "Rotation",
     subtitle: "random in-plane rotation",
   },
   "color-jitter": {
-    number: 3,
     title: "ColorJitter",
     subtitle: "brightness and contrast jitter",
   },
+  "rand-augment": {
+    title: "RandAugment",
+    subtitle: "random learned policy-style ops",
+  },
   "gaussian-blur": {
-    number: 4,
     title: "GaussianBlur",
     subtitle: "apply gaussian blur",
   },
   "random-erasing": {
-    number: 5,
     title: "RandomErasing",
     subtitle: "erase a random region",
   },
@@ -97,9 +119,12 @@ const defaultTransformState: TransformState = {
     "random-resized-crop": true,
     rotation: true,
     "color-jitter": true,
+    "rand-augment": false,
     "gaussian-blur": false,
     "random-erasing": false,
   },
+  randAugmentMagnitude: 9,
+  randAugmentOps: 2,
   rotationDegrees: 12,
 };
 
@@ -211,6 +236,59 @@ function randomErase(maxArea: number): EraseSample {
     x: randomBetween(0, 1 - width),
     y: randomBetween(0, 1 - height),
   };
+}
+
+function randomInteger(min: number, max: number) {
+  return Math.floor(randomBetween(min, max + 1));
+}
+
+function randomRandAugmentOps(
+  numOps: number,
+  magnitude: number,
+): RandAugmentSample[] {
+  const operations: RandAugmentOperation[] = [
+    "Rotate",
+    "Brightness",
+    "Contrast",
+    "Saturation",
+    "ShearX",
+    "TranslateX",
+  ];
+  const available = [...operations];
+  const count = Math.min(Math.max(1, numOps), available.length);
+
+  return Array.from({ length: count }).map(() => {
+    const index = randomInteger(0, available.length - 1);
+    const [name] = available.splice(index, 1);
+
+    return {
+      amount: randomBetween(-magnitude, magnitude),
+      name,
+    };
+  });
+}
+
+function moveTransform(
+  order: TransformId[],
+  sourceId: TransformId,
+  targetId: TransformId,
+) {
+  if (sourceId === targetId) {
+    return order;
+  }
+
+  const sourceIndex = order.indexOf(sourceId);
+  const targetIndex = order.indexOf(targetId);
+
+  if (sourceIndex < 0 || targetIndex < 0) {
+    return order;
+  }
+
+  const nextOrder = [...order];
+  const [moved] = nextOrder.splice(sourceIndex, 1);
+  nextOrder.splice(targetIndex, 0, moved);
+
+  return nextOrder;
 }
 
 function RangeRow({
@@ -331,12 +409,30 @@ function ImageThumbnail({
 
 function TransformBlock({
   id,
+  index,
+  isDragging,
+  isDragTarget,
   state,
+  totalCount,
+  onDragEnd,
+  onDragEnter,
+  onDragStart,
+  onMoveDown,
+  onMoveUp,
   onToggle,
   onUpdate,
 }: {
   id: TransformId;
+  index: number;
+  isDragging: boolean;
+  isDragTarget: boolean;
   state: TransformState;
+  totalCount: number;
+  onDragEnd: () => void;
+  onDragEnter: (id: TransformId) => void;
+  onDragStart: (id: TransformId) => void;
+  onMoveDown: (id: TransformId) => void;
+  onMoveUp: (id: TransformId) => void;
   onToggle: (id: TransformId, enabled: boolean) => void;
   onUpdate: (patch: Partial<TransformState>) => void;
 }) {
@@ -345,16 +441,40 @@ function TransformBlock({
 
   return (
     <div
+      onDragEnd={onDragEnd}
+      onDragEnter={(event) => {
+        event.preventDefault();
+        onDragEnter(id);
+      }}
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={(event) => {
+        event.preventDefault();
+        onDragEnd();
+      }}
       className={`rounded-[8px] border px-3 py-3 transition ${
-        isEnabled
-          ? "border-[#c8d5f6] bg-white"
-          : "border-[#dbe4f6] bg-[#f8fbff] opacity-70"
-      }`}
+        isDragTarget
+          ? "border-[#052cff] bg-[#eef3ff]"
+          : isEnabled
+            ? "border-[#c8d5f6] bg-white"
+            : "border-[#dbe4f6] bg-[#f8fbff] opacity-70"
+      } ${isDragging ? "scale-[0.99] opacity-50" : ""}`}
     >
-      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_48px_34px] items-center gap-3">
-        <DragHandle />
+      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_92px_48px_34px] items-center gap-3">
+        <span
+          aria-label={`Drag ${copy.title}`}
+          draggable
+          title="Drag to reorder"
+          onDragStart={(event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", id);
+            onDragStart(id);
+          }}
+          className="cursor-grab active:cursor-grabbing"
+        >
+          <DragHandle />
+        </span>
         <span className="rounded-[6px] border border-[#d7e0f3] bg-[#fbfcff] py-1 text-center font-mono text-[14px] font-black text-[#052cff]">
-          {copy.number}
+          {index + 1}
         </span>
         <div className="min-w-0">
           <p className="truncate text-[15px] font-black text-[#071024]">
@@ -363,6 +483,26 @@ function TransformBlock({
           <p className="truncate text-[11px] font-bold text-[#30446f]">
             {copy.subtitle}
           </p>
+        </div>
+        <div className="flex items-center justify-end gap-1">
+          <button
+            type="button"
+            aria-label={`Move ${copy.title} up`}
+            disabled={index === 0}
+            onClick={() => onMoveUp(id)}
+            className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[12px] font-black text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
+          >
+            Up
+          </button>
+          <button
+            type="button"
+            aria-label={`Move ${copy.title} down`}
+            disabled={index === totalCount - 1}
+            onClick={() => onMoveDown(id)}
+            className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[12px] font-black text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
+          >
+            Down
+          </button>
         </div>
         <Toggle
           label={`${isEnabled ? "Disable" : "Enable"} ${copy.title}`}
@@ -378,6 +518,10 @@ function TransformBlock({
           x
         </button>
       </div>
+
+      <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
+        position {index + 1} of {totalCount}
+      </p>
 
       <div className="mt-3 space-y-2">
         {id === "random-resized-crop" ? (
@@ -429,6 +573,33 @@ function TransformBlock({
           </>
         ) : null}
 
+        {id === "rand-augment" ? (
+          <>
+            <RangeRow
+              disabled={!isEnabled}
+              label="num ops"
+              min={1}
+              max={4}
+              step={1}
+              value={state.randAugmentOps}
+              valueDigits={0}
+              onChange={(randAugmentOps) => onUpdate({ randAugmentOps })}
+            />
+            <RangeRow
+              disabled={!isEnabled}
+              label="magnitude"
+              min={0}
+              max={30}
+              step={1}
+              value={state.randAugmentMagnitude}
+              valueDigits={0}
+              onChange={(randAugmentMagnitude) =>
+                onUpdate({ randAugmentMagnitude })
+              }
+            />
+          </>
+        ) : null}
+
         {id === "gaussian-blur" ? (
           <RangeRow
             disabled={!isEnabled}
@@ -460,49 +631,67 @@ function TransformBlock({
           crop sample is drawn when the pipeline runs
         </p>
       ) : null}
+
+      {id === "rand-augment" && isEnabled ? (
+        <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
+          ops are sampled from RandAugment when the pipeline runs
+        </p>
+      ) : null}
     </div>
   );
 }
 
-function getEnabledCodeLines(state: TransformState) {
+function getEnabledCodeLines(state: TransformState, order: TransformId[]) {
   const lines: string[] = [];
 
-  if (state.enabled["random-resized-crop"]) {
-    lines.push(
-      `    v2.RandomResizedCrop(size=(224, 224), scale=(${formatDecimal(
-        state.cropMinArea,
-      )}, 1.0)),`,
-    );
-  }
+  order.forEach((id) => {
+    if (!state.enabled[id]) {
+      return;
+    }
 
-  if (state.enabled.rotation) {
-    lines.push(`    v2.RandomRotation(degrees=${state.rotationDegrees}),`);
-  }
+    if (id === "random-resized-crop") {
+      lines.push(
+        `    v2.RandomResizedCrop(size=(224, 224), scale=(${formatDecimal(
+          state.cropMinArea,
+        )}, 1.0)),`,
+      );
+    }
 
-  if (state.enabled["color-jitter"]) {
-    lines.push(
-      `    v2.ColorJitter(brightness=${formatDecimal(
-        state.brightness,
-      )}, contrast=${formatDecimal(state.contrast)}),`,
-    );
-  }
+    if (id === "rotation") {
+      lines.push(`    v2.RandomRotation(degrees=${state.rotationDegrees}),`);
+    }
 
-  if (state.enabled["gaussian-blur"]) {
-    lines.push(
-      `    v2.GaussianBlur(kernel_size=5, sigma=(0.1, ${formatDecimal(
-        state.blurSigma,
-        1,
-      )})),`,
-    );
-  }
+    if (id === "color-jitter") {
+      lines.push(
+        `    v2.ColorJitter(brightness=${formatDecimal(
+          state.brightness,
+        )}, contrast=${formatDecimal(state.contrast)}),`,
+      );
+    }
 
-  if (state.enabled["random-erasing"]) {
-    lines.push(
-      `    v2.RandomErasing(p=0.35, scale=(0.02, ${formatDecimal(
-        state.eraseMaxArea,
-      )})),`,
-    );
-  }
+    if (id === "rand-augment") {
+      lines.push(
+        `    v2.RandAugment(num_ops=${state.randAugmentOps}, magnitude=${state.randAugmentMagnitude}),`,
+      );
+    }
+
+    if (id === "gaussian-blur") {
+      lines.push(
+        `    v2.GaussianBlur(kernel_size=5, sigma=(0.1, ${formatDecimal(
+          state.blurSigma,
+          1,
+        )})),`,
+      );
+    }
+
+    if (id === "random-erasing") {
+      lines.push(
+        `    v2.RandomErasing(p=0.35, scale=(0.02, ${formatDecimal(
+          state.eraseMaxArea,
+        )})),`,
+      );
+    }
+  });
 
   return [
     "from torchvision.transforms import v2",
@@ -521,6 +710,10 @@ function createPipelineRun(state: TransformState, version: number): PipelineRun 
     contrastFactor: randomBetween(1 - state.contrast, 1 + state.contrast),
     crop: randomResizedCrop(state.cropMinArea),
     erase: randomErase(state.eraseMaxArea),
+    randAugment: randomRandAugmentOps(
+      state.randAugmentOps,
+      state.randAugmentMagnitude,
+    ),
     rotationDegrees: randomBetween(
       -state.rotationDegrees,
       state.rotationDegrees,
@@ -533,36 +726,84 @@ function createPipelineRun(state: TransformState, version: number): PipelineRun 
   };
 }
 
-function getImageVisualState(state: TransformState, run: PipelineRun | null) {
+function applyRandAugmentVisual(
+  operations: RandAugmentSample[],
+  transforms: string[],
+  filters: string[],
+) {
+  operations.forEach((operation) => {
+    if (operation.name === "Rotate") {
+      transforms.push(`rotate(${operation.amount.toFixed(2)}deg)`);
+    }
+
+    if (operation.name === "Brightness") {
+      filters.push(`brightness(${(1 + Math.abs(operation.amount) / 60).toFixed(3)})`);
+    }
+
+    if (operation.name === "Contrast") {
+      filters.push(`contrast(${(1 + Math.abs(operation.amount) / 58).toFixed(3)})`);
+    }
+
+    if (operation.name === "Saturation") {
+      filters.push(`saturate(${(1 + Math.abs(operation.amount) / 48).toFixed(3)})`);
+    }
+
+    if (operation.name === "ShearX") {
+      transforms.push(`skewX(${(operation.amount / 2).toFixed(2)}deg)`);
+    }
+
+    if (operation.name === "TranslateX") {
+      transforms.push(`translateX(${(operation.amount / 1.8).toFixed(2)}%)`);
+    }
+  });
+}
+
+function getImageVisualState(
+  state: TransformState,
+  order: TransformId[],
+  run: PipelineRun | null,
+) {
   const crop = run?.crop ?? null;
   const originX = crop ? ((crop.x + crop.width / 2) * 100).toFixed(1) : "50";
   const originY = crop ? ((crop.y + crop.height / 2) * 100).toFixed(1) : "50";
   const transforms: string[] = [];
   const filters: string[] = [];
 
-  if (run && state.enabled["random-resized-crop"]) {
-    transforms.push(
-      `scale(${(1 / run.crop.width).toFixed(3)}, ${(
-        1 / run.crop.height
-      ).toFixed(3)})`,
-    );
-  }
+  if (run) {
+    order.forEach((id) => {
+      if (!state.enabled[id]) {
+        return;
+      }
 
-  if (run && state.enabled.rotation) {
-    transforms.push(`rotate(${run.rotationDegrees.toFixed(2)}deg)`);
-  }
+      if (id === "random-resized-crop") {
+        transforms.push(
+          `scale(${(1 / run.crop.width).toFixed(3)}, ${(
+            1 / run.crop.height
+          ).toFixed(3)})`,
+        );
+      }
 
-  if (run && state.enabled["color-jitter"]) {
-    filters.push(
-      `brightness(${run.brightnessFactor})`,
-      `contrast(${run.contrastFactor})`,
-      `saturate(${run.saturationFactor})`,
-    );
-  }
+      if (id === "rotation") {
+        transforms.push(`rotate(${run.rotationDegrees.toFixed(2)}deg)`);
+      }
 
-  if (run && state.enabled["gaussian-blur"]) {
-    filters.push(`blur(${Math.min(4, run.blurSigma * 1.8).toFixed(2)}px)`);
-    transforms.push("scale(1.03)");
+      if (id === "color-jitter") {
+        filters.push(
+          `brightness(${run.brightnessFactor})`,
+          `contrast(${run.contrastFactor})`,
+          `saturate(${run.saturationFactor})`,
+        );
+      }
+
+      if (id === "rand-augment") {
+        applyRandAugmentVisual(run.randAugment, transforms, filters);
+      }
+
+      if (id === "gaussian-blur") {
+        filters.push(`blur(${Math.min(4, run.blurSigma * 1.8).toFixed(2)}px)`);
+        transforms.push("scale(1.03)");
+      }
+    });
   }
 
   return {
@@ -584,31 +825,51 @@ function getImageVisualState(state: TransformState, run: PipelineRun | null) {
   };
 }
 
-function getRunSummary(run: PipelineRun, state: TransformState) {
+function getRunSummary(
+  run: PipelineRun,
+  state: TransformState,
+  order: TransformId[],
+) {
   const summary: string[] = [];
 
-  if (state.enabled["random-resized-crop"]) {
-    summary.push(`crop area ${Math.round(run.crop.area * 100)}%`);
-  }
+  order.forEach((id) => {
+    if (!state.enabled[id]) {
+      return;
+    }
 
-  if (state.enabled.rotation) {
-    summary.push(`rotation ${run.rotationDegrees.toFixed(1)}deg`);
-  }
+    if (id === "random-resized-crop") {
+      summary.push(`crop area ${Math.round(run.crop.area * 100)}%`);
+    }
 
-  if (state.enabled["color-jitter"]) {
-    summary.push(
-      `brightness x${formatDecimal(run.brightnessFactor)}`,
-      `contrast x${formatDecimal(run.contrastFactor)}`,
-    );
-  }
+    if (id === "rotation") {
+      summary.push(`rotation ${run.rotationDegrees.toFixed(1)}deg`);
+    }
 
-  if (state.enabled["gaussian-blur"]) {
-    summary.push(`blur sigma ${formatDecimal(run.blurSigma, 1)}`);
-  }
+    if (id === "color-jitter") {
+      summary.push(
+        `brightness x${formatDecimal(run.brightnessFactor)}`,
+        `contrast x${formatDecimal(run.contrastFactor)}`,
+      );
+    }
 
-  if (state.enabled["random-erasing"]) {
-    summary.push(`erase area ${Math.round(run.erase.width * run.erase.height * 100)}%`);
-  }
+    if (id === "rand-augment") {
+      summary.push(
+        `rand ${run.randAugment
+          .map((operation) => `${operation.name} ${operation.amount.toFixed(1)}`)
+          .join(", ")}`,
+      );
+    }
+
+    if (id === "gaussian-blur") {
+      summary.push(`blur sigma ${formatDecimal(run.blurSigma, 1)}`);
+    }
+
+    if (id === "random-erasing") {
+      summary.push(
+        `erase area ${Math.round(run.erase.width * run.erase.height * 100)}%`,
+      );
+    }
+  });
 
   return summary;
 }
@@ -653,6 +914,11 @@ export function PytorchImageAugmentationsPlayground() {
   const [selectedExampleId, setSelectedExampleId] =
     useState<ClassExample["id"]>("cat");
   const [state, setState] = useState<TransformState>(defaultTransformState);
+  const [transformOrder, setTransformOrder] =
+    useState<TransformId[]>(defaultTransformOrder);
+  const [draggedTransformId, setDraggedTransformId] =
+    useState<TransformId | null>(null);
+  const [dropTargetId, setDropTargetId] = useState<TransformId | null>(null);
   const [pipelineVersion, setPipelineVersion] = useState(0);
   const [run, setRun] = useState<PipelineRun | null>(null);
 
@@ -662,17 +928,24 @@ export function PytorchImageAugmentationsPlayground() {
       classExamples[0],
     [selectedExampleId],
   );
-  const activeTransformCount = transformOrder.filter((id) => state.enabled[id]).length;
-  const codeLines = getEnabledCodeLines(state);
+  const activeTransformCount = transformOrder.filter(
+    (id) => state.enabled[id],
+  ).length;
+  const codeLines = getEnabledCodeLines(state, transformOrder);
   const currentRun = run?.version === pipelineVersion ? run : null;
   const { cropBoxStyle, resultImageStyle } = getImageVisualState(
     state,
+    transformOrder,
     currentRun,
   );
 
+  function markPipelineChanged() {
+    setPipelineVersion((version) => version + 1);
+  }
+
   function updateState(patch: Partial<TransformState>) {
     setState((current) => ({ ...current, ...patch }));
-    setPipelineVersion((version) => version + 1);
+    markPipelineChanged();
   }
 
   function toggleTransform(id: TransformId, enabled: boolean) {
@@ -683,16 +956,44 @@ export function PytorchImageAugmentationsPlayground() {
         [id]: enabled,
       },
     }));
-    setPipelineVersion((version) => version + 1);
+    markPipelineChanged();
   }
 
   function selectExample(exampleId: ClassExample["id"]) {
     setSelectedExampleId(exampleId);
-    setPipelineVersion((version) => version + 1);
+    markPipelineChanged();
   }
 
   function runPipeline() {
     setRun(createPipelineRun(state, pipelineVersion));
+  }
+
+  function reorderTransforms(sourceId: TransformId, targetId: TransformId) {
+    const nextOrder = moveTransform(transformOrder, sourceId, targetId);
+
+    if (nextOrder === transformOrder) {
+      return;
+    }
+
+    setTransformOrder(nextOrder);
+    markPipelineChanged();
+  }
+
+  function moveTransformByOffset(id: TransformId, offset: -1 | 1) {
+    const index = transformOrder.indexOf(id);
+    const targetId = transformOrder[index + offset];
+
+    if (index < 0 || !targetId) {
+      return;
+    }
+
+    setTransformOrder(moveTransform(transformOrder, id, targetId));
+    markPipelineChanged();
+  }
+
+  function endDrag() {
+    setDraggedTransformId(null);
+    setDropTargetId(null);
   }
 
   async function copyCode() {
@@ -731,11 +1032,29 @@ export function PytorchImageAugmentationsPlayground() {
           <div className="mt-4 grid gap-5 xl:grid-cols-[minmax(430px,0.86fr)_minmax(0,1fr)]">
             <div className="space-y-3">
               <div className="space-y-2">
-                {transformOrder.map((id) => (
+                {transformOrder.map((id, index) => (
                   <TransformBlock
                     key={id}
                     id={id}
+                    index={index}
+                    isDragging={draggedTransformId === id}
+                    isDragTarget={dropTargetId === id}
                     state={state}
+                    totalCount={transformOrder.length}
+                    onDragEnd={endDrag}
+                    onDragEnter={(targetId) => {
+                      setDropTargetId(targetId);
+
+                      if (draggedTransformId) {
+                        reorderTransforms(draggedTransformId, targetId);
+                      }
+                    }}
+                    onDragStart={(draggedId) => {
+                      setDraggedTransformId(draggedId);
+                      setDropTargetId(draggedId);
+                    }}
+                    onMoveDown={(moveId) => moveTransformByOffset(moveId, 1)}
+                    onMoveUp={(moveId) => moveTransformByOffset(moveId, -1)}
                     onToggle={toggleTransform}
                     onUpdate={updateState}
                   />
@@ -844,7 +1163,9 @@ export function PytorchImageAugmentationsPlayground() {
                 </p>
                 {currentRun ? (
                   <p className="mt-2 font-mono text-[12px] font-bold text-[#10245a]">
-                    {getRunSummary(currentRun, state).join(" / ")}
+                    {getRunSummary(currentRun, state, transformOrder).join(
+                      " / ",
+                    )}
                   </p>
                 ) : (
                   <p className="mt-2 text-[13px] font-semibold text-[#30446f]">

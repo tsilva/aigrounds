@@ -12,11 +12,15 @@ import { classExamples } from "./scenario";
 
 type TransformId =
   | "random-resized-crop"
+  | "horizontal-flip"
+  | "vertical-flip"
   | "rotation"
   | "color-jitter"
+  | "trivial-augment"
   | "rand-augment"
   | "gaussian-blur"
-  | "random-erasing";
+  | "random-erasing"
+  | "to-tensor";
 
 type TransformState = {
   blurSigma: number;
@@ -25,9 +29,11 @@ type TransformState = {
   cropMinArea: number;
   eraseMaxArea: number;
   enabled: Record<TransformId, boolean>;
+  horizontalFlipProbability: number;
   randAugmentMagnitude: number;
   randAugmentOps: number;
   rotationDegrees: number;
+  verticalFlipProbability: number;
 };
 
 type CropSample = {
@@ -64,19 +70,26 @@ type PipelineRun = {
   contrastFactor: number;
   crop: CropSample;
   erase: EraseSample;
+  horizontalFlipApplied: boolean;
   randAugment: RandAugmentSample[];
   rotationDegrees: number;
   saturationFactor: number;
+  trivialAugment: RandAugmentSample;
+  verticalFlipApplied: boolean;
   version: number;
 };
 
 const defaultTransformOrder: TransformId[] = [
   "random-resized-crop",
+  "horizontal-flip",
+  "vertical-flip",
   "rotation",
   "color-jitter",
-  "rand-augment",
   "gaussian-blur",
   "random-erasing",
+  "trivial-augment",
+  "rand-augment",
+  "to-tensor",
 ];
 
 const transformCopy: Record<
@@ -87,6 +100,14 @@ const transformCopy: Record<
     title: "RandomResizedCrop",
     subtitle: "random crop and resize",
   },
+  "horizontal-flip": {
+    title: "HorizontalFlip",
+    subtitle: "random mirror left to right",
+  },
+  "vertical-flip": {
+    title: "VerticalFlip",
+    subtitle: "random mirror top to bottom",
+  },
   rotation: {
     title: "Rotation",
     subtitle: "random in-plane rotation",
@@ -94,6 +115,10 @@ const transformCopy: Record<
   "color-jitter": {
     title: "ColorJitter",
     subtitle: "brightness and contrast jitter",
+  },
+  "trivial-augment": {
+    title: "TrivialAugmentWide",
+    subtitle: "one sampled wide augmentation",
   },
   "rand-augment": {
     title: "RandAugment",
@@ -107,25 +132,35 @@ const transformCopy: Record<
     title: "RandomErasing",
     subtitle: "erase a random region",
   },
+  "to-tensor": {
+    title: "ToTensor",
+    subtitle: "convert PIL image to tensor",
+  },
 };
 
 const defaultTransformState: TransformState = {
   blurSigma: 0.8,
   brightness: 0.3,
   contrast: 0.3,
-  cropMinArea: 0.72,
+  cropMinArea: 0.08,
   eraseMaxArea: 0.12,
   enabled: {
     "random-resized-crop": true,
-    rotation: true,
-    "color-jitter": true,
+    "horizontal-flip": true,
+    "vertical-flip": false,
+    rotation: false,
+    "color-jitter": false,
+    "trivial-augment": true,
     "rand-augment": false,
     "gaussian-blur": false,
     "random-erasing": false,
+    "to-tensor": true,
   },
+  horizontalFlipProbability: 0.5,
   randAugmentMagnitude: 9,
   randAugmentOps: 2,
   rotationDegrees: 12,
+  verticalFlipProbability: 0.5,
 };
 
 function Panel({
@@ -194,7 +229,7 @@ function randomBetween(min: number, max: number) {
 }
 
 function sampleResizedCrop(minArea: number, cropSeed: number): CropSample {
-  const boundedMinArea = Math.min(1, Math.max(0.72, minArea));
+  const boundedMinArea = Math.min(1, Math.max(0.08, minArea));
   const area = boundedMinArea + seededUnit(cropSeed, 1) * (1 - boundedMinArea);
   const aspectRatio = Math.exp(
     Math.log(0.75) + seededUnit(cropSeed, 2) * (Math.log(4 / 3) - Math.log(0.75)),
@@ -273,22 +308,38 @@ function moveTransform(
   sourceId: TransformId,
   targetId: TransformId,
 ) {
-  if (sourceId === targetId) {
+  if (
+    sourceId === targetId ||
+    sourceId === "rand-augment" ||
+    sourceId === "to-tensor"
+  ) {
     return order;
   }
 
   const sourceIndex = order.indexOf(sourceId);
-  const targetIndex = order.indexOf(targetId);
 
-  if (sourceIndex < 0 || targetIndex < 0) {
+  if (sourceIndex < 0) {
     return order;
   }
 
-  const nextOrder = [...order];
-  const [moved] = nextOrder.splice(sourceIndex, 1);
-  nextOrder.splice(targetIndex, 0, moved);
+  const nextOrder = order.filter((id) => id !== sourceId);
+  const targetIndex = nextOrder.indexOf(targetId);
 
-  return nextOrder;
+  if (targetIndex < 0) {
+    return order;
+  }
+
+  nextOrder.splice(targetIndex, 0, sourceId);
+
+  const normalizedOrder: TransformId[] = [
+    ...nextOrder.filter(
+      (id) => id !== "rand-augment" && id !== "to-tensor",
+    ),
+    "rand-augment",
+    "to-tensor",
+  ];
+
+  return normalizedOrder.join("|") === order.join("|") ? order : normalizedOrder;
 }
 
 function RangeRow({
@@ -408,6 +459,9 @@ function ImageThumbnail({
 }
 
 function TransformBlock({
+  canDrag,
+  canMoveDown,
+  canMoveUp,
   id,
   index,
   isDragging,
@@ -422,6 +476,9 @@ function TransformBlock({
   onToggle,
   onUpdate,
 }: {
+  canDrag: boolean;
+  canMoveDown: boolean;
+  canMoveUp: boolean;
   id: TransformId;
   index: number;
   isDragging: boolean;
@@ -462,14 +519,19 @@ function TransformBlock({
       <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_92px_48px_34px] items-center gap-3">
         <span
           aria-label={`Drag ${copy.title}`}
-          draggable
-          title="Drag to reorder"
+          draggable={canDrag}
+          title={canDrag ? "Drag to reorder" : "Pinned last in pipeline"}
           onDragStart={(event) => {
+            if (!canDrag) {
+              event.preventDefault();
+              return;
+            }
+
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData("text/plain", id);
             onDragStart(id);
           }}
-          className="cursor-grab active:cursor-grabbing"
+          className={canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-not-allowed opacity-45"}
         >
           <DragHandle />
         </span>
@@ -488,7 +550,7 @@ function TransformBlock({
           <button
             type="button"
             aria-label={`Move ${copy.title} up`}
-            disabled={index === 0}
+            disabled={!canMoveUp}
             onClick={() => onMoveUp(id)}
             className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[12px] font-black text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
           >
@@ -497,7 +559,7 @@ function TransformBlock({
           <button
             type="button"
             aria-label={`Move ${copy.title} down`}
-            disabled={index === totalCount - 1}
+            disabled={!canMoveDown}
             onClick={() => onMoveDown(id)}
             className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[12px] font-black text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
           >
@@ -528,7 +590,7 @@ function TransformBlock({
           <RangeRow
             disabled={!isEnabled}
             label="min crop area"
-            min={0.72}
+            min={0.08}
             max={1}
             step={0.01}
             value={state.cropMinArea}
@@ -547,6 +609,34 @@ function TransformBlock({
             value={state.rotationDegrees}
             valueDigits={0}
             onChange={(rotationDegrees) => onUpdate({ rotationDegrees })}
+          />
+        ) : null}
+
+        {id === "horizontal-flip" ? (
+          <RangeRow
+            disabled={!isEnabled}
+            label="flip prob"
+            min={0}
+            max={1}
+            step={0.05}
+            value={state.horizontalFlipProbability}
+            onChange={(horizontalFlipProbability) =>
+              onUpdate({ horizontalFlipProbability })
+            }
+          />
+        ) : null}
+
+        {id === "vertical-flip" ? (
+          <RangeRow
+            disabled={!isEnabled}
+            label="flip prob"
+            min={0}
+            max={1}
+            step={0.05}
+            value={state.verticalFlipProbability}
+            onChange={(verticalFlipProbability) =>
+              onUpdate({ verticalFlipProbability })
+            }
           />
         ) : null}
 
@@ -571,6 +661,12 @@ function TransformBlock({
               onChange={(contrast) => onUpdate({ contrast })}
             />
           </>
+        ) : null}
+
+        {id === "trivial-augment" ? (
+          <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
+            No knobs: TrivialAugmentWide samples one operation and magnitude.
+          </p>
         ) : null}
 
         {id === "rand-augment" ? (
@@ -624,6 +720,12 @@ function TransformBlock({
             onChange={(eraseMaxArea) => onUpdate({ eraseMaxArea })}
           />
         ) : null}
+
+        {id === "to-tensor" ? (
+          <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
+            No visual change: this converts the image into a training tensor.
+          </p>
+        ) : null}
       </div>
 
       {id === "random-resized-crop" && isEnabled ? (
@@ -632,9 +734,21 @@ function TransformBlock({
         </p>
       ) : null}
 
+      {(id === "horizontal-flip" || id === "vertical-flip") && isEnabled ? (
+        <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
+          flip decision is sampled when the pipeline runs
+        </p>
+      ) : null}
+
       {id === "rand-augment" && isEnabled ? (
         <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
           ops are sampled from RandAugment when the pipeline runs
+        </p>
+      ) : null}
+
+      {id === "trivial-augment" && isEnabled ? (
+        <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
+          one operation is sampled from TrivialAugmentWide when the pipeline runs
         </p>
       ) : null}
     </div>
@@ -650,34 +764,62 @@ function getEnabledCodeLines(state: TransformState, order: TransformId[]) {
     }
 
     if (id === "random-resized-crop") {
-      lines.push(
-        `    v2.RandomResizedCrop(size=(224, 224), scale=(${formatDecimal(
-          state.cropMinArea,
-        )}, 1.0)),`,
-      );
+      if (state.cropMinArea <= 0.08) {
+        lines.push("    transforms.RandomResizedCrop(224),");
+      } else {
+        lines.push(
+          `    transforms.RandomResizedCrop(224, scale=(${formatDecimal(
+            state.cropMinArea,
+          )}, 1.0)),`,
+        );
+      }
     }
 
     if (id === "rotation") {
-      lines.push(`    v2.RandomRotation(degrees=${state.rotationDegrees}),`);
+      lines.push(`    transforms.RandomRotation(degrees=${state.rotationDegrees}),`);
+    }
+
+    if (id === "horizontal-flip") {
+      if (state.horizontalFlipProbability === 0.5) {
+        lines.push("    transforms.RandomHorizontalFlip(),");
+      } else {
+        lines.push(
+          `    transforms.RandomHorizontalFlip(p=${formatDecimal(
+            state.horizontalFlipProbability,
+          )}),`,
+        );
+      }
+    }
+
+    if (id === "vertical-flip") {
+      lines.push(
+        `    transforms.RandomVerticalFlip(p=${formatDecimal(
+          state.verticalFlipProbability,
+        )}),`,
+      );
     }
 
     if (id === "color-jitter") {
       lines.push(
-        `    v2.ColorJitter(brightness=${formatDecimal(
+        `    transforms.ColorJitter(brightness=${formatDecimal(
           state.brightness,
         )}, contrast=${formatDecimal(state.contrast)}),`,
       );
     }
 
+    if (id === "trivial-augment") {
+      lines.push("    transforms.TrivialAugmentWide(),");
+    }
+
     if (id === "rand-augment") {
       lines.push(
-        `    v2.RandAugment(num_ops=${state.randAugmentOps}, magnitude=${state.randAugmentMagnitude}),`,
+        `    transforms.RandAugment(num_ops=${state.randAugmentOps}, magnitude=${state.randAugmentMagnitude}),`,
       );
     }
 
     if (id === "gaussian-blur") {
       lines.push(
-        `    v2.GaussianBlur(kernel_size=5, sigma=(0.1, ${formatDecimal(
+        `    transforms.GaussianBlur(kernel_size=5, sigma=(0.1, ${formatDecimal(
           state.blurSigma,
           1,
         )})),`,
@@ -686,17 +828,21 @@ function getEnabledCodeLines(state: TransformState, order: TransformId[]) {
 
     if (id === "random-erasing") {
       lines.push(
-        `    v2.RandomErasing(p=0.35, scale=(0.02, ${formatDecimal(
+        `    transforms.RandomErasing(p=0.35, scale=(0.02, ${formatDecimal(
           state.eraseMaxArea,
         )})),`,
       );
     }
+
+    if (id === "to-tensor") {
+      lines.push("    transforms.ToTensor(),");
+    }
   });
 
   return [
-    "from torchvision.transforms import v2",
+    "from torchvision import transforms",
     "",
-    "transform = v2.Compose([",
+    "transform = transforms.Compose([",
     ...lines,
     "])",
     "image = transform(image)",
@@ -710,6 +856,7 @@ function createPipelineRun(state: TransformState, version: number): PipelineRun 
     contrastFactor: randomBetween(1 - state.contrast, 1 + state.contrast),
     crop: randomResizedCrop(state.cropMinArea),
     erase: randomErase(state.eraseMaxArea),
+    horizontalFlipApplied: Math.random() < state.horizontalFlipProbability,
     randAugment: randomRandAugmentOps(
       state.randAugmentOps,
       state.randAugmentMagnitude,
@@ -722,6 +869,8 @@ function createPipelineRun(state: TransformState, version: number): PipelineRun 
       1 - state.brightness * 0.8,
       1 + state.brightness * 1.4,
     ),
+    trivialAugment: randomRandAugmentOps(1, 30)[0],
+    verticalFlipApplied: Math.random() < state.verticalFlipProbability,
     version,
   };
 }
@@ -787,6 +936,14 @@ function getImageVisualState(
         transforms.push(`rotate(${run.rotationDegrees.toFixed(2)}deg)`);
       }
 
+      if (id === "horizontal-flip" && run.horizontalFlipApplied) {
+        transforms.push("scaleX(-1)");
+      }
+
+      if (id === "vertical-flip" && run.verticalFlipApplied) {
+        transforms.push("scaleY(-1)");
+      }
+
       if (id === "color-jitter") {
         filters.push(
           `brightness(${run.brightnessFactor})`,
@@ -797,6 +954,10 @@ function getImageVisualState(
 
       if (id === "rand-augment") {
         applyRandAugmentVisual(run.randAugment, transforms, filters);
+      }
+
+      if (id === "trivial-augment") {
+        applyRandAugmentVisual([run.trivialAugment], transforms, filters);
       }
 
       if (id === "gaussian-blur") {
@@ -845,6 +1006,16 @@ function getRunSummary(
       summary.push(`rotation ${run.rotationDegrees.toFixed(1)}deg`);
     }
 
+    if (id === "horizontal-flip") {
+      summary.push(
+        `hflip ${run.horizontalFlipApplied ? "applied" : "skipped"}`,
+      );
+    }
+
+    if (id === "vertical-flip") {
+      summary.push(`vflip ${run.verticalFlipApplied ? "applied" : "skipped"}`);
+    }
+
     if (id === "color-jitter") {
       summary.push(
         `brightness x${formatDecimal(run.brightnessFactor)}`,
@@ -857,6 +1028,14 @@ function getRunSummary(
         `rand ${run.randAugment
           .map((operation) => `${operation.name} ${operation.amount.toFixed(1)}`)
           .join(", ")}`,
+      );
+    }
+
+    if (id === "trivial-augment") {
+      summary.push(
+        `trivial ${run.trivialAugment.name} ${run.trivialAugment.amount.toFixed(
+          1,
+        )}`,
       );
     }
 
@@ -931,6 +1110,12 @@ export function PytorchImageAugmentationsPlayground() {
   const activeTransformCount = transformOrder.filter(
     (id) => state.enabled[id],
   ).length;
+  const overlappingRandAugmentTransforms = [
+    state.enabled.rotation ? "Rotation" : null,
+    state.enabled["color-jitter"] ? "ColorJitter" : null,
+  ].filter(Boolean);
+  const shouldWarnAboutRandAugmentOverlap =
+    state.enabled["rand-augment"] && overlappingRandAugmentTransforms.length > 0;
   const codeLines = getEnabledCodeLines(state, transformOrder);
   const currentRun = run?.version === pipelineVersion ? run : null;
   const { cropBoxStyle, resultImageStyle } = getImageVisualState(
@@ -980,6 +1165,10 @@ export function PytorchImageAugmentationsPlayground() {
   }
 
   function moveTransformByOffset(id: TransformId, offset: -1 | 1) {
+    if (id === "rand-augment" || id === "to-tensor") {
+      return;
+    }
+
     const index = transformOrder.indexOf(id);
     const targetId = transformOrder[index + offset];
 
@@ -1035,6 +1224,17 @@ export function PytorchImageAugmentationsPlayground() {
                 {transformOrder.map((id, index) => (
                   <TransformBlock
                     key={id}
+                    canDrag={id !== "rand-augment" && id !== "to-tensor"}
+                    canMoveDown={
+                      id !== "rand-augment" &&
+                      id !== "to-tensor" &&
+                      index < transformOrder.length - 1 &&
+                      transformOrder[index + 1] !== "rand-augment" &&
+                      transformOrder[index + 1] !== "to-tensor"
+                    }
+                    canMoveUp={
+                      id !== "rand-augment" && id !== "to-tensor" && index > 0
+                    }
                     id={id}
                     index={index}
                     isDragging={draggedTransformId === id}
@@ -1060,6 +1260,14 @@ export function PytorchImageAugmentationsPlayground() {
                   />
                 ))}
               </div>
+
+              {shouldWarnAboutRandAugmentOverlap ? (
+                <div className="rounded-[8px] border border-[#f6c75f] bg-[#fff8e6] px-4 py-3 text-[13px] font-bold text-[#684800]">
+                  Warning: RandAugment can already sample rotation and color
+                  changes. {overlappingRandAugmentTransforms.join(" and ")} will
+                  stack on top of it if left enabled.
+                </div>
+              ) : null}
 
               <div className="rounded-[9px] border border-[#d4def5] bg-[#fbfcff]">
                 <div className="flex items-center justify-between gap-3 border-b border-[#d4def5] px-4 py-3">

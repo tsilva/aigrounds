@@ -1774,99 +1774,98 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   },
   "pytorch-image-augmentations": {
     intro:
-      "Work through five augmentation experiments. Predict whether a transform should preserve the label, then adjust the visible controls and explain when the target must become a soft label.",
+      "Work through one image-transform stack. Choose an image, tune the transforms, compare the original with the composed result, and connect the controls to torchvision code.",
     whyItMatters:
-      "Image augmentation makes training data more varied, but each transform is an assumption about what should not matter. CutMix and MixUp are especially important because they change the image and the target label together.",
+      "Image augmentation makes training data more varied, but each transform is an assumption about what should not matter. Seeing the composed image next to the exact code makes those assumptions concrete.",
     openingMessage:
-      "No prior PyTorch transform details needed. We will inspect augmentation as a label contract.\n\n- Geometry, color, and occlusion transforms usually keep a one-hot class label.\n- CutMix pastes part of one batched image into another.\n- MixUp blends two batched images.\n- CutMix and MixUp require soft labels because the mixed example contains evidence for two classes.\n\nFirst prediction: when CutMix uses lambda = 0.64, should the target stay one-hot or become a mix of two classes? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior PyTorch transform details needed. We will build one torchvision transform stack.\n\n- Each block receives the image from the block above it.\n- Each slider maps to a parameter in the generated v2.Compose code.\n- Single-image transforms change pixels while the class label stays one-hot.\n\nFirst prediction: if we crop, rotate, and color-jitter a cat image but it is still clearly a cat, should the target label stay one-hot or change? Reply with your prediction first. Then I will tell you exactly what to try.",
     requireTypedPredictionToStart: true,
     masteryCriteria: [
-      "Separates single-image transforms from batch-mixing transforms.",
-      "Explains why normal geometry, color, and occlusion transforms can keep a one-hot target.",
-      "Connects lambda to the displayed CutMix patch size and soft target weights.",
-      "Explains why CutMix and MixUp change labels into class-probability vectors.",
-      "Recognizes AugMix as image-only robustness rather than a soft-label batch mixer.",
+      "Explains that transforms compound top to bottom.",
+      "Connects at least two sliders to their matching torchvision parameters.",
+      "Uses the original/result panes to describe the visible pixel changes.",
+      "Explains why the selected image keeps a one-hot class label.",
     ],
     steps: [
       {
-        title: "Start with the label contract",
+        title: "Read the stack top to bottom",
         experiment:
-          "Use the Batch mixing card and CutMix tab. Compare the label contract box with the soft target bars in the pair-mix panel.",
+          "Start with the cat image selected. Read the enabled blocks from top to bottom: RandomResizedCrop, Rotation, and ColorJitter. Compare that order with the generated v2.Compose code beneath the stack.",
         predictionQuestion:
-          "When CutMix combines two images, should the target stay one-hot or become a mix of two classes?",
+          "Which transform should touch the image first: the top block or the bottom block?",
         observationPrompt:
-          "What changed about the target after the batch pair was mixed?",
+          "How did the transform stack match the code order?",
         observationOptions: [
-          "The target became two class weights",
-          "The class weights summed to 1.00",
+          "The code order matched the block order",
+          "Each block feeds the next block",
           "I am not sure",
         ],
         takeaway:
-          "CutMix and MixUp create examples with evidence for two classes, so the target must become a soft class-probability vector.",
+          "A v2.Compose pipeline applies transforms in order: each block receives the image produced by the block above it.",
       },
       {
-        title: "Move lambda",
+        title: "Resample the crop",
         experiment:
-          "Leave alpha (Beta) at 1.00 for this lab. Use the lambda Source A quick buttons to set 0.40, then 0.80, or drag the slider to those values. Watch the patch size, Source A and Source B bars, and the metric pills. Alpha is PyTorch context for how lambdas are sampled in training; here the learner moves lambda directly.",
+          "Use the Resample crop button in the RandomResizedCrop block. Watch the crop rectangle on the original image and the composed result on the right.",
         predictionQuestion:
-          "If Source A gets a larger lambda, what should happen to Source B's label weight and patch share?",
+          "When the crop sample changes but the object is still recognizable, should the class label change?",
         observationPrompt:
-          "How did lambda control both the image mix and the soft labels?",
+          "What changed when the crop was resampled?",
         observationOptions: [
-          "Source A's bar grew",
-          "Source B's patch and bar shrank",
+          "The crop rectangle moved or changed size",
+          "The composed result changed",
           "I am not sure",
         ],
         takeaway:
-          "Lambda is the coupling between pixels and labels: Source A gets lambda, while Source B gets 1 - lambda.",
+          "RandomResizedCrop samples a crop box, then resizes that crop back to the model input size.",
       },
       {
-        title: "Compare MixUp",
+        title: "Tune rotation and color",
         experiment:
-          "Use the mix choice dropdown or the MixUp tab to select MixUp. Compare the full-image blend, Source A and Source B soft target bars, and the metric pill that changes from Source B patch to Source B blend.",
+          "Move the Rotation max degrees slider and the ColorJitter brightness or contrast sliders. Watch both the composed result and the generated code update.",
         predictionQuestion:
-          "Should MixUp also need a soft label, or can it keep a one-hot target?",
+          "Which code values should change when you move those sliders?",
         observationPrompt:
-          "What stayed the same and what changed when you switched from CutMix to MixUp?",
+          "Which visible changes came from rotation and which came from color jitter?",
         observationOptions: [
-          "It still used two class weights",
-          "The image changed from a patch to a full blend",
+          "Rotation changed the angle",
+          "ColorJitter changed brightness or contrast",
           "I am not sure",
         ],
         takeaway:
-          "MixUp blends whole images instead of pasting a patch, but it still combines two examples, so it also needs lambda-weighted soft labels.",
+          "The sliders are not generic strength controls; they map directly to torchvision transform parameters.",
       },
       {
-        title: "Compare a one-hot transform",
+        title: "Toggle extra transforms",
         experiment:
-          "Choose Geometry, then RandomResizedCrop. Leave strength at 0.70 unless you want an optional comparison. Scroll to the Label mode metric and compare the augmented samples with the risk metrics.",
+          "Enable GaussianBlur or RandomErasing. Compare the active transform count, the composed result, and the generated code.",
         predictionQuestion:
-          "Should a crop that keeps the object recognizable change the one-hot label?",
+          "What should happen to the generated code when a transform is disabled?",
         observationPrompt:
-          "What stayed different between RandomResizedCrop and CutMix?",
+          "What changed when the extra transform was enabled or disabled?",
         observationOptions: [
-          "The label stayed one-hot",
-          "Only nuisance details changed",
+          "The code added or removed a transform line",
+          "The active transform count changed",
           "I am not sure",
         ],
         takeaway:
-          "Single-image transforms should change nuisance details while preserving the class. Batch mixing is different because the example itself contains two labels.",
+          "Only enabled blocks are part of the composed transform pipeline.",
       },
       {
-        title: "Place AugMix correctly",
+        title: "Switch the image",
         experiment:
-          "Choose Color, then choose the AugMix tab. Read the code and the AugMix chip, then compare its Label mode with CutMix and MixUp.",
+          "Choose another image such as the stop sign or sneaker. Keep the same transform stack and compare how the same parameters affect a different image.",
         predictionQuestion:
-          "Should AugMix behave like CutMix with soft labels, or like an image-only robustness transform?",
+          "Should switching from cat to stop sign change the code, or only the image being transformed?",
         observationPrompt:
-          "Where did AugMix belong in the label contract?",
+          "What stayed the same after selecting a different image?",
         observationOptions: [
-          "AugMix kept one-hot labels",
-          "CutMix and MixUp required soft labels",
+          "The transform code stayed the same",
+          "The one-hot class changed to the selected image",
           "I am not sure",
         ],
         takeaway:
-          "AugMix can make images harder and more varied, but it does not combine two examples into a soft target the way CutMix and MixUp do.",
+          "The transform stack describes image operations. The selected image determines which one-hot class label is preserved.",
       },
     ],
   },

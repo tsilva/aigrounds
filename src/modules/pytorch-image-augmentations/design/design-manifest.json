@@ -1,9 +1,9 @@
 {
   "lessonPlanStep": null,
-  "lessonPlanTitle": "PyTorch Image Augmentations",
+  "lessonPlanTitle": "PyTorch Image Transforms",
   "slug": "pytorch-image-augmentations",
   "modulePath": "src/modules/pytorch-image-augmentations",
   "acceptedMockup": "src/modules/pytorch-image-augmentations/design/accepted-mockup.png",
   "prompt": "src/modules/pytorch-image-augmentations/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e6dd0-b3d4-7282-b45c-5efa598caa21/ig_05bb898015250f2f016a18072df6e08191bcf89030c70e41e0.png"
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e6e3f-3137-7512-8eb3-e8d446452ffc/ig_06a0d9813666ba6c016a18431809f0819183370d2cec5bb55f.png"
 }

@@ -2,26 +2,88 @@
 
 import Image from "next/image";
 import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
-import {
-  calculateMixAnalysis,
-  calculateSingleImageAnalysis,
-  formatDecimal,
-  formatPercent,
-  getFamilyForTransform,
-  type AugmentationFamilyId,
-  type ClassExample,
-  type TransformDefinition,
-  type TransformId,
-} from "./pytorch-image-augmentations-engine";
-import {
-  augmentationFamilies,
-  classExamples,
-  defaultFamilyId,
-  defaultLambda,
-  defaultStrength,
-  defaultTransformId,
-  transformDefinitions,
-} from "./scenario";
+import { type ClassExample } from "./pytorch-image-augmentations-engine";
+import { classExamples } from "./scenario";
+
+type TransformId =
+  | "random-resized-crop"
+  | "rotation"
+  | "color-jitter"
+  | "gaussian-blur"
+  | "random-erasing";
+
+type TransformState = {
+  blurSigma: number;
+  brightness: number;
+  contrast: number;
+  cropMinArea: number;
+  eraseMaxArea: number;
+  enabled: Record<TransformId, boolean>;
+  rotationDegrees: number;
+};
+
+type CropSample = {
+  area: number;
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+};
+
+const transformOrder: TransformId[] = [
+  "random-resized-crop",
+  "rotation",
+  "color-jitter",
+  "gaussian-blur",
+  "random-erasing",
+];
+
+const transformCopy: Record<
+  TransformId,
+  { number: number; title: string; subtitle: string }
+> = {
+  "random-resized-crop": {
+    number: 1,
+    title: "RandomResizedCrop",
+    subtitle: "random crop and resize",
+  },
+  rotation: {
+    number: 2,
+    title: "Rotation",
+    subtitle: "random in-plane rotation",
+  },
+  "color-jitter": {
+    number: 3,
+    title: "ColorJitter",
+    subtitle: "brightness and contrast jitter",
+  },
+  "gaussian-blur": {
+    number: 4,
+    title: "GaussianBlur",
+    subtitle: "apply gaussian blur",
+  },
+  "random-erasing": {
+    number: 5,
+    title: "RandomErasing",
+    subtitle: "erase a random region",
+  },
+};
+
+const defaultTransformState: TransformState = {
+  blurSigma: 0.8,
+  brightness: 0.3,
+  contrast: 0.3,
+  cropMinArea: 0.72,
+  eraseMaxArea: 0.12,
+  enabled: {
+    "random-resized-crop": true,
+    rotation: true,
+    "color-jitter": true,
+    "gaussian-blur": false,
+    "random-erasing": false,
+  },
+  rotationDegrees: 12,
+};
 
 function Panel({
   children,
@@ -32,18 +94,10 @@ function Panel({
 }) {
   return (
     <section
-      className={`min-w-0 rounded-[12px] border border-[#c8d5f6] bg-white shadow-[0_14px_34px_rgba(58,88,160,0.06)] ${className}`}
+      className={`rounded-[12px] border border-[#c8d5f6] bg-white shadow-[0_14px_34px_rgba(58,88,160,0.06)] ${className}`}
     >
       {children}
     </section>
-  );
-}
-
-function LessonTitle({ children }: { children: ReactNode }) {
-  return (
-    <h2 className="text-[16px] leading-tight font-black text-[#052cff] uppercase sm:text-[19px]">
-      {children}
-    </h2>
   );
 }
 
@@ -60,146 +114,30 @@ function HelpIcon() {
       strokeWidth="2"
     >
       <circle cx="12" cy="12" r="9" />
-      <path d="M9.4 9a2.8 2.8 0 0 1 5.2 1.4c0 1.9-2.2 2.2-2.2 3.7" />
+      <path d="M9.6 9a2.6 2.6 0 0 1 4.9 1.2c0 1.8-2 2.1-2 3.5" />
       <path d="M12 17h.01" />
     </svg>
   );
 }
 
-function FamilyIcon({ familyId }: { familyId: AugmentationFamilyId }) {
-  if (familyId === "batch-mixing") {
-    return (
-      <svg viewBox="0 0 40 40" aria-hidden="true" className="size-10">
-        <path
-          d="M10 11h13v13H10zM17 17h13v13H17z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <path
-          d="M9 29h6M25 9h6M30 9v6M15 29v-6"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="2"
-        />
-      </svg>
-    );
-  }
-
-  if (familyId === "color") {
-    return (
-      <svg viewBox="0 0 40 40" aria-hidden="true" className="size-10">
-        <circle
-          cx="20"
-          cy="20"
-          r="7"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <path
-          d="M20 5v5M20 30v5M5 20h5M30 20h5M9.4 9.4l3.6 3.6M27 27l3.6 3.6M30.6 9.4 27 13M13 27l-3.6 3.6"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="2"
-        />
-      </svg>
-    );
-  }
-
-  if (familyId === "occlusion") {
-    return (
-      <svg viewBox="0 0 40 40" aria-hidden="true" className="size-10">
-        <path
-          d="M10 9h18v18H10z"
-          fill="none"
-          stroke="currentColor"
-          strokeDasharray="4 3"
-          strokeWidth="2"
-        />
-        <path d="M22 22h10v10H22z" fill="currentColor" opacity="0.82" />
-      </svg>
-    );
-  }
-
+function DragHandle() {
   return (
-    <svg viewBox="0 0 40 40" aria-hidden="true" className="size-10">
-      <path
-        d="M11 9h18v18H11zM8 16V9h7M32 20v7h-7"
-        fill="none"
-        stroke="currentColor"
-        strokeDasharray="5 3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-      <path
-        d="m11 30-4-4 4-4M29 10l4 4-4 4"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-function ObjectThumbnail({
-  example,
-  variant = "normal",
-}: {
-  example: ClassExample;
-  variant?: "normal" | "flipped" | "cropped" | "erased" | "jitter";
-}) {
-  const isMuted = variant === "erased";
-  const scaleClass = variant === "cropped" ? "scale-125" : "";
-  const flipClass = variant === "flipped" ? "-scale-x-100" : "";
-  const filterClass =
-    variant === "jitter"
-      ? "saturate-[1.6] contrast-[1.18]"
-      : isMuted
-        ? "opacity-80 grayscale"
-        : "";
-
-  return (
-    <div
-      className={`relative flex aspect-[4/2.15] min-h-0 items-center justify-center overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff] ${filterClass}`}
+    <span
+      aria-hidden="true"
+      className="grid h-7 w-4 shrink-0 grid-cols-2 content-center gap-1"
     >
-      <Image
-        src={example.imageSrc}
-        alt={example.imageAlt}
-        fill
-        sizes="(max-width: 768px) 44vw, 180px"
-        className={`object-cover transition ${scaleClass} ${flipClass}`}
-        style={{ objectPosition: example.objectPosition }}
-      />
-      {isMuted ? (
-        <div className="absolute top-[26%] left-[48%] h-[44%] w-[30%] rounded bg-[#0f172a]/70" />
-      ) : null}
-    </div>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <span
+          key={index}
+          className="size-1 rounded-full bg-[#31466f]"
+        />
+      ))}
+    </span>
   );
 }
 
-type TransformPreviewVisual = {
-  imageStyle: CSSProperties;
-  cropBoxStyle?: CSSProperties;
-  overlayStyle?: CSSProperties;
-  caption: string;
-};
-
-type CropSample = {
-  area: number;
-  height: number;
-  width: number;
-  x: number;
-  y: number;
-};
-
-function clampPreviewStrength(strength: number) {
-  return Math.max(0, Math.min(1, strength));
+function formatDecimal(value: number, digits = 2) {
+  return value.toFixed(digits);
 }
 
 function seededUnit(seed: number, salt: number) {
@@ -208,14 +146,12 @@ function seededUnit(seed: number, salt: number) {
   return value - Math.floor(value);
 }
 
-function sampleResizedCrop(strength: number, cropSeed: number): CropSample {
-  const amount = clampPreviewStrength(strength);
-  const minArea = 1 - amount * 0.28;
-  const area = minArea + seededUnit(cropSeed, 1) * (1 - minArea);
-  const logMinRatio = Math.log(0.75) * amount;
-  const logMaxRatio = Math.log(4 / 3) * amount;
-  const aspectRatio =
-    Math.exp(logMinRatio + seededUnit(cropSeed, 2) * (logMaxRatio - logMinRatio));
+function sampleResizedCrop(minArea: number, cropSeed: number): CropSample {
+  const boundedMinArea = Math.min(1, Math.max(0.72, minArea));
+  const area = boundedMinArea + seededUnit(cropSeed, 1) * (1 - boundedMinArea);
+  const aspectRatio = Math.exp(
+    Math.log(0.75) + seededUnit(cropSeed, 2) * (Math.log(4 / 3) - Math.log(0.75)),
+  );
   let width = Math.sqrt(area * aspectRatio);
   let height = Math.sqrt(area / aspectRatio);
 
@@ -238,1002 +174,450 @@ function sampleResizedCrop(strength: number, cropSeed: number): CropSample {
   };
 }
 
-function getTransformPreviewVisual({
-  activeTransform,
-  cropSeed,
-  example,
-  strength,
-}: {
-  activeTransform: TransformDefinition;
-  cropSeed: number;
-  example: ClassExample;
-  strength: number;
-}): TransformPreviewVisual {
-  const amount = clampPreviewStrength(strength);
-  const baseStyle: CSSProperties = {
-    objectPosition: example.objectPosition,
-    transform: "none",
-    filter: "none",
-  };
-
-  if (activeTransform.id === "random-resized-crop") {
-    const crop = sampleResizedCrop(strength, cropSeed);
-    const originX = ((crop.x + crop.width / 2) * 100).toFixed(1);
-    const originY = ((crop.y + crop.height / 2) * 100).toFixed(1);
-
-    return {
-      imageStyle: {
-        ...baseStyle,
-        transform: `scale(${(1 / crop.width).toFixed(3)}, ${(
-          1 / crop.height
-        ).toFixed(3)})`,
-        transformOrigin: `${originX}% ${originY}%`,
-      },
-      cropBoxStyle: {
-        height: `${crop.height * 100}%`,
-        left: `${crop.x * 100}%`,
-        top: `${crop.y * 100}%`,
-        width: `${crop.width * 100}%`,
-      },
-      caption: `sampled area ${Math.round(crop.area * 100)}%, x ${Math.round(
-        crop.x * 100,
-      )}%, y ${Math.round(crop.y * 100)}%`,
-    };
-  }
-
-  if (activeTransform.id === "horizontal-flip") {
-    return {
-      imageStyle: {
-        ...baseStyle,
-        transform: amount === 0 ? "scaleX(1)" : "scaleX(-1)",
-      },
-      caption:
-        amount === 0
-          ? "p=0.00, sample passes through"
-          : `mirrored sample, p=${formatDecimal(amount)}`,
-    };
-  }
-
-  if (activeTransform.id === "rotation") {
-    const degrees = amount * 30;
-
-    return {
-      imageStyle: {
-        ...baseStyle,
-        transform: `rotate(${degrees.toFixed(1)}deg) scale(1.08)`,
-      },
-      caption: `${degrees.toFixed(1)}deg rotation`,
-    };
-  }
-
-  if (activeTransform.id === "color-jitter") {
-    const brightness = 1 + amount * 0.34;
-    const contrast = 1 + amount * 0.32;
-    const saturation = 1 + amount * 0.7;
-
-    return {
-      imageStyle: {
-        ...baseStyle,
-        filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`,
-      },
-      caption: `brightness x${brightness.toFixed(
-        2,
-      )}, contrast x${contrast.toFixed(2)}`,
-    };
-  }
-
-  if (activeTransform.id === "random-grayscale") {
-    return {
-      imageStyle: {
-        ...baseStyle,
-        filter: `grayscale(${amount}) contrast(${1 + amount * 0.12})`,
-      },
-      caption: `${Math.round(amount * 100)}% grayscale`,
-    };
-  }
-
-  if (activeTransform.id === "gaussian-blur") {
-    const blur = amount * 4.2;
-
-    return {
-      imageStyle: {
-        ...baseStyle,
-        filter: `blur(${blur.toFixed(2)}px)`,
-        transform: "scale(1.03)",
-      },
-      caption: `blur sigma proxy ${blur.toFixed(2)}px`,
-    };
-  }
-
-  if (activeTransform.id === "random-erasing") {
-    return {
-      imageStyle: {
-        ...baseStyle,
-        filter: `saturate(${1 - amount * 0.18})`,
-      },
-      overlayStyle: {
-        top: `${20 + amount * 8}%`,
-        left: `${46 - amount * 16}%`,
-        width: `${14 + amount * 30}%`,
-        height: `${12 + amount * 34}%`,
-        opacity: 0.28 + amount * 0.68,
-      },
-      caption: `erase patch covers about ${Math.round(
-        (0.02 + amount * 0.22) * 100,
-      )}%`,
-    };
-  }
-
-  const hue = -14 + amount * 28;
-
-  return {
-    imageStyle: {
-      ...baseStyle,
-      filter: `contrast(${1 + amount * 0.28}) saturate(${
-        1 + amount * 0.85
-      }) hue-rotate(${hue.toFixed(1)}deg)`,
-      transform: `rotate(${(amount * 7 - 3.5).toFixed(1)}deg) scale(${
-        1 + amount * 0.08
-      })`,
-    },
-    caption: `AugMix-style color and geometry chain, width ${formatDecimal(
-      amount,
-    )}`,
-  };
-}
-
-function TransformPreviewImage({
-  activeTransform,
-  cropSeed,
-  example,
-  strength,
-  mode,
-}: {
-  activeTransform: TransformDefinition;
-  cropSeed: number;
-  example: ClassExample;
-  strength: number;
-  mode: "original" | "augmented";
-}) {
-  const cropVisual =
-    activeTransform.id === "random-resized-crop"
-      ? getTransformPreviewVisual({
-          activeTransform,
-          cropSeed,
-          example,
-          strength,
-        })
-      : null;
-  const visual: TransformPreviewVisual =
-    mode === "augmented"
-      ? (cropVisual ??
-        getTransformPreviewVisual({
-          activeTransform,
-          cropSeed,
-          example,
-          strength,
-        }))
-      : {
-          cropBoxStyle: cropVisual?.cropBoxStyle,
-          imageStyle: {
-            objectPosition: example.objectPosition,
-          },
-          caption:
-            activeTransform.id === "random-resized-crop"
-              ? "sampled crop box before resize"
-              : "source image",
-        };
-
-  return (
-    <div className="space-y-2">
-      <div className="relative aspect-[4/2.55] overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff]">
-        <Image
-          src={example.imageSrc}
-          alt={
-            mode === "augmented"
-              ? `${example.imageAlt}, augmented with ${activeTransform.title}`
-              : example.imageAlt
-          }
-          fill
-          sizes="(max-width: 768px) 92vw, 520px"
-          className="object-cover transition-[filter,transform] duration-200 ease-out"
-          style={visual.imageStyle}
-        />
-        {visual.overlayStyle ? (
-          <div
-            className="absolute rounded-[5px] bg-[#0f172a]"
-            style={visual.overlayStyle}
-          />
-        ) : null}
-        {mode === "original" && visual.cropBoxStyle ? (
-          <div
-            className="absolute border-2 border-[#052cff] bg-[#052cff]/10 shadow-[0_0_0_999px_rgba(7,16,36,0.18)]"
-            style={visual.cropBoxStyle}
-          />
-        ) : null}
-      </div>
-      <p className="min-h-[20px] text-center font-mono text-[12px] font-black text-[#30446f]">
-        {visual.caption}
-      </p>
-    </div>
-  );
-}
-
-function CutMixThumbnail({
-  sourceA,
-  sourceB,
-  patchPercent,
-}: {
-  sourceA: ClassExample;
-  sourceB: ClassExample;
-  patchPercent: number;
-}) {
-  return (
-    <div className="relative">
-      <ObjectThumbnail example={sourceA} />
-      <div
-        className="absolute top-[18%] right-[8%] overflow-hidden rounded-[4px] border-2 border-white shadow-[0_8px_20px_rgba(15,23,42,0.28)]"
-        style={{
-          width: `${Math.max(24, Math.min(54, patchPercent + 18))}%`,
-          height: `${Math.max(28, Math.min(60, patchPercent + 22))}%`,
-        }}
-      >
-        <ObjectThumbnail example={sourceB} variant="cropped" />
-      </div>
-    </div>
-  );
-}
-
-function MixUpThumbnail({
-  sourceA,
-  sourceB,
-  sourceBWeight,
-}: {
-  sourceA: ClassExample;
-  sourceB: ClassExample;
-  sourceBWeight: number;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff]">
-      <ObjectThumbnail example={sourceA} />
-      <div
-        className="absolute inset-0"
-        style={{ opacity: Math.max(0.18, Math.min(0.78, sourceBWeight)) }}
-      >
-        <ObjectThumbnail example={sourceB} />
-      </div>
-      <div className="absolute right-2 bottom-2 rounded-[4px] bg-white/90 px-2 py-1 font-mono text-[12px] font-black text-[#071024] shadow">
-        blend
-      </div>
-    </div>
-  );
-}
-
-function MetricPill({
+function RangeRow({
+  disabled = false,
   label,
-  value,
-  tone = "blue",
-}: {
-  label: string;
-  value: string;
-  tone?: "blue" | "red" | "neutral";
-}) {
-  const valueClass =
-    tone === "red"
-      ? "text-[#ff1d37]"
-      : tone === "neutral"
-        ? "text-[#071024]"
-        : "text-[#052cff]";
-
-  return (
-    <div className="min-w-0 rounded-[8px] border border-[#dbe4ff] bg-white px-3 py-3 text-center">
-      <p className="text-[11px] leading-tight font-black text-[#30446f] uppercase">
-        {label}
-      </p>
-      <p className={`mt-2 font-mono text-[22px] leading-none font-black ${valueClass}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function SoftTargetBars({
-  sourceA,
-  sourceB,
-  sourceAWeight,
-  sourceBWeight,
-}: {
-  sourceA: ClassExample;
-  sourceB: ClassExample;
-  sourceAWeight: number;
-  sourceBWeight: number;
-}) {
-  return (
-    <div className="min-w-0 space-y-2">
-      <div className="grid grid-cols-[92px_minmax(0,1fr)_48px] items-center gap-3">
-        <span className="text-[13px] font-bold text-[#10245a]">
-          {sourceA.label} ({sourceA.classIndex})
-        </span>
-        <div className="h-6 overflow-hidden rounded-[4px] border border-[#c8d5f6] bg-white">
-          <div
-            className="h-full bg-[#052cff]"
-            style={{ width: `${sourceAWeight * 100}%` }}
-          />
-        </div>
-        <span className="font-mono text-[14px] font-black">
-          {formatDecimal(sourceAWeight)}
-        </span>
-      </div>
-      <div className="grid grid-cols-[92px_minmax(0,1fr)_48px] items-center gap-3">
-        <span className="text-[13px] font-bold text-[#10245a]">
-          {sourceB.label} ({sourceB.classIndex})
-        </span>
-        <div className="h-6 overflow-hidden rounded-[4px] border border-[#c8d5f6] bg-white">
-          <div
-            className="h-full bg-[#ff1d37]"
-            style={{ width: `${sourceBWeight * 100}%` }}
-          />
-        </div>
-        <span className="font-mono text-[14px] font-black">
-          {formatDecimal(sourceBWeight)}
-        </span>
-      </div>
-      <p className="border-t border-dashed border-[#c8d5f6] pt-2 text-center font-mono text-[13px] font-bold text-[#30446f]">
-        sum = 1.00
-      </p>
-    </div>
-  );
-}
-
-function RangeControl({
-  label,
-  value,
-  min,
   max,
+  min,
   step,
-  quickValues,
+  suffix = "",
+  value,
+  valueDigits = 2,
   onChange,
 }: {
+  disabled?: boolean;
   label: string;
-  value: number;
-  min: number;
   max: number;
+  min: number;
   step: number;
-  quickValues?: number[];
+  suffix?: string;
+  value: number;
+  valueDigits?: number;
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="grid grid-cols-1 gap-2 text-[14px] font-semibold text-[#10245a] sm:grid-cols-[150px_minmax(0,1fr)_74px] sm:items-center sm:gap-4">
-        <span>{label}</span>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(event) => onChange(Number(event.target.value))}
-          className="h-2 w-full accent-[#1735ff]"
+    <label
+      className={`grid grid-cols-[124px_38px_minmax(0,1fr)_44px_72px] items-center gap-2 text-[12px] font-bold ${
+        disabled ? "text-[#7890b8]" : "text-[#10245a]"
+      }`}
+    >
+      <span>{label}</span>
+      <span className="text-right font-mono">{formatDecimal(min, valueDigits)}</span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="h-2 w-full accent-[#1735ff] disabled:accent-[#aab7d1]"
+      />
+      <span className="font-mono">{formatDecimal(max, valueDigits)}</span>
+      <span className="rounded-[6px] border border-[#d4def5] bg-white px-2 py-1.5 text-center font-mono text-[13px] font-black text-[#071024]">
+        {formatDecimal(value, valueDigits)}
+        {suffix ? <span className="ml-1">{suffix}</span> : null}
+      </span>
+    </label>
+  );
+}
+
+function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative h-7 w-12 rounded-full transition ${
+        checked ? "bg-[#052cff]" : "bg-[#cbd5e1]"
+      }`}
+    >
+      <span
+        className={`absolute top-1 size-5 rounded-full bg-white transition ${
+          checked ? "left-6" : "left-1"
+        }`}
+      />
+    </button>
+  );
+}
+
+function ImageThumbnail({
+  example,
+  isSelected,
+  onSelect,
+}: {
+  example: ClassExample;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={isSelected}
+      onClick={onSelect}
+      className={`rounded-[8px] border p-1.5 transition ${
+        isSelected
+          ? "border-[#052cff] bg-[#eef3ff] shadow-[0_10px_22px_rgba(23,53,255,0.14)]"
+          : "border-[#d7e0f3] bg-white hover:border-[#aebced]"
+      }`}
+    >
+      <div className="relative aspect-[1.25] overflow-hidden rounded-[6px] bg-[#f8fbff]">
+        <Image
+          src={example.imageSrc}
+          alt={example.imageAlt}
+          fill
+          sizes="(max-width: 768px) 42vw, 140px"
+          className="object-cover"
+          style={{ objectPosition: example.objectPosition }}
         />
-        <span className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 text-center font-mono font-black text-[#071024]">
-          {formatDecimal(value)}
+      </div>
+      <p className="mt-1.5 text-center text-[12px] font-black text-[#10245a]">
+        {example.label}
+      </p>
+      <p className="text-center font-mono text-[11px] font-bold text-[#30446f]">
+        class {example.classIndex}
+      </p>
+    </button>
+  );
+}
+
+function TransformBlock({
+  cropSeed,
+  id,
+  state,
+  onResampleCrop,
+  onToggle,
+  onUpdate,
+}: {
+  cropSeed: number;
+  id: TransformId;
+  state: TransformState;
+  onResampleCrop: () => void;
+  onToggle: (id: TransformId, enabled: boolean) => void;
+  onUpdate: (patch: Partial<TransformState>) => void;
+}) {
+  const copy = transformCopy[id];
+  const isEnabled = state.enabled[id];
+
+  return (
+    <div
+      className={`rounded-[8px] border px-3 py-3 transition ${
+        isEnabled
+          ? "border-[#c8d5f6] bg-white"
+          : "border-[#dbe4f6] bg-[#f8fbff] opacity-70"
+      }`}
+    >
+      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_48px_34px] items-center gap-3">
+        <DragHandle />
+        <span className="rounded-[6px] border border-[#d7e0f3] bg-[#fbfcff] py-1 text-center font-mono text-[14px] font-black text-[#052cff]">
+          {copy.number}
         </span>
-      </label>
-      {quickValues ? (
-        <div className="flex flex-wrap gap-2 sm:ml-[166px]">
-          {quickValues.map((quickValue) => (
-            <button
-              key={quickValue}
-              type="button"
-              onClick={() => onChange(quickValue)}
-              className={`rounded-[6px] border px-3 py-1.5 font-mono text-[12px] font-black transition ${
-                Math.abs(value - quickValue) < step / 2
-                  ? "border-[#052cff] bg-[#052cff] text-white"
-                  : "border-[#d4def5] bg-white text-[#10245a] hover:border-[#aebced]"
-              }`}
-            >
-              set {formatDecimal(quickValue)}
-            </button>
-          ))}
+        <div className="min-w-0">
+          <p className="truncate text-[15px] font-black text-[#071024]">
+            {copy.title}
+          </p>
+          <p className="truncate text-[11px] font-bold text-[#30446f]">
+            {copy.subtitle}
+          </p>
         </div>
+        <Toggle
+          label={`${isEnabled ? "Disable" : "Enable"} ${copy.title}`}
+          checked={isEnabled}
+          onChange={(checked) => onToggle(id, checked)}
+        />
+        <button
+          type="button"
+          aria-label={`Disable ${copy.title}`}
+          onClick={() => onToggle(id, false)}
+          className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[14px] font-black text-[#30446f] transition hover:border-[#aebced]"
+        >
+          x
+        </button>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {id === "random-resized-crop" ? (
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_126px]">
+            <RangeRow
+              disabled={!isEnabled}
+              label="min crop area"
+              min={0.72}
+              max={1}
+              step={0.01}
+              value={state.cropMinArea}
+              onChange={(cropMinArea) => onUpdate({ cropMinArea })}
+            />
+            <button
+              type="button"
+              disabled={!isEnabled}
+              onClick={onResampleCrop}
+              className="rounded-[6px] border border-[#052cff] bg-white px-3 py-2 text-[12px] font-black text-[#052cff] transition hover:bg-[#eef3ff] disabled:border-[#cbd5e1] disabled:text-[#7890b8]"
+            >
+              Resample crop
+            </button>
+          </div>
+        ) : null}
+
+        {id === "rotation" ? (
+          <RangeRow
+            disabled={!isEnabled}
+            label="max degrees"
+            min={0}
+            max={18}
+            step={1}
+            suffix="deg"
+            value={state.rotationDegrees}
+            valueDigits={0}
+            onChange={(rotationDegrees) => onUpdate({ rotationDegrees })}
+          />
+        ) : null}
+
+        {id === "color-jitter" ? (
+          <>
+            <RangeRow
+              disabled={!isEnabled}
+              label="brightness"
+              min={0}
+              max={0.3}
+              step={0.01}
+              value={state.brightness}
+              onChange={(brightness) => onUpdate({ brightness })}
+            />
+            <RangeRow
+              disabled={!isEnabled}
+              label="contrast"
+              min={0}
+              max={0.3}
+              step={0.01}
+              value={state.contrast}
+              onChange={(contrast) => onUpdate({ contrast })}
+            />
+          </>
+        ) : null}
+
+        {id === "gaussian-blur" ? (
+          <RangeRow
+            disabled={!isEnabled}
+            label="max sigma"
+            min={0.1}
+            max={2}
+            step={0.1}
+            value={state.blurSigma}
+            valueDigits={1}
+            onChange={(blurSigma) => onUpdate({ blurSigma })}
+          />
+        ) : null}
+
+        {id === "random-erasing" ? (
+          <RangeRow
+            disabled={!isEnabled}
+            label="max erase area"
+            min={0.02}
+            max={0.3}
+            step={0.01}
+            value={state.eraseMaxArea}
+            onChange={(eraseMaxArea) => onUpdate({ eraseMaxArea })}
+          />
+        ) : null}
+      </div>
+
+      {id === "random-resized-crop" && isEnabled ? (
+        <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
+          sample #{cropSeed}
+        </p>
       ) : null}
     </div>
   );
 }
 
-function FamilyPanel({
-  activeFamilyId,
-  onSelectFamily,
-}: {
-  activeFamilyId: AugmentationFamilyId;
-  onSelectFamily: (familyId: AugmentationFamilyId) => void;
-}) {
-  return (
-    <Panel className="p-4 sm:p-5">
-      <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_420px]">
-        <div>
-          <LessonTitle>1. Choose The Augmentation Assumption</LessonTitle>
-          <div className="mt-4 grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
-            {augmentationFamilies.map((family) => {
-              const isActive = family.id === activeFamilyId;
+function getEnabledCodeLines(state: TransformState) {
+  const lines: string[] = [];
 
-              return (
-                <button
-                  key={family.id}
-                  type="button"
-                  onClick={() => onSelectFamily(family.id)}
-                  className={`min-h-[130px] rounded-[9px] border px-4 py-4 text-left transition ${
-                    isActive
-                      ? "border-[#1735ff] bg-[linear-gradient(180deg,#123cff,#0227d7)] text-white shadow-[0_16px_28px_rgba(23,53,255,0.18)]"
-                      : "border-[#d8e1f5] bg-white text-[#071024] hover:border-[#aebced]"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className={isActive ? "text-white" : "text-[#052cff]"}>
-                      <FamilyIcon familyId={family.id} />
-                    </span>
-                    <span className="text-[17px] font-black">
-                      {family.title}
-                    </span>
-                  </div>
-                  <div
-                    className={`mt-3 space-y-1 font-mono text-[13px] leading-tight ${
-                      isActive ? "text-white" : "text-[#0f1f4a]"
-                    }`}
-                  >
-                    {family.transforms.map((transformId) => {
-                      const transform = transformDefinitions.find(
-                        (item) => item.id === transformId,
-                      );
+  if (state.enabled["random-resized-crop"]) {
+    lines.push(
+      `    v2.RandomResizedCrop(size=(224, 224), scale=(${formatDecimal(
+        state.cropMinArea,
+      )}, 1.0)),`,
+    );
+  }
 
-                      return transform ? (
-                        <p key={transform.id}>{transform.title}</p>
-                      ) : null;
-                    })}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          <div className="mt-3 inline-flex max-w-full items-center gap-2 rounded-[7px] border border-[#cfd9f5] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-            <span aria-hidden="true">+</span>
-            <span>AugMix: image-only robustness, label stays one-hot</span>
-          </div>
-        </div>
+  if (state.enabled.rotation) {
+    lines.push(`    v2.RandomRotation(degrees=${state.rotationDegrees}),`);
+  }
 
-        <div className="rounded-[10px] border border-[#d6e0f6] bg-white p-4">
-          <p className="text-[15px] font-black text-[#052cff] uppercase">
-            The Label Contract
-          </p>
-          <div className="mt-4 space-y-4 text-[15px] font-semibold text-[#071024]">
-            <div className="grid grid-cols-[minmax(0,1fr)_32px_minmax(0,1fr)] items-center gap-3">
-              <span>Single-image transforms</span>
-              <span className="text-center text-[22px] text-[#071024]">→</span>
-              <span>one-hot label survives</span>
-            </div>
-            <div className="border-t border-[#c8d5f6]" />
-            <div className="grid grid-cols-[minmax(0,1fr)_32px_minmax(0,1fr)] items-center gap-3">
-              <span>CutMix / MixUp</span>
-              <span className="text-center text-[22px] text-[#071024]">→</span>
-              <span>soft label is required</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
+  if (state.enabled["color-jitter"]) {
+    lines.push(
+      `    v2.ColorJitter(brightness=${formatDecimal(
+        state.brightness,
+      )}, contrast=${formatDecimal(state.contrast)}),`,
+    );
+  }
+
+  if (state.enabled["gaussian-blur"]) {
+    lines.push(
+      `    v2.GaussianBlur(kernel_size=5, sigma=(0.1, ${formatDecimal(
+        state.blurSigma,
+        1,
+      )})),`,
+    );
+  }
+
+  if (state.enabled["random-erasing"]) {
+    lines.push(
+      `    v2.RandomErasing(p=0.35, scale=(0.02, ${formatDecimal(
+        state.eraseMaxArea,
+      )})),`,
+    );
+  }
+
+  return [
+    "from torchvision.transforms import v2",
+    "",
+    "transform = v2.Compose([",
+    ...lines,
+    "])",
+    "image = transform(image)",
+  ];
 }
 
-function TransformPanel({
-  activeTransform,
-  activeFamilyId,
-  alpha,
-  lambda,
-  strength,
-  onSelectTransform,
-  onChangeAlpha,
-  onChangeLambda,
-  onChangeStrength,
-}: {
-  activeTransform: TransformDefinition;
-  activeFamilyId: AugmentationFamilyId;
-  alpha: number;
-  lambda: number;
-  strength: number;
-  onSelectTransform: (transformId: TransformId) => void;
-  onChangeAlpha: (value: number) => void;
-  onChangeLambda: (value: number) => void;
-  onChangeStrength: (value: number) => void;
-}) {
-  const shownTransforms: TransformId[] =
-    activeFamilyId === "batch-mixing"
-      ? ["cutmix", "mixup"]
-      : activeFamilyId === "color"
-        ? ["color-jitter", "random-grayscale", "gaussian-blur", "augmix"]
-        : augmentationFamilies.find((family) => family.id === activeFamilyId)
-            ?.transforms ?? [];
-  const code =
-    activeTransform.labelBehavior === "soft"
-      ? activeTransform.id === "mixup"
-        ? [
-            "from torchvision.transforms import v2",
-            "",
-            "mixup = v2.MixUp(num_classes=4, alpha=1.0)",
-            "images, labels = mixup(images, labels)",
-          ]
-        : [
-            "from torchvision.transforms import v2",
-            "",
-            "cutmix = v2.CutMix(num_classes=4, alpha=1.0)",
-            "images, labels = cutmix(images, labels)",
-          ]
-      : [
-          "from torchvision.transforms import v2",
-          "",
-          "transform = v2.Compose([",
-          `    ${activeTransform.codeName},`,
-          "])",
-          "image = transform(image)",
-        ];
+function getImageVisualState(state: TransformState, cropSeed: number) {
+  const crop = sampleResizedCrop(state.cropMinArea, cropSeed);
+  const originX = ((crop.x + crop.width / 2) * 100).toFixed(1);
+  const originY = ((crop.y + crop.height / 2) * 100).toFixed(1);
+  const transforms: string[] = [];
+  const filters: string[] = [];
 
-  return (
-    <Panel className="p-4 sm:p-5">
-      <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.82fr)_minmax(520px,1fr)]">
-        <div>
-          <LessonTitle>2. Tune The Transform</LessonTitle>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {shownTransforms.map((transformId) => {
-              const transform = transformDefinitions.find(
-                (item) => item.id === transformId,
-              );
+  if (state.enabled["random-resized-crop"]) {
+    transforms.push(
+      `scale(${(1 / crop.width).toFixed(3)}, ${(1 / crop.height).toFixed(3)})`,
+    );
+  }
 
-              if (!transform) {
-                return null;
-              }
+  if (state.enabled.rotation) {
+    transforms.push(`rotate(${state.rotationDegrees}deg)`);
+  }
 
-              const isActive = transform.id === activeTransform.id;
+  if (state.enabled["color-jitter"]) {
+    filters.push(
+      `brightness(${1 + state.brightness})`,
+      `contrast(${1 + state.contrast})`,
+      `saturate(${1 + state.brightness * 1.4})`,
+    );
+  }
 
-              return (
-                <button
-                  key={transform.id}
-                  type="button"
-                  onClick={() => onSelectTransform(transform.id)}
-                  className={`rounded-[7px] border px-5 py-2 text-[14px] font-bold transition ${
-                    isActive
-                      ? "border-[#052cff] bg-[#052cff] text-white"
-                      : "border-[#d7e0f3] bg-white text-[#071024] hover:border-[#aebced]"
-                  }`}
-                >
-                  {transform.title}
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-2 text-[12px] leading-5 font-bold text-[#30446f]">
-            Guide path: CutMix, MixUp, RandomResizedCrop, and AugMix. Other
-            transform tabs are optional comparisons.
-          </p>
-          <div className="mt-5 space-y-4">
-            {activeTransform.labelBehavior === "soft" ? (
-              <>
-                <RangeControl
-                  label="alpha (Beta)"
-                  value={alpha}
-                  min={0.2}
-                  max={2}
-                  step={0.1}
-                  onChange={onChangeAlpha}
-                />
-                <RangeControl
-                  label="lambda Source A"
-                  value={lambda}
-                  min={0.05}
-                  max={0.95}
-                  step={0.01}
-                  quickValues={[0.4, defaultLambda, 0.8]}
-                  onChange={onChangeLambda}
-                />
-                <div className="grid grid-cols-1 gap-2 text-[14px] font-semibold text-[#10245a] sm:grid-cols-[150px_minmax(0,1fr)] sm:items-center sm:gap-4">
-                  <span>mix choice</span>
-                  <select
-                    value={activeTransform.id}
-                    onChange={(event) =>
-                      onSelectTransform(event.target.value as TransformId)
-                    }
-                    className="rounded-[7px] border border-[#d4def5] bg-white px-3 py-2 font-bold text-[#071024]"
-                  >
-                    <option value="cutmix">CutMix</option>
-                    <option value="mixup">MixUp</option>
-                  </select>
-                </div>
-                <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-                  Guide focus: move lambda directly. Optional context: alpha
-                  shapes sampled lambdas in real PyTorch; mix choice switches
-                  between CutMix and MixUp.
-                </p>
-                <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-                  lambda semantics: Source A gets lambda; Source B gets 1 -
-                  lambda.
-                </p>
-              </>
-            ) : (
-              <>
-                <RangeControl
-                  label="strength"
-                  value={strength}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  onChange={onChangeStrength}
-                />
-                <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-                  {activeTransform.helper}
-                </p>
-                <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-                  Guide focus: leave strength at 0.70 unless exploring; higher
-                  strength makes the single-image transform more intense.
-                </p>
-              </>
-            )}
-          </div>
-        </div>
+  if (state.enabled["gaussian-blur"]) {
+    filters.push(`blur(${Math.min(4, state.blurSigma * 1.8).toFixed(2)}px)`);
+    transforms.push("scale(1.03)");
+  }
 
-        <div className="overflow-hidden rounded-[9px] border border-[#d4def5] bg-[#fbfcff]">
-          <pre className="overflow-x-auto p-4 font-mono text-[12px] leading-6 font-semibold text-[#071024] sm:text-[14px]">
-            {code.map((line, index) => (
-              <code key={`${line}-${index}`} className="block">
-                {line}
-              </code>
-            ))}
-          </pre>
-          <p className="border-t border-[#d4def5] px-4 py-3 text-[13px] font-semibold text-[#30446f]">
-            {activeTransform.labelBehavior === "soft"
-              ? "Use after batching, or from collate_fn."
-              : "Single-image transforms can run before batching."}
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
+  return {
+    crop,
+    cropBoxStyle: {
+      height: `${crop.height * 100}%`,
+      left: `${crop.x * 100}%`,
+      top: `${crop.y * 100}%`,
+      width: `${crop.width * 100}%`,
+    } satisfies CSSProperties,
+    resultImageStyle: {
+      filter: filters.length ? filters.join(" ") : "none",
+      objectPosition: "50% 50%",
+      transform: transforms.length ? transforms.join(" ") : "none",
+      transformOrigin: `${originX}% ${originY}%`,
+    } satisfies CSSProperties,
+  };
 }
 
-function BatchMixPanel({
-  activeTransform,
-  lambda,
+function ImagePane({
+  children,
+  example,
+  imageClassName = "",
+  imageStyle,
+  title,
 }: {
-  activeTransform: TransformDefinition;
-  lambda: number;
+  children?: ReactNode;
+  example: ClassExample;
+  imageClassName?: string;
+  imageStyle?: CSSProperties;
+  title: string;
 }) {
-  const analysis = calculateMixAnalysis(lambda);
-  const pairOne = [classExamples[0], classExamples[1]] as const;
-  const pairTwo = [classExamples[2], classExamples[3]] as const;
-  const isMixUp = activeTransform.id === "mixup";
-  const resultTitle = isMixUp
-    ? `MixUp result (${analysis.sourceAPercent}% A / ${analysis.sourceBPercent}% B)`
-    : `CutMix result (${analysis.sourceBPercent}% from B)`;
-
   return (
-    <Panel className="p-4 sm:p-5">
-      <LessonTitle>3. Watch A Batch Pair Mix</LessonTitle>
-      <div className="mt-4 space-y-5">
-        {[pairOne, pairTwo].map(([sourceA, sourceB]) => (
-          <div
-            key={sourceA.id}
-            className="grid gap-4 border-b border-dashed border-[#c8d5f6] pb-5 last:border-b-0 last:pb-0 2xl:grid-cols-[170px_24px_170px_42px_220px_minmax(320px,1fr)] 2xl:items-center"
-          >
-            <div>
-              <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-                Source A ({formatDecimal(analysis.sourceAWeight)})
-              </p>
-              <ObjectThumbnail example={sourceA} />
-              <p className="mt-2 text-center text-[13px] font-bold text-[#10245a]">
-                {sourceA.label} class {sourceA.classIndex}
-              </p>
-            </div>
-            <div className="hidden text-center text-[34px] font-light text-[#071024] 2xl:block">
-              +
-            </div>
-            <div>
-              <p className="mb-2 text-center text-[12px] font-black text-[#ff1d37] uppercase">
-                Source B ({formatDecimal(analysis.sourceBWeight)})
-              </p>
-              <ObjectThumbnail example={sourceB} />
-              <p className="mt-2 text-center text-[13px] font-bold text-[#10245a]">
-                {sourceB.label} class {sourceB.classIndex}
-              </p>
-            </div>
-            <div className="hidden text-center text-[34px] font-light text-[#071024] 2xl:block">
-              →
-            </div>
-            <div>
-              <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-                {resultTitle}
-              </p>
-              {isMixUp ? (
-                <MixUpThumbnail
-                  sourceA={sourceA}
-                  sourceB={sourceB}
-                  sourceBWeight={analysis.sourceBWeight}
-                />
-              ) : (
-                <CutMixThumbnail
-                  sourceA={sourceA}
-                  sourceB={sourceB}
-                  patchPercent={analysis.sourceBPercent}
-                />
-              )}
-            </div>
-            <div>
-              <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-                Soft target (class probabilities)
-              </p>
-              <SoftTargetBars
-                sourceA={sourceA}
-                sourceB={sourceB}
-                sourceAWeight={analysis.sourceAWeight}
-                sourceBWeight={analysis.sourceBWeight}
-              />
-            </div>
-          </div>
-        ))}
+    <div>
+      <p className="mb-2 text-center text-[12px] font-black text-[#30446f] uppercase">
+        {title}
+      </p>
+      <div className="relative aspect-[1.28] overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff]">
+        <Image
+          src={example.imageSrc}
+          alt={`${example.imageAlt} ${title.toLowerCase()}`}
+          fill
+          sizes="(max-width: 768px) 92vw, 430px"
+          className={`object-cover transition-[filter,transform] duration-200 ease-out ${imageClassName}`}
+          style={{
+            objectPosition: example.objectPosition,
+            ...imageStyle,
+          }}
+        />
+        {children}
       </div>
-    </Panel>
-  );
-}
-
-function SingleImagePanel({
-  activeTransform,
-  cropSeed,
-  onResampleCrop,
-  strength,
-  selectedExample,
-  onSelectExample,
-}: {
-  activeTransform: TransformDefinition;
-  cropSeed: number;
-  onResampleCrop: () => void;
-  strength: number;
-  selectedExample: ClassExample;
-  onSelectExample: (exampleId: ClassExample["id"]) => void;
-}) {
-  const isRandomResizedCrop = activeTransform.id === "random-resized-crop";
-
-  return (
-    <Panel className="p-4 sm:p-5">
-      <LessonTitle>3. Compare Original vs Augmented</LessonTitle>
-      <div className="mt-4 grid gap-5 xl:grid-cols-[250px_minmax(0,1fr)]">
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#30446f] uppercase">
-            Select source image
-          </p>
-          <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
-            {classExamples.map((example) => {
-              const isSelected = example.id === selectedExample.id;
-
-              return (
-                <button
-                  key={example.id}
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={() => onSelectExample(example.id)}
-                  className={`rounded-[9px] border p-1.5 text-left transition ${
-                    isSelected
-                      ? "border-[#052cff] bg-[#eef3ff] shadow-[0_10px_22px_rgba(23,53,255,0.14)]"
-                      : "border-[#d7e0f3] bg-white hover:border-[#aebced]"
-                  }`}
-                >
-                  <ObjectThumbnail example={example} />
-                  <p className="mt-1.5 text-center text-[12px] font-black text-[#10245a]">
-                    {example.label} / class {example.classIndex}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div>
-          <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-center text-[12px] font-black text-[#052cff] uppercase sm:text-left">
-              {selectedExample.label}: {activeTransform.title}, strength{" "}
-              {formatDecimal(strength)}
-            </p>
-            {isRandomResizedCrop ? (
-              <button
-                type="button"
-                onClick={onResampleCrop}
-                className="rounded-[7px] border border-[#052cff] bg-white px-3 py-2 text-[12px] font-black text-[#052cff] transition hover:bg-[#eef3ff]"
-              >
-                Resample crop
-              </button>
-            ) : null}
-          </div>
-          <div className="grid gap-3 lg:grid-cols-2">
-            <div>
-              <p className="mb-2 text-center text-[12px] font-black text-[#30446f] uppercase">
-                Original
-              </p>
-              <TransformPreviewImage
-                activeTransform={activeTransform}
-                cropSeed={cropSeed}
-                example={selectedExample}
-                strength={strength}
-                mode="original"
-              />
-            </div>
-            <div>
-              <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-                Augmented
-              </p>
-              <TransformPreviewImage
-                activeTransform={activeTransform}
-                cropSeed={cropSeed}
-                example={selectedExample}
-                strength={strength}
-                mode="augmented"
-              />
-            </div>
-          </div>
-          <p className="mt-3 rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-            {isRandomResizedCrop
-              ? "RandomResizedCrop samples a crop box, then resizes that crop back to the model input size."
-              : `Label stays one-hot for class ${selectedExample.classIndex}; only the image pixels are transformed.`}
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function MetricsPanel({
-  activeTransform,
-  lambda,
-  strength,
-}: {
-  activeTransform: TransformDefinition;
-  lambda: number;
-  strength: number;
-}) {
-  const isSoft = activeTransform.labelBehavior === "soft";
-  const mixAnalysis = calculateMixAnalysis(lambda);
-  const singleAnalysis = calculateSingleImageAnalysis(activeTransform, strength);
-  const meterValue = isSoft
-    ? mixAnalysis.oneHotViolation
-    : singleAnalysis.risk;
-
-  return (
-    <Panel className="p-4 sm:p-5">
-      <LessonTitle>4. Check What Changed</LessonTitle>
-      <div className="mt-4 grid gap-4 2xl:grid-cols-[minmax(0,1fr)_390px] 2xl:items-center">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {isSoft ? (
-            <>
-              <MetricPill label="Label mode" value={mixAnalysis.labelMode} />
-              <MetricPill
-                label="Source A weight"
-                value={`${mixAnalysis.sourceAPercent}%`}
-              />
-              <MetricPill
-                label={
-                  activeTransform.id === "mixup"
-                    ? "Source B blend"
-                    : "Source B patch"
-                }
-                value={`${mixAnalysis.sourceBPercent}%`}
-                tone="red"
-              />
-              <MetricPill
-                label="Label entropy"
-                value={`${formatDecimal(mixAnalysis.entropyBits)} bits`}
-              />
-            </>
-          ) : (
-            <>
-              <MetricPill label="Label mode" value={singleAnalysis.labelMode} />
-              <MetricPill
-                label="Label clarity"
-                value={formatPercent(singleAnalysis.labelClarity)}
-              />
-              <MetricPill
-                label="Diversity gain"
-                value={`+${formatPercent(singleAnalysis.diversityGain)}`}
-              />
-              <MetricPill
-                label="Risk"
-                value={formatPercent(singleAnalysis.risk)}
-                tone={singleAnalysis.risk > 0.22 ? "red" : "blue"}
-              />
-            </>
-          )}
-        </div>
-        <div className="rounded-[9px] border border-[#d6e0f6] bg-[#fbfcff] p-4">
-          <div className="flex items-center justify-between gap-3 text-[13px] font-black text-[#10245a] uppercase">
-            <span>{isSoft ? "One-hot violation" : "Label confusion risk"}</span>
-            <span className="font-mono text-[#052cff]">
-              {isSoft ? "amber-low" : "low"}
-            </span>
-          </div>
-          <div className="relative mt-4 h-5 rounded-full bg-[linear-gradient(90deg,#16a34a,#facc15,#ff2525)]">
-            <div
-              className="absolute top-[-7px] h-9 w-1.5 rounded-full bg-[#071024]"
-              style={{ left: `calc(${meterValue * 100}% - 3px)` }}
-            />
-          </div>
-          <div className="mt-2 flex justify-between text-[12px] font-bold text-[#30446f]">
-            <span>Low</span>
-            <span>Medium</span>
-            <span>High</span>
-          </div>
-        </div>
-      </div>
-      <div className="mt-4 rounded-[8px] border border-[#cfd9f5] bg-[#fbfcff] px-4 py-3 text-[16px] font-semibold text-[#10245a]">
-        {isSoft
-          ? "The target changes because the mixed image contains evidence for two classes."
-          : "Good single-image augmentation changes nuisance details, not the class."}
-      </div>
-    </Panel>
+    </div>
   );
 }
 
 export function PytorchImageAugmentationsPlayground() {
-  const [activeFamilyId, setActiveFamilyId] =
-    useState<AugmentationFamilyId>(defaultFamilyId);
-  const [activeTransformId, setActiveTransformId] =
-    useState<TransformId>(defaultTransformId);
-  const [alpha, setAlpha] = useState(1);
-  const [lambda, setLambda] = useState(defaultLambda);
-  const [strength, setStrength] = useState(defaultStrength);
   const [selectedExampleId, setSelectedExampleId] =
     useState<ClassExample["id"]>("cat");
+  const [state, setState] = useState<TransformState>(defaultTransformState);
   const [cropSeed, setCropSeed] = useState(7);
 
-  const activeTransform = useMemo(
-    () =>
-      transformDefinitions.find((transform) => transform.id === activeTransformId) ??
-      transformDefinitions.find((transform) => transform.id === defaultTransformId)!,
-    [activeTransformId],
-  );
   const selectedExample = useMemo(
     () =>
       classExamples.find((example) => example.id === selectedExampleId) ??
       classExamples[0],
     [selectedExampleId],
   );
+  const activeTransformCount = transformOrder.filter((id) => state.enabled[id]).length;
+  const codeLines = getEnabledCodeLines(state);
+  const { cropBoxStyle, resultImageStyle } = getImageVisualState(state, cropSeed);
 
-  function selectFamily(familyId: AugmentationFamilyId) {
-    const family = augmentationFamilies.find((item) => item.id === familyId);
-
-    if (!family) {
-      return;
-    }
-
-    setActiveFamilyId(familyId);
-    setActiveTransformId(family.transforms[0]);
+  function updateState(patch: Partial<TransformState>) {
+    setState((current) => ({ ...current, ...patch }));
   }
 
-  function selectTransform(transformId: TransformId) {
-    const transform = transformDefinitions.find((item) => item.id === transformId);
+  function toggleTransform(id: TransformId, enabled: boolean) {
+    setState((current) => ({
+      ...current,
+      enabled: {
+        ...current.enabled,
+        [id]: enabled,
+      },
+    }));
+  }
 
-    if (!transform) {
-      return;
-    }
-
-    setActiveTransformId(transform.id);
-    setActiveFamilyId(getFamilyForTransform(transform));
+  async function copyCode() {
+    await navigator.clipboard?.writeText(codeLines.join("\n"));
   }
 
   return (
     <main className="min-h-screen overflow-x-clip bg-[#fbfcff] px-3 py-4 text-[#071024] sm:px-5">
       <div className="mx-auto max-w-[1536px]">
-        <header className="mb-4 pl-0 sm:pl-6">
+        <header className="mb-4 pl-0 sm:pl-2">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black tracking-[-0.055em] text-[#030713] sm:text-[52px]">
-                PyTorch Image Augmentations
+              <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black text-[#030713] sm:text-[52px]">
+                PyTorch Image Transforms
               </h1>
-              <p className="mt-2 max-w-[64rem] text-[18px] leading-tight font-medium text-[#052cff] sm:text-[22px]">
-                Tune image transforms, then see when the target label must
-                change too.
+              <p className="mt-2 max-w-[64rem] text-[18px] leading-tight font-medium text-[#10245a] sm:text-[22px]">
+                Stack transforms on one image and watch the composed result
+                update.
               </p>
             </div>
             <button
@@ -1241,45 +625,142 @@ export function PytorchImageAugmentationsPlayground() {
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[8px] border border-[#cfd4ff] bg-white px-5 py-3 text-[15px] font-black text-[#052cff] shadow-[0_10px_24px_rgba(68,88,170,0.06)]"
             >
               <HelpIcon />
-              What should stay invariant?
+              What changes and what stays?
             </button>
           </div>
         </header>
 
-        <div className="grid gap-3 sm:gap-4">
-          <FamilyPanel
-            activeFamilyId={activeFamilyId}
-            onSelectFamily={selectFamily}
-          />
-          <TransformPanel
-            activeTransform={activeTransform}
-            activeFamilyId={activeFamilyId}
-            alpha={alpha}
-            lambda={lambda}
-            strength={strength}
-            onSelectTransform={selectTransform}
-            onChangeAlpha={setAlpha}
-            onChangeLambda={setLambda}
-            onChangeStrength={setStrength}
-          />
-          {activeTransform.labelBehavior === "soft" ? (
-            <BatchMixPanel activeTransform={activeTransform} lambda={lambda} />
-          ) : (
-            <SingleImagePanel
-              activeTransform={activeTransform}
-              cropSeed={cropSeed}
-              onResampleCrop={() => setCropSeed((seed) => seed + 1)}
-              strength={strength}
-              selectedExample={selectedExample}
-              onSelectExample={setSelectedExampleId}
-            />
-          )}
-          <MetricsPanel
-            activeTransform={activeTransform}
-            lambda={lambda}
-            strength={strength}
-          />
-        </div>
+        <Panel className="p-4 sm:p-5">
+          <h2 className="text-[16px] leading-tight font-black text-[#052cff] uppercase sm:text-[19px]">
+            1. Stack Transforms And Preview The Result
+          </h2>
+
+          <div className="mt-4 grid gap-5 xl:grid-cols-[minmax(430px,0.86fr)_minmax(0,1fr)]">
+            <div className="space-y-3">
+              <div className="space-y-2">
+                {transformOrder.map((id) => (
+                  <TransformBlock
+                    key={id}
+                    cropSeed={cropSeed}
+                    id={id}
+                    state={state}
+                    onResampleCrop={() => setCropSeed((seed) => seed + 1)}
+                    onToggle={toggleTransform}
+                    onUpdate={updateState}
+                  />
+                ))}
+              </div>
+
+              <div className="rounded-[9px] border border-[#d4def5] bg-[#fbfcff]">
+                <div className="flex items-center justify-between gap-3 border-b border-[#d4def5] px-4 py-3">
+                  <p className="text-[15px] font-black text-[#052cff] uppercase">
+                    Generated torchvision code
+                  </p>
+                  <button
+                    type="button"
+                    onClick={copyCode}
+                    className="rounded-[7px] border border-[#052cff] bg-white px-3 py-2 text-[12px] font-black text-[#052cff] transition hover:bg-[#eef3ff]"
+                  >
+                    Copy code
+                  </button>
+                </div>
+                <pre className="overflow-x-auto p-4 font-mono text-[12px] leading-6 font-semibold text-[#071024] sm:text-[14px]">
+                  {codeLines.map((line, index) => (
+                    <code key={`${line}-${index}`} className="block">
+                      {line}
+                    </code>
+                  ))}
+                </pre>
+              </div>
+            </div>
+
+            <div className="min-w-0 space-y-4 border-t border-[#d6e0f6] pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-5">
+              <div>
+                <p className="mb-3 text-[13px] font-black text-[#052cff] uppercase">
+                  Choose an image
+                </p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {classExamples.map((example) => (
+                    <ImageThumbnail
+                      key={example.id}
+                      example={example}
+                      isSelected={example.id === selectedExample.id}
+                      onSelect={() => setSelectedExampleId(example.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] xl:items-center">
+                <ImagePane example={selectedExample} title="Original">
+                  {state.enabled["random-resized-crop"] ? (
+                    <div
+                      className="absolute border-2 border-dashed border-[#052cff] bg-[#052cff]/10 shadow-[0_0_0_999px_rgba(7,16,36,0.12)]"
+                      style={cropBoxStyle}
+                    />
+                  ) : null}
+                </ImagePane>
+
+                <div className="hidden text-center text-[#10245a] xl:block">
+                  <p className="text-[13px] font-bold leading-tight">
+                    top to
+                    <br />
+                    bottom
+                  </p>
+                  <p className="mt-3 text-[32px] leading-none">-&gt;</p>
+                </div>
+
+                <ImagePane
+                  example={selectedExample}
+                  imageStyle={resultImageStyle}
+                  title="Composed result"
+                >
+                  {state.enabled["random-erasing"] ? (
+                    <div
+                      className="absolute rounded-[5px] bg-[#0f172a]/75"
+                      style={{
+                        height: `${Math.round(state.eraseMaxArea * 120)}%`,
+                        left: "46%",
+                        top: "28%",
+                        width: `${Math.round(state.eraseMaxArea * 120)}%`,
+                      }}
+                    />
+                  ) : null}
+                </ImagePane>
+              </div>
+
+              <div className="grid rounded-[9px] border border-[#d6e0f6] bg-white text-center sm:grid-cols-3">
+                <div className="border-b border-[#d6e0f6] px-4 py-3 sm:border-r sm:border-b-0">
+                  <p className="text-[12px] font-bold text-[#30446f]">
+                    label mode
+                  </p>
+                  <p className="mt-1 text-[18px] font-black text-[#071024]">
+                    one-hot
+                  </p>
+                </div>
+                <div className="border-b border-[#d6e0f6] px-4 py-3 sm:border-r sm:border-b-0">
+                  <p className="text-[12px] font-bold text-[#30446f]">class</p>
+                  <p className="mt-1 text-[18px] font-black text-[#071024]">
+                    {selectedExample.label} ({selectedExample.classIndex})
+                  </p>
+                </div>
+                <div className="px-4 py-3">
+                  <p className="text-[12px] font-bold text-[#30446f]">
+                    active transforms
+                  </p>
+                  <p className="mt-1 text-[18px] font-black text-[#071024]">
+                    {activeTransformCount}
+                  </p>
+                </div>
+              </div>
+
+              <p className="rounded-[8px] border border-[#cfd9f5] bg-[#fbfcff] px-4 py-3 text-[15px] font-semibold text-[#052cff]">
+                Transforms compound: each block receives the image from the
+                block above it.
+              </p>
+            </div>
+          </div>
+        </Panel>
       </div>
     </main>
   );

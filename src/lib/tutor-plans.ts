@@ -1774,7 +1774,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
   },
   "pytorch-image-augmentations": {
     intro:
-      "Work through three augmentation experiments. Predict whether a transform should preserve the label, then adjust the visible controls and explain when the target must become a soft label.",
+      "Work through five augmentation experiments. Predict whether a transform should preserve the label, then adjust the visible controls and explain when the target must become a soft label.",
     whyItMatters:
       "Image augmentation makes training data more varied, but each transform is an assumption about what should not matter. CutMix and MixUp are especially important because they change the image and the target label together.",
     openingMessage:
@@ -1807,7 +1807,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Move lambda",
         experiment:
-          "Drag lambda Source A down near 0.40, then up near 0.80. Watch the patch size, Source A and Source B bars, and the metric pills.",
+          "Leave alpha (Beta) at 1.00 for this lab. Use the lambda Source A quick buttons to set 0.40, then 0.80, or drag the slider to those values. Watch the patch size, Source A and Source B bars, and the metric pills. Alpha is PyTorch context for how lambdas are sampled in training; here the learner moves lambda directly.",
         predictionQuestion:
           "If Source A gets a larger lambda, what should happen to Source B's label weight and patch share?",
         observationPrompt:
@@ -1821,9 +1821,25 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
           "Lambda is the coupling between pixels and labels: Source A gets lambda, while Source B gets 1 - lambda.",
       },
       {
+        title: "Compare MixUp",
+        experiment:
+          "Use the mix choice dropdown or the MixUp tab to select MixUp. Compare the full-image blend, Source A and Source B soft target bars, and the metric pill that changes from Source B patch to Source B blend.",
+        predictionQuestion:
+          "Should MixUp also need a soft label, or can it keep a one-hot target?",
+        observationPrompt:
+          "What stayed the same and what changed when you switched from CutMix to MixUp?",
+        observationOptions: [
+          "It still used two class weights",
+          "The image changed from a patch to a full blend",
+          "I am not sure",
+        ],
+        takeaway:
+          "MixUp blends whole images instead of pasting a patch, but it still combines two examples, so it also needs lambda-weighted soft labels.",
+      },
+      {
         title: "Compare a one-hot transform",
         experiment:
-          "Choose Geometry, then RandomResizedCrop. Compare the augmented samples with the Label mode and risk metrics.",
+          "Choose Geometry, then RandomResizedCrop. Leave strength at 0.70 unless you want an optional comparison. Scroll to the Label mode metric and compare the augmented samples with the risk metrics.",
         predictionQuestion:
           "Should a crop that keeps the object recognizable change the one-hot label?",
         observationPrompt:
@@ -1839,7 +1855,7 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
       {
         title: "Place AugMix correctly",
         experiment:
-          "Choose the AugMix tab. Read the code and the AugMix chip, then compare its label mode with CutMix.",
+          "Choose Color, then choose the AugMix tab. Read the code and the AugMix chip, then compare its Label mode with CutMix and MixUp.",
         predictionQuestion:
           "Should AugMix behave like CutMix with soft labels, or like an image-only robustness transform?",
         observationPrompt:

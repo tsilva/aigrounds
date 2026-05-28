@@ -208,6 +208,31 @@ function CutMixThumbnail({
   );
 }
 
+function MixUpThumbnail({
+  sourceA,
+  sourceB,
+  sourceBWeight,
+}: {
+  sourceA: ClassExample;
+  sourceB: ClassExample;
+  sourceBWeight: number;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff]">
+      <ObjectThumbnail example={sourceA} />
+      <div
+        className="absolute inset-0"
+        style={{ opacity: Math.max(0.18, Math.min(0.78, sourceBWeight)) }}
+      >
+        <ObjectThumbnail example={sourceB} />
+      </div>
+      <div className="absolute right-2 bottom-2 rounded-[4px] bg-white/90 px-2 py-1 font-mono text-[12px] font-black text-[#071024] shadow">
+        blend
+      </div>
+    </div>
+  );
+}
+
 function MetricPill({
   label,
   value,
@@ -290,6 +315,7 @@ function RangeControl({
   min,
   max,
   step,
+  quickValues,
   onChange,
 }: {
   label: string;
@@ -297,24 +323,45 @@ function RangeControl({
   min: number;
   max: number;
   step: number;
+  quickValues?: number[];
   onChange: (value: number) => void;
 }) {
   return (
-    <label className="grid grid-cols-[150px_minmax(0,1fr)_74px] items-center gap-4 text-[14px] font-semibold text-[#10245a]">
-      <span>{label}</span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="h-2 w-full accent-[#1735ff]"
-      />
-      <span className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 text-center font-mono font-black text-[#071024]">
-        {formatDecimal(value)}
-      </span>
-    </label>
+    <div className="space-y-2">
+      <label className="grid grid-cols-1 gap-2 text-[14px] font-semibold text-[#10245a] sm:grid-cols-[150px_minmax(0,1fr)_74px] sm:items-center sm:gap-4">
+        <span>{label}</span>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="h-2 w-full accent-[#1735ff]"
+        />
+        <span className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 text-center font-mono font-black text-[#071024]">
+          {formatDecimal(value)}
+        </span>
+      </label>
+      {quickValues ? (
+        <div className="flex flex-wrap gap-2 sm:ml-[166px]">
+          {quickValues.map((quickValue) => (
+            <button
+              key={quickValue}
+              type="button"
+              onClick={() => onChange(quickValue)}
+              className={`rounded-[6px] border px-3 py-1.5 font-mono text-[12px] font-black transition ${
+                Math.abs(value - quickValue) < step / 2
+                  ? "border-[#052cff] bg-[#052cff] text-white"
+                  : "border-[#d4def5] bg-white text-[#10245a] hover:border-[#aebced]"
+              }`}
+            >
+              set {formatDecimal(quickValue)}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -327,10 +374,10 @@ function FamilyPanel({
 }) {
   return (
     <Panel className="p-4 sm:p-5">
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_420px]">
         <div>
           <LessonTitle>1. Choose The Augmentation Assumption</LessonTitle>
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-4 grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
             {augmentationFamilies.map((family) => {
               const isActive = family.id === activeFamilyId;
 
@@ -424,21 +471,26 @@ function TransformPanel({
 }) {
   const shownTransforms: TransformId[] =
     activeFamilyId === "batch-mixing"
-      ? ["cutmix", "mixup", "augmix", "random-erasing", "color-jitter"]
+      ? ["cutmix", "mixup"]
       : activeFamilyId === "color"
         ? ["color-jitter", "random-grayscale", "gaussian-blur", "augmix"]
-      : augmentationFamilies.find((family) => family.id === activeFamilyId)
-          ?.transforms ?? [];
+        : augmentationFamilies.find((family) => family.id === activeFamilyId)
+            ?.transforms ?? [];
   const code =
     activeTransform.labelBehavior === "soft"
-      ? [
-          "from torchvision.transforms import v2",
-          "",
-          "cutmix = v2.CutMix(num_classes=4, alpha=1.0)",
-          "mixup = v2.MixUp(num_classes=4, alpha=1.0)",
-          "cutmix_or_mixup = v2.RandomChoice([cutmix, mixup])",
-          "images, labels = cutmix_or_mixup(images, labels)",
-        ]
+      ? activeTransform.id === "mixup"
+        ? [
+            "from torchvision.transforms import v2",
+            "",
+            "mixup = v2.MixUp(num_classes=4, alpha=1.0)",
+            "images, labels = mixup(images, labels)",
+          ]
+        : [
+            "from torchvision.transforms import v2",
+            "",
+            "cutmix = v2.CutMix(num_classes=4, alpha=1.0)",
+            "images, labels = cutmix(images, labels)",
+          ]
       : [
           "from torchvision.transforms import v2",
           "",
@@ -450,7 +502,7 @@ function TransformPanel({
 
   return (
     <Panel className="p-4 sm:p-5">
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(520px,1fr)]">
+      <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.82fr)_minmax(520px,1fr)]">
         <div>
           <LessonTitle>2. Tune The Transform</LessonTitle>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -481,6 +533,10 @@ function TransformPanel({
               );
             })}
           </div>
+          <p className="mt-2 text-[12px] leading-5 font-bold text-[#30446f]">
+            Guide path: CutMix, MixUp, RandomResizedCrop, and AugMix. Other
+            transform tabs are optional comparisons.
+          </p>
           <div className="mt-5 space-y-4">
             {activeTransform.labelBehavior === "soft" ? (
               <>
@@ -498,9 +554,10 @@ function TransformPanel({
                   min={0.05}
                   max={0.95}
                   step={0.01}
+                  quickValues={[0.4, defaultLambda, 0.8]}
                   onChange={onChangeLambda}
                 />
-                <div className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-4 text-[14px] font-semibold text-[#10245a]">
+                <div className="grid grid-cols-1 gap-2 text-[14px] font-semibold text-[#10245a] sm:grid-cols-[150px_minmax(0,1fr)] sm:items-center sm:gap-4">
                   <span>mix choice</span>
                   <select
                     value={activeTransform.id}
@@ -513,6 +570,11 @@ function TransformPanel({
                     <option value="mixup">MixUp</option>
                   </select>
                 </div>
+                <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
+                  Guide focus: move lambda directly. Optional context: alpha
+                  shapes sampled lambdas in real PyTorch; mix choice switches
+                  between CutMix and MixUp.
+                </p>
                 <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
                   lambda semantics: Source A gets lambda; Source B gets 1 -
                   lambda.
@@ -530,6 +592,10 @@ function TransformPanel({
                 />
                 <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
                   {activeTransform.helper}
+                </p>
+                <p className="rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
+                  Guide focus: leave strength at 0.70 unless exploring; higher
+                  strength makes the single-image transform more intense.
                 </p>
               </>
             )}
@@ -556,13 +622,19 @@ function TransformPanel({
 }
 
 function BatchMixPanel({
+  activeTransform,
   lambda,
 }: {
+  activeTransform: TransformDefinition;
   lambda: number;
 }) {
   const analysis = calculateMixAnalysis(lambda);
   const pairOne = [classExamples[0], classExamples[1]] as const;
   const pairTwo = [classExamples[2], classExamples[3]] as const;
+  const isMixUp = activeTransform.id === "mixup";
+  const resultTitle = isMixUp
+    ? `MixUp result (${analysis.sourceAPercent}% A / ${analysis.sourceBPercent}% B)`
+    : `CutMix result (${analysis.sourceBPercent}% from B)`;
 
   return (
     <Panel className="p-4 sm:p-5">
@@ -571,7 +643,7 @@ function BatchMixPanel({
         {[pairOne, pairTwo].map(([sourceA, sourceB]) => (
           <div
             key={sourceA.id}
-            className="grid gap-4 border-b border-dashed border-[#c8d5f6] pb-5 last:border-b-0 last:pb-0 lg:grid-cols-[170px_24px_170px_42px_220px_minmax(320px,1fr)] lg:items-center"
+            className="grid gap-4 border-b border-dashed border-[#c8d5f6] pb-5 last:border-b-0 last:pb-0 2xl:grid-cols-[170px_24px_170px_42px_220px_minmax(320px,1fr)] 2xl:items-center"
           >
             <div>
               <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
@@ -582,7 +654,7 @@ function BatchMixPanel({
                 {sourceA.label} class {sourceA.classIndex}
               </p>
             </div>
-            <div className="hidden text-center text-[34px] font-light text-[#071024] lg:block">
+            <div className="hidden text-center text-[34px] font-light text-[#071024] 2xl:block">
               +
             </div>
             <div>
@@ -594,18 +666,26 @@ function BatchMixPanel({
                 {sourceB.label} class {sourceB.classIndex}
               </p>
             </div>
-            <div className="hidden text-center text-[34px] font-light text-[#071024] lg:block">
+            <div className="hidden text-center text-[34px] font-light text-[#071024] 2xl:block">
               →
             </div>
             <div>
               <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-                CutMix result ({analysis.sourceBPercent}% from B)
+                {resultTitle}
               </p>
-              <CutMixThumbnail
-                sourceA={sourceA}
-                sourceB={sourceB}
-                patchPercent={analysis.sourceBPercent}
-              />
+              {isMixUp ? (
+                <MixUpThumbnail
+                  sourceA={sourceA}
+                  sourceB={sourceB}
+                  sourceBWeight={analysis.sourceBWeight}
+                />
+              ) : (
+                <CutMixThumbnail
+                  sourceA={sourceA}
+                  sourceB={sourceB}
+                  patchPercent={analysis.sourceBPercent}
+                />
+              )}
             </div>
             <div>
               <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
@@ -658,7 +738,7 @@ function SingleImagePanel({
             Augmented samples ({activeTransform.title}, strength{" "}
             {formatDecimal(strength)})
           </p>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
             {classExamples.map((example) => (
               <div key={example.id} className="space-y-2">
                 <ObjectThumbnail example={example} variant={variant} />
@@ -693,7 +773,7 @@ function MetricsPanel({
   return (
     <Panel className="p-4 sm:p-5">
       <LessonTitle>4. Check What Changed</LessonTitle>
-      <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_390px] xl:items-center">
+      <div className="mt-4 grid gap-4 2xl:grid-cols-[minmax(0,1fr)_390px] 2xl:items-center">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {isSoft ? (
             <>
@@ -703,7 +783,11 @@ function MetricsPanel({
                 value={`${mixAnalysis.sourceAPercent}%`}
               />
               <MetricPill
-                label="Source B patch"
+                label={
+                  activeTransform.id === "mixup"
+                    ? "Source B blend"
+                    : "Source B patch"
+                }
                 value={`${mixAnalysis.sourceBPercent}%`}
                 tone="red"
               />
@@ -839,7 +923,7 @@ export function PytorchImageAugmentationsPlayground() {
             onChangeStrength={setStrength}
           />
           {activeTransform.labelBehavior === "soft" ? (
-            <BatchMixPanel lambda={lambda} />
+            <BatchMixPanel activeTransform={activeTransform} lambda={lambda} />
           ) : (
             <SingleImagePanel
               activeTransform={activeTransform}

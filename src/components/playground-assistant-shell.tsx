@@ -941,7 +941,7 @@ export function PlaygroundAssistantShell({
     isDesktop && isAssistantOpen
       ? "min-h-screen bg-[#f7f9ff] text-slate-950 md:grid md:grid-cols-[minmax(0,1fr)_24rem]"
       : isAssistantOpen
-        ? "grid h-screen grid-rows-[minmax(0,1fr)_minmax(18rem,46vh)] overflow-hidden bg-[#f7f9ff] text-slate-950"
+        ? "grid h-screen grid-rows-[minmax(0,1fr)_minmax(14rem,34vh)] overflow-hidden bg-[#f7f9ff] text-slate-950"
         : "min-h-screen bg-[#f7f9ff] text-slate-950";
   const playgroundRootClassName =
     isAssistantOpen && !isDesktop

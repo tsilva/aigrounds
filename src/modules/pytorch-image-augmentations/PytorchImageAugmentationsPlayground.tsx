@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { type ReactNode, useMemo, useState } from "react";
 import {
   calculateMixAnalysis,
@@ -167,82 +168,14 @@ function ObjectThumbnail({
     <div
       className={`relative flex aspect-[4/2.15] min-h-0 items-center justify-center overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff] ${filterClass}`}
     >
-      <svg
-        viewBox="0 0 160 86"
-        aria-label={example.label}
-        className={`h-full w-full transition ${scaleClass} ${flipClass}`}
-      >
-        {example.id === "cat" ? (
-          <>
-            <rect width="160" height="86" fill="#e8f0dc" />
-            <circle cx="80" cy="46" r="28" fill="#b88d5f" />
-            <path d="M55 28 45 8l24 10M105 28l10-20-24 10" fill="#9a7048" />
-            <circle cx="69" cy="43" r="5" fill="#10245a" />
-            <circle cx="91" cy="43" r="5" fill="#10245a" />
-            <path
-              d="M80 50v8M67 61c8 7 18 7 26 0"
-              fill="none"
-              stroke="#4d2f21"
-              strokeLinecap="round"
-              strokeWidth="3"
-            />
-            <path
-              d="M45 52h22M93 52h22M47 61h21M92 61h21"
-              stroke="#4d2f21"
-              strokeLinecap="round"
-              strokeWidth="2"
-            />
-          </>
-        ) : null}
-        {example.id === "sneaker" ? (
-          <>
-            <rect width="160" height="86" fill="#eef3fb" />
-            <path
-              d="M30 58c20-3 34-21 48-20 11 0 20 14 33 17 10 2 18 1 24 5 4 3 2 9-3 10H34c-9 0-11-9-4-12Z"
-              fill="#f8fafc"
-              stroke="#1e3a8a"
-              strokeWidth="4"
-            />
-            <path d="M55 45 76 63h32L77 39Z" fill="#1d4ed8" />
-            <path d="M35 69h96" stroke="#ef4444" strokeWidth="4" />
-          </>
-        ) : null}
-        {example.id === "stop-sign" ? (
-          <>
-            <rect width="160" height="86" fill="#e6edf4" />
-            <path
-              d="M61 14h38l27 27v38H88L61 52Z"
-              fill="#dc2626"
-              stroke="white"
-              strokeWidth="5"
-            />
-            <text
-              x="93"
-              y="53"
-              textAnchor="middle"
-              className="fill-white text-[25px] font-black"
-            >
-              STOP
-            </text>
-          </>
-        ) : null}
-        {example.id === "leaf" ? (
-          <>
-            <rect width="160" height="86" fill="#e7f5de" />
-            <path
-              d="M30 63c27-41 73-50 105-35-12 35-52 49-105 35Z"
-              fill="#65a30d"
-            />
-            <path
-              d="M35 61c34-10 60-20 96-34M63 55l-2-23M86 47l6-27M105 39l14-18"
-              fill="none"
-              stroke="#d9f99d"
-              strokeLinecap="round"
-              strokeWidth="3"
-            />
-          </>
-        ) : null}
-      </svg>
+      <Image
+        src={example.imageSrc}
+        alt={example.imageAlt}
+        fill
+        sizes="(max-width: 768px) 44vw, 180px"
+        className={`object-cover transition ${scaleClass} ${flipClass}`}
+        style={{ objectPosition: example.objectPosition }}
+      />
       {isMuted ? (
         <div className="absolute top-[26%] left-[48%] h-[44%] w-[30%] rounded bg-[#0f172a]/70" />
       ) : null}

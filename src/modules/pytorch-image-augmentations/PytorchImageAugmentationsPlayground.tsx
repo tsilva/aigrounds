@@ -30,6 +30,24 @@ type CropSample = {
   y: number;
 };
 
+type EraseSample = {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+};
+
+type PipelineRun = {
+  blurSigma: number;
+  brightnessFactor: number;
+  contrastFactor: number;
+  crop: CropSample;
+  erase: EraseSample;
+  rotationDegrees: number;
+  saturationFactor: number;
+  version: number;
+};
+
 const transformOrder: TransformId[] = [
   "random-resized-crop",
   "rotation",
@@ -146,6 +164,10 @@ function seededUnit(seed: number, salt: number) {
   return value - Math.floor(value);
 }
 
+function randomBetween(min: number, max: number) {
+  return min + Math.random() * (max - min);
+}
+
 function sampleResizedCrop(minArea: number, cropSeed: number): CropSample {
   const boundedMinArea = Math.min(1, Math.max(0.72, minArea));
   const area = boundedMinArea + seededUnit(cropSeed, 1) * (1 - boundedMinArea);
@@ -171,6 +193,23 @@ function sampleResizedCrop(minArea: number, cropSeed: number): CropSample {
     width,
     x: seededUnit(cropSeed, 3) * (1 - width),
     y: seededUnit(cropSeed, 4) * (1 - height),
+  };
+}
+
+function randomResizedCrop(minArea: number): CropSample {
+  return sampleResizedCrop(minArea, Math.random() * 100000);
+}
+
+function randomErase(maxArea: number): EraseSample {
+  const area = randomBetween(0.02, Math.max(0.02, maxArea));
+  const width = Math.min(0.62, Math.sqrt(area) * randomBetween(0.82, 1.22));
+  const height = Math.min(0.62, area / width);
+
+  return {
+    height,
+    width,
+    x: randomBetween(0, 1 - width),
+    y: randomBetween(0, 1 - height),
   };
 }
 
@@ -291,17 +330,13 @@ function ImageThumbnail({
 }
 
 function TransformBlock({
-  cropSeed,
   id,
   state,
-  onResampleCrop,
   onToggle,
   onUpdate,
 }: {
-  cropSeed: number;
   id: TransformId;
   state: TransformState;
-  onResampleCrop: () => void;
   onToggle: (id: TransformId, enabled: boolean) => void;
   onUpdate: (patch: Partial<TransformState>) => void;
 }) {
@@ -346,25 +381,15 @@ function TransformBlock({
 
       <div className="mt-3 space-y-2">
         {id === "random-resized-crop" ? (
-          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_126px]">
-            <RangeRow
-              disabled={!isEnabled}
-              label="min crop area"
-              min={0.72}
-              max={1}
-              step={0.01}
-              value={state.cropMinArea}
-              onChange={(cropMinArea) => onUpdate({ cropMinArea })}
-            />
-            <button
-              type="button"
-              disabled={!isEnabled}
-              onClick={onResampleCrop}
-              className="rounded-[6px] border border-[#052cff] bg-white px-3 py-2 text-[12px] font-black text-[#052cff] transition hover:bg-[#eef3ff] disabled:border-[#cbd5e1] disabled:text-[#7890b8]"
-            >
-              Resample crop
-            </button>
-          </div>
+          <RangeRow
+            disabled={!isEnabled}
+            label="min crop area"
+            min={0.72}
+            max={1}
+            step={0.01}
+            value={state.cropMinArea}
+            onChange={(cropMinArea) => onUpdate({ cropMinArea })}
+          />
         ) : null}
 
         {id === "rotation" ? (
@@ -432,7 +457,7 @@ function TransformBlock({
 
       {id === "random-resized-crop" && isEnabled ? (
         <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
-          sample #{cropSeed}
+          crop sample is drawn when the pipeline runs
         </p>
       ) : null}
     </div>
@@ -489,44 +514,67 @@ function getEnabledCodeLines(state: TransformState) {
   ];
 }
 
-function getImageVisualState(state: TransformState, cropSeed: number) {
-  const crop = sampleResizedCrop(state.cropMinArea, cropSeed);
-  const originX = ((crop.x + crop.width / 2) * 100).toFixed(1);
-  const originY = ((crop.y + crop.height / 2) * 100).toFixed(1);
+function createPipelineRun(state: TransformState, version: number): PipelineRun {
+  return {
+    blurSigma: randomBetween(0.1, state.blurSigma),
+    brightnessFactor: randomBetween(1 - state.brightness, 1 + state.brightness),
+    contrastFactor: randomBetween(1 - state.contrast, 1 + state.contrast),
+    crop: randomResizedCrop(state.cropMinArea),
+    erase: randomErase(state.eraseMaxArea),
+    rotationDegrees: randomBetween(
+      -state.rotationDegrees,
+      state.rotationDegrees,
+    ),
+    saturationFactor: randomBetween(
+      1 - state.brightness * 0.8,
+      1 + state.brightness * 1.4,
+    ),
+    version,
+  };
+}
+
+function getImageVisualState(state: TransformState, run: PipelineRun | null) {
+  const crop = run?.crop ?? null;
+  const originX = crop ? ((crop.x + crop.width / 2) * 100).toFixed(1) : "50";
+  const originY = crop ? ((crop.y + crop.height / 2) * 100).toFixed(1) : "50";
   const transforms: string[] = [];
   const filters: string[] = [];
 
-  if (state.enabled["random-resized-crop"]) {
+  if (run && state.enabled["random-resized-crop"]) {
     transforms.push(
-      `scale(${(1 / crop.width).toFixed(3)}, ${(1 / crop.height).toFixed(3)})`,
+      `scale(${(1 / run.crop.width).toFixed(3)}, ${(
+        1 / run.crop.height
+      ).toFixed(3)})`,
     );
   }
 
-  if (state.enabled.rotation) {
-    transforms.push(`rotate(${state.rotationDegrees}deg)`);
+  if (run && state.enabled.rotation) {
+    transforms.push(`rotate(${run.rotationDegrees.toFixed(2)}deg)`);
   }
 
-  if (state.enabled["color-jitter"]) {
+  if (run && state.enabled["color-jitter"]) {
     filters.push(
-      `brightness(${1 + state.brightness})`,
-      `contrast(${1 + state.contrast})`,
-      `saturate(${1 + state.brightness * 1.4})`,
+      `brightness(${run.brightnessFactor})`,
+      `contrast(${run.contrastFactor})`,
+      `saturate(${run.saturationFactor})`,
     );
   }
 
-  if (state.enabled["gaussian-blur"]) {
-    filters.push(`blur(${Math.min(4, state.blurSigma * 1.8).toFixed(2)}px)`);
+  if (run && state.enabled["gaussian-blur"]) {
+    filters.push(`blur(${Math.min(4, run.blurSigma * 1.8).toFixed(2)}px)`);
     transforms.push("scale(1.03)");
   }
 
   return {
     crop,
-    cropBoxStyle: {
-      height: `${crop.height * 100}%`,
-      left: `${crop.x * 100}%`,
-      top: `${crop.y * 100}%`,
-      width: `${crop.width * 100}%`,
-    } satisfies CSSProperties,
+    cropBoxStyle: crop
+      ? ({
+          height: `${crop.height * 100}%`,
+          left: `${crop.x * 100}%`,
+          top: `${crop.y * 100}%`,
+          width: `${crop.width * 100}%`,
+        } satisfies CSSProperties)
+      : null,
     resultImageStyle: {
       filter: filters.length ? filters.join(" ") : "none",
       objectPosition: "50% 50%",
@@ -534,6 +582,35 @@ function getImageVisualState(state: TransformState, cropSeed: number) {
       transformOrigin: `${originX}% ${originY}%`,
     } satisfies CSSProperties,
   };
+}
+
+function getRunSummary(run: PipelineRun, state: TransformState) {
+  const summary: string[] = [];
+
+  if (state.enabled["random-resized-crop"]) {
+    summary.push(`crop area ${Math.round(run.crop.area * 100)}%`);
+  }
+
+  if (state.enabled.rotation) {
+    summary.push(`rotation ${run.rotationDegrees.toFixed(1)}deg`);
+  }
+
+  if (state.enabled["color-jitter"]) {
+    summary.push(
+      `brightness x${formatDecimal(run.brightnessFactor)}`,
+      `contrast x${formatDecimal(run.contrastFactor)}`,
+    );
+  }
+
+  if (state.enabled["gaussian-blur"]) {
+    summary.push(`blur sigma ${formatDecimal(run.blurSigma, 1)}`);
+  }
+
+  if (state.enabled["random-erasing"]) {
+    summary.push(`erase area ${Math.round(run.erase.width * run.erase.height * 100)}%`);
+  }
+
+  return summary;
 }
 
 function ImagePane({
@@ -576,7 +653,8 @@ export function PytorchImageAugmentationsPlayground() {
   const [selectedExampleId, setSelectedExampleId] =
     useState<ClassExample["id"]>("cat");
   const [state, setState] = useState<TransformState>(defaultTransformState);
-  const [cropSeed, setCropSeed] = useState(7);
+  const [pipelineVersion, setPipelineVersion] = useState(0);
+  const [run, setRun] = useState<PipelineRun | null>(null);
 
   const selectedExample = useMemo(
     () =>
@@ -586,10 +664,15 @@ export function PytorchImageAugmentationsPlayground() {
   );
   const activeTransformCount = transformOrder.filter((id) => state.enabled[id]).length;
   const codeLines = getEnabledCodeLines(state);
-  const { cropBoxStyle, resultImageStyle } = getImageVisualState(state, cropSeed);
+  const currentRun = run?.version === pipelineVersion ? run : null;
+  const { cropBoxStyle, resultImageStyle } = getImageVisualState(
+    state,
+    currentRun,
+  );
 
   function updateState(patch: Partial<TransformState>) {
     setState((current) => ({ ...current, ...patch }));
+    setPipelineVersion((version) => version + 1);
   }
 
   function toggleTransform(id: TransformId, enabled: boolean) {
@@ -600,6 +683,16 @@ export function PytorchImageAugmentationsPlayground() {
         [id]: enabled,
       },
     }));
+    setPipelineVersion((version) => version + 1);
+  }
+
+  function selectExample(exampleId: ClassExample["id"]) {
+    setSelectedExampleId(exampleId);
+    setPipelineVersion((version) => version + 1);
+  }
+
+  function runPipeline() {
+    setRun(createPipelineRun(state, pipelineVersion));
   }
 
   async function copyCode() {
@@ -641,10 +734,8 @@ export function PytorchImageAugmentationsPlayground() {
                 {transformOrder.map((id) => (
                   <TransformBlock
                     key={id}
-                    cropSeed={cropSeed}
                     id={id}
                     state={state}
-                    onResampleCrop={() => setCropSeed((seed) => seed + 1)}
                     onToggle={toggleTransform}
                     onUpdate={updateState}
                   />
@@ -676,16 +767,25 @@ export function PytorchImageAugmentationsPlayground() {
 
             <div className="min-w-0 space-y-4 border-t border-[#d6e0f6] pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-5">
               <div>
-                <p className="mb-3 text-[13px] font-black text-[#052cff] uppercase">
-                  Choose an image
-                </p>
+                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-[13px] font-black text-[#052cff] uppercase">
+                    Choose an image
+                  </p>
+                  <button
+                    type="button"
+                    onClick={runPipeline}
+                    className="rounded-[7px] border border-[#052cff] bg-[#052cff] px-4 py-2 text-[13px] font-black text-white shadow-[0_10px_22px_rgba(23,53,255,0.16)] transition hover:bg-[#0227d7]"
+                  >
+                    Run pipeline
+                  </button>
+                </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {classExamples.map((example) => (
                     <ImageThumbnail
                       key={example.id}
                       example={example}
                       isSelected={example.id === selectedExample.id}
-                      onSelect={() => setSelectedExampleId(example.id)}
+                      onSelect={() => selectExample(example.id)}
                     />
                   ))}
                 </div>
@@ -693,7 +793,9 @@ export function PytorchImageAugmentationsPlayground() {
 
               <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] xl:items-center">
                 <ImagePane example={selectedExample} title="Original">
-                  {state.enabled["random-resized-crop"] ? (
+                  {currentRun &&
+                  state.enabled["random-resized-crop"] &&
+                  cropBoxStyle ? (
                     <div
                       className="absolute border-2 border-dashed border-[#052cff] bg-[#052cff]/10 shadow-[0_0_0_999px_rgba(7,16,36,0.12)]"
                       style={cropBoxStyle}
@@ -715,18 +817,42 @@ export function PytorchImageAugmentationsPlayground() {
                   imageStyle={resultImageStyle}
                   title="Composed result"
                 >
-                  {state.enabled["random-erasing"] ? (
+                  {!currentRun ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 px-4 text-center">
+                      <p className="rounded-[8px] border border-[#d6e0f6] bg-white px-4 py-3 text-[14px] font-black text-[#052cff] shadow-[0_10px_20px_rgba(68,88,170,0.08)]">
+                        Run pipeline to sample the random transforms.
+                      </p>
+                    </div>
+                  ) : null}
+                  {currentRun && state.enabled["random-erasing"] ? (
                     <div
                       className="absolute rounded-[5px] bg-[#0f172a]/75"
                       style={{
-                        height: `${Math.round(state.eraseMaxArea * 120)}%`,
-                        left: "46%",
-                        top: "28%",
-                        width: `${Math.round(state.eraseMaxArea * 120)}%`,
+                        height: `${currentRun.erase.height * 100}%`,
+                        left: `${currentRun.erase.x * 100}%`,
+                        top: `${currentRun.erase.y * 100}%`,
+                        width: `${currentRun.erase.width * 100}%`,
                       }}
                     />
                   ) : null}
                 </ImagePane>
+              </div>
+
+              <div className="rounded-[8px] border border-[#d6e0f6] bg-[#fbfcff] px-4 py-3">
+                <p className="text-[12px] font-black text-[#052cff] uppercase">
+                  Latest sampled values
+                </p>
+                {currentRun ? (
+                  <p className="mt-2 font-mono text-[12px] font-bold text-[#10245a]">
+                    {getRunSummary(currentRun, state).join(" / ")}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-[13px] font-semibold text-[#30446f]">
+                    Sliders edit pipeline parameters. Press Run pipeline to draw
+                    a crop, rotation angle, color factors, and other random
+                    samples.
+                  </p>
+                )}
               </div>
 
               <div className="grid rounded-[9px] border border-[#d6e0f6] bg-white text-center sm:grid-cols-3">

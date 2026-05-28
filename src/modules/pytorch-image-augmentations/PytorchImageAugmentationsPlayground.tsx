@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type ReactNode, useMemo, useState } from "react";
+import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
 import {
   calculateMixAnalysis,
   calculateSingleImageAnalysis,
@@ -179,6 +179,206 @@ function ObjectThumbnail({
       {isMuted ? (
         <div className="absolute top-[26%] left-[48%] h-[44%] w-[30%] rounded bg-[#0f172a]/70" />
       ) : null}
+    </div>
+  );
+}
+
+type TransformPreviewVisual = {
+  imageStyle: CSSProperties;
+  overlayStyle?: CSSProperties;
+  caption: string;
+};
+
+const cropFocusByExampleId: Record<ClassExample["id"], string> = {
+  cat: "44% 42%",
+  sneaker: "44% 62%",
+  "stop-sign": "50% 50%",
+  leaf: "58% 48%",
+};
+
+function clampPreviewStrength(strength: number) {
+  return Math.max(0, Math.min(1, strength));
+}
+
+function getTransformPreviewVisual({
+  activeTransform,
+  example,
+  strength,
+}: {
+  activeTransform: TransformDefinition;
+  example: ClassExample;
+  strength: number;
+}): TransformPreviewVisual {
+  const amount = clampPreviewStrength(strength);
+  const baseStyle: CSSProperties = {
+    objectPosition: example.objectPosition,
+    transform: "none",
+    filter: "none",
+  };
+
+  if (activeTransform.id === "random-resized-crop") {
+    const zoom = 1 + amount * 0.46;
+
+    return {
+      imageStyle: {
+        ...baseStyle,
+        objectPosition:
+          amount > 0.08
+            ? cropFocusByExampleId[example.id]
+            : example.objectPosition,
+        transform: `scale(${zoom})`,
+      },
+      caption: `crop window ${(100 / zoom).toFixed(0)}% of original`,
+    };
+  }
+
+  if (activeTransform.id === "horizontal-flip") {
+    return {
+      imageStyle: {
+        ...baseStyle,
+        transform: amount === 0 ? "scaleX(1)" : "scaleX(-1)",
+      },
+      caption:
+        amount === 0
+          ? "p=0.00, sample passes through"
+          : `mirrored sample, p=${formatDecimal(amount)}`,
+    };
+  }
+
+  if (activeTransform.id === "rotation") {
+    const degrees = amount * 30;
+
+    return {
+      imageStyle: {
+        ...baseStyle,
+        transform: `rotate(${degrees.toFixed(1)}deg) scale(1.08)`,
+      },
+      caption: `${degrees.toFixed(1)}deg rotation`,
+    };
+  }
+
+  if (activeTransform.id === "color-jitter") {
+    const brightness = 1 + amount * 0.34;
+    const contrast = 1 + amount * 0.32;
+    const saturation = 1 + amount * 0.7;
+
+    return {
+      imageStyle: {
+        ...baseStyle,
+        filter: `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`,
+      },
+      caption: `brightness x${brightness.toFixed(
+        2,
+      )}, contrast x${contrast.toFixed(2)}`,
+    };
+  }
+
+  if (activeTransform.id === "random-grayscale") {
+    return {
+      imageStyle: {
+        ...baseStyle,
+        filter: `grayscale(${amount}) contrast(${1 + amount * 0.12})`,
+      },
+      caption: `${Math.round(amount * 100)}% grayscale`,
+    };
+  }
+
+  if (activeTransform.id === "gaussian-blur") {
+    const blur = amount * 4.2;
+
+    return {
+      imageStyle: {
+        ...baseStyle,
+        filter: `blur(${blur.toFixed(2)}px)`,
+        transform: "scale(1.03)",
+      },
+      caption: `blur sigma proxy ${blur.toFixed(2)}px`,
+    };
+  }
+
+  if (activeTransform.id === "random-erasing") {
+    return {
+      imageStyle: {
+        ...baseStyle,
+        filter: `saturate(${1 - amount * 0.18})`,
+      },
+      overlayStyle: {
+        top: `${20 + amount * 8}%`,
+        left: `${46 - amount * 16}%`,
+        width: `${14 + amount * 30}%`,
+        height: `${12 + amount * 34}%`,
+        opacity: 0.28 + amount * 0.68,
+      },
+      caption: `erase patch covers about ${Math.round(
+        (0.02 + amount * 0.22) * 100,
+      )}%`,
+    };
+  }
+
+  const hue = -14 + amount * 28;
+
+  return {
+    imageStyle: {
+      ...baseStyle,
+      filter: `contrast(${1 + amount * 0.28}) saturate(${
+        1 + amount * 0.85
+      }) hue-rotate(${hue.toFixed(1)}deg)`,
+      transform: `rotate(${(amount * 7 - 3.5).toFixed(1)}deg) scale(${
+        1 + amount * 0.08
+      })`,
+    },
+    caption: `AugMix-style color and geometry chain, width ${formatDecimal(
+      amount,
+    )}`,
+  };
+}
+
+function TransformPreviewImage({
+  activeTransform,
+  example,
+  strength,
+  mode,
+}: {
+  activeTransform: TransformDefinition;
+  example: ClassExample;
+  strength: number;
+  mode: "original" | "augmented";
+}) {
+  const visual: TransformPreviewVisual =
+    mode === "augmented"
+      ? getTransformPreviewVisual({ activeTransform, example, strength })
+      : {
+          imageStyle: {
+            objectPosition: example.objectPosition,
+          },
+          caption: "source image",
+        };
+
+  return (
+    <div className="space-y-2">
+      <div className="relative aspect-[4/2.55] overflow-hidden rounded-[8px] border border-[#b8c5e8] bg-[#f8fbff]">
+        <Image
+          src={example.imageSrc}
+          alt={
+            mode === "augmented"
+              ? `${example.imageAlt}, augmented with ${activeTransform.title}`
+              : example.imageAlt
+          }
+          fill
+          sizes="(max-width: 768px) 92vw, 520px"
+          className="object-cover transition-[filter,transform] duration-200 ease-out"
+          style={visual.imageStyle}
+        />
+        {visual.overlayStyle ? (
+          <div
+            className="absolute rounded-[5px] bg-[#0f172a]"
+            style={visual.overlayStyle}
+          />
+        ) : null}
+      </div>
+      <p className="min-h-[20px] text-center font-mono text-[12px] font-black text-[#30446f]">
+        {visual.caption}
+      </p>
     </div>
   );
 }
@@ -708,46 +908,81 @@ function BatchMixPanel({
 function SingleImagePanel({
   activeTransform,
   strength,
+  selectedExample,
+  onSelectExample,
 }: {
   activeTransform: TransformDefinition;
   strength: number;
+  selectedExample: ClassExample;
+  onSelectExample: (exampleId: ClassExample["id"]) => void;
 }) {
-  const variant =
-    activeTransform.family === "geometry"
-      ? "cropped"
-      : activeTransform.family === "occlusion"
-        ? "erased"
-        : "jitter";
-
   return (
     <Panel className="p-4 sm:p-5">
-      <LessonTitle>3. Watch A Training Batch Change</LessonTitle>
-      <div className="mt-4 grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)]">
+      <LessonTitle>3. Compare Original vs Augmented</LessonTitle>
+      <div className="mt-4 grid gap-5 xl:grid-cols-[250px_minmax(0,1fr)]">
         <div>
-          <p className="mb-2 text-center text-[12px] font-black text-[#30446f] uppercase">
-            Original
+          <p className="mb-2 text-[12px] font-black text-[#30446f] uppercase">
+            Select source image
           </p>
-          <div className="space-y-3">
-            {classExamples.map((example) => (
-              <ObjectThumbnail key={example.id} example={example} />
-            ))}
+          <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
+            {classExamples.map((example) => {
+              const isSelected = example.id === selectedExample.id;
+
+              return (
+                <button
+                  key={example.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => onSelectExample(example.id)}
+                  className={`rounded-[9px] border p-1.5 text-left transition ${
+                    isSelected
+                      ? "border-[#052cff] bg-[#eef3ff] shadow-[0_10px_22px_rgba(23,53,255,0.14)]"
+                      : "border-[#d7e0f3] bg-white hover:border-[#aebced]"
+                  }`}
+                >
+                  <ObjectThumbnail example={example} />
+                  <p className="mt-1.5 text-center text-[12px] font-black text-[#10245a]">
+                    {example.label} / class {example.classIndex}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         </div>
+
         <div>
           <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-            Augmented samples ({activeTransform.title}, strength{" "}
-            {formatDecimal(strength)})
+            {selectedExample.label}: {activeTransform.title}, strength{" "}
+            {formatDecimal(strength)}
           </p>
-          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
-            {classExamples.map((example) => (
-              <div key={example.id} className="space-y-2">
-                <ObjectThumbnail example={example} variant={variant} />
-                <p className="text-center text-[13px] font-bold text-[#10245a]">
-                  {example.label}: one-hot stays class {example.classIndex}
-                </p>
-              </div>
-            ))}
+          <div className="grid gap-3 lg:grid-cols-2">
+            <div>
+              <p className="mb-2 text-center text-[12px] font-black text-[#30446f] uppercase">
+                Original
+              </p>
+              <TransformPreviewImage
+                activeTransform={activeTransform}
+                example={selectedExample}
+                strength={strength}
+                mode="original"
+              />
+            </div>
+            <div>
+              <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
+                Augmented
+              </p>
+              <TransformPreviewImage
+                activeTransform={activeTransform}
+                example={selectedExample}
+                strength={strength}
+                mode="augmented"
+              />
+            </div>
           </div>
+          <p className="mt-3 rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
+            Label stays one-hot for class {selectedExample.classIndex}; only the
+            image pixels are transformed.
+          </p>
         </div>
       </div>
     </Panel>
@@ -852,12 +1087,20 @@ export function PytorchImageAugmentationsPlayground() {
   const [alpha, setAlpha] = useState(1);
   const [lambda, setLambda] = useState(defaultLambda);
   const [strength, setStrength] = useState(defaultStrength);
+  const [selectedExampleId, setSelectedExampleId] =
+    useState<ClassExample["id"]>("cat");
 
   const activeTransform = useMemo(
     () =>
       transformDefinitions.find((transform) => transform.id === activeTransformId) ??
       transformDefinitions.find((transform) => transform.id === defaultTransformId)!,
     [activeTransformId],
+  );
+  const selectedExample = useMemo(
+    () =>
+      classExamples.find((example) => example.id === selectedExampleId) ??
+      classExamples[0],
+    [selectedExampleId],
   );
 
   function selectFamily(familyId: AugmentationFamilyId) {
@@ -928,6 +1171,8 @@ export function PytorchImageAugmentationsPlayground() {
             <SingleImagePanel
               activeTransform={activeTransform}
               strength={strength}
+              selectedExample={selectedExample}
+              onSelectExample={setSelectedExampleId}
             />
           )}
           <MetricsPanel

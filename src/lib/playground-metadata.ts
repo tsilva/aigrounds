@@ -582,6 +582,34 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "pytorch-image-augmentations",
+    title: "PyTorch Image Augmentations",
+    tag: "computer vision",
+    kicker:
+      "Tune torchvision transforms and see when the image changes enough that the label must change too.",
+    summary:
+      "Compare geometry, color, occlusion, AugMix, CutMix, and MixUp transforms. The lab connects transform controls to image batches, PyTorch code, soft target vectors, and label-risk metrics.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Image augmentation",
+      "torchvision transforms",
+      "CutMix",
+      "MixUp",
+      "Soft labels",
+    ],
+    learningGoals: [
+      "Distinguish single-image transforms from batch-mixing transforms.",
+      "See why geometry, color, occlusion, and AugMix usually keep one-hot labels.",
+      "Connect CutMix and MixUp lambda values to soft target probabilities.",
+      "Recognize augmentation as an invariance assumption rather than free data.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["pytorch-image-augmentations"],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+  },
+  {
     slug: "batch-normalization",
     title: "Batch Normalization Lab",
     tag: "neural networks",
@@ -1223,6 +1251,7 @@ export const dashboardLessonPlanOrder = [
   "activation-functions",
   "neural-network-forward-pass",
   "mnist-mlp-inference-debugger",
+  "pytorch-image-augmentations",
   "autograd-graphs",
   "backpropagation-inspector",
   "batch-normalization",

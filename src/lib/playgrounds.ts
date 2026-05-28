@@ -19,6 +19,7 @@ import { MnistMlpInferenceDebuggerPlayground } from "@/modules/mnist-mlp-inferen
 import { MonteCarloTreeSearchPlayground } from "@/modules/monte-carlo-tree-search/MonteCarloTreeSearchPlayground";
 import { OverfittingPlayground } from "@/modules/overfitting/OverfittingPlayground";
 import { ProbabilityRulesPlayground } from "@/modules/probability-rules/ProbabilityRulesPlayground";
+import { PytorchImageAugmentationsPlayground } from "@/modules/pytorch-image-augmentations/PytorchImageAugmentationsPlayground";
 import { RangeQuartilesIqrPlayground } from "@/modules/range-quartiles-iqr/RangeQuartilesIqrPlayground";
 import { ShapeSkewOutliersPlayground } from "@/modules/shape-skew-outliers/ShapeSkewOutliersPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
@@ -63,6 +64,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "byte-pair-encoding": BytePairEncodingPlayground,
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
+  "pytorch-image-augmentations": PytorchImageAugmentationsPlayground,
   "mnist-mlp-inference-debugger": MnistMlpInferenceDebuggerPlayground,
   "autograd-graphs": AutogradGraphsPlayground,
   "backpropagation-inspector": BackpropagationInspectorPlayground,

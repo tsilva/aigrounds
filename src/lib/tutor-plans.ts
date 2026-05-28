@@ -20,6 +20,7 @@ type TutorPlanSlug =
   | "byte-pair-encoding"
   | "transformer-attention"
   | "linear-quantization-int4"
+  | "pytorch-image-augmentations"
   | "mnist-mlp-inference-debugger"
   | "autograd-graphs"
   | "backpropagation-inspector"
@@ -1768,6 +1769,88 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "Backprop computes the gradient first. The learning rate only scales how much the optimizer moves the weight.",
+      },
+    ],
+  },
+  "pytorch-image-augmentations": {
+    intro:
+      "Work through three augmentation experiments. Predict whether a transform should preserve the label, then adjust the visible controls and explain when the target must become a soft label.",
+    whyItMatters:
+      "Image augmentation makes training data more varied, but each transform is an assumption about what should not matter. CutMix and MixUp are especially important because they change the image and the target label together.",
+    openingMessage:
+      "No prior PyTorch transform details needed. We will inspect augmentation as a label contract.\n\n- Geometry, color, and occlusion transforms usually keep a one-hot class label.\n- CutMix pastes part of one batched image into another.\n- MixUp blends two batched images.\n- CutMix and MixUp require soft labels because the mixed example contains evidence for two classes.\n\nFirst prediction: when CutMix uses lambda = 0.64, should the target stay one-hot or become a mix of two classes? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Separates single-image transforms from batch-mixing transforms.",
+      "Explains why normal geometry, color, and occlusion transforms can keep a one-hot target.",
+      "Connects lambda to the displayed CutMix patch size and soft target weights.",
+      "Explains why CutMix and MixUp change labels into class-probability vectors.",
+      "Recognizes AugMix as image-only robustness rather than a soft-label batch mixer.",
+    ],
+    steps: [
+      {
+        title: "Start with the label contract",
+        experiment:
+          "Use the Batch mixing card and CutMix tab. Compare the label contract box with the soft target bars in the pair-mix panel.",
+        predictionQuestion:
+          "When CutMix combines two images, should the target stay one-hot or become a mix of two classes?",
+        observationPrompt:
+          "What changed about the target after the batch pair was mixed?",
+        observationOptions: [
+          "The target became two class weights",
+          "The class weights summed to 1.00",
+          "I am not sure",
+        ],
+        takeaway:
+          "CutMix and MixUp create examples with evidence for two classes, so the target must become a soft class-probability vector.",
+      },
+      {
+        title: "Move lambda",
+        experiment:
+          "Drag lambda Source A down near 0.40, then up near 0.80. Watch the patch size, Source A and Source B bars, and the metric pills.",
+        predictionQuestion:
+          "If Source A gets a larger lambda, what should happen to Source B's label weight and patch share?",
+        observationPrompt:
+          "How did lambda control both the image mix and the soft labels?",
+        observationOptions: [
+          "Source A's bar grew",
+          "Source B's patch and bar shrank",
+          "I am not sure",
+        ],
+        takeaway:
+          "Lambda is the coupling between pixels and labels: Source A gets lambda, while Source B gets 1 - lambda.",
+      },
+      {
+        title: "Compare a one-hot transform",
+        experiment:
+          "Choose Geometry, then RandomResizedCrop. Compare the augmented samples with the Label mode and risk metrics.",
+        predictionQuestion:
+          "Should a crop that keeps the object recognizable change the one-hot label?",
+        observationPrompt:
+          "What stayed different between RandomResizedCrop and CutMix?",
+        observationOptions: [
+          "The label stayed one-hot",
+          "Only nuisance details changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Single-image transforms should change nuisance details while preserving the class. Batch mixing is different because the example itself contains two labels.",
+      },
+      {
+        title: "Place AugMix correctly",
+        experiment:
+          "Choose the AugMix tab. Read the code and the AugMix chip, then compare its label mode with CutMix.",
+        predictionQuestion:
+          "Should AugMix behave like CutMix with soft labels, or like an image-only robustness transform?",
+        observationPrompt:
+          "Where did AugMix belong in the label contract?",
+        observationOptions: [
+          "AugMix kept one-hot labels",
+          "CutMix and MixUp required soft labels",
+          "I am not sure",
+        ],
+        takeaway:
+          "AugMix can make images harder and more varied, but it does not combine two examples into a soft target the way CutMix and MixUp do.",
       },
     ],
   },

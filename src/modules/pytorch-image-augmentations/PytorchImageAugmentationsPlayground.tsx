@@ -198,6 +198,44 @@ function HelpIcon() {
   );
 }
 
+function ArrowUpIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-4"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.4"
+    >
+      <path d="m12 5 6 6" />
+      <path d="m12 5-6 6" />
+      <path d="M12 19V5" />
+    </svg>
+  );
+}
+
+function ArrowDownIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-4"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.4"
+    >
+      <path d="m12 19 6-6" />
+      <path d="m12 19-6-6" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
 function DragHandle() {
   return (
     <span
@@ -516,7 +554,7 @@ function TransformBlock({
             : "border-[#dbe4f6] bg-[#f8fbff] opacity-70"
       } ${isDragging ? "scale-[0.99] opacity-50" : ""}`}
     >
-      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_92px_48px_34px] items-center gap-3">
+      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_80px_48px] items-center gap-3">
         <span
           aria-label={`Drag ${copy.title}`}
           draggable={canDrag}
@@ -550,20 +588,22 @@ function TransformBlock({
           <button
             type="button"
             aria-label={`Move ${copy.title} up`}
+            title={`Move ${copy.title} up`}
             disabled={!canMoveUp}
             onClick={() => onMoveUp(id)}
-            className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[12px] font-black text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
+            className="inline-flex size-9 items-center justify-center rounded-[6px] border border-[#d7e0f3] bg-white text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
           >
-            Up
+            <ArrowUpIcon />
           </button>
           <button
             type="button"
             aria-label={`Move ${copy.title} down`}
+            title={`Move ${copy.title} down`}
             disabled={!canMoveDown}
             onClick={() => onMoveDown(id)}
-            className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[12px] font-black text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
+            className="inline-flex size-9 items-center justify-center rounded-[6px] border border-[#d7e0f3] bg-white text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
           >
-            Down
+            <ArrowDownIcon />
           </button>
         </div>
         <Toggle
@@ -571,14 +611,6 @@ function TransformBlock({
           checked={isEnabled}
           onChange={(checked) => onToggle(id, checked)}
         />
-        <button
-          type="button"
-          aria-label={`Disable ${copy.title}`}
-          onClick={() => onToggle(id, false)}
-          className="rounded-[6px] border border-[#d7e0f3] bg-white px-2 py-1 text-[14px] font-black text-[#30446f] transition hover:border-[#aebced]"
-        >
-          x
-        </button>
       </div>
 
       <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">

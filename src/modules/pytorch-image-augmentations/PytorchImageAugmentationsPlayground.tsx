@@ -212,6 +212,19 @@ function ChevronIcon({ isExpanded }: { isExpanded: boolean }) {
   );
 }
 
+function PlayIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="size-5"
+      fill="currentColor"
+    >
+      <path d="M8 5.6v12.8L18.4 12 8 5.6Z" />
+    </svg>
+  );
+}
+
 function formatDecimal(value: number, digits = 2) {
   return value.toFixed(digits);
 }
@@ -352,6 +365,12 @@ function hasConfigurableControls(id: TransformId) {
     id === "random-erasing"
   );
 }
+
+const defaultCollapsedTransformIds = Object.fromEntries(
+  defaultTransformOrder
+    .filter((id) => hasConfigurableControls(id))
+    .map((id) => [id, true]),
+) as Partial<Record<TransformId, boolean>>;
 
 function RangeRow({
   disabled = false,
@@ -549,9 +568,6 @@ function TransformBlock({
           <p className="truncate text-[15px] font-black text-[#071024]">
             {copy.title}
           </p>
-          <p className="truncate text-[11px] font-bold text-[#30446f]">
-            {copy.subtitle}
-          </p>
         </div>
         {canCollapse ? (
           <button
@@ -653,12 +669,6 @@ function TransformBlock({
             </>
           ) : null}
 
-          {id === "trivial-augment" ? (
-            <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
-              No knobs: TrivialAugmentWide samples one operation and magnitude.
-            </p>
-          ) : null}
-
           {id === "rand-augment" ? (
             <>
               <RangeRow
@@ -711,11 +721,6 @@ function TransformBlock({
             />
           ) : null}
 
-          {id === "to-tensor" ? (
-            <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
-              No visual change: this converts the image into a training tensor.
-            </p>
-          ) : null}
         </div>
       ) : null}
 
@@ -1093,7 +1098,7 @@ export function PytorchImageAugmentationsPlayground() {
   const [dropTargetId, setDropTargetId] = useState<TransformId | null>(null);
   const [collapsedTransformIds, setCollapsedTransformIds] = useState<
     Partial<Record<TransformId, boolean>>
-  >({});
+  >(defaultCollapsedTransformIds);
   const [pipelineVersion, setPipelineVersion] = useState(0);
   const [run, setRun] = useState<PipelineRun | null>(null);
 
@@ -1267,10 +1272,12 @@ export function PytorchImageAugmentationsPlayground() {
                   </p>
                   <button
                     type="button"
+                    aria-label="Run pipeline"
+                    title="Run pipeline"
                     onClick={runPipeline}
-                    className="rounded-[7px] border border-[#052cff] bg-[#052cff] px-4 py-2 text-[13px] font-black text-white shadow-[0_10px_22px_rgba(23,53,255,0.16)] transition hover:bg-[#0227d7]"
+                    className="inline-flex size-11 items-center justify-center rounded-[7px] border border-[#052cff] bg-[#052cff] text-white shadow-[0_10px_22px_rgba(23,53,255,0.16)] transition hover:bg-[#0227d7]"
                   >
-                    Run pipeline
+                    <PlayIcon />
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

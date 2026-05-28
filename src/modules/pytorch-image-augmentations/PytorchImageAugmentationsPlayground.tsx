@@ -185,27 +185,67 @@ function ObjectThumbnail({
 
 type TransformPreviewVisual = {
   imageStyle: CSSProperties;
+  cropBoxStyle?: CSSProperties;
   overlayStyle?: CSSProperties;
   caption: string;
 };
 
-const cropFocusByExampleId: Record<ClassExample["id"], string> = {
-  cat: "44% 42%",
-  sneaker: "44% 62%",
-  "stop-sign": "50% 50%",
-  leaf: "58% 48%",
+type CropSample = {
+  area: number;
+  height: number;
+  width: number;
+  x: number;
+  y: number;
 };
 
 function clampPreviewStrength(strength: number) {
   return Math.max(0, Math.min(1, strength));
 }
 
+function seededUnit(seed: number, salt: number) {
+  const value = Math.sin(seed * 917.3 + salt * 611.7) * 10000;
+
+  return value - Math.floor(value);
+}
+
+function sampleResizedCrop(strength: number, cropSeed: number): CropSample {
+  const amount = clampPreviewStrength(strength);
+  const minArea = 1 - amount * 0.28;
+  const area = minArea + seededUnit(cropSeed, 1) * (1 - minArea);
+  const logMinRatio = Math.log(0.75) * amount;
+  const logMaxRatio = Math.log(4 / 3) * amount;
+  const aspectRatio =
+    Math.exp(logMinRatio + seededUnit(cropSeed, 2) * (logMaxRatio - logMinRatio));
+  let width = Math.sqrt(area * aspectRatio);
+  let height = Math.sqrt(area / aspectRatio);
+
+  if (width > 1) {
+    height /= width;
+    width = 1;
+  }
+
+  if (height > 1) {
+    width /= height;
+    height = 1;
+  }
+
+  return {
+    area: width * height,
+    height,
+    width,
+    x: seededUnit(cropSeed, 3) * (1 - width),
+    y: seededUnit(cropSeed, 4) * (1 - height),
+  };
+}
+
 function getTransformPreviewVisual({
   activeTransform,
+  cropSeed,
   example,
   strength,
 }: {
   activeTransform: TransformDefinition;
+  cropSeed: number;
   example: ClassExample;
   strength: number;
 }): TransformPreviewVisual {
@@ -217,18 +257,27 @@ function getTransformPreviewVisual({
   };
 
   if (activeTransform.id === "random-resized-crop") {
-    const zoom = 1 + amount * 0.46;
+    const crop = sampleResizedCrop(strength, cropSeed);
+    const originX = ((crop.x + crop.width / 2) * 100).toFixed(1);
+    const originY = ((crop.y + crop.height / 2) * 100).toFixed(1);
 
     return {
       imageStyle: {
         ...baseStyle,
-        objectPosition:
-          amount > 0.08
-            ? cropFocusByExampleId[example.id]
-            : example.objectPosition,
-        transform: `scale(${zoom})`,
+        transform: `scale(${(1 / crop.width).toFixed(3)}, ${(
+          1 / crop.height
+        ).toFixed(3)})`,
+        transformOrigin: `${originX}% ${originY}%`,
       },
-      caption: `crop window ${(100 / zoom).toFixed(0)}% of original`,
+      cropBoxStyle: {
+        height: `${crop.height * 100}%`,
+        left: `${crop.x * 100}%`,
+        top: `${crop.y * 100}%`,
+        width: `${crop.width * 100}%`,
+      },
+      caption: `sampled area ${Math.round(crop.area * 100)}%, x ${Math.round(
+        crop.x * 100,
+      )}%, y ${Math.round(crop.y * 100)}%`,
     };
   }
 
@@ -335,23 +384,44 @@ function getTransformPreviewVisual({
 
 function TransformPreviewImage({
   activeTransform,
+  cropSeed,
   example,
   strength,
   mode,
 }: {
   activeTransform: TransformDefinition;
+  cropSeed: number;
   example: ClassExample;
   strength: number;
   mode: "original" | "augmented";
 }) {
+  const cropVisual =
+    activeTransform.id === "random-resized-crop"
+      ? getTransformPreviewVisual({
+          activeTransform,
+          cropSeed,
+          example,
+          strength,
+        })
+      : null;
   const visual: TransformPreviewVisual =
     mode === "augmented"
-      ? getTransformPreviewVisual({ activeTransform, example, strength })
+      ? (cropVisual ??
+        getTransformPreviewVisual({
+          activeTransform,
+          cropSeed,
+          example,
+          strength,
+        }))
       : {
+          cropBoxStyle: cropVisual?.cropBoxStyle,
           imageStyle: {
             objectPosition: example.objectPosition,
           },
-          caption: "source image",
+          caption:
+            activeTransform.id === "random-resized-crop"
+              ? "sampled crop box before resize"
+              : "source image",
         };
 
   return (
@@ -373,6 +443,12 @@ function TransformPreviewImage({
           <div
             className="absolute rounded-[5px] bg-[#0f172a]"
             style={visual.overlayStyle}
+          />
+        ) : null}
+        {mode === "original" && visual.cropBoxStyle ? (
+          <div
+            className="absolute border-2 border-[#052cff] bg-[#052cff]/10 shadow-[0_0_0_999px_rgba(7,16,36,0.18)]"
+            style={visual.cropBoxStyle}
           />
         ) : null}
       </div>
@@ -907,15 +983,21 @@ function BatchMixPanel({
 
 function SingleImagePanel({
   activeTransform,
+  cropSeed,
+  onResampleCrop,
   strength,
   selectedExample,
   onSelectExample,
 }: {
   activeTransform: TransformDefinition;
+  cropSeed: number;
+  onResampleCrop: () => void;
   strength: number;
   selectedExample: ClassExample;
   onSelectExample: (exampleId: ClassExample["id"]) => void;
 }) {
+  const isRandomResizedCrop = activeTransform.id === "random-resized-crop";
+
   return (
     <Panel className="p-4 sm:p-5">
       <LessonTitle>3. Compare Original vs Augmented</LessonTitle>
@@ -951,10 +1033,21 @@ function SingleImagePanel({
         </div>
 
         <div>
-          <p className="mb-2 text-center text-[12px] font-black text-[#052cff] uppercase">
-            {selectedExample.label}: {activeTransform.title}, strength{" "}
-            {formatDecimal(strength)}
-          </p>
+          <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-center text-[12px] font-black text-[#052cff] uppercase sm:text-left">
+              {selectedExample.label}: {activeTransform.title}, strength{" "}
+              {formatDecimal(strength)}
+            </p>
+            {isRandomResizedCrop ? (
+              <button
+                type="button"
+                onClick={onResampleCrop}
+                className="rounded-[7px] border border-[#052cff] bg-white px-3 py-2 text-[12px] font-black text-[#052cff] transition hover:bg-[#eef3ff]"
+              >
+                Resample crop
+              </button>
+            ) : null}
+          </div>
           <div className="grid gap-3 lg:grid-cols-2">
             <div>
               <p className="mb-2 text-center text-[12px] font-black text-[#30446f] uppercase">
@@ -962,6 +1055,7 @@ function SingleImagePanel({
               </p>
               <TransformPreviewImage
                 activeTransform={activeTransform}
+                cropSeed={cropSeed}
                 example={selectedExample}
                 strength={strength}
                 mode="original"
@@ -973,6 +1067,7 @@ function SingleImagePanel({
               </p>
               <TransformPreviewImage
                 activeTransform={activeTransform}
+                cropSeed={cropSeed}
                 example={selectedExample}
                 strength={strength}
                 mode="augmented"
@@ -980,8 +1075,9 @@ function SingleImagePanel({
             </div>
           </div>
           <p className="mt-3 rounded-[7px] border border-[#d6e0f6] bg-[#fbfcff] px-3 py-2 text-[13px] font-bold text-[#052cff]">
-            Label stays one-hot for class {selectedExample.classIndex}; only the
-            image pixels are transformed.
+            {isRandomResizedCrop
+              ? "RandomResizedCrop samples a crop box, then resizes that crop back to the model input size."
+              : `Label stays one-hot for class ${selectedExample.classIndex}; only the image pixels are transformed.`}
           </p>
         </div>
       </div>
@@ -1089,6 +1185,7 @@ export function PytorchImageAugmentationsPlayground() {
   const [strength, setStrength] = useState(defaultStrength);
   const [selectedExampleId, setSelectedExampleId] =
     useState<ClassExample["id"]>("cat");
+  const [cropSeed, setCropSeed] = useState(7);
 
   const activeTransform = useMemo(
     () =>
@@ -1170,6 +1267,8 @@ export function PytorchImageAugmentationsPlayground() {
           ) : (
             <SingleImagePanel
               activeTransform={activeTransform}
+              cropSeed={cropSeed}
+              onResampleCrop={() => setCropSeed((seed) => seed + 1)}
               strength={strength}
               selectedExample={selectedExample}
               onSelectExample={setSelectedExampleId}

@@ -179,63 +179,6 @@ function Panel({
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M9.6 9a2.6 2.6 0 0 1 4.9 1.2c0 1.8-2 2.1-2 3.5" />
-      <path d="M12 17h.01" />
-    </svg>
-  );
-}
-
-function ArrowUpIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2.4"
-    >
-      <path d="m12 5 6 6" />
-      <path d="m12 5-6 6" />
-      <path d="M12 19V5" />
-    </svg>
-  );
-}
-
-function ArrowDownIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2.4"
-    >
-      <path d="m12 19 6-6" />
-      <path d="m12 19-6-6" />
-      <path d="M12 5v14" />
-    </svg>
-  );
-}
-
 function DragHandle() {
   return (
     <span
@@ -249,6 +192,23 @@ function DragHandle() {
         />
       ))}
     </span>
+  );
+}
+
+function ChevronIcon({ isExpanded }: { isExpanded: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={`size-4 transition ${isExpanded ? "rotate-90" : ""}`}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.4"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
   );
 }
 
@@ -380,6 +340,19 @@ function moveTransform(
   return normalizedOrder.join("|") === order.join("|") ? order : normalizedOrder;
 }
 
+function hasConfigurableControls(id: TransformId) {
+  return (
+    id === "random-resized-crop" ||
+    id === "horizontal-flip" ||
+    id === "vertical-flip" ||
+    id === "rotation" ||
+    id === "color-jitter" ||
+    id === "rand-augment" ||
+    id === "gaussian-blur" ||
+    id === "random-erasing"
+  );
+}
+
 function RangeRow({
   disabled = false,
   label,
@@ -498,36 +471,32 @@ function ImageThumbnail({
 
 function TransformBlock({
   canDrag,
-  canMoveDown,
-  canMoveUp,
+  canCollapse,
   id,
   index,
+  isCollapsed,
   isDragging,
   isDragTarget,
   state,
-  totalCount,
   onDragEnd,
   onDragEnter,
   onDragStart,
-  onMoveDown,
-  onMoveUp,
+  onToggleCollapse,
   onToggle,
   onUpdate,
 }: {
   canDrag: boolean;
-  canMoveDown: boolean;
-  canMoveUp: boolean;
+  canCollapse: boolean;
   id: TransformId;
   index: number;
+  isCollapsed: boolean;
   isDragging: boolean;
   isDragTarget: boolean;
   state: TransformState;
-  totalCount: number;
   onDragEnd: () => void;
   onDragEnter: (id: TransformId) => void;
   onDragStart: (id: TransformId) => void;
-  onMoveDown: (id: TransformId) => void;
-  onMoveUp: (id: TransformId) => void;
+  onToggleCollapse: (id: TransformId) => void;
   onToggle: (id: TransformId, enabled: boolean) => void;
   onUpdate: (patch: Partial<TransformState>) => void;
 }) {
@@ -554,7 +523,7 @@ function TransformBlock({
             : "border-[#dbe4f6] bg-[#f8fbff] opacity-70"
       } ${isDragging ? "scale-[0.99] opacity-50" : ""}`}
     >
-      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_80px_48px] items-center gap-3">
+      <div className="grid grid-cols-[18px_36px_minmax(0,1fr)_36px_48px] items-center gap-3">
         <span
           aria-label={`Drag ${copy.title}`}
           draggable={canDrag}
@@ -584,28 +553,20 @@ function TransformBlock({
             {copy.subtitle}
           </p>
         </div>
-        <div className="flex items-center justify-end gap-1">
+        {canCollapse ? (
           <button
             type="button"
-            aria-label={`Move ${copy.title} up`}
-            title={`Move ${copy.title} up`}
-            disabled={!canMoveUp}
-            onClick={() => onMoveUp(id)}
-            className="inline-flex size-9 items-center justify-center rounded-[6px] border border-[#d7e0f3] bg-white text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
+            aria-expanded={!isCollapsed}
+            aria-label={`${isCollapsed ? "Expand" : "Collapse"} ${copy.title} settings`}
+            title={`${isCollapsed ? "Expand" : "Collapse"} settings`}
+            onClick={() => onToggleCollapse(id)}
+            className="inline-flex size-9 items-center justify-center rounded-[6px] border border-[#d7e0f3] bg-white text-[#30446f] transition hover:border-[#aebced]"
           >
-            <ArrowUpIcon />
+            <ChevronIcon isExpanded={!isCollapsed} />
           </button>
-          <button
-            type="button"
-            aria-label={`Move ${copy.title} down`}
-            title={`Move ${copy.title} down`}
-            disabled={!canMoveDown}
-            onClick={() => onMoveDown(id)}
-            className="inline-flex size-9 items-center justify-center rounded-[6px] border border-[#d7e0f3] bg-white text-[#30446f] transition hover:border-[#aebced] disabled:text-[#aab7d1]"
-          >
-            <ArrowDownIcon />
-          </button>
-        </div>
+        ) : (
+          <span aria-hidden="true" />
+        )}
         <Toggle
           label={`${isEnabled ? "Disable" : "Enable"} ${copy.title}`}
           checked={isEnabled}
@@ -613,172 +574,172 @@ function TransformBlock({
         />
       </div>
 
-      <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
-        position {index + 1} of {totalCount}
-      </p>
-
-      <div className="mt-3 space-y-2">
-        {id === "random-resized-crop" ? (
-          <RangeRow
-            disabled={!isEnabled}
-            label="min crop area"
-            min={0.08}
-            max={1}
-            step={0.01}
-            value={state.cropMinArea}
-            onChange={(cropMinArea) => onUpdate({ cropMinArea })}
-          />
-        ) : null}
-
-        {id === "rotation" ? (
-          <RangeRow
-            disabled={!isEnabled}
-            label="max degrees"
-            min={0}
-            max={18}
-            step={1}
-            suffix="deg"
-            value={state.rotationDegrees}
-            valueDigits={0}
-            onChange={(rotationDegrees) => onUpdate({ rotationDegrees })}
-          />
-        ) : null}
-
-        {id === "horizontal-flip" ? (
-          <RangeRow
-            disabled={!isEnabled}
-            label="flip prob"
-            min={0}
-            max={1}
-            step={0.05}
-            value={state.horizontalFlipProbability}
-            onChange={(horizontalFlipProbability) =>
-              onUpdate({ horizontalFlipProbability })
-            }
-          />
-        ) : null}
-
-        {id === "vertical-flip" ? (
-          <RangeRow
-            disabled={!isEnabled}
-            label="flip prob"
-            min={0}
-            max={1}
-            step={0.05}
-            value={state.verticalFlipProbability}
-            onChange={(verticalFlipProbability) =>
-              onUpdate({ verticalFlipProbability })
-            }
-          />
-        ) : null}
-
-        {id === "color-jitter" ? (
-          <>
+      {!isCollapsed ? (
+        <div className="mt-3 space-y-2">
+          {id === "random-resized-crop" ? (
             <RangeRow
               disabled={!isEnabled}
-              label="brightness"
-              min={0}
-              max={0.3}
+              label="min crop area"
+              min={0.08}
+              max={1}
               step={0.01}
-              value={state.brightness}
-              onChange={(brightness) => onUpdate({ brightness })}
+              value={state.cropMinArea}
+              onChange={(cropMinArea) => onUpdate({ cropMinArea })}
             />
-            <RangeRow
-              disabled={!isEnabled}
-              label="contrast"
-              min={0}
-              max={0.3}
-              step={0.01}
-              value={state.contrast}
-              onChange={(contrast) => onUpdate({ contrast })}
-            />
-          </>
-        ) : null}
+          ) : null}
 
-        {id === "trivial-augment" ? (
-          <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
-            No knobs: TrivialAugmentWide samples one operation and magnitude.
-          </p>
-        ) : null}
-
-        {id === "rand-augment" ? (
-          <>
+          {id === "rotation" ? (
             <RangeRow
               disabled={!isEnabled}
-              label="num ops"
-              min={1}
-              max={4}
-              step={1}
-              value={state.randAugmentOps}
-              valueDigits={0}
-              onChange={(randAugmentOps) => onUpdate({ randAugmentOps })}
-            />
-            <RangeRow
-              disabled={!isEnabled}
-              label="magnitude"
+              label="max degrees"
               min={0}
-              max={30}
+              max={18}
               step={1}
-              value={state.randAugmentMagnitude}
+              suffix="deg"
+              value={state.rotationDegrees}
               valueDigits={0}
-              onChange={(randAugmentMagnitude) =>
-                onUpdate({ randAugmentMagnitude })
+              onChange={(rotationDegrees) => onUpdate({ rotationDegrees })}
+            />
+          ) : null}
+
+          {id === "horizontal-flip" ? (
+            <RangeRow
+              disabled={!isEnabled}
+              label="flip prob"
+              min={0}
+              max={1}
+              step={0.05}
+              value={state.horizontalFlipProbability}
+              onChange={(horizontalFlipProbability) =>
+                onUpdate({ horizontalFlipProbability })
               }
             />
-          </>
-        ) : null}
+          ) : null}
 
-        {id === "gaussian-blur" ? (
-          <RangeRow
-            disabled={!isEnabled}
-            label="max sigma"
-            min={0.1}
-            max={2}
-            step={0.1}
-            value={state.blurSigma}
-            valueDigits={1}
-            onChange={(blurSigma) => onUpdate({ blurSigma })}
-          />
-        ) : null}
+          {id === "vertical-flip" ? (
+            <RangeRow
+              disabled={!isEnabled}
+              label="flip prob"
+              min={0}
+              max={1}
+              step={0.05}
+              value={state.verticalFlipProbability}
+              onChange={(verticalFlipProbability) =>
+                onUpdate({ verticalFlipProbability })
+              }
+            />
+          ) : null}
 
-        {id === "random-erasing" ? (
-          <RangeRow
-            disabled={!isEnabled}
-            label="max erase area"
-            min={0.02}
-            max={0.3}
-            step={0.01}
-            value={state.eraseMaxArea}
-            onChange={(eraseMaxArea) => onUpdate({ eraseMaxArea })}
-          />
-        ) : null}
+          {id === "color-jitter" ? (
+            <>
+              <RangeRow
+                disabled={!isEnabled}
+                label="brightness"
+                min={0}
+                max={0.3}
+                step={0.01}
+                value={state.brightness}
+                onChange={(brightness) => onUpdate({ brightness })}
+              />
+              <RangeRow
+                disabled={!isEnabled}
+                label="contrast"
+                min={0}
+                max={0.3}
+                step={0.01}
+                value={state.contrast}
+                onChange={(contrast) => onUpdate({ contrast })}
+              />
+            </>
+          ) : null}
 
-        {id === "to-tensor" ? (
-          <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
-            No visual change: this converts the image into a training tensor.
-          </p>
-        ) : null}
-      </div>
+          {id === "trivial-augment" ? (
+            <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
+              No knobs: TrivialAugmentWide samples one operation and magnitude.
+            </p>
+          ) : null}
 
-      {id === "random-resized-crop" && isEnabled ? (
+          {id === "rand-augment" ? (
+            <>
+              <RangeRow
+                disabled={!isEnabled}
+                label="num ops"
+                min={1}
+                max={4}
+                step={1}
+                value={state.randAugmentOps}
+                valueDigits={0}
+                onChange={(randAugmentOps) => onUpdate({ randAugmentOps })}
+              />
+              <RangeRow
+                disabled={!isEnabled}
+                label="magnitude"
+                min={0}
+                max={30}
+                step={1}
+                value={state.randAugmentMagnitude}
+                valueDigits={0}
+                onChange={(randAugmentMagnitude) =>
+                  onUpdate({ randAugmentMagnitude })
+                }
+              />
+            </>
+          ) : null}
+
+          {id === "gaussian-blur" ? (
+            <RangeRow
+              disabled={!isEnabled}
+              label="max sigma"
+              min={0.1}
+              max={2}
+              step={0.1}
+              value={state.blurSigma}
+              valueDigits={1}
+              onChange={(blurSigma) => onUpdate({ blurSigma })}
+            />
+          ) : null}
+
+          {id === "random-erasing" ? (
+            <RangeRow
+              disabled={!isEnabled}
+              label="max erase area"
+              min={0.02}
+              max={0.3}
+              step={0.01}
+              value={state.eraseMaxArea}
+              onChange={(eraseMaxArea) => onUpdate({ eraseMaxArea })}
+            />
+          ) : null}
+
+          {id === "to-tensor" ? (
+            <p className="rounded-[6px] border border-[#d4def5] bg-white px-3 py-2 font-mono text-[11px] font-bold text-[#30446f]">
+              No visual change: this converts the image into a training tensor.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!isCollapsed && id === "random-resized-crop" && isEnabled ? (
         <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
           crop sample is drawn when the pipeline runs
         </p>
       ) : null}
 
-      {(id === "horizontal-flip" || id === "vertical-flip") && isEnabled ? (
+      {!isCollapsed &&
+      (id === "horizontal-flip" || id === "vertical-flip") &&
+      isEnabled ? (
         <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
           flip decision is sampled when the pipeline runs
         </p>
       ) : null}
 
-      {id === "rand-augment" && isEnabled ? (
+      {!isCollapsed && id === "rand-augment" && isEnabled ? (
         <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
           ops are sampled from RandAugment when the pipeline runs
         </p>
       ) : null}
 
-      {id === "trivial-augment" && isEnabled ? (
+      {!isCollapsed && id === "trivial-augment" && isEnabled ? (
         <p className="mt-2 font-mono text-[10px] font-bold text-[#58709d]">
           one operation is sampled from TrivialAugmentWide when the pipeline runs
         </p>
@@ -1130,6 +1091,9 @@ export function PytorchImageAugmentationsPlayground() {
   const [draggedTransformId, setDraggedTransformId] =
     useState<TransformId | null>(null);
   const [dropTargetId, setDropTargetId] = useState<TransformId | null>(null);
+  const [collapsedTransformIds, setCollapsedTransformIds] = useState<
+    Partial<Record<TransformId, boolean>>
+  >({});
   const [pipelineVersion, setPipelineVersion] = useState(0);
   const [run, setRun] = useState<PipelineRun | null>(null);
 
@@ -1139,9 +1103,6 @@ export function PytorchImageAugmentationsPlayground() {
       classExamples[0],
     [selectedExampleId],
   );
-  const activeTransformCount = transformOrder.filter(
-    (id) => state.enabled[id],
-  ).length;
   const overlappingRandAugmentTransforms = [
     state.enabled.rotation ? "Rotation" : null,
     state.enabled["color-jitter"] ? "ColorJitter" : null,
@@ -1176,6 +1137,13 @@ export function PytorchImageAugmentationsPlayground() {
     markPipelineChanged();
   }
 
+  function toggleTransformCollapse(id: TransformId) {
+    setCollapsedTransformIds((current) => ({
+      ...current,
+      [id]: !current[id],
+    }));
+  }
+
   function selectExample(exampleId: ClassExample["id"]) {
     setSelectedExampleId(exampleId);
     markPipelineChanged();
@@ -1193,22 +1161,6 @@ export function PytorchImageAugmentationsPlayground() {
     }
 
     setTransformOrder(nextOrder);
-    markPipelineChanged();
-  }
-
-  function moveTransformByOffset(id: TransformId, offset: -1 | 1) {
-    if (id === "rand-augment" || id === "to-tensor") {
-      return;
-    }
-
-    const index = transformOrder.indexOf(id);
-    const targetId = transformOrder[index + offset];
-
-    if (index < 0 || !targetId) {
-      return;
-    }
-
-    setTransformOrder(moveTransform(transformOrder, id, targetId));
     markPipelineChanged();
   }
 
@@ -1235,13 +1187,6 @@ export function PytorchImageAugmentationsPlayground() {
                 update.
               </p>
             </div>
-            <button
-              type="button"
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[8px] border border-[#cfd4ff] bg-white px-5 py-3 text-[15px] font-black text-[#052cff] shadow-[0_10px_24px_rgba(68,88,170,0.06)]"
-            >
-              <HelpIcon />
-              What changes and what stays?
-            </button>
           </div>
         </header>
 
@@ -1257,22 +1202,13 @@ export function PytorchImageAugmentationsPlayground() {
                   <TransformBlock
                     key={id}
                     canDrag={id !== "rand-augment" && id !== "to-tensor"}
-                    canMoveDown={
-                      id !== "rand-augment" &&
-                      id !== "to-tensor" &&
-                      index < transformOrder.length - 1 &&
-                      transformOrder[index + 1] !== "rand-augment" &&
-                      transformOrder[index + 1] !== "to-tensor"
-                    }
-                    canMoveUp={
-                      id !== "rand-augment" && id !== "to-tensor" && index > 0
-                    }
+                    canCollapse={hasConfigurableControls(id)}
                     id={id}
                     index={index}
+                    isCollapsed={Boolean(collapsedTransformIds[id])}
                     isDragging={draggedTransformId === id}
                     isDragTarget={dropTargetId === id}
                     state={state}
-                    totalCount={transformOrder.length}
                     onDragEnd={endDrag}
                     onDragEnter={(targetId) => {
                       setDropTargetId(targetId);
@@ -1285,8 +1221,7 @@ export function PytorchImageAugmentationsPlayground() {
                       setDraggedTransformId(draggedId);
                       setDropTargetId(draggedId);
                     }}
-                    onMoveDown={(moveId) => moveTransformByOffset(moveId, 1)}
-                    onMoveUp={(moveId) => moveTransformByOffset(moveId, -1)}
+                    onToggleCollapse={toggleTransformCollapse}
                     onToggle={toggleTransform}
                     onUpdate={updateState}
                   />
@@ -1416,35 +1351,6 @@ export function PytorchImageAugmentationsPlayground() {
                 )}
               </div>
 
-              <div className="grid rounded-[9px] border border-[#d6e0f6] bg-white text-center sm:grid-cols-3">
-                <div className="border-b border-[#d6e0f6] px-4 py-3 sm:border-r sm:border-b-0">
-                  <p className="text-[12px] font-bold text-[#30446f]">
-                    label mode
-                  </p>
-                  <p className="mt-1 text-[18px] font-black text-[#071024]">
-                    one-hot
-                  </p>
-                </div>
-                <div className="border-b border-[#d6e0f6] px-4 py-3 sm:border-r sm:border-b-0">
-                  <p className="text-[12px] font-bold text-[#30446f]">class</p>
-                  <p className="mt-1 text-[18px] font-black text-[#071024]">
-                    {selectedExample.label} ({selectedExample.classIndex})
-                  </p>
-                </div>
-                <div className="px-4 py-3">
-                  <p className="text-[12px] font-bold text-[#30446f]">
-                    active transforms
-                  </p>
-                  <p className="mt-1 text-[18px] font-black text-[#071024]">
-                    {activeTransformCount}
-                  </p>
-                </div>
-              </div>
-
-              <p className="rounded-[8px] border border-[#cfd9f5] bg-[#fbfcff] px-4 py-3 text-[15px] font-semibold text-[#052cff]">
-                Transforms compound: each block receives the image from the
-                block above it.
-              </p>
             </div>
           </div>
         </Panel>

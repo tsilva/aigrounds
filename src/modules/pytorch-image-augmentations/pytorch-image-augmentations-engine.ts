@@ -38,6 +38,10 @@ export type ClassExample = {
   label: string;
   classIndex: number;
   tone: "blue" | "red" | "green" | "amber";
+  imageSrc: string;
+  imageAlt: string;
+  objectPosition: string;
+  sourceUrl: string;
 };
 
 export type MixAnalysis = {

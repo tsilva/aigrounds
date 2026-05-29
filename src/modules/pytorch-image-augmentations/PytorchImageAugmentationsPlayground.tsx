@@ -4,7 +4,9 @@ import Image from "next/image";
 import {
   type CSSProperties,
   type ReactNode,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { type ClassExample } from "./pytorch-image-augmentations-engine";
@@ -371,6 +373,8 @@ const defaultCollapsedTransformIds = Object.fromEntries(
     .filter((id) => hasConfigurableControls(id))
     .map((id) => [id, true]),
 ) as Partial<Record<TransformId, boolean>>;
+
+const pipelineAnimationMs = 220;
 
 function RangeRow({
   disabled = false,
@@ -1101,6 +1105,8 @@ export function PytorchImageAugmentationsPlayground() {
   >(defaultCollapsedTransformIds);
   const [pipelineVersion, setPipelineVersion] = useState(0);
   const [run, setRun] = useState<PipelineRun | null>(null);
+  const [isPipelineAnimating, setIsPipelineAnimating] = useState(false);
+  const pipelineAnimationTimeoutRef = useRef<number | null>(null);
 
   const selectedExample = useMemo(
     () =>
@@ -1121,6 +1127,14 @@ export function PytorchImageAugmentationsPlayground() {
     transformOrder,
     currentRun,
   );
+
+  useEffect(() => {
+    return () => {
+      if (pipelineAnimationTimeoutRef.current) {
+        window.clearTimeout(pipelineAnimationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   function markPipelineChanged() {
     setPipelineVersion((version) => version + 1);
@@ -1155,7 +1169,21 @@ export function PytorchImageAugmentationsPlayground() {
   }
 
   function runPipeline() {
+    if (isPipelineAnimating) {
+      return;
+    }
+
     setRun(createPipelineRun(state, pipelineVersion));
+    setIsPipelineAnimating(true);
+
+    if (pipelineAnimationTimeoutRef.current) {
+      window.clearTimeout(pipelineAnimationTimeoutRef.current);
+    }
+
+    pipelineAnimationTimeoutRef.current = window.setTimeout(() => {
+      setIsPipelineAnimating(false);
+      pipelineAnimationTimeoutRef.current = null;
+    }, pipelineAnimationMs);
   }
 
   function reorderTransforms(sourceId: TransformId, targetId: TransformId) {
@@ -1197,7 +1225,7 @@ export function PytorchImageAugmentationsPlayground() {
 
         <Panel className="p-4 sm:p-5">
           <h2 className="text-[16px] leading-tight font-black text-[#052cff] uppercase sm:text-[19px]">
-            1. Stack Transforms And Preview The Result
+            1. Stack Transforms And Preview The Code
           </h2>
 
           <div className="mt-4 grid gap-5 xl:grid-cols-[minmax(430px,0.86fr)_minmax(0,1fr)]">
@@ -1268,14 +1296,19 @@ export function PytorchImageAugmentationsPlayground() {
               <div>
                 <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-[13px] font-black text-[#052cff] uppercase">
-                    Choose an image
+                    Click play to run the pipeline and see the transformation
                   </p>
                   <button
                     type="button"
                     aria-label="Run pipeline"
-                    title="Run pipeline"
+                    title={
+                      isPipelineAnimating
+                        ? "Pipeline is animating"
+                        : "Run pipeline"
+                    }
+                    disabled={isPipelineAnimating}
                     onClick={runPipeline}
-                    className="inline-flex size-11 items-center justify-center rounded-[7px] border border-[#052cff] bg-[#052cff] text-white shadow-[0_10px_22px_rgba(23,53,255,0.16)] transition hover:bg-[#0227d7]"
+                    className="inline-flex size-11 items-center justify-center rounded-[7px] border border-[#052cff] bg-[#052cff] text-white shadow-[0_10px_22px_rgba(23,53,255,0.16)] transition hover:bg-[#0227d7] disabled:cursor-not-allowed disabled:border-[#9eadff] disabled:bg-[#9eadff] disabled:shadow-none"
                   >
                     <PlayIcon />
                   </button>
@@ -1327,7 +1360,7 @@ export function PytorchImageAugmentationsPlayground() {
                   ) : null}
                   {currentRun && state.enabled["random-erasing"] ? (
                     <div
-                      className="absolute rounded-[5px] bg-[#0f172a]/75"
+                      className="absolute rounded-[5px] bg-black"
                       style={{
                         height: `${currentRun.erase.height * 100}%`,
                         left: `${currentRun.erase.x * 100}%`,

@@ -64,43 +64,6 @@ function SectionTitle({
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2.2"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
-    </svg>
-  );
-}
-
-function ResetIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2.2"
-    >
-      <path d="M3 12a9 9 0 1 0 3-6.7" />
-      <path d="M3 4v6h6" />
-    </svg>
-  );
-}
-
 function MatrixGrid({
   matrix,
   cellSize = 42,
@@ -221,17 +184,23 @@ function StepperButton({
   children,
   label,
   onClick,
+  variant = "default",
 }: {
   children: ReactNode;
   label: string;
   onClick: () => void;
+  variant?: "default" | "primary";
 }) {
   return (
     <button
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="grid size-10 place-items-center rounded-[8px] border border-[#cbd7f4] bg-white text-[18px] font-black text-[#1d25ff] transition hover:border-[#1d25ff] focus:outline-none focus:ring-4 focus:ring-blue-100"
+      className={`grid size-10 place-items-center rounded-[8px] border text-[18px] font-black transition focus:outline-none focus:ring-4 focus:ring-blue-100 ${
+        variant === "primary"
+          ? "border-[#1d25ff] bg-[#1d25ff] text-white shadow-[0_10px_22px_rgba(29,37,255,0.18)] hover:bg-[#1018d8]"
+          : "border-[#cbd7f4] bg-white text-[#1d25ff] hover:border-[#1d25ff]"
+      }`}
     >
       {children}
     </button>
@@ -301,6 +270,7 @@ function SlidePanel({
   onCellEnter,
   onCellPointerDown,
   onSetDragging,
+  onSetNextPosition,
   onSetPadding,
   onSetPosition,
   onSetStride,
@@ -313,6 +283,7 @@ function SlidePanel({
   onCellEnter: (row: number, col: number) => void;
   onCellPointerDown: (row: number, col: number) => void;
   onSetDragging: (isDragging: boolean) => void;
+  onSetNextPosition: () => void;
   onSetPadding: (padding: number) => void;
   onSetPosition: (row: number, col: number) => void;
   onSetStride: (stride: number) => void;
@@ -330,8 +301,8 @@ function SlidePanel({
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 text-[14px] font-black text-[#111a44]">
           Stride
-          <div className="grid grid-cols-2 overflow-hidden rounded-[8px] border border-[#cbd7f4]">
-            {[1, 2].map((value) => (
+          <div className="grid grid-cols-3 overflow-hidden rounded-[8px] border border-[#cbd7f4]">
+            {[1, 2, 3].map((value) => (
               <button
                 key={value}
                 type="button"
@@ -347,8 +318,8 @@ function SlidePanel({
         </div>
         <div className="flex items-center gap-2 text-[14px] font-black text-[#111a44]">
           Padding
-          <div className="grid grid-cols-2 overflow-hidden rounded-[8px] border border-[#cbd7f4]">
-            {[0, 1].map((value) => (
+          <div className="grid grid-cols-3 overflow-hidden rounded-[8px] border border-[#cbd7f4]">
+            {[0, 1, 2].map((value) => (
               <button
                 key={value}
                 type="button"
@@ -382,39 +353,41 @@ function SlidePanel({
             Padded image ({analysis.paddedImage.length}x
             {analysis.paddedImage.length})
           </p>
-          <MatrixGrid
-            matrix={analysis.paddedImage}
-            cellSize={38}
-            getCellClassName={(row, col, value) => {
-              const classes = [];
+          <div className="max-w-full overflow-x-auto pb-2">
+            <MatrixGrid
+              matrix={analysis.paddedImage}
+              cellSize={38}
+              getCellClassName={(row, col, value) => {
+                const classes = [];
 
-              if (value === 0 && padding > 0) {
-                classes.push("bg-[#fff4ce]");
-              }
+                if (value === 0 && padding > 0) {
+                  classes.push("bg-[#fff4ce]");
+                }
 
-              if (
-                isInCurrentPatch(
-                  row,
-                  col,
-                  analysis.topLeftRow,
-                  analysis.topLeftCol,
-                )
-              ) {
-                classes.push("ring-2 ring-inset ring-[#1d25ff]");
-              }
+                if (
+                  isInCurrentPatch(
+                    row,
+                    col,
+                    analysis.topLeftRow,
+                    analysis.topLeftCol,
+                  )
+                ) {
+                  classes.push("ring-2 ring-inset ring-[#1d25ff]");
+                }
 
-              return classes.join(" ");
-            }}
-            onCellPointerDown={(row, col) => {
-              onSetDragging(true);
-              onCellPointerDown(row, col);
-            }}
-            onCellEnter={(row, col) => {
-              if (isDragging) {
-                onCellEnter(row, col);
-              }
-            }}
-          />
+                return classes.join(" ");
+              }}
+              onCellPointerDown={(row, col) => {
+                onSetDragging(true);
+                onCellPointerDown(row, col);
+              }}
+              onCellEnter={(row, col) => {
+                if (isDragging) {
+                  onCellEnter(row, col);
+                }
+              }}
+            />
+          </div>
         </div>
         <div className="grid gap-4">
           <div>
@@ -470,10 +443,17 @@ function SlidePanel({
             >
               →
             </StepperButton>
+            <StepperButton
+              label="Move to next output cell"
+              onClick={onSetNextPosition}
+              variant="primary"
+            >
+              ↪
+            </StepperButton>
           </div>
           <p className="text-[14px] leading-6 text-[#172452]">
-            The top-left corner moves by the stride. Each visited position
-            writes one output cell.
+            The next arrow moves left to right, then down. After the
+            bottom-right output cell, it wraps back to the top-left.
           </p>
         </div>
       </div>
@@ -567,15 +547,17 @@ function OutputPanel({
           <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
             Output feature map ({analysis.outputSize}x{analysis.outputSize})
           </p>
-          <MatrixGrid
-            matrix={analysis.output}
-            cellSize={54}
-            getCellClassName={(row, col) =>
-              row === rowIndex && col === colIndex
-                ? "bg-[#e8f7e8] ring-4 ring-inset ring-[#1d25ff] text-[#001fe5]"
-                : "bg-[#e8f7e8]"
-            }
-          />
+          <div className="max-w-full overflow-x-auto pb-2">
+            <MatrixGrid
+              matrix={analysis.output}
+              cellSize={54}
+              getCellClassName={(row, col) =>
+                row === rowIndex && col === colIndex
+                  ? "bg-[#e8f7e8] ring-4 ring-inset ring-[#1d25ff] text-[#001fe5]"
+                  : "bg-[#e8f7e8]"
+              }
+            />
+          </div>
         </div>
         <div className="grid gap-3 text-[14px] font-semibold text-[#18224a]">
           <div>
@@ -616,7 +598,6 @@ export function ConvolutionFilterLabPlayground() {
     rowIndex: 0,
     stride: 1,
   });
-  const [showHelp, setShowHelp] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const activeFilter =
@@ -646,6 +627,17 @@ export function ConvolutionFilterLabPlayground() {
     updateState({ rowIndex, colIndex });
   }
 
+  function setNextPosition() {
+    const nextColIndex =
+      clampedCol + 1 < analysis.outputSize ? clampedCol + 1 : 0;
+    const nextRowIndex =
+      clampedCol + 1 < analysis.outputSize
+        ? clampedRow
+        : (clampedRow + 1) % analysis.outputSize;
+
+    setPosition(nextRowIndex, nextColIndex);
+  }
+
   function setPositionFromPaddedCell(row: number, col: number) {
     const nextRow = Math.round(row / state.stride);
     const nextCol = Math.round(col / state.stride);
@@ -653,20 +645,10 @@ export function ConvolutionFilterLabPlayground() {
     setPosition(nextRow, nextCol);
   }
 
-  function resetLab() {
-    setState({
-      colIndex: 0,
-      filterId: "edge",
-      padding: 1,
-      rowIndex: 0,
-      stride: 1,
-    });
-  }
-
   return (
     <main className="min-h-screen overflow-x-clip bg-[#f7f9fd] px-4 py-5 text-[#071024] sm:px-6 lg:px-8 2xl:pr-56">
       <div className="mx-auto w-full max-w-[358px] sm:max-w-[1500px]">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header className="min-w-0">
           <div className="min-w-0">
             <h1 className="max-w-full text-[30px] leading-[1.02] font-black break-words text-[#050912] sm:text-[56px] lg:text-[64px]">
               Convolution Filter Lab
@@ -675,24 +657,7 @@ export function ConvolutionFilterLabPlayground() {
               Drag a 3x3 kernel across a tiny image and watch output cells fill.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowHelp((value) => !value)}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-3 rounded-[9px] border border-[#bfd0ff] bg-white px-6 text-[15px] font-black text-[#0a3df0] shadow-[0_8px_24px_rgba(26,38,80,0.05)] transition hover:border-[#7898ff] focus:outline-none focus:ring-4 focus:ring-blue-100"
-          >
-            <InfoIcon />
-            AI Guide
-          </button>
         </header>
-
-        {showHelp ? (
-          <div className="mt-5 rounded-[10px] border border-[#d8e0f3] bg-white px-5 py-4 text-[15px] leading-7 text-[#16264e] shadow-[0_18px_42px_rgba(26,38,80,0.05)]">
-            A convolution filter slides a small kernel over an image. Each
-            output cell is the sum of patch values multiplied by kernel weights.
-            Stride decides how far the window jumps. Padding adds border values
-            so edge neighborhoods can still be measured.
-          </div>
-        ) : null}
 
         <div className="mt-6 grid gap-4">
           <FilterPanel
@@ -707,6 +672,7 @@ export function ConvolutionFilterLabPlayground() {
               onCellEnter={setPositionFromPaddedCell}
               onCellPointerDown={setPositionFromPaddedCell}
               onSetDragging={setIsDragging}
+              onSetNextPosition={setNextPosition}
               onSetPadding={(padding) => updateState({ padding })}
               onSetPosition={setPosition}
               onSetStride={(stride) => updateState({ stride })}
@@ -725,23 +691,6 @@ export function ConvolutionFilterLabPlayground() {
             rowIndex={clampedRow}
             colIndex={clampedCol}
           />
-          <div className="flex flex-col gap-3 rounded-[10px] border border-[#c7d5fb] bg-white px-5 py-4 text-[15px] leading-7 text-[#172452] shadow-[0_18px_42px_rgba(26,38,80,0.05)] sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <span className="font-black text-[#1d25ff]">
-                What&apos;s happening:
-              </span>{" "}
-              y[{clampedRow},{clampedCol}] is computed from the highlighted
-              patch, the selected kernel, and the product table.
-            </div>
-            <button
-              type="button"
-              onClick={resetLab}
-              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-[8px] border border-[#bfd0ff] bg-white px-5 text-[14px] font-black text-[#1d25ff] transition hover:border-[#7898ff] focus:outline-none focus:ring-4 focus:ring-blue-100"
-            >
-              <ResetIcon />
-              Reset lab
-            </button>
-          </div>
         </div>
       </div>
     </main>

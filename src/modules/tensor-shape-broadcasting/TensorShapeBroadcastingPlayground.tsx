@@ -43,25 +43,6 @@ function LessonTitle({ children }: { children: ReactNode }) {
   );
 }
 
-function InfoIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 10v7" />
-      <path d="M12 7h.01" />
-    </svg>
-  );
-}
-
 function CheckIcon({ className = "size-6" }: { className?: string }) {
   return (
     <svg
@@ -683,7 +664,6 @@ export function TensorShapeBroadcastingPlayground() {
   const [outputIndex, setOutputIndex] = useState<number[]>([
     ...defaultOutputIndex,
   ]);
-  const [showHelp, setShowHelp] = useState(false);
 
   const analysis = useMemo(() => analyzeBroadcast(aShape, bShape), [aShape, bShape]);
   const safeOutputIndex = useMemo(
@@ -742,7 +722,7 @@ export function TensorShapeBroadcastingPlayground() {
   return (
     <main className="min-h-screen bg-[#f7f9fd] px-4 py-5 text-[#071024] sm:px-6 lg:px-8 2xl:pr-56">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header>
           <div className="min-w-0">
             <h1 className="text-[42px] leading-[0.95] font-black tracking-[-0.05em] text-[#050912] sm:text-[56px] lg:text-[64px]">
               Tensor Shape & Broadcasting Lab
@@ -751,23 +731,7 @@ export function TensorShapeBroadcastingPlayground() {
               Pick two tensor shapes and see axes stretch or fail.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowHelp((value) => !value)}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-3 rounded-[9px] border border-[#bfd0ff] bg-white px-6 text-[15px] font-black text-[#0a3df0] shadow-[0_8px_24px_rgba(26,38,80,0.05)] transition hover:border-[#7898ff] focus:outline-none focus:ring-4 focus:ring-blue-100"
-          >
-            <InfoIcon />
-            How does this work?
-          </button>
         </header>
-
-        {showHelp ? (
-          <div className="mt-5 rounded-[10px] border border-[#d8e0f3] bg-white px-5 py-4 text-[15px] leading-[1.55] text-[#16264e] shadow-[0_18px_42px_rgba(26,38,80,0.05)]">
-            Broadcasting lets tensors with different shapes share an operation
-            when each right-aligned axis either matches or has size 1. A size-1
-            axis reuses the same value across the larger axis.
-          </div>
-        ) : null}
 
         <div className="mt-6 grid gap-4">
           <ShapePicker

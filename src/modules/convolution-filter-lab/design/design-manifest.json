@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Convolution Filter Lab",
+  "slug": "convolution-filter-lab",
+  "modulePath": "src/modules/convolution-filter-lab",
+  "acceptedMockup": "src/modules/convolution-filter-lab/design/accepted-mockup.png",
+  "prompt": "src/modules/convolution-filter-lab/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/private/tmp/convolution-filter-lab-mockup.svg.png"
+}

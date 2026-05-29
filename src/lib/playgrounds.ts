@@ -11,6 +11,7 @@ import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-
 import { ExpectedValueRiskPlayground } from "@/modules/expected-value-risk/ExpectedValueRiskPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
 import { KlDivergencePlayground } from "@/modules/kl-divergence/KlDivergencePlayground";
+import { LabelMixingImageTransformsPlayground } from "@/modules/label-mixing-image-transforms/LabelMixingImageTransformsPlayground";
 import { LayerNormalizationPlayground } from "@/modules/layer-normalization/LayerNormalizationPlayground";
 import { LinearQuantizationInt4Playground } from "@/modules/linear-quantization-int4/LinearQuantizationInt4Playground";
 import { MatrixMultiplicationPlayground } from "@/modules/matrix-multiplication/MatrixMultiplicationPlayground";
@@ -65,6 +66,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
   "pytorch-image-augmentations": PytorchImageAugmentationsPlayground,
+  "label-mixing-image-transforms": LabelMixingImageTransformsPlayground,
   "mnist-mlp-inference-debugger": MnistMlpInferenceDebuggerPlayground,
   "autograd-graphs": AutogradGraphsPlayground,
   "backpropagation-inspector": BackpropagationInspectorPlayground,

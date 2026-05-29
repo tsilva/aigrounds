@@ -8,7 +8,7 @@
 
 AI Grounds is an interactive educational web app for learning AI concepts through hands-on playgrounds. Instead of reading static explanations, you run small visual simulations and watch the important tradeoffs change in the browser.
 
-The app currently includes labs for Mean, Median & Mode, Range, Quartiles & IQR, Variance & Standard Deviation, Shape, Skew & Outliers, Probability Rules, Conditional Probability & Independence, Bayes Rule, Expected Value & Risk, Bernoulli/Categorical/Binomial distributions, Waiting & Arrival Distributions, Overfitting, Confusion Matrix & Thresholds, Softmax Temperature, Cross Entropy Loss, KL Divergence, Matrix Multiplication, Gradient Descent, Monte Carlo Tree Search, Byte Pair Encoding, Transformer Attention, Batch Normalization, Layer Normalization, MNIST MLP Inference Debugging with WebGPU, PyTorch Image Augmentations, Autograd Graphs, Backpropagation Inspector, Linear Quantization (INT4), and Zero Knowledge Proofs.
+The app currently includes labs for Mean, Median & Mode, Range, Quartiles & IQR, Variance & Standard Deviation, Shape, Skew & Outliers, Probability Rules, Conditional Probability & Independence, Bayes Rule, Expected Value & Risk, Bernoulli/Categorical/Binomial distributions, Waiting & Arrival Distributions, Overfitting, Confusion Matrix & Thresholds, Softmax Temperature, Cross Entropy Loss, KL Divergence, Matrix Multiplication, Gradient Descent, Monte Carlo Tree Search, Byte Pair Encoding, Transformer Attention, Batch Normalization, Layer Normalization, MNIST MLP Inference Debugging with WebGPU, PyTorch Image Augmentations, Label-Mixing Image Transforms, Autograd Graphs, Backpropagation Inspector, Linear Quantization (INT4), and Zero Knowledge Proofs.
 
 ## Install
 

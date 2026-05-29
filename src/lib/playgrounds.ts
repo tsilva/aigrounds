@@ -7,6 +7,7 @@ import { BernoulliCategoricalBinomialPlayground } from "@/modules/bernoulli-cate
 import { BytePairEncodingPlayground } from "@/modules/byte-pair-encoding/BytePairEncodingPlayground";
 import { CategoricalCrossEntropyPlayground } from "@/modules/categorical-cross-entropy/CategoricalCrossEntropyPlayground";
 import { ConditionalProbabilityPlayground } from "@/modules/conditional-probability/ConditionalProbabilityPlayground";
+import { ConvolutionFilterLabPlayground } from "@/modules/convolution-filter-lab/ConvolutionFilterLabPlayground";
 import { ConfusionMatrixThresholdsPlayground } from "@/modules/confusion-matrix-thresholds/ConfusionMatrixThresholdsPlayground";
 import { ExpectedValueRiskPlayground } from "@/modules/expected-value-risk/ExpectedValueRiskPlayground";
 import { GradientDescentPlayground } from "@/modules/gradient-descent/GradientDescentPlayground";
@@ -67,6 +68,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "byte-pair-encoding": BytePairEncodingPlayground,
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,
+  "convolution-filter-lab": ConvolutionFilterLabPlayground,
   "pytorch-image-augmentations": PytorchImageAugmentationsPlayground,
   "label-mixing-image-transforms": LabelMixingImageTransformsPlayground,
   "mnist-mlp-inference-debugger": MnistMlpInferenceDebuggerPlayground,

@@ -609,6 +609,33 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "convolution-filter-lab",
+    title: "Convolution Filter Lab",
+    tag: "computer vision",
+    kicker:
+      "Drag a 3x3 kernel across a tiny image and see output cells fill.",
+    summary:
+      "Choose Edge, Blur, or Sharpen kernels, slide the 3x3 window over a padded image, and connect patch products, stride, padding, and feature-map cells.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Convolution kernels",
+      "Stride",
+      "Padding",
+      "Feature maps",
+    ],
+    learningGoals: [
+      "Explain one convolution output cell as a weighted sum of a local patch and kernel.",
+      "Connect the highlighted image window to the patch, product table, formula, and feature-map cell.",
+      "Compare how different 3x3 kernels ask different local questions of the same image.",
+      "See how stride and padding change sampled windows and output size.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["convolution-filter-lab"],
+    theme: {
+      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+  },
+  {
     slug: "pytorch-image-augmentations",
     title: "PyTorch Image Transforms",
     tag: "computer vision",
@@ -1307,6 +1334,7 @@ export const dashboardLessonPlanOrder = [
   "activation-functions",
   "neural-network-forward-pass",
   "mnist-mlp-inference-debugger",
+  "convolution-filter-lab",
   "pytorch-image-augmentations",
   "label-mixing-image-transforms",
   "autograd-graphs",

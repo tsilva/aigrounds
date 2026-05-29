@@ -21,6 +21,7 @@ type TutorPlanSlug =
   | "byte-pair-encoding"
   | "transformer-attention"
   | "linear-quantization-int4"
+  | "convolution-filter-lab"
   | "pytorch-image-augmentations"
   | "label-mixing-image-transforms"
   | "mnist-mlp-inference-debugger"
@@ -1868,6 +1869,88 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "The transform stack describes image operations. The selected image determines which one-hot class label is preserved.",
+      },
+    ],
+  },
+  "convolution-filter-lab": {
+    intro:
+      "Work through four convolution experiments. Pick a kernel, move the 3x3 window, change stride and padding, then explain how one output cell is produced.",
+    whyItMatters:
+      "Convolution is the core operation behind many image models. It turns local pixel neighborhoods into feature maps, so learners need to see both the sliding window and the arithmetic inside one output cell.",
+    openingMessage:
+      "No prior computer vision knowledge needed. We will trace one tiny convolution by hand.\n\n- A kernel is a small grid of weights.\n- The kernel slides over the image and multiplies the current patch element by element.\n- The products add up to one output cell.\n- Stride skips window positions. Padding adds border values so edge neighborhoods can participate.\n\nFirst prediction: when the Edge kernel sees values increasing left to right, should the current weighted sum be positive, negative, or zero? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains that a convolution output cell is a weighted sum of a local patch and kernel.",
+      "Connects the highlighted image window to the patch, product table, formula, and current output cell.",
+      "Compares how Edge, Blur, and Sharpen kernels produce different feature maps from the same image.",
+      "Explains how stride changes sampled positions and output size.",
+      "Explains how padding adds border values so edge cells can be computed.",
+    ],
+    steps: [
+      {
+        title: "Read one edge response",
+        experiment:
+          "Keep Edge selected with stride 1 and padding 1. Look at the highlighted top-left patch, the product table, and the current output cell.",
+        predictionQuestion:
+          "When the Edge kernel sees values increasing left to right, should the weighted sum be positive, negative, or zero?",
+        observationPrompt:
+          "Which surfaces agreed on the current value?",
+        observationOptions: [
+          "The patch and product table produced the formula",
+          "The formula matched the highlighted output cell",
+          "I am not sure",
+        ],
+        takeaway:
+          "One convolution output cell is just the sum of patch values multiplied by kernel weights.",
+      },
+      {
+        title: "Move the window",
+        experiment:
+          "Use the arrow buttons or drag the padded image window to a different output cell. Watch the patch, product table, formula, current sum, and highlighted output cell update together.",
+        predictionQuestion:
+          "When the window moves right, which values should change first: the kernel weights or the image patch?",
+        observationPrompt:
+          "What changed when the window moved?",
+        observationOptions: [
+          "The patch changed",
+          "The current output cell changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "The kernel stays fixed while the patch changes. Each visited patch writes a different output location.",
+      },
+      {
+        title: "Switch kernels",
+        experiment:
+          "Switch from Edge to Blur, then Sharpen. Compare the kernel table, current sum, and output feature map.",
+        predictionQuestion:
+          "Should changing the kernel alter the output map even when the image stays the same?",
+        observationPrompt:
+          "What changed when the kernel changed?",
+        observationOptions: [
+          "The kernel weights changed",
+          "The output feature map changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Different kernels ask different local questions of the same image neighborhood.",
+      },
+      {
+        title: "Change stride and padding",
+        experiment:
+          "Set padding to 0, then set stride to 2. Watch the padded image, output size pill, available window positions, and output map size.",
+        predictionQuestion:
+          "Which setting should preserve border positions: padding 0 or padding 1?",
+        observationPrompt:
+          "How did stride and padding change the feature map?",
+        observationOptions: [
+          "Padding changed whether borders were sampled",
+          "Stride changed how many windows were visited",
+          "I am not sure",
+        ],
+        takeaway:
+          "Padding changes the border neighborhoods available to the kernel. Stride changes how densely the kernel samples those neighborhoods.",
       },
     ],
   },

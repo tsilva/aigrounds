@@ -502,6 +502,33 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "tensor-shape-broadcasting",
+    title: "Tensor Shape & Broadcasting Lab",
+    tag: "tensors",
+    kicker:
+      "Pick two tensor shapes and see each aligned axis stretch, match, or block the operation.",
+    summary:
+      "Edit tensor shape axes, zip them from the right, compare success and failure cases, and inspect one output index to see how size-1 axes reuse values.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "Tensor shapes",
+      "Broadcasting",
+      "Shape compatibility",
+      "Axis alignment",
+    ],
+    learningGoals: [
+      "Understand that broadcasting compares tensor shapes from the trailing axes.",
+      "See why axes are compatible when sizes match or one side is 1.",
+      "Recognize that size-1 axes reuse values across the larger output axis.",
+      "Identify when mismatched non-1 axes make an operation fail.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["tensor-shape-broadcasting"],
+    theme: {
+      badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
+    },
+  },
+  {
     slug: "byte-pair-encoding",
     title: "Byte Pair Encoding Lab",
     tag: "tokenization",
@@ -1257,6 +1284,7 @@ export const dashboardLessonPlanOrder = [
   "distance-metrics",
   "vector-geometry-similarity",
   "matrix-multiplication",
+  "tensor-shape-broadcasting",
   "projection-foundations",
   "pca-principal-components",
   "t-sne-neighborhood-map",

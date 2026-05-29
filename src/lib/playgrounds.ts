@@ -24,6 +24,7 @@ import { PytorchImageAugmentationsPlayground } from "@/modules/pytorch-image-aug
 import { RangeQuartilesIqrPlayground } from "@/modules/range-quartiles-iqr/RangeQuartilesIqrPlayground";
 import { ShapeSkewOutliersPlayground } from "@/modules/shape-skew-outliers/ShapeSkewOutliersPlayground";
 import { SoftmaxTemperaturePlayground } from "@/modules/softmax-temperature/SoftmaxTemperaturePlayground";
+import { TensorShapeBroadcastingPlayground } from "@/modules/tensor-shape-broadcasting/TensorShapeBroadcastingPlayground";
 import { TransformerAttentionPlayground } from "@/modules/transformer-attention/TransformerAttentionPlayground";
 import { VarianceStandardDeviationPlayground } from "@/modules/variance-standard-deviation/VarianceStandardDeviationPlayground";
 import { WaitingArrivalDistributionsPlayground } from "@/modules/waiting-arrival-distributions/WaitingArrivalDistributionsPlayground";
@@ -62,6 +63,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "gradient-descent": GradientDescentPlayground,
   "monte-carlo-tree-search": MonteCarloTreeSearchPlayground,
   "matrix-multiplication": MatrixMultiplicationPlayground,
+  "tensor-shape-broadcasting": TensorShapeBroadcastingPlayground,
   "byte-pair-encoding": BytePairEncodingPlayground,
   "transformer-attention": TransformerAttentionPlayground,
   "linear-quantization-int4": LinearQuantizationInt4Playground,

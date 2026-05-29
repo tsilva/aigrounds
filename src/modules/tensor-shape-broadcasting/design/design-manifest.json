@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Tensor Shape & Broadcasting Lab",
+  "slug": "tensor-shape-broadcasting",
+  "modulePath": "src/modules/tensor-shape-broadcasting",
+  "acceptedMockup": "src/modules/tensor-shape-broadcasting/design/accepted-mockup.png",
+  "prompt": "src/modules/tensor-shape-broadcasting/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e746d-c045-7463-97ce-e27ef6657768/ig_0bdbe7e10b7cdd6b016a19bb954b1c81919eb8962b11830d94.png"
+}

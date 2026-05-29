@@ -610,6 +610,34 @@ export const activePlaygroundMetadata = [
     },
   },
   {
+    slug: "label-mixing-image-transforms",
+    title: "Label-Mixing Image Transforms",
+    tag: "computer vision",
+    kicker:
+      "Mix two training examples and watch CutMix and MixUp turn one-hot targets into soft labels.",
+    summary:
+      "Choose source images, switch between CutMix and MixUp, tune lambda, and see the mixed image, soft target vector, generated torchvision code, and weighted loss update together.",
+    estimatedDuration: "5 to 7 minutes",
+    concepts: [
+      "CutMix",
+      "MixUp",
+      "Soft labels",
+      "Lambda mixing",
+      "Cross entropy",
+    ],
+    learningGoals: [
+      "Explain why CutMix and MixUp change the target label as well as the image.",
+      "Connect lambda to both the visible image mixture and the soft-label vector.",
+      "Compare CutMix patch replacement with MixUp full-image blending.",
+      "Interpret the weighted cross-entropy terms created by a soft target.",
+    ],
+    presentation: "immersive",
+    tutorPlan: playgroundTutorPlans["label-mixing-image-transforms"],
+    theme: {
+      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+  },
+  {
     slug: "batch-normalization",
     title: "Batch Normalization Lab",
     tag: "neural networks",
@@ -1252,6 +1280,7 @@ export const dashboardLessonPlanOrder = [
   "neural-network-forward-pass",
   "mnist-mlp-inference-debugger",
   "pytorch-image-augmentations",
+  "label-mixing-image-transforms",
   "autograd-graphs",
   "backpropagation-inspector",
   "batch-normalization",

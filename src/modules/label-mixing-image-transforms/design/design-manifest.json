@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Label-Mixing Image Transforms",
+  "slug": "label-mixing-image-transforms",
+  "modulePath": "src/modules/label-mixing-image-transforms",
+  "acceptedMockup": "src/modules/label-mixing-image-transforms/design/accepted-mockup.png",
+  "prompt": "src/modules/label-mixing-image-transforms/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e6e3f-3137-7512-8eb3-e8d446452ffc/ig_0533d6cfd63be70b016a197b837eb48191b1ce18feba0c5c9a.png"
+}

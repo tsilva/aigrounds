@@ -21,6 +21,7 @@ type TutorPlanSlug =
   | "transformer-attention"
   | "linear-quantization-int4"
   | "pytorch-image-augmentations"
+  | "label-mixing-image-transforms"
   | "mnist-mlp-inference-debugger"
   | "autograd-graphs"
   | "backpropagation-inspector"
@@ -1866,6 +1867,87 @@ export const playgroundTutorPlans: Record<TutorPlanSlug, TutorPlan> = {
         ],
         takeaway:
           "The transform stack describes image operations. The selected image determines which one-hot class label is preserved.",
+      },
+    ],
+  },
+  "label-mixing-image-transforms": {
+    intro:
+      "Work through three label-mixing experiments. Choose two examples, compare CutMix with MixUp, move lambda, and connect the mixed image to the soft target vector.",
+    whyItMatters:
+      "CutMix and MixUp are different from ordinary image transforms because the class target is no longer one-hot. Training with them only makes sense when the label vector changes in the same proportion as the mixed pixels.",
+    openingMessage:
+      "No prior CutMix or MixUp details needed. We will build the label contract visually.\n\n- Ordinary single-image transforms keep the original one-hot target.\n- CutMix pastes a region from one image into another.\n- MixUp blends two full images.\n- Both require a soft target vector such as 0.62 cat and 0.38 stop sign.\n\nFirst prediction: if 38% of a stop sign is pasted into a cat image, should the target stay 100% cat or become a mixture? Reply with your prediction first. Then I will tell you exactly what to try.",
+    requireTypedPredictionToStart: true,
+    masteryCriteria: [
+      "Explains why CutMix and MixUp change both pixels and labels.",
+      "Connects lambda to the visible image mixture and soft-label vector.",
+      "Compares CutMix patch mixing with MixUp full-image blending.",
+      "Explains why the loss has weighted terms for both selected classes.",
+    ],
+    steps: [
+      {
+        title: "Choose the two source labels",
+        experiment:
+          "Keep cat as source A and stop sign as source B. Read the one-hot target rows for y_A and y_B before changing the mixed image.",
+        predictionQuestion:
+          "If the training example contains evidence from both images, should the label stay one-hot?",
+        observationPrompt:
+          "What did the two source target rows show before mixing?",
+        observationOptions: [
+          "A was one-hot for cat",
+          "B was one-hot for stop sign",
+          "I am not sure",
+        ],
+        takeaway:
+          "CutMix and MixUp start from ordinary one-hot labels, then combine those labels in the same proportions as the image mixture.",
+      },
+      {
+        title: "Move lambda",
+        experiment:
+          "Use CutMix. Move lambda from about 0.20 to about 0.80. Watch the mixed image, the A/B percentage pill, and the soft-label bars.",
+        predictionQuestion:
+          "When lambda gets larger, should the source A label weight go up or down?",
+        observationPrompt:
+          "Which surfaces changed when lambda moved?",
+        observationOptions: [
+          "The A/B percentages changed",
+          "The soft-label bars changed",
+          "I am not sure",
+        ],
+        takeaway:
+          "Lambda is the target weight for source A. The complement, 1 - lambda, is the target weight for source B.",
+      },
+      {
+        title: "Compare CutMix and MixUp",
+        experiment:
+          "Switch between CutMix and MixUp while keeping the same lambda. Compare the image preview with the soft-label vector.",
+        predictionQuestion:
+          "Should switching between CutMix and MixUp change the label formula if lambda stays the same?",
+        observationPrompt:
+          "What changed and what stayed the same after switching modes?",
+        observationOptions: [
+          "The pixel mixing style changed",
+          "The label vector stayed tied to lambda",
+          "I am not sure",
+        ],
+        takeaway:
+          "CutMix and MixUp mix pixels differently, but both produce soft labels from the same weighted-label idea.",
+      },
+      {
+        title: "Read the loss",
+        experiment:
+          "Look at the weighted cross-entropy panel. Compare the two weights with the soft-label bars above it.",
+        predictionQuestion:
+          "Why should the loss include terms for both selected classes?",
+        observationPrompt:
+          "How did the loss terms match the mixed target vector?",
+        observationOptions: [
+          "The source A class got lambda weight",
+          "The source B class got 1 - lambda weight",
+          "I am not sure",
+        ],
+        takeaway:
+          "A soft label asks the model to put probability mass on both classes, weighted by how much each source contributed.",
       },
     ],
   },

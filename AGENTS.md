@@ -57,3 +57,7 @@ Modules are described in `src/lib/playground-metadata.ts` and wired to component
 ## Product Specifications
 
 Before any task in this repository, use the `$specs-author` skill to read the root `SPECS.md`. Use `$specs-author` whenever reading or writing `SPECS.md`.
+
+## Learning Page Workflows
+
+Use `$aigrounds-learning-page` when creating, optimizing, fixing, or auditing an individual playground and its AI Guide. Use `$aigrounds-lesson-plan-review` only for cross-lesson sequencing, prerequisite-lesson creation, and lesson splits or merges.

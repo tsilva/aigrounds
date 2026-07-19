@@ -87,9 +87,14 @@ truth, but verify live status against the app before trusting metadata alone.
 
 6. Verify.
    - Run `pnpm lint` and `pnpm build` after code changes.
-   - Start or reuse `pnpm dev` if dashboard code changed.
-   - Use the official OpenAI Browser Use plugin to inspect `/` and confirm the
-     visible card order matches `dashboardLessonPlanOrder`.
+   - Reuse an existing development server if dashboard code changed. Otherwise
+     run `pnpm dev --port auto`, report its printed URL, and never kill or
+     restart an existing server. Stop and warn if automatic port selection or
+     startup fails.
+   - Load the bundled Browser skill/runtime, initialize `browser-client`, select
+     `agent.browsers.get("iab")`, and use its documented Playwright/CUA APIs to
+     inspect `/` and confirm the visible card order matches
+     `dashboardLessonPlanOrder`.
    - Report any skipped verification command and why it was skipped.
 
 ## Ordering Heuristics

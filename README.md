@@ -65,10 +65,6 @@ Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. S
 - New live playgrounds are registered in `src/lib/playground-metadata.ts`, wired to components in `src/lib/playgrounds.ts`, and rendered through the dynamic playground route. Sitemap entries are generated from the active playground metadata.
 - No test framework is configured yet.
 
-## Architecture
-
-![AI Grounds architecture diagram](./architecture.png)
-
 ## License
 
 [MIT](LICENSE)

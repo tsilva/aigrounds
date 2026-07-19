@@ -9,12 +9,9 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  getPlaygroundMetadataFromPathname,
-} from "@/lib/playground-metadata";
+import { getPlaygroundMetadataFromPathname } from "@/lib/playground-metadata";
 import {
   getTutorOpeningMessage,
-  isTypedPredictionTutorPlan,
   type TutorStep,
 } from "@/lib/tutor-plans";
 import {
@@ -603,16 +600,11 @@ export function PlaygroundAssistantShell({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const screenshotActionsRef = useRef<ScreenshotAction[]>([]);
 
-  const playgroundName = useMemo(
-    () =>
-      getPlaygroundMetadataFromPathname(pathname)?.title ??
-      "this playground",
-    [pathname],
-  );
   const playgroundContext = useMemo(
     () => getPlaygroundMetadataFromPathname(pathname),
     [pathname],
   );
+  const playgroundName = playgroundContext?.title ?? "this playground";
   const tutorPlan = playgroundContext?.tutorPlan;
   const currentTutorStep = tutorPlan?.steps[tutorStepIndex];
 
@@ -650,7 +642,7 @@ export function PlaygroundAssistantShell({
       return;
     }
 
-    if (tutorPlan && currentTutorStep && isTypedPredictionTutorPlan(tutorPlan)) {
+    if (tutorPlan && currentTutorStep) {
       const previousTutorState = {
         isTutorActive,
         tutorPhase,
@@ -788,8 +780,6 @@ export function PlaygroundAssistantShell({
         messages: requestMessages,
         context: {
           pathname,
-          playgroundName,
-          playground: playgroundContext,
         },
         screenshot,
         stream: true,

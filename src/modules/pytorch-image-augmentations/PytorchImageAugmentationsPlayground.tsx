@@ -9,8 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { type ClassExample } from "./pytorch-image-augmentations-engine";
-import { classExamples } from "./scenario";
+import { classExamples, type ClassExample } from "./scenario";
 
 type TransformId =
   | "random-resized-crop"

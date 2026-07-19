@@ -36,8 +36,7 @@ Modules are described in `src/lib/playground-metadata.ts` and wired to component
 
 - `src/app/` — Next.js App Router (layout, pages, global styles)
 - `src/app/playgrounds/[slug]/page.tsx` — dynamic route that resolves modules by slug
-- `src/components/playground-shell.tsx` — shared wrapper providing consistent header, breadcrumb, learning goals
-- `src/lib/playground-metadata.ts` — canonical dashboard lesson plan, playground metadata, tags, presentation mode, and learning goals
+- `src/lib/playground-metadata.ts` — canonical dashboard lesson plan, playground metadata, tags, and learning goals
 - `src/lib/playgrounds.ts` — slug-to-component registry and `ActivePlayground` type
 - `src/app/api/chat/route.ts` — OpenRouter-backed playground assistant API route
 

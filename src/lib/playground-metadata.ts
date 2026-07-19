@@ -3,10 +3,6 @@ import {
   type TutorPlan,
 } from "@/lib/tutor-plans";
 
-type Theme = {
-  badgeClassName: string;
-};
-
 export type PlaygroundMetadata = {
   slug: string;
   title: string;
@@ -16,9 +12,7 @@ export type PlaygroundMetadata = {
   estimatedDuration: string;
   concepts: string[];
   learningGoals: string[];
-  presentation: "standard" | "immersive";
   tutorPlan: TutorPlan;
-  theme: Theme;
 };
 
 type UpcomingPlayground = {
@@ -29,10 +23,14 @@ type UpcomingPlayground = {
   concepts: string[];
 };
 
+type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
+  slug: keyof typeof playgroundTutorPlans;
+};
+
 // The landing dashboard is the canonical lesson plan for both live and planned
 // playgrounds. Keep this metadata and the dashboard order in sync with what `/`
 // should show.
-export const activePlaygroundMetadata = [
+const activePlaygroundDefinitions = [
   {
     slug: "mean-median-mode",
     title: "Mean, Median & Mode Lab",
@@ -53,11 +51,6 @@ export const activePlaygroundMetadata = [
       "See why the median resists extreme values after sorting.",
       "Recognize mode as the most common value and when a dataset has no mode.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["mean-median-mode"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "range-quartiles-iqr",
@@ -79,11 +72,6 @@ export const activePlaygroundMetadata = [
       "See how quartiles split sorted data into lower, middle, and upper sections.",
       "Recognize why IQR describes the middle 50% and resists outliers better than range.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["range-quartiles-iqr"],
-    theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
-    },
   },
   {
     slug: "variance-standard-deviation",
@@ -105,11 +93,6 @@ export const activePlaygroundMetadata = [
       "See why squaring deviations makes far-away values dominate variance.",
       "Recognize standard deviation as a typical distance from the mean in the original units.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["variance-standard-deviation"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "shape-skew-outliers",
@@ -131,11 +114,6 @@ export const activePlaygroundMetadata = [
       "See how outliers can pull the mean and range more than the median and IQR.",
       "Understand why a histogram and box plot explain what one summary number hides.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["shape-skew-outliers"],
-    theme: {
-      badgeClassName: "border-sky-300 bg-sky-100 text-sky-950",
-    },
   },
   {
     slug: "probability-rules",
@@ -157,11 +135,6 @@ export const activePlaygroundMetadata = [
       "See why complements, intersections, and unions are regions of the same grid.",
       "Recognize why union probability subtracts overlap that was counted twice.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["probability-rules"],
-    theme: {
-      badgeClassName: "border-sky-300 bg-sky-100 text-sky-950",
-    },
   },
   {
     slug: "conditional-probability",
@@ -183,11 +156,6 @@ export const activePlaygroundMetadata = [
       "See how P(B ∣ A), P(B), and P(A ∩ B) describe different slices of the same population.",
       "Recognize independence as the case where filtering by A does not change the probability of B.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["conditional-probability"],
-    theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
-    },
   },
   {
     slug: "bayes-rule",
@@ -209,11 +177,6 @@ export const activePlaygroundMetadata = [
       "See how sensitivity and false-positive rate create the positive-test denominator.",
       "Recognize why rare base rates can make a positive result less certain than expected.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["bayes-rule"],
-    theme: {
-      badgeClassName: "border-emerald-300 bg-emerald-100 text-emerald-950",
-    },
   },
   {
     slug: "expected-value-risk",
@@ -235,11 +198,6 @@ export const activePlaygroundMetadata = [
       "See why two bets with similar expected value can have very different spread.",
       "Recognize that short-run samples can bounce around before the long-run average appears.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["expected-value-risk"],
-    theme: {
-      badgeClassName: "border-amber-300 bg-amber-100 text-amber-950",
-    },
   },
   {
     slug: "bernoulli-categorical-binomial",
@@ -261,11 +219,6 @@ export const activePlaygroundMetadata = [
       "See categorical outcomes as one draw from several probability buckets.",
       "Recognize binomial counts as repeated Bernoulli trials summarized by number of successes.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["bernoulli-categorical-binomial"],
-    theme: {
-      badgeClassName: "border-emerald-300 bg-emerald-100 text-emerald-950",
-    },
   },
   {
     slug: "waiting-arrival-distributions",
@@ -287,11 +240,6 @@ export const activePlaygroundMetadata = [
       "See how a Poisson rate model describes counts inside a fixed time window.",
       "Recognize when the rare-event approximation is useful and when the exact formula is safer.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["waiting-arrival-distributions"],
-    theme: {
-      badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
-    },
   },
   {
     slug: "overfitting",
@@ -313,11 +261,6 @@ export const activePlaygroundMetadata = [
       "Understand why test error can rise when a curve memorizes noisy training examples.",
       "Recognize the useful middle between underfitting and overfitting.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans.overfitting,
-    theme: {
-      badgeClassName: "border-orange-300 bg-orange-100 text-orange-950",
-    },
   },
   {
     slug: "confusion-matrix-thresholds",
@@ -339,11 +282,6 @@ export const activePlaygroundMetadata = [
       "Understand why lowering a threshold usually raises recall while adding false positives.",
       "Recognize how precision, recall, and F1 summarize different mistake costs.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["confusion-matrix-thresholds"],
-    theme: {
-      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
-    },
   },
   {
     slug: "softmax-temperature",
@@ -365,11 +303,6 @@ export const activePlaygroundMetadata = [
       "See why temperature changes confidence while preserving the class ranking.",
       "Recognize the difference between a sharp and a high-entropy prediction.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["softmax-temperature"],
-    theme: {
-      badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
-    },
   },
   {
     slug: "categorical-cross-entropy",
@@ -391,11 +324,6 @@ export const activePlaygroundMetadata = [
       "See why categorical cross entropy uses the predicted probability assigned to the one true class.",
       "Recognize that multi-label cross entropy treats every label as an independent binary question.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["categorical-cross-entropy"],
-    theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
-    },
   },
   {
     slug: "kl-divergence",
@@ -417,11 +345,6 @@ export const activePlaygroundMetadata = [
       "See how source-weighted log-ratio terms make high-probability reference buckets expensive to miss.",
       "Recognize why DKL(P || Q) and DKL(Q || P) can differ for the same two distributions.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["kl-divergence"],
-    theme: {
-      badgeClassName: "border-purple-300 bg-purple-100 text-purple-950",
-    },
   },
   {
     slug: "gradient-descent",
@@ -443,11 +366,6 @@ export const activePlaygroundMetadata = [
       "Understand how learning rate changes the distance traveled on each update.",
       "Recognize how momentum carries previous updates and can speed convergence or overshoot.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["gradient-descent"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "monte-carlo-tree-search",
@@ -469,11 +387,6 @@ export const activePlaygroundMetadata = [
       "See how UCB combines win rate with an exploration bonus for less-visited moves.",
       "Recognize why more rollouts turn uncertain branches into evidence-backed decisions.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["monte-carlo-tree-search"],
-    theme: {
-      badgeClassName: "border-amber-300 bg-amber-100 text-amber-950",
-    },
   },
   {
     slug: "matrix-multiplication",
@@ -495,11 +408,6 @@ export const activePlaygroundMetadata = [
       "Compute one output cell as a row of A dotted with a column of B.",
       "Recognize why (m x n) times (n x p) produces an (m x p) matrix.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["matrix-multiplication"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "tensor-shape-broadcasting",
@@ -522,11 +430,6 @@ export const activePlaygroundMetadata = [
       "Recognize that size-1 axes reuse values across the larger output axis.",
       "Identify when mismatched non-1 axes make an operation fail.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["tensor-shape-broadcasting"],
-    theme: {
-      badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
-    },
   },
   {
     slug: "byte-pair-encoding",
@@ -548,11 +451,6 @@ export const activePlaygroundMetadata = [
       "See why more merge steps reduce token count while increasing vocabulary size.",
       "Recognize why learned tokens transfer best to text that repeats training patterns.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["byte-pair-encoding"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "transformer-attention",
@@ -574,11 +472,6 @@ export const activePlaygroundMetadata = [
       "See how query-key scores decide which tokens receive larger weights.",
       "Recognize that values, not keys, are blended into the next representation.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["transformer-attention"],
-    theme: {
-      badgeClassName: "border-cyan-300 bg-cyan-100 text-cyan-950",
-    },
   },
   {
     slug: "linear-quantization-int4",
@@ -602,11 +495,6 @@ export const activePlaygroundMetadata = [
       "Compare why different blocks use different ranges while the 16-code INT4 budget stays fixed.",
       "Recognize the range tradeoff between smaller steps, more clipping, and memory savings.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["linear-quantization-int4"],
-    theme: {
-      badgeClassName: "border-emerald-300 bg-emerald-100 text-emerald-950",
-    },
   },
   {
     slug: "convolution-filter-lab",
@@ -629,11 +517,6 @@ export const activePlaygroundMetadata = [
       "Compare how different 3x3 kernels ask different local questions of the same image.",
       "See how stride and padding change sampled windows and output size.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["convolution-filter-lab"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "pytorch-image-augmentations",
@@ -657,11 +540,6 @@ export const activePlaygroundMetadata = [
       "Observe how crop, rotation, color, blur, and erasing compound on the selected image.",
       "Recognize that these transforms change pixels while the class label stays one-hot.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["pytorch-image-augmentations"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "label-mixing-image-transforms",
@@ -685,11 +563,6 @@ export const activePlaygroundMetadata = [
       "Compare CutMix patch replacement with MixUp full-image blending.",
       "Interpret the weighted cross-entropy terms created by a soft target.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["label-mixing-image-transforms"],
-    theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
-    },
   },
   {
     slug: "batch-normalization",
@@ -712,11 +585,6 @@ export const activePlaygroundMetadata = [
       "Understand how learned scale and shift restore output size and center.",
       "Distinguish training-time batch statistics from inference-time running statistics.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["batch-normalization"],
-    theme: {
-      badgeClassName: "border-blue-300 bg-blue-100 text-blue-950",
-    },
   },
   {
     slug: "layer-normalization",
@@ -739,11 +607,6 @@ export const activePlaygroundMetadata = [
       "Understand how gamma and beta restore useful feature scale after normalization.",
       "Distinguish LayerNorm's per-token statistics from BatchNorm's batch statistics.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["layer-normalization"],
-    theme: {
-      badgeClassName: "border-indigo-300 bg-indigo-100 text-indigo-950",
-    },
   },
   {
     slug: "mnist-mlp-inference-debugger",
@@ -765,11 +628,6 @@ export const activePlaygroundMetadata = [
       "Run dense neural network layers on WebGPU inside the browser.",
       "Connect hidden activations, contribution signs, softmax confidence, and input saliency to one prediction.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["mnist-mlp-inference-debugger"],
-    theme: {
-      badgeClassName: "border-fuchsia-300 bg-fuchsia-100 text-fuchsia-950",
-    },
   },
   {
     slug: "autograd-graphs",
@@ -792,11 +650,6 @@ export const activePlaygroundMetadata = [
       "Recognize why gradients from multiple paths into the same parameter add together.",
       "Compare function and derivative charts for each adjustable parameter.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["autograd-graphs"],
-    theme: {
-      badgeClassName: "border-rose-300 bg-rose-100 text-rose-950",
-    },
   },
   {
     slug: "backpropagation-inspector",
@@ -818,11 +671,6 @@ export const activePlaygroundMetadata = [
       "Connect each output-weight gradient to cached activation times downstream error.",
       "Use gradient sign and learning rate to explain a before/after weight update.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["backpropagation-inspector"],
-    theme: {
-      badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
-    },
   },
   {
     slug: "zero-knowledge-proofs",
@@ -844,13 +692,18 @@ export const activePlaygroundMetadata = [
       "See how repeated random edge checks reduce a cheating prover's chance of escaping.",
       "Recognize why fresh hidden shuffles keep local openings from revealing the secret coloring.",
     ],
-    presentation: "immersive",
-    tutorPlan: playgroundTutorPlans["zero-knowledge-proofs"],
-    theme: {
-      badgeClassName: "border-violet-300 bg-violet-100 text-violet-950",
-    },
   },
-] satisfies PlaygroundMetadata[];
+] satisfies ActivePlaygroundDefinition[];
+
+type ActivePlaygroundSlug =
+  (typeof activePlaygroundDefinitions)[number]["slug"];
+
+export const activePlaygroundMetadata: Array<
+  PlaygroundMetadata & { slug: ActivePlaygroundSlug }
+> = activePlaygroundDefinitions.map((metadata) => ({
+  ...metadata,
+  tutorPlan: playgroundTutorPlans[metadata.slug],
+}));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
   {

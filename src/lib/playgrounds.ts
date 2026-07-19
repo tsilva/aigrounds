@@ -32,8 +32,6 @@ import { WaitingArrivalDistributionsPlayground } from "@/modules/waiting-arrival
 import { ZeroKnowledgeProofsPlayground } from "@/modules/zero-knowledge-proofs/ZeroKnowledgeProofsPlayground";
 import {
   activePlaygroundMetadata,
-  dashboardLessonPlanOrder,
-  upcomingPlaygrounds,
   type PlaygroundMetadata,
 } from "@/lib/playground-metadata";
 
@@ -85,8 +83,6 @@ export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.ma
     component: playgroundComponents[metadata.slug],
   }),
 );
-
-export { dashboardLessonPlanOrder, upcomingPlaygrounds };
 
 export function getActivePlayground(slug: string) {
   return activePlaygrounds.find((playground) => playground.slug === slug);

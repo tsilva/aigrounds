@@ -33,8 +33,3 @@ export const defaultBroadcastPreset = broadcastPresets[0];
 export const defaultOutputIndex = [1, 2, 3] satisfies Shape;
 
 export const axisProbeValues = [1, 2, 3, 4] as const;
-
-export const axisProbeBase = {
-  axisLabel: -3,
-  aSize: 2,
-};

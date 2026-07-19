@@ -53,3 +53,7 @@ Modules are described in `src/lib/playground-metadata.ts` and wired to component
 - Algorithm engines should be pure-functional (no mutations) for testability and traceability
 - Each module is fully self-contained — shared code lives in `src/components/` or `src/lib/`
 - README.md must be kept up to date with any significant project changes
+
+## Product Specifications
+
+Before any task in this repository, use the `$specs-author` skill to read the root `SPECS.md`. Use `$specs-author` whenever reading or writing `SPECS.md`.

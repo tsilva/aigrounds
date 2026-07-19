@@ -1,9 +1,9 @@
 import { HomePage, type HomePlaygroundCard } from "@/app/home-page";
 import {
-  activePlaygrounds,
   dashboardLessonPlanOrder,
   upcomingPlaygrounds,
-} from "@/lib/playgrounds";
+} from "@/lib/playground-metadata";
+import { activePlaygrounds } from "@/lib/playgrounds";
 import packageJson from "../../package.json";
 
 function compactOutcome(summary: string) {

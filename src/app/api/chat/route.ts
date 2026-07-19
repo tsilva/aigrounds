@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPlaygroundMetadataFromPathname } from "@/lib/playground-metadata";
-import {
-  getTutorOpeningMessage,
-  isTypedPredictionTutorPlan,
-} from "@/lib/tutor-plans";
+import { getTutorOpeningMessage } from "@/lib/tutor-plans";
 import {
   isClientMessage,
   type ChatRequestBody,
@@ -164,10 +161,6 @@ function systemPrompt(
     context?.playgroundName ??
     "the current playground";
   const tutorPlan = resolvedPlayground?.tutorPlan;
-  const isTypedTutorPlan = tutorPlan
-    ? isTypedPredictionTutorPlan(tutorPlan)
-    : false;
-
   return [
     "You are the AI Grounds playground assistant.",
     "Help learners understand the interactive AI concept they are currently exploring.",
@@ -212,9 +205,7 @@ function systemPrompt(
           `Tutor opening message shown to learner:\n${getTutorOpeningMessage(
             tutorPlan,
           )}`,
-          isTypedTutorPlan
-            ? "This tutor plan is typed-only: quick reply buttons are hidden. Use the learner's typed messages as the signal to advance. The learner must type a prediction before you give experiment controls. After a prediction, acknowledge it briefly, give the exact experiment action, and ask what they observe. After an observation, connect it to the target takeaway and ask for a short explanation in their own words."
-            : undefined,
+          "This tutor plan is typed-only: quick reply buttons are hidden. Use the learner's typed messages as the signal to advance. The learner must type a prediction before you give experiment controls. After a prediction, acknowledge it briefly, give the exact experiment action, and ask what they observe. After an observation, connect it to the target takeaway and ask for a short explanation in their own words.",
           tutorPlan.masteryCriteria?.length
             ? `Mastery criteria. The learner has understood this lesson only when their answers show they can:\n${tutorPlan.masteryCriteria
                 .map((criterion) => `- ${criterion}`)
@@ -230,9 +221,7 @@ function systemPrompt(
             : undefined,
           tutor.takeaway ? `Target takeaway: ${tutor.takeaway}` : undefined,
           tutor.phase === "start" || tutor.phase === "predict"
-            ? isTypedTutorPlan
-              ? "Your next move: explain the playground and key concepts in plain language, then ask only the prediction question. Do not give the experiment action until the learner has answered."
-              : "Your next move: give the exact experiment action and ask the prediction question before explaining the result."
+            ? "Your next move: explain the playground and key concepts in plain language, then ask only the prediction question. Do not give the experiment action until the learner has answered."
             : undefined,
           tutor.phase === "observe"
             ? "Your next move: treat the learner's latest message as their prediction. Do not call the screenshot tool in this phase unless the learner explicitly says they already changed controls or asks about the current graph. Briefly acknowledge the prediction, tell the learner the exact experiment action, name the UI surfaces to watch, and ask what they observe. Avoid giving away the full explanation yet."
@@ -241,9 +230,7 @@ function systemPrompt(
             ? "Your next move: treat the learner's latest message as their observation. Respond to it, connect it to the target takeaway, then ask them to explain the concept in their own words before moving on."
             : undefined,
           tutor.phase === "next"
-            ? isTypedTutorPlan
-              ? "Your next move: treat the learner's latest message as their explanation of the previous concept. Briefly acknowledge or correct it, introduce only the next experiment title, then ask the prediction question. Do not give the next experiment controls until the learner answers."
-              : "Your next move: briefly acknowledge the last lesson, then introduce only the next experiment and ask for a prediction."
+            ? "Your next move: treat the learner's latest message as their explanation of the previous concept. Briefly acknowledge or correct it, introduce only the next experiment title, then ask the prediction question. Do not give the next experiment controls until the learner answers."
             : undefined,
           tutor.phase === "complete"
             ? tutorPlan.masteryCriteria?.length

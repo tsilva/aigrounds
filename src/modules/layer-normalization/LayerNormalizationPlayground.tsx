@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import {
   analyzeLayerNormalization,
   formatValue,
-  valueToPercent,
 } from "./layer-normalization-engine";
 import {
   defaultBeta,

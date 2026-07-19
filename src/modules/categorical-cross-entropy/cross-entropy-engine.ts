@@ -148,18 +148,6 @@ export function adjustProbability(
   return rebalance(classes, nextProbabilities, changedClassId);
 }
 
-export function setTrueClassDistribution(
-  classes: CrossEntropyClass[],
-  probabilities: Record<string, number>,
-  trueClassId: string,
-) {
-  if ((probabilities[trueClassId] ?? 0) >= 0.45) {
-    return probabilities;
-  }
-
-  return adjustProbability(classes, probabilities, trueClassId, 0.7);
-}
-
 function qualityLabel(loss: number) {
   if (loss < 0.5) {
     return "Lower is better! The model is more confident in the correct class.";

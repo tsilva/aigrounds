@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { PlaygroundShell } from "@/components/playground-shell";
 import { activePlaygrounds, getActivePlayground } from "@/lib/playgrounds";
 
 type PlaygroundPageProps = {
@@ -45,19 +44,9 @@ export default async function PlaygroundPage({
 
   const ModuleComponent = playground.component;
 
-  if (playground.presentation === "immersive") {
-    return (
-      <PlaygroundPageWithHomeButton>
-        <ModuleComponent />
-      </PlaygroundPageWithHomeButton>
-    );
-  }
-
   return (
     <PlaygroundPageWithHomeButton>
-      <PlaygroundShell module={playground}>
-        <ModuleComponent />
-      </PlaygroundShell>
+      <ModuleComponent />
     </PlaygroundPageWithHomeButton>
   );
 }

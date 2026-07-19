@@ -440,7 +440,7 @@ function ComparePanel({ analysis }: { analysis: BpeAnalysis }) {
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>4. Compare Texts</LessonTitle>
-      <div className="mt-4 hidden overflow-x-auto md:block">
+      <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-left">
           <thead>
             <tr className="border-b border-[#dce4f6] text-[11px] font-black tracking-[0.04em] text-[#607198] uppercase">
@@ -496,51 +496,6 @@ function ComparePanel({ analysis }: { analysis: BpeAnalysis }) {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="mt-4 grid gap-3 md:hidden">
-        {analysis.compareAnalyses.map((entry) => (
-          <div
-            key={entry.example.text}
-            className="rounded-[10px] border border-[#dbe2f2] bg-[#fbfbff] p-4"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-mono text-[14px] font-black text-[#071024]">
-                  {entry.example.text}
-                </p>
-                <p className="mt-1 text-[12px] leading-5 font-semibold text-[#607198]">
-                  {entry.example.note}
-                </p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="font-mono text-[13px] font-black text-[#071024]">
-                  {entry.before.count} {"->"} {entry.after.count}
-                </p>
-                <p className="mt-1 font-mono text-[13px] font-black text-[#0aa052]">
-                  {formatReduction(entry.reduction)}
-                </p>
-              </div>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {entry.after.tokens.map((token, index) => (
-                <span
-                  key={`${entry.example.text}-mobile-${token}-${index}`}
-                  className="rounded-[5px] border border-[#d5ddec] bg-white px-2 py-1.5 font-mono text-[12px] font-black text-[#071024]"
-                >
-                  {token}
-                </span>
-              ))}
-            </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#d7deeb]">
-              <div
-                className="h-full rounded-full bg-[#0aa052]"
-                style={{
-                  width: `${Math.max(entry.reduction * 100, 3)}%`,
-                }}
-              />
-            </div>
-          </div>
-        ))}
       </div>
       <div className="mt-4 rounded-[9px] border border-[#c9ecd8] bg-[#effbf4] px-4 py-3 text-[15px] font-bold text-[#0a6336]">
         Frequent patterns become cheap; rare strings still split.

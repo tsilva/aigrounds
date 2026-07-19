@@ -134,11 +134,79 @@ a {
 }
 
 .playground-page-with-home > main {
-  padding-top: calc(env(safe-area-inset-top) + 5rem);
+  padding-top: calc(env(safe-area-inset-top) + 5.5rem);
 }
 
-@media (min-width: 640px) {
-  .playground-page-with-home > main {
-    padding-top: calc(env(safe-area-inset-top) + 5.5rem);
+.desktop-only-notice {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  body {
+    background: #f7faff;
+  }
+
+  body::before,
+  .desktop-only-content {
+    display: none;
+  }
+
+  .desktop-only-notice {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    min-height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 2rem 1.5rem;
+    background:
+      radial-gradient(circle at top, rgba(199, 210, 254, 0.55), transparent 42%),
+      #f7faff;
+    color: #0f172a;
+    text-align: center;
+  }
+
+  .desktop-only-notice__card {
+    width: min(100%, 24rem);
+    border: 1px solid #dbeafe;
+    border-radius: 1rem;
+    padding: 2rem 1.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 24px 64px rgba(37, 99, 235, 0.12);
+  }
+
+  .desktop-only-notice__eyebrow {
+    color: #4f46e5;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .desktop-only-notice__icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 1.5rem auto;
+    fill: none;
+    stroke: #4f46e5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+  }
+
+  .desktop-only-notice h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+  }
+
+  .desktop-only-notice__card > p:last-child {
+    margin-top: 1rem;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.65;
   }
 }

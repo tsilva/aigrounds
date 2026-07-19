@@ -172,6 +172,7 @@ function ScenarioSelector({
                   key={scenario.id}
                   type="button"
                   onClick={() => onSelectScenario(scenario)}
+                  aria-pressed={isSelected}
                   className={`relative min-w-0 rounded-[10px] border p-4 text-left transition ${
                     isSelected
                       ? "border-[#2f2bff] bg-[#fbfbff] shadow-[0_10px_24px_rgba(47,43,255,0.14)]"
@@ -204,26 +205,48 @@ function ScenarioSelector({
             Current Reference Distribution P
           </p>
           <div className="mt-4 overflow-hidden rounded-[8px] border border-[#d9e2f3] bg-white">
-            <div className="grid grid-cols-5 border-b border-[#d9e2f3] text-center font-mono text-[12px] font-bold text-[#30446f]">
-              <div className="border-r border-[#d9e2f3] p-2 text-left font-sans text-[11px] font-black uppercase text-[#7180a5]">
-                Bucket
-              </div>
-              {klCategories.map((category) => (
-                <div key={category.id} className="border-r border-[#d9e2f3] p-2 last:border-r-0">
-                  {category.label}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-5 text-center font-mono text-[13px] font-bold text-[#071024]">
-              <div className="border-r border-[#d9e2f3] p-2 font-serif">
-                P<sub>i</sub>
-              </div>
-              {activeScenario.values.map((value, index) => (
-                <div key={klCategories[index].id} className="border-r border-[#d9e2f3] p-2 last:border-r-0">
-                  {formatProbability(value)}
-                </div>
-              ))}
-            </div>
+            <table className="w-full table-fixed border-collapse text-center font-mono">
+              <caption className="sr-only">
+                Current reference distribution P by bucket
+              </caption>
+              <thead className="text-[12px] font-bold text-[#30446f]">
+                <tr className="border-b border-[#d9e2f3]">
+                  <th
+                    scope="col"
+                    className="border-r border-[#d9e2f3] p-2 text-left font-sans text-[11px] font-black uppercase text-[#7180a5]"
+                  >
+                    Bucket
+                  </th>
+                  {klCategories.map((category) => (
+                    <th
+                      key={category.id}
+                      scope="col"
+                      className="border-r border-[#d9e2f3] p-2 last:border-r-0"
+                    >
+                      {category.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="text-[13px] font-bold text-[#071024]">
+                <tr>
+                  <th
+                    scope="row"
+                    className="border-r border-[#d9e2f3] p-2 font-serif"
+                  >
+                    P<sub>i</sub>
+                  </th>
+                  {activeScenario.values.map((value, index) => (
+                    <td
+                      key={klCategories[index].id}
+                      className="border-r border-[#d9e2f3] p-2 last:border-r-0"
+                    >
+                      {formatProbability(value)}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
           </div>
           <p className="mt-4 rounded-[8px] border border-[#e3e8f6] bg-white px-3 py-2 text-[13px] leading-[1.4] text-[#30446f]">
             Tutor path uses Peaked and Rare event. Balanced is optional for
@@ -275,48 +298,89 @@ function FormulaPanel({
           </p>
         </div>
         <div className="min-w-0 overflow-hidden rounded-[10px] border border-[#dbe2f2] bg-white">
-          <div className="grid grid-cols-[0.7fr_0.9fr_0.9fr_0.95fr_1.25fr] border-b border-[#dbe2f2] bg-[#fbfbff] text-[11px] font-black tracking-[0.02em] text-[#53658f] uppercase">
-            <div className="p-2.5">Bucket</div>
-            <div className="p-2.5">{analysis.sourceLabel}i</div>
-            <div className="p-2.5">{analysis.targetLabel}i</div>
-            <div className="p-2.5">Ratio</div>
-            <div className="p-2.5">Contribution</div>
-          </div>
-          {analysis.contributions.map((row) => {
-            const isLargestSource =
-              row.sourceValue ===
-              Math.max(
-                ...analysis.contributions.map(
-                  (contribution) => contribution.sourceValue,
-                ),
-              );
+          <table className="w-full table-fixed border-collapse font-mono text-[12px] font-bold text-[#071024] sm:text-[13px]">
+            <caption className="sr-only">
+              Per-bucket contributions for D KL of {analysis.sourceLabel} relative
+              to {analysis.targetLabel}
+            </caption>
+            <colgroup>
+              <col className="w-[14%]" />
+              <col className="w-[18%]" />
+              <col className="w-[18%]" />
+              <col className="w-[19%]" />
+              <col className="w-[31%]" />
+            </colgroup>
+            <thead className="bg-[#fbfbff] text-[11px] font-black tracking-[0.02em] text-[#53658f] uppercase">
+              <tr className="border-b border-[#dbe2f2]">
+                <th scope="col" className="p-2.5 text-left">
+                  Bucket
+                </th>
+                <th scope="col" className="p-2.5 text-left">
+                  {analysis.sourceLabel}<sub>i</sub>
+                </th>
+                <th scope="col" className="p-2.5 text-left">
+                  {analysis.targetLabel}<sub>i</sub>
+                </th>
+                <th scope="col" className="p-2.5 text-left">
+                  Ratio
+                </th>
+                <th scope="col" className="p-2.5 text-left">
+                  Contribution
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {analysis.contributions.map((row) => {
+                const isLargestSource =
+                  row.sourceValue ===
+                  Math.max(
+                    ...analysis.contributions.map(
+                      (contribution) => contribution.sourceValue,
+                    ),
+                  );
 
-            return (
-              <div
-                key={row.category.id}
-                className={`grid grid-cols-[0.7fr_0.9fr_0.9fr_0.95fr_1.25fr] border-b border-[#e5ebf6] font-mono text-[12px] font-bold text-[#071024] last:border-b-0 sm:text-[13px] ${
-                  isLargestSource ? "bg-[#fff8df]" : "bg-white"
-                }`}
-              >
-                <div className="p-2.5">{row.category.label}</div>
-                <div className="p-2.5">{formatProbability(row.sourceValue)}</div>
-                <div className="p-2.5">{formatProbability(row.targetValue)}</div>
-                <div className="p-2.5">{formatRatio(row.ratio)}</div>
-                <div
-                  className={`p-2.5 ${
-                    row.contribution >= 0 ? "text-[#ff2525]" : "text-[#09984c]"
-                  }`}
-                >
-                  {row.contribution >= 0 ? "+" : ""}
-                  {formatKl(row.contribution)}
-                </div>
-              </div>
-            );
-          })}
-          <div className="grid grid-cols-[3.45fr_1.25fr] bg-[#fbfbff] font-mono text-[13px] font-black">
-            <div className="p-2.5 text-center text-[#071024]">Sum</div>
-            <div className="p-2.5 text-[#ff2525]">{formatKl(analysis.score)}</div>
-          </div>
+                return (
+                  <tr
+                    key={row.category.id}
+                    className={`border-b border-[#e5ebf6] ${
+                      isLargestSource ? "bg-[#fff8df]" : "bg-white"
+                    }`}
+                  >
+                    <th scope="row" className="p-2.5 text-left">
+                      {row.category.label}
+                    </th>
+                    <td className="p-2.5">
+                      {formatProbability(row.sourceValue)}
+                    </td>
+                    <td className="p-2.5">
+                      {formatProbability(row.targetValue)}
+                    </td>
+                    <td className="p-2.5">{formatRatio(row.ratio)}</td>
+                    <td
+                      className={`p-2.5 ${
+                        row.contribution >= 0
+                          ? "text-[#ff2525]"
+                          : "text-[#09984c]"
+                      }`}
+                    >
+                      {row.contribution >= 0 ? "+" : ""}
+                      {formatKl(row.contribution)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot className="bg-[#fbfbff] font-black">
+              <tr>
+                <th scope="row" colSpan={4} className="p-2.5 text-center">
+                  Sum
+                </th>
+                <td className="p-2.5 text-[#ff2525]">
+                  {formatKl(analysis.score)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     </Panel>
@@ -339,12 +403,28 @@ function MismatchPanel({
   const largestPositive = Math.max(
     ...analysis.contributions.map((row) => row.contribution),
   );
+  const distributionChartLabel = `Bar chart comparing reference P and approximation Q. ${klCategories
+    .map(
+      (category, index) =>
+        `${category.label}: P ${formatProbability(reference[index])}, Q ${formatProbability(approximation[index])}`,
+    )
+    .join("; ")}.`;
+  const contributionChartLabel = `Per-bucket contributions in nats for D KL of ${analysis.sourceLabel} relative to ${analysis.targetLabel}. ${analysis.contributions
+    .map(
+      (row) =>
+        `${row.category.label}: ${row.contribution >= 0 ? "plus " : "minus "}${formatKl(Math.abs(row.contribution))}`,
+    )
+    .join("; ")}.`;
 
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>3. See The Weighted Mismatch</LessonTitle>
       <div className="mt-4 grid gap-7 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,0.85fr)_minmax(260px,0.55fr)]">
-        <div className="min-w-0">
+        <div
+          className="min-w-0"
+          role="img"
+          aria-label={distributionChartLabel}
+        >
           <p className="text-[14px] font-bold text-[#16264e]">
             Reference P (blue) vs Approximation Q (red)
           </p>
@@ -395,7 +475,11 @@ function MismatchPanel({
           </div>
         </div>
 
-        <div className="min-w-0">
+        <div
+          className="min-w-0"
+          role="img"
+          aria-label={contributionChartLabel}
+        >
           <p className="font-serif text-[16px] font-bold text-[#071024]">
             Per-bucket contribution {analysis.sourceLabel}
             <sub>i</sub> log({analysis.sourceLabel}
@@ -493,11 +577,19 @@ function ApproximationControls({
       values: reference,
     },
   ];
+  const updateApproximation = (index: number, value: number) => {
+    onApproximationChange(
+      adjustApproximation(approximation, index, value),
+    );
+  };
 
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>4. Set The Approximation Q</LessonTitle>
-      <p className="mt-4 text-[14px] font-bold text-[#30446f]">
+      <p
+        id="kl-approximation-help"
+        className="mt-4 text-[14px] font-bold text-[#30446f]"
+      >
         Adjust Q with the sliders. Values rebalance to sum to 1.
       </p>
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -514,35 +606,45 @@ function ApproximationControls({
       </div>
       <div className="mt-5 space-y-4">
         {klCategories.map((category, index) => (
-          <label
+          <div
             key={category.id}
             className="grid grid-cols-[44px_minmax(0,1fr)_58px] items-center gap-3"
           >
-            <span className="font-serif text-[17px] font-black text-[#071024]">
+            <label
+              htmlFor={`kl-q-${category.id}`}
+              className="font-serif text-[17px] font-black text-[#071024]"
+            >
               Q<sub>{category.label}</sub>
-            </span>
+            </label>
             <input
+              id={`kl-q-${category.id}`}
               type="range"
               min="0.01"
               max="0.97"
               step="0.01"
               value={approximation[index]}
-              onChange={(event) =>
-                onApproximationChange(
-                  adjustApproximation(
-                    approximation,
-                    index,
-                    Number(event.target.value),
-                  ),
-                )
+              onInput={(event) =>
+                updateApproximation(index, Number(event.currentTarget.value))
               }
               className="h-2 accent-[#ff2525]"
-              aria-label={`Q ${category.label}`}
+              aria-label={`Q ${category.label} slider`}
+              aria-describedby="kl-approximation-help"
             />
-            <span className="rounded-[7px] border border-[#d8e0f3] bg-white px-2 py-1 text-center font-mono text-[14px] font-black text-[#071024]">
-              {formatProbability(approximation[index])}
-            </span>
-          </label>
+            <input
+              type="number"
+              min="0.01"
+              max="0.97"
+              step="0.01"
+              inputMode="decimal"
+              value={formatProbability(approximation[index])}
+              onChange={(event) =>
+                updateApproximation(index, Number(event.currentTarget.value))
+              }
+              className="min-w-0 rounded-[7px] border border-[#d8e0f3] bg-white px-2 py-1 text-center font-mono text-[14px] font-black text-[#071024]"
+              aria-label={`Q ${category.label} exact value`}
+              aria-describedby="kl-approximation-help"
+            />
+          </div>
         ))}
       </div>
       <div className="mt-5 flex items-center justify-between border-t border-[#dfe6f4] pt-4">
@@ -606,6 +708,7 @@ function DirectionPanel({
             key={option.value}
             type="button"
             onClick={() => onDirectionChange(option.value)}
+            aria-pressed={direction === option.value}
             className={`px-3 py-3 font-serif text-[18px] font-black transition ${
               direction === option.value
                 ? "bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white"
@@ -670,38 +773,30 @@ function ScorePanel({
     approximation,
     direction,
   );
-  const position = Math.min(98, Math.max(2, (analysis.score / 0.7) * 100));
-  const toneClass =
-    analysis.qualityTone === "good"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-      : analysis.qualityTone === "medium"
-        ? "border-amber-200 bg-amber-50 text-amber-800"
-        : "border-red-200 bg-red-50 text-red-800";
 
   return (
     <Panel className="p-5 sm:p-6">
       <LessonTitle>6. Read The Mismatch</LessonTitle>
-      <div className="mt-4 text-center">
+      <div
+        className="mt-4 rounded-[10px] border border-[#d8e0f3] bg-white p-4 text-center"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         <p className="text-[13px] font-black text-[#30446f]">
-          KL divergence (nats)
+          D<sub>KL</sub>({analysis.sourceLabel} || {analysis.targetLabel}) in nats
         </p>
         <p className="mt-1 font-mono text-[48px] leading-none font-black text-[#ff2525]">
           {formatKl(analysis.score)}
         </p>
+        <p className="mt-3 text-[13px] font-bold text-[#30446f]">
+          {analysis.sourceLabel} supplies the weights in this direction.
+        </p>
       </div>
-      <div className="relative mt-5 h-8">
-        <div className="absolute top-3 left-0 h-2 w-full rounded-full bg-[linear-gradient(90deg,#16a34a,#f5c542,#ff2525)]" />
-        <div
-          className="absolute top-1 h-6 w-6 -translate-x-1/2 rounded-full border-4 border-white bg-[#ff2525] shadow"
-          style={{ left: `${position}%` }}
-        />
-      </div>
-      <div className="flex justify-between text-[11px] font-black text-[#30446f]">
-        <span className="text-[#09984c]">Low mismatch</span>
-        <span className="text-[#ff2525]">High mismatch</span>
-      </div>
-      <div className={`mt-4 rounded-[8px] border px-3 py-2 text-[13px] font-bold ${toneClass}`}>
-        {analysis.qualityLabel}
+      <div className="mt-4 rounded-[8px] border border-[#c7d2fe] bg-[#eef2ff] px-3 py-2 text-[13px] font-bold text-[#30446f]">
+        <strong className="text-[#071024]">Read the exact value:</strong> 0 means
+        the distributions match. Larger values mean more mismatch in this
+        direction; KL has no fixed maximum.
       </div>
       <div className="mt-4 rounded-[10px] border border-[#d8e0f3] bg-[#fbfbff] p-4">
         <p className="text-[13px] font-black text-[#352cff] uppercase">
@@ -732,6 +827,7 @@ export function KlDivergencePlayground() {
   );
   const [approximation, setApproximation] = useState(initialApproximation);
   const [direction, setDirection] = useState<KlDirection>("p-to-q");
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const activeScenario =
     referenceScenarios.find((scenario) => scenario.id === activeScenarioId) ??
     referenceScenarios[0];
@@ -752,12 +848,40 @@ export function KlDivergencePlayground() {
           </div>
           <button
             type="button"
+            onClick={() => setIsHelpOpen((isOpen) => !isOpen)}
+            aria-expanded={isHelpOpen}
+            aria-controls="kl-divergence-help"
             className="inline-flex items-center justify-center gap-3 rounded-[8px] border border-[#cfd6ff] bg-white/85 px-5 py-3 text-[15px] font-black text-[#2f2bff] shadow-[0_12px_28px_rgba(47,43,255,0.08)] transition hover:border-[#aeb8ff] hover:bg-white"
           >
             <HelpIcon />
             What is KL Divergence?
           </button>
         </header>
+
+        {isHelpOpen ? (
+          <aside
+            id="kl-divergence-help"
+            className="mt-5 rounded-[12px] border border-[#c7d2fe] bg-[#eef2ff] p-5 text-[#16264e]"
+            aria-labelledby="kl-divergence-help-title"
+          >
+            <h2
+              id="kl-divergence-help-title"
+              className="text-[18px] font-black text-[#352cff]"
+            >
+              KL divergence in one minute
+            </h2>
+            <p className="mt-2 max-w-[980px] text-[15px] leading-[1.5] font-bold">
+              KL divergence adds source-weighted log-ratios to compare two
+              probability distributions. In D<sub>KL</sub>(P || Q), P supplies
+              the weights and Q is the approximation.
+            </p>
+            <ul className="mt-3 grid gap-2 text-[14px] font-bold md:grid-cols-3">
+              <li>0 means P and Q match.</li>
+              <li>The total is nonnegative, even if one bucket is negative.</li>
+              <li>KL has no fixed maximum and is not a symmetric distance.</li>
+            </ul>
+          </aside>
+        ) : null}
 
         <div className="mt-6 space-y-4">
           <ScenarioSelector

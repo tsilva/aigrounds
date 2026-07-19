@@ -3,6 +3,7 @@ export function DesktopOnlyNotice() {
     <main
       className="desktop-only-notice"
       aria-labelledby="desktop-only-title"
+      tabIndex={0}
     >
       <div className="desktop-only-notice__card">
         <p className="desktop-only-notice__eyebrow">AI Grounds</p>

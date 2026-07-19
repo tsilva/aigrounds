@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Grounds Learning Page Optimizer"
+  short_description: "Create, optimize, or audit AI Grounds lessons"
+  default_prompt: "Use $aigrounds-learning-page to optimize the selected AI Grounds lesson for accuracy, functionality, teaching quality, and minimal friction."

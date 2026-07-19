@@ -1,307 +1,325 @@
 ---
 name: aigrounds-learning-page
-description: Use when creating or updating one or more AI Grounds learning playgrounds/pages for concepts. The workflow must design the simplest memorable interactive teaching page in the existing AI Grounds design system, show imagegen mockups to the user, iterate until explicit acceptance, then implement and hook the accepted playgrounds into the app. Supports explicit parallel batches such as "parallelize with 3".
+description: Create, optimize, fix, or audit an individual AI Grounds learning playground and its AI Guide. Use for new or planned concepts, live playground URLs or slugs, beginner-learning audits, deterministic lesson fixes, and full teaching-experience optimization. Keep cross-lesson ordering, prerequisite-lesson creation, and curriculum splits or merges in the separate lesson-plan review skill.
 ---
 
 # AI Grounds Learning Page
 
-Use this skill when the user gives a topic or concept to teach in AI Grounds.
+Build or evaluate one coherent teaching system: the rendered playground, concept
+engine, scenarios, visible copy, and AI Guide. Optimize for a learner who knows
+the declared prerequisites and nothing more.
 
-If the user invokes this skill without naming a concept or task, assume the task
-is the next planned playground-sized item on the home dashboard. Inspect
-`src/lib/playground-metadata.ts`, choose the first slug in
-`dashboardLessonPlanOrder` that appears in `upcomingPlaygrounds`, and proceed
-without asking for a concept. The same default applies when the user asks for
-the "next" page or "next task".
+Read root `SPECS.md` before acting. AI Grounds supports lesson interaction only
+at viewport widths of 768 CSS pixels or wider; below that boundary, verify only
+the desktop/laptop notice rather than designing a mobile lesson.
 
-When a task is selected from the dashboard lesson plan, reserve that planned
-lesson by noting its slug and title in the work summary before starting concept
-design, image generation, or implementation. Do not edit the dashboard metadata
-until the accepted design is ready to implement.
+## Resolve the Mode and Target
 
-If the user asks to parallelize with a number `N`, treat that as explicit
-permission to use subagents for this skill. Select the next `N` unchecked
-planned playground-sized items from the dashboard lesson plan unless the user
-names specific concepts. Reserve those `N` planned lessons before design work
-begins.
+Resolve intent semantically, in this order:
 
-## Hard Rules
+1. Select **Audit** when the user explicitly forbids writes or asks only to
+   audit, review, diagnose, report, suggest, or plan. Mentioning possible fixes
+   inside a report request does not authorize edits.
+2. Select **Create** for an imperative to create, build, or add a lesson/page.
+3. Select **Optimize** for an imperative to fix, apply, implement, update,
+   improve, iterate on, or optimize a selected lesson/page. A request to audit
+   and then apply or fix findings is Optimize.
+4. Without a verb, resolve the target:
+   - reachable live URL or live slug -> Audit;
+   - planned slug or clearly novel concept supplied through an explicit skill
+     invocation -> Create;
+   - unresolved ordinary-language noun phrase -> ask one mode question.
+5. For a bare explicit invocation, select the first slug in
+   `dashboardLessonPlanOrder` that is still in `upcomingPlaygrounds` and use
+   Create. Record its lesson-plan position, slug, and title before design work.
 
-- Do not implement before the user explicitly accepts a visual design.
-- Always show the proposed page design using imagegen before editing app code.
-- After the user accepts a visual design, persist the accepted mockup and prompt
-  in the lesson module's design artifacts before implementing the module.
-- Iterate the imagegen design with the user until they clearly accept it.
-- Never end the turn immediately after an imagegen call. Treat every generated
-  image as an unapproved draft until you have located the generated PNG,
-  inspected it, written a defect ledger, and either regenerated it or marked it
-  approval-ready.
-- Before showing any proposed design to the user, run a rigorous
-  evaluate-redesign loop: generate a design, inspect it, name every material
-  reference, teaching, numeric, visual, or interaction defect, then regenerate
-  when any material defect remains. Continue until the latest design has no
-  material issue worth fixing. Do not stop merely because a fixed number of
-  passes has been reached.
-- A design is not ready to show if any chart, timeline, formula, probability,
-  metric, label, control range, or visible state is internally inconsistent or
-  likely to teach the wrong idea.
-- A lesson is not ready to implement or ship until its visible controls,
-  tutor-plan steps, learning goals, and expected observations are reconciled in
-  a coverage matrix.
-- Keep the page as simple as possible while making the concept interactive and memorable.
-- Match the existing AI Grounds design system; the canonical reference screenshot is `assets/cross-entropy-design-reference.png`.
-- Before the first imagegen call, open and inspect the canonical reference screenshot. Do not rely on memory or the prose design system alone.
-- Do not show a generated mockup if it violates the reference structure. Regenerate it first.
-- Do not ask the user to approve a mockup in the same assistant message that
-  follows the imagegen tool call. First run the artifact inspection and defect
-  ledger steps below.
-- In a parallel batch, do not dispatch implementation subagents until the user has explicitly accepted the final mockup for every lesson in the batch.
-- When a dashboard lesson is implemented, it must not remain marked
-  `coming-soon`: remove its `upcomingPlaygrounds` entry in the same change that
-  adds active metadata and component registration.
+Retain conversational context: after auditing a target, a follow-up such as
+"fix all" switches that same target and defect ledger to Optimize. Audit never
+self-escalates into a write mode.
 
-## Workflow
+For a production URL:
 
-1. Understand the concept.
-   - If using a default dashboard item, record the selected lesson number, slug,
-     and exact title before any other work on the page begins.
-   - Derive the
-     implementation slug from that title using the repo's existing slug style
-     (lowercase words joined by hyphens, preserving established abbreviations
-     such as `iqr` when already used), unless the dashboard already provides a
-     slug.
-   - Identify the one core intuition the user should remember.
-   - Choose the smallest interaction that makes that intuition visible.
-   - Prefer direct manipulation: sliders, toggles, segmented controls, selectable examples, step/run controls, draggable values, or live visual state.
+- Audit the exact rendered URL.
+- In Optimize, capture the remote baseline, map its slug to local metadata and
+  source, and reproduce every remote defect locally before editing.
+- If the slug is unmapped or behavior cannot be reproduced because remote and
+  local semantics differ, stop and report deployment/configuration divergence.
+- Certify the local rendered route after changes and report it as locally
+  verified, not deployed, unless deployment was separately authorized.
 
-2. Design before implementation.
-   - Open `assets/cross-entropy-design-reference.png` and extract concrete
-     page invariants before writing the imagegen prompt.
-   - Required invariants from the current reference:
-     - No logo, no top-left brand mark, no global nav, no sidebar.
-     - Top area has only a huge black page title at upper left, a short dark-blue subtitle underneath, and one pale outlined help button at upper right.
-     - Content is a centered dense lesson page, not a landing page.
-     - Lesson sections are numbered compact panels with pale blue borders.
-     - Controls and formulas live inside those panels; avoid decorative chrome.
-   - Before calling imagegen, tell the user the generated image is a draft that
-     will be reviewed before approval. Do not ask for approval yet.
-   - Use imagegen to create a high-fidelity mockup of the page.
-   - Base the prompt on the design system below and the inspected reference screenshot. Include the required invariants explicitly in the prompt, especially the absence of logo/nav/site chrome.
-   - Immediately after imagegen returns, do not stop or hand control back. Locate
-     the generated PNG path, inspect it with the available image-viewing tool,
-     and complete this review ledger in your own working context before any
-     approval request:
+If the user explicitly requests a batch or parallel count, resolve and reserve
+each target independently. Use subagents only with that explicit permission,
+give workers disjoint module ownership, and integrate shared files in the main
+agent.
 
-     ```text
-     Design draft N review
-     - Reference fidelity:
-     - Learning quality:
-     - Interaction coverage:
-     - Numeric/model consistency:
-     - Visual correctness:
-     - Simplicity:
-     - Decision: regenerate because ... / approval-ready because ...
-     ```
+## Protect Existing Work
 
-   - After imagegen returns, visually compare the mockup to the reference before considering it for presentation. Check for:
-     - unwanted logo/nav/sidebar/marketing hero elements,
-     - missing numbered lesson panels,
-     - nested decorative cards or ornamental backgrounds,
-     - text that appears too cramped, clipped, or visually dominant,
-     - a central interaction that does not visibly teach the chosen intuition.
-   - Run an evaluate-redesign loop before showing any mockup to the user.
-     Treat every generated mockup as a draft, then inspect it against all of
-     these checks:
-     - Reference fidelity: no logo/nav/sidebar/marketing hero, numbered compact
-       lesson panels, pale borders, no nested decorative cards, no ornamental
-       backgrounds.
-     - Learning quality: the core intuition is visible in the main interaction
-       within a few seconds and every widget has a clear teaching job.
-     - Interaction coverage: each control updates at least two teaching
-       surfaces, such as a chart plus formula, simulation plus metric, or state
-       diagram plus narration.
-     - Numeric and model consistency: formulas, parameters, chart labels,
-       probabilities, simulated examples, timeline counts, control ranges, and
-       takeaway statements agree with each other and with the concept's actual
-       assumptions.
-     - Visual correctness: no clipped text, malformed labels, duplicated axis
-       ticks, overcrowded controls, hidden marks, chart overflow, or misleading
-       visual encodings.
-     - Simplicity: nothing decorative, redundant, confusing, or likely to
-       distract from the concept.
-   - During the loop, ask:
-     - Would a user learn the topic thoroughly by manipulating this playground, rather than merely seeing a diagram?
-     - Is the core intuition visible in the main interaction within a few seconds?
-     - Does every widget, metric, control, panel, and visual element have a clear teaching job?
-     - Are any important experiences missing, such as comparing cases, seeing failure modes, stepping through a process, changing assumptions, or connecting a formula to behavior?
-     - Does each interaction update at least two teaching surfaces, such as a chart plus formula, simulation plus metric, or state diagram plus narration?
-     - Is anything decorative, redundant, confusing, or likely to distract from the concept?
-   - If the mockup fails any reference, learning, interaction, numeric/model, or
-     visual-correctness check, generate another design pass with a stricter
-     prompt that names exactly what to add, remove, simplify, or correct.
-     When regenerating, briefly tell the user the concrete defects found in the
-     previous draft so they can audit the loop.
-   - Continue evaluating and redesigning until the latest mockup has no material
-     issue worth fixing. If a remaining tradeoff is unavoidable rather than a
-     fixable defect, name the tradeoff when asking the user for approval.
-   - Show only the best self-reviewed design to the user and ask whether to
-     revise or approve it for implementation. Include a concise "review passed"
-     note that names the strongest checks, such as exact numeric consistency,
-     reference fidelity, and interaction coverage. Do not implement until the
-     user explicitly approves.
-   - If the user requests changes, generate an updated mockup before coding.
+Before any mode, capture `git status --short`. Before Create or Optimize, also
+capture relevant tracked diffs, dirty-file contents, and an inventory plus
+content hashes for pre-existing untracked files.
 
-3. Persist the accepted design.
-   - Immediately after explicit user approval, copy the accepted generated PNG
-     into the module-owned artifact path:
-     `src/modules/{slug}/design/accepted-mockup.png`.
-   - Also create `src/modules/{slug}/design/imagegen-prompt.md` containing the
-     final accepted imagegen prompt or a faithful reconstruction of it if the
-     prompt was assembled across revision rounds.
-   - Also create `src/modules/{slug}/design/design-manifest.json` with this
-     shape, using stable deterministic fields:
+- Never revert, overwrite, or reformat user-owned work.
+- Merge around separable overlap; pause before touching a file when ownership
+  cannot be distinguished safely.
+- Keep final reporting clear about pre-existing versus skill-made changes.
+- Store screenshots, run ledgers, and other transient verification evidence
+  outside the repository unless they are accepted design artifacts.
 
-     ```json
-     {
-       "lessonPlanStep": 10,
-       "lessonPlanTitle": "Waiting & Arrival Distributions Lab",
-       "slug": "waiting-arrival-distributions",
-       "modulePath": "src/modules/waiting-arrival-distributions",
-       "acceptedMockup": "src/modules/waiting-arrival-distributions/design/accepted-mockup.png",
-       "prompt": "src/modules/waiting-arrival-distributions/design/imagegen-prompt.md",
-       "sourceGeneratedImage": "/absolute/path/to/generated/image.png"
-     }
-     ```
+Audit must create no repository-visible product delta. At the end, require the
+tracked and non-ignored untracked status, contents, and hashes to match the
+baseline. Known ignored generated caches such as `.next` may change during
+rendering; never read, log, or directly alter ignored user configuration or
+secrets.
 
-   - The deterministic pairing is: dashboard lesson-plan step and title ->
-     `design-manifest.json` -> module slug/path -> accepted screenshot and
-     implementation. Do not store accepted lesson mockups only in
-     `/Users/.../.codex/generated_images`, because that path is session-oriented
-     and is not paired with the module.
-   - If the lesson is not from the dashboard lesson plan, use `null` for
-     `lessonPlanStep` and the chosen concept title for `lessonPlanTitle`, but
-     still store the slug, module path, prompt, and accepted mockup in the module
-     directory.
+## Establish the Teaching Contract
 
-4. Implement after acceptance.
-   - Before or while implementing the tutor plan, create a concise coverage
-     matrix:
-     `visible control / surface -> tutor step -> learning goal -> expected learner observation`.
-   - Every primary visible learner control must be either exercised by the AI
-     Guide, explicitly marked optional/exploratory in the UI or tutor plan, or
-     removed/simplified.
-   - Every learning goal must have at least one guide step that asks the learner
-     to observe or explain it.
-   - If the UI includes scenario or example selectors, the tutor plan must use
-     more than one scenario unless the extra scenarios are intentionally marked
-     optional.
-   - If the lesson displays derived parameters such as scale, zero point,
-     threshold, probability, loss, gradient, or score, the tutor plan must teach
-     how at least one displayed value is produced, not only ask the learner to
-     use it.
-   - Add a self-contained module under `src/modules/{slug}/`.
-   - Put pure concept logic in `{slug}-engine.ts` when there is meaningful algorithmic state.
-   - Put scenario/example data in a separate scenario file when it helps readability.
-   - Register the module in `src/lib/playgrounds.ts`.
-   - Move the implemented lesson from `upcomingPlaygrounds` to
-     `activePlaygroundMetadata`: add the active metadata, delete the matching
-     upcoming object, keep the slug in `dashboardLessonPlanOrder`, and link the
-     finished playground through the landing page so users can open it from `/`.
-   - Before verification, search the metadata for the implemented slug and
-     confirm it appears in `activePlaygroundMetadata` and
-     `dashboardLessonPlanOrder`, but no longer appears in `upcomingPlaygrounds`.
-   - Use `presentation: "immersive"` when the page should own the full viewport like the cross entropy page.
-   - Update `README.md` for significant new playgrounds.
+Before design, repair, or certification, record:
 
-5. Verify.
-   - Run `pnpm build`.
-   - Start or reuse `pnpm dev`.
-   - Use the official Browser Use plugin for browser verification and screenshots.
-   - Check the home page has a working link/card for the new playground and no
-     `coming soon` badge on the implemented lesson card.
-   - Re-check the coverage matrix against the rendered UI and tutor plan. Flag
-     or fix any primary control, derived value, or learning goal that the guide
-     can skip while still reaching lesson completion.
-   - Check desktop and mobile widths for text overflow, layout collisions, and broken interactions.
-   - Exercise the primary interaction at low, middle, and high settings. Confirm it updates at least two teaching surfaces, such as a chart plus metrics or a formula plus narration.
-   - Inspect browser screenshots for SVG/canvas overflow, clipped controls, cramped numeric pills, and visualizations escaping their plot bounds.
-   - Check browser console errors before considering verification complete.
+- lesson identity and scope;
+- explicit prerequisites;
+- one core intuition;
+- the smallest sufficient set of observable outcomes, normally 2-5 and never
+  more than 5;
+- high-risk misconceptions and whether each is addressed or out of scope.
 
-## Parallel Batch Workflow
+Use user- or lesson-plan-declared prerequisites first. Never infer that every
+earlier dashboard lesson is required. When prerequisites are absent, derive and
+state a minimum set from authoritative concept sources. Pause only if the
+choice materially changes the teaching model; otherwise mark it provisional.
+Route sequencing disputes, new prerequisite lessons, lesson reordering, and
+splits or merges to `$aigrounds-lesson-plan-review`.
 
-Use this section only when the user explicitly asks to parallelize or gives a
-batch size, for example "parallelize with 3".
+### Build a Claim/State Oracle
 
-1. Select the batch.
-   - If no concepts are named, inspect `src/lib/playground-metadata.ts` and
-     select the next `N` planned playground-sized items from the dashboard
-     lesson plan.
-   - Reserve all selected dashboard lessons immediately, before design, image
-     generation, or implementation work begins.
-   - Assign each lesson a stable label such as `Lesson 1: Variance` so the user
-     can request targeted revisions.
+Inventory every teachable claim and state family across visible UI, Guide
+steps, engine output, scenarios, control ranges, formulas, units, labels,
+takeaways, visualization mappings, causal claims, assumptions, examples, and
+boundary behavior.
 
-2. Parallelize design.
-   - Spawn exactly `N` design subagents, one per lesson.
-   - Each design subagent must inspect `assets/cross-entropy-design-reference.png`,
-     identify the core intuition, choose the smallest interaction, generate or
-     request an imagegen mockup, self-check it against the reference invariants,
-     run the evaluate-redesign loop until no material issue remains, and return
-     the strongest design with a concise summary of why every major widget
-     belongs.
-   - Present all `N` accepted-by-agent mockups to the user together, grouped by
-     lesson label.
+Validate the inventory with the best applicable authority, preferring:
 
-3. Iterate per lesson.
-   - When the user asks to tweak one lesson, route only that lesson back through
-     design revision and imagegen.
-   - Preserve the other accepted mockups unchanged.
-   - Keep showing the current batch state until the user explicitly confirms the
-     final design set.
+1. a standard or specification;
+2. a canonical textbook;
+3. official technical documentation;
+4. a peer-reviewed survey;
+5. a seminal paper.
 
-4. Parallelize implementation after final confirmation.
-   - Before dispatching implementation workers, persist the accepted design
-     artifacts for every lesson using the normal design artifact convention:
-     `src/modules/{slug}/design/accepted-mockup.png`,
-     `imagegen-prompt.md`, and `design-manifest.json`.
-   - Dispatch exactly `N` implementation subagents, one per accepted lesson.
-   - Tell each worker it is not alone in the codebase, must not revert edits made
-     by others, and must adapt to concurrent changes.
-   - Give each worker disjoint ownership of its `src/modules/{slug}/` directory.
-     Avoid assigning shared files such as `src/lib/playgrounds.ts`, the home
-     page, or `README.md` to multiple workers unless ownership is explicitly
-     divided.
-   - Prefer having workers implement module files and return the registry/home
-     metadata they need. The main agent should integrate shared files after the
-     workers finish to avoid merge conflicts.
+Record sources, domain, assumptions, conventions, and reconciled conflicts in
+the run ledger. Exhaust every discrete branch and state. For continuous or
+high-cardinality families, verify governing formulas and invariants,
+equivalence classes, extrema, boundaries, and representative values. Recompute
+representative and boundary values independently without reusing production
+logic. Claim coverage of this defined state model, never empirical proof of
+every possible continuous value.
 
-5. Verify the batch.
-   - Run the normal verification workflow for every new playground.
-   - Check `/` links to each lesson and each lesson works on desktop and mobile.
-   - Exercise the primary interaction for each lesson at low, middle, and high
-     settings before handing control back.
+## Optimize the Teaching Model
 
-## Design System
+Use this priority order:
 
-The cross entropy page is the source of truth:
+1. correctness and supported-desktop accessibility as hard gates;
+2. prerequisite-qualified mastery and misconception-recovery proxies;
+3. among similarly effective designs, the least cluttered, shortest, most
+   direct learner path.
 
-- Visual tone: bright, technical, playful, dense enough for learning, not a marketing page.
-- Background: very light cool gray or white, with soft blue-lavender panel borders.
-- Layout: stacked full-width lesson panels with tight vertical rhythm; no decorative nested cards.
-- Panel style: white or near-white surfaces, 8-14px radius, 1px pale blue border, subtle cool shadow.
-- Typography: oversized black page title, compact blue uppercase section titles, readable explanatory body copy, mono text for formulas, values, and targets.
-- Color roles: electric blue/indigo for active controls and headings, red for predicted/error/probability emphasis, green/amber/red for quality or mood feedback, restrained neutral text.
-- Controls: segmented cards/buttons for modes, sliders or direct controls for numeric state, small fact pills for current state, compact buttons with clear labels or icons.
-- Teaching rhythm: start with a shape/mode choice, reveal the changing formula/model, provide a live simulator, then show a small memorable takeaway.
-- Interaction feedback: every user action should visibly update at least two things, such as a chart plus numeric score, formula term plus narration, grid state plus policy.
-- Copy: short, concrete, outcome-focused. Avoid generic feature descriptions and visible instructions about how the UI is built.
+Allow a small increase in friction only for a material mastery or recovery gain
+and record the tradeoff. Require every control, surface, formula, metric, and
+text block to have a unique teaching job, be used by the Guide, or be clearly
+optional. Prefer one causal interaction with only the feedback necessary to
+observe the target idea. Explain non-prerequisite jargon on first use, use exact
+visible control labels in Guide instructions, and keep learner actions atomic.
+One exercise may evidence several outcomes.
 
-## Imagegen Prompt Pattern
+Treat `assets/cross-entropy-design-reference.png` as a visual-language reference
+only. Inspect it before Create or a material redesign. Do not force its exact
+panel rhythm, number of surfaces, or interaction structure onto another
+concept.
 
-Ask imagegen for one polished app screenshot, not an illustration:
+### Challenge Full Optimizations
+
+Before choosing a Create design and before certifying a full Optimize run,
+maintain a novelty ledger and run two independent challenges:
+
+1. a pedagogy/mechanism challenge;
+2. a deletion-first/accessibility challenge.
+
+A candidate counts only when it materially changes at least one instructional
+axis: causal interaction or representation, scaffold sequence, feedback or
+mastery probe, or deletion-first simplification. Cosmetic variants do not
+count. Compare viable candidates on correctness, accessibility, mastery
+proxies, prerequisite burden, misconception recovery, actions/controls, and
+time to insight. Record why an axis has no viable alternative when applicable.
+
+Any viable new family or adopted candidate resets challenge saturation and
+clean-pass counting. If a practical exploration cap is reached, report
+`incomplete saturation`; do not call the result optimized.
+
+A narrowly scoped, deterministic correctness, label, or behavior repair may
+skip this challenge and finish only as `fixed/verified`. Requests to optimize,
+iterate, or fix all to completion must challenge the stable teaching model
+before using an optimization confidence label.
+
+## Run the Selected Lifecycle
+
+### Create
+
+1. Reserve the planned slug without editing metadata.
+2. Establish the contract, oracle, and alternative challenge.
+3. Inspect the visual reference and use imagegen to create a high-fidelity
+   mockup. Treat every generated image as a draft: inspect it, write a defect
+   ledger, and regenerate while material teaching, numeric, visual, or
+   interaction defects remain.
+4. Show only the strongest self-reviewed mockup. Obtain explicit approval of
+   the latest version before editing application code.
+5. Persist the approved design artifacts, then implement and verify.
+
+### Optimize
+
+1. Capture remote/local baselines when applicable and reproduce findings.
+2. Play through the rendered lesson, create a ranked defect ledger, and apply
+   the smallest autonomous repairs inside the existing lesson identity and
+   prerequisite contract.
+3. Reopen approval only for material divergence from explicit user-approved
+   prerequisites, outcomes, identity, scope, curriculum intent, external
+   behavior, or for a materially different teaching model or interaction/layout
+   redesign.
+4. Use imagegen and refresh design approval for such a redesign. Minor copy,
+   behavior, accessibility, and layout repairs may skip imagegen.
+5. Run the full challenge when optimization certification is requested, then
+   repair and verify until convergence.
+
+### Audit
+
+1. Inspect the target module, metadata, engine, scenarios, tutor plan, and
+   assistant shell without changing them.
+2. Play the rendered target as a learner limited to the declared prerequisites.
+   Read visible instructions literally and never bridge gaps with code or oracle
+   knowledge.
+3. Cover the Guide journey and unguided interaction surface, recording concrete
+   reproduction evidence.
+4. Replay uncertain findings once, report all material defects and limits, and
+   stop without fixes or repository-visible artifacts.
+
+## Persist Approved Design and Integrate Create
+
+After Create approval, and after every approved material Optimize redesign,
+refresh:
+
+- `src/modules/{slug}/design/accepted-mockup.png`;
+- `src/modules/{slug}/design/imagegen-prompt.md`;
+- `src/modules/{slug}/design/design-manifest.json`.
+
+The manifest must record the lesson-plan step or `null`, title, slug, module
+path, accepted mockup path, prompt path, and source generated-image path.
+
+For Create:
+
+- implement a self-contained module under `src/modules/{slug}/`;
+- keep meaningful concept logic pure in `{slug}-engine.ts` and separate scenario
+  data when helpful;
+- reconcile `visible control/surface -> Guide step -> outcome -> expected
+  observation` before verification;
+- register the component in `src/lib/playgrounds.ts`;
+- move its metadata from `upcomingPlaygrounds` to
+  `activePlaygroundMetadata`, preserving its existing position in
+  `dashboardLessonPlanOrder`;
+- verify its home card, route, and removal of the `coming-soon` state;
+- update the published-playground inventory in `README.md`.
+
+Define ownership behaviorally rather than by path. Change shared tutor,
+assistant-shell, registry, or metadata files only when required for the selected
+lesson. After shared runtime/UI changes, smoke-test at least one unaffected
+published playground.
+
+## Verify and Converge
+
+Use an existing development server when available. Otherwise run
+`pnpm dev --port auto`, report its printed URL, and never kill or restart an
+existing server. If automatic port selection or startup fails, stop and warn;
+do not switch to a fixed port.
+
+For rendered testing, load the bundled Browser skill/runtime, initialize
+`browser-client`, select `agent.browsers.get("iab")`, and use its documented
+Playwright/CUA APIs. Follow Browser recovery guidance and never silently fall
+back to another browser surface.
+
+Preflight the real rendered AI Guide. If it is unavailable, failed, or blocked
+by missing external configuration:
+
+- do not count a clean pass;
+- do not add a product-code workaround;
+- do not read, request, or log secret values;
+- run static tutor-plan checks only as partial evidence;
+- report external/environment verification as blocked.
+
+### Clean-Pass Gate
+
+Require two consecutive clean passes with unchanged code for Create and full
+Optimize only. Any repair resets the count. In each pass:
+
+1. Run a canonical Guide journey as the prerequisite-bounded learner, using
+   only visible page and Guide information.
+2. From a fresh/reset state with the Guide unavailable, identify the lesson
+   question, intended first action, prediction, and changed evidence without
+   guessing. Then cover every primary control, alternate scenarios, boundaries,
+   and at least one alternate action order or Guide-answer branch.
+3. Gather prediction, action, and explanation evidence for every outcome plus a
+   near-transfer case. Deliberately submit a vague or incorrect response,
+   confirm it cannot complete the lesson, and verify recovery.
+4. Reject stale state, dead controls, console errors, answer leakage, mismatched
+   labels, redundant surfaces, ambiguous affordances, uncovered misconceptions,
+   or unresolved material friction.
+
+Store a compact pass record outside the repository: URL/build identity, CSS
+viewport and zoom, reset marker, exact guided and unguided paths and answers,
+oracle expected-to-observed results, console result, accessibility-tree result,
+and selective screenshots. Consecutive passes must use different exploration
+or answer paths.
+
+### Supported-Desktop Accessibility
+
+Use a desktop accessibility matrix derived from WCAG 2.2 AA, but do not claim
+full AA conformance because the product intentionally removes lesson content
+below 768 CSS pixels. At supported widths verify:
+
+- correct accessible names, roles, values, and states;
+- logical visible focus, no traps, and keyboard-equivalent operation for every
+  control;
+- live/status exposure for instructional updates;
+- text or data equivalents for every instructional chart, canvas, SVG, or
+  dynamic visualization;
+- color-independent meaning, text spacing, readable contrast, distinguishable
+  focus and state, and reduced-motion behavior that preserves instruction;
+- 200% zoom/reflow from a physical viewport wide enough to retain at least 768
+  effective CSS pixels.
+
+At 767 CSS pixels, require only the desktop notice to be visible, accessible,
+and keyboard-reachable. Lesson markup may remain in the DOM only when hidden,
+inert, absent from the accessibility tree, and unfocusable. At exactly 768 CSS
+pixels require the full lesson to be visible and operable. Also exercise the
+lesson at 1024 and 1440 CSS pixels.
+
+After the final write, run:
 
 ```text
-Design a high-fidelity AI Grounds interactive learning playground page for {concept}. It must match the visual system of the provided cross entropy reference: bright white/cool-gray background, electric indigo section titles and active controls, pale blue borders, compact lesson panels, mono numeric/formula details, dense but readable teaching UI. Create the simplest memorable interaction for the concept: {interaction}. Show a desktop app screenshot with stacked learning panels, live controls, a central visualization, numeric/formula feedback, and a concise takeaway. Avoid marketing hero layout, decorative orbs, nested cards, and long explanatory text.
+pnpm lint
+pnpm check:cycles
+pnpm build
 ```
 
-When the concept needs a different interaction, replace `{interaction}` with the smallest concrete teaching mechanism.
+## Report Confidence and Results
+
+Use only these calibrated labels:
+
+- `fixed/verified` for a narrow deterministic repair;
+- `expert-verified / novice-simulated candidate` after full agent verification;
+- `learner-observed` for limited, non-preregistered learner evidence;
+- `learner-validated winner` only after a preregistered comparative protocol
+  with prerequisite-qualified learners measuring prediction, explanation,
+  near transfer, incorrect-answer recovery, adverse misconceptions, completion
+  friction, and time to insight.
+
+Report the selected mode and target, prerequisite and source assumptions,
+changes or audit findings, challenge families, clean-pass evidence, commands,
+accessibility and viewport coverage, confidence label, blockers, remaining
+risk, and whether results are local-only. Never claim universal learning
+optimality or full WCAG conformance without matching evidence.

@@ -20,8 +20,6 @@ export type KlAnalysis = {
   reverseScore: number;
   contributions: KlContribution[];
   formulaTerms: string[];
-  qualityLabel: string;
-  qualityTone: "good" | "medium" | "bad";
 };
 
 const minProbability = 0.01;
@@ -67,8 +65,6 @@ export function analyzeKlDivergence(
           row.sourceValue,
         )}/${formatProbability(row.targetValue)})`,
     ),
-    qualityLabel: qualityLabel(score),
-    qualityTone: qualityTone(score),
   };
 }
 
@@ -159,30 +155,6 @@ function buildContributions(
 
 function sumContributions(contributions: KlContribution[]) {
   return contributions.reduce((total, row) => total + row.contribution, 0);
-}
-
-function qualityLabel(score: number) {
-  if (score < 0.05) {
-    return "The approximation is close to the reference shape.";
-  }
-
-  if (score < 0.25) {
-    return "A few buckets are mismatched enough to create a visible penalty.";
-  }
-
-  return "The approximation is missing important mass from the reference.";
-}
-
-function qualityTone(score: number): KlAnalysis["qualityTone"] {
-  if (score < 0.05) {
-    return "good";
-  }
-
-  if (score < 0.25) {
-    return "medium";
-  }
-
-  return "bad";
 }
 
 function roundProbability(value: number) {

@@ -1614,4 +1614,53 @@ export const playgroundTutorPlans = {
       },
     ],
   },
+  "ai-concept-atlas": {
+    intro:
+      "Use the atlas for three short navigation experiments. Predict where an idea belongs, reveal its prerequisite path, and explain the difference between a category link and a learning dependency.",
+    whyItMatters:
+      "AI vocabulary is difficult because the field is not a flat list. A concept map makes the domain structure, prerequisite chains, and useful next steps visible so you can build a learning route instead of collecting disconnected definitions.",
+    openingMessage:
+      "No prior AI knowledge is required. The map uses three relationship types.\n\n- A solid arrow means one concept is a prerequisite for another.\n- A dotted line means the concepts are related but neither is necessarily required first.\n- A thin line means a concept is part of a broader branch.\n- Search selects a concept and expands its local branch.\n- Domain filters reduce the overview without deleting concepts from the atlas.\n\nFirst prediction: Transformer is selected. Which broad foundation do you expect at the beginning of its highlighted learning path? Reply with your prediction first. Then I will tell you exactly what to try.",
+    masteryCriteria: [
+      "Uses search or domain filters to locate a concept without manually scanning the entire map.",
+      "Distinguishes prerequisite, related-to, and part-of relationships from their labels and line patterns.",
+      "Traces a prerequisite path and identifies a reasonable next concept that it unlocks.",
+      "Explains why the atlas reveals one branch at a time instead of showing every concept label simultaneously.",
+    ],
+    steps: [
+      {
+        title: "Trace one prerequisite path",
+        experiment:
+          "Keep Transformer selected and choose Trace this learning path. Compare the highlighted map path with Learn this first in the detail panel.",
+        predictionQuestion:
+          "Which broad foundation do you expect at the beginning of the Transformer path?",
+        observationPrompt:
+          "What sequence did the highlighted prerequisite path reveal?",
+        takeaway:
+          "A learning path crosses domain branches: foundational math can support neural networks, which support attention, which supports transformers.",
+      },
+      {
+        title: "Jump across the field",
+        experiment:
+          "Use Search to find Q-learning. Select it, then compare its branch, Learn this first, and Unlocks next.",
+        predictionQuestion:
+          "Do you expect Q-learning to sit under Machine Learning generally or the Reinforcement Learning branch specifically?",
+        observationPrompt:
+          "Which branch expanded, and what did Q-learning require and unlock?",
+        takeaway:
+          "Search is a direct route into a large map: selecting a result expands its neighborhood and preserves the wider field for orientation.",
+      },
+      {
+        title: "Separate related from required",
+        experiment:
+          "Search for Calibration. Turn Related off, then on. Compare dotted related links with the solid prerequisite path and the thin part-of links.",
+        predictionQuestion:
+          "Should every concept related to calibration be required before learning calibration?",
+        observationPrompt:
+          "Which connections disappeared when Related was off, and which remained?",
+        takeaway:
+          "Related ideas are useful neighbors, but only prerequisite arrows claim a learn-this-first dependency.",
+      },
+    ],
+  },
 } satisfies Record<string, TutorPlan>;

@@ -693,6 +693,28 @@ const activePlaygroundDefinitions = [
       "Recognize why fresh hidden shuffles keep local openings from revealing the secret coloring.",
     ],
   },
+  {
+    slug: "ai-concept-atlas",
+    title: "The AI Concept Atlas",
+    tag: "concept map",
+    kicker:
+      "Search hundreds of AI ideas and reveal the learning paths that connect them.",
+    summary:
+      "Navigate a zoomable map of AI, machine learning, deep learning, generative AI, reinforcement learning, evaluation, safety, and production systems. Select any concept to reveal its prerequisites, neighboring ideas, and useful next steps.",
+    estimatedDuration: "8 to 12 minutes",
+    concepts: [
+      "AI taxonomy",
+      "Prerequisites",
+      "Concept relationships",
+      "Learning paths",
+    ],
+    learningGoals: [
+      "Locate an AI concept quickly with search, filters, and progressive branch expansion.",
+      "Distinguish prerequisite, related-to, and part-of relationships.",
+      "Trace a concept's learning path and identify what it can unlock next.",
+      "Recognize AI as a connected dependency graph rather than a flat vocabulary list.",
+    ],
+  },
 ] satisfies ActivePlaygroundDefinition[];
 
 type ActivePlaygroundSlug =
@@ -1208,6 +1230,7 @@ export const dashboardLessonPlanOrder = [
   "safety-refusal-robustness-metrics",
   "llm-app-ops-metrics",
   "zero-knowledge-proofs",
+  "ai-concept-atlas",
 ] as const;
 
 function getPlaygroundMetadata(slug: string) {

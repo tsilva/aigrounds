@@ -1,4 +1,5 @@
 import { type ComponentType } from "react";
+import { AiConceptAtlasPlayground } from "@/modules/ai-concept-atlas/AiConceptAtlasPlayground";
 import { AutogradGraphsPlayground } from "@/modules/autograd-graphs/AutogradGraphsPlayground";
 import { BayesRulePlayground } from "@/modules/bayes-rule/BayesRulePlayground";
 import { BackpropagationInspectorPlayground } from "@/modules/backpropagation-inspector/BackpropagationInspectorPlayground";
@@ -75,6 +76,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "zero-knowledge-proofs": ZeroKnowledgeProofsPlayground,
   "batch-normalization": BatchNormalizationPlayground,
   "layer-normalization": LayerNormalizationPlayground,
+  "ai-concept-atlas": AiConceptAtlasPlayground,
 };
 
 export const activePlaygrounds: ActivePlayground[] = activePlaygroundMetadata.map(

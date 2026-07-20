@@ -1,0 +1,9 @@
+{
+  "lessonPlanStep": 84,
+  "lessonPlanTitle": "The AI Concept Atlas",
+  "slug": "ai-concept-atlas",
+  "modulePath": "src/modules/ai-concept-atlas",
+  "acceptedMockup": "src/modules/ai-concept-atlas/design/accepted-mockup.png",
+  "prompt": "src/modules/ai-concept-atlas/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019f810a-db85-70a1-8951-6975c8cea4df/exec-ceb13c30-012e-4a80-bffc-fb0d8bb078f1.png"
+}

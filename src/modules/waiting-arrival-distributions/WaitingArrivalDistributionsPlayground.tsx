@@ -831,7 +831,7 @@ export function WaitingArrivalDistributionsPlayground() {
   return (
     <main className="min-h-screen bg-[#f8faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1540px]">
-        <header className="flex flex-col gap-4 pb-5 lg:flex-row lg:items-start lg:justify-between">
+        <header className="pb-5">
           <div>
             <h1 className="text-[38px] leading-none font-black tracking-[-0.03em] text-[#030816] sm:text-[52px]">
               Waiting & Arrival Distributions Lab
@@ -840,9 +840,6 @@ export function WaitingArrivalDistributionsPlayground() {
               One event chance per tick has two faces: how long we wait, and
               how many arrive.
             </p>
-          </div>
-          <div className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-[8px] border border-[#d9d3ff] bg-white px-6 text-[14px] font-black text-[#2429ff] shadow-[0_10px_30px_rgba(46,43,140,0.06)]">
-            ? What are Waiting & Arrival Distributions?
           </div>
         </header>
 

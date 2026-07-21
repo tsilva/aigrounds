@@ -54,35 +54,6 @@ function FactPill({ label, value }: { label: string; value: string }) {
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M9.7 9a2.4 2.4 0 0 1 4.6 1.1c0 1.8-2.3 2-2.3 3.6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M12 17.4h.01"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.6"
-      />
-    </svg>
-  );
-}
-
 function ScenarioAndQueryPanel({
   scenario,
   queryToken,
@@ -531,7 +502,6 @@ export function TransformerAttentionPlayground() {
     useState<AttentionScenarioId>("river-bank");
   const [queryTokenId, setQueryTokenId] = useState("bank");
   const [sharpness, setSharpness] = useState(initialSharpness);
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const scenario =
     attentionScenarios.find((item) => item.id === scenarioId) ??
     attentionScenarios[0]!;
@@ -555,7 +525,7 @@ export function TransformerAttentionPlayground() {
         className="mx-auto flex w-full max-w-[1536px] flex-col gap-4"
         style={{ "--attention-accent": "#352cff" } as CSSProperties}
       >
-        <header className="flex flex-col gap-4 pt-1 pb-2 sm:flex-row sm:items-start sm:justify-between">
+        <header className="pt-1 pb-2">
           <div className="min-w-0 sm:pl-6">
             <h1 className="text-[42px] leading-none font-black tracking-[-0.04em] text-[#071024] sm:text-[58px]">
               Transformer Attention
@@ -565,37 +535,7 @@ export function TransformerAttentionPlayground() {
               representation.
             </p>
           </div>
-
-          <button
-            type="button"
-            aria-expanded={isHelpOpen}
-            onClick={() => setIsHelpOpen((current) => !current)}
-            className="inline-flex h-12 items-center justify-center gap-3 rounded-[10px] border border-[#d7d7ff] bg-white/90 px-5 text-[15px] font-black text-[#2f31ff] shadow-[0_18px_42px_rgba(26,38,80,0.04)] transition hover:border-[#aaa8ff] sm:min-w-[300px]"
-          >
-            <HelpIcon />
-            What Is Attention?
-          </button>
         </header>
-
-        {isHelpOpen ? (
-          <Panel className="p-5 sm:mx-6 sm:p-6">
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center">
-              <div>
-                <LessonTitle>Attention In This Lab</LessonTitle>
-                <p className="mt-3 text-[16px] leading-[1.45] text-[#16264e]">
-                  Pick one token as the query. It compares with every key, turns
-                  those scores into weights, then blends the matching value
-                  vectors into the token&apos;s next representation.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <FactPill label="Query asks" value="which context matters?" />
-                <FactPill label="Keys compete" value="higher score = more weight" />
-                <FactPill label="Values mix" value="new token meaning" />
-              </div>
-            </div>
-          </Panel>
-        ) : null}
 
         <ScenarioAndQueryPanel
           scenario={scenario}

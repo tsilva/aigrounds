@@ -50,7 +50,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
     color: "#7c3aed",
     softColor: "#f3efff",
     summary:
-      "The mathematical, statistical, computational, and symbolic ideas that support AI systems.",
+      "The mathematical, statistical, and computational ideas that support AI systems.",
     groups: [
       {
         id: "linear-algebra",
@@ -78,8 +78,8 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         ],
       },
       {
-        id: "calculus-optimization",
-        label: "Calculus & Optimization",
+        id: "calculus",
+        label: "Calculus & Differential Methods",
         difficulty: "intermediate",
         concepts: [
           "Functions",
@@ -92,6 +92,13 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Hessians",
           "Chain rule",
           "Taylor approximation",
+        ],
+      },
+      {
+        id: "mathematical-optimization",
+        label: "Optimization & Numerical Computing",
+        difficulty: "intermediate",
+        concepts: [
           "Optimization",
           "Convexity",
           "Constrained optimization",
@@ -100,11 +107,12 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Stochastic optimization",
           "Saddle points",
           "Numerical optimization",
+          "Floating-point arithmetic",
         ],
       },
       {
         id: "probability",
-        label: "Probability",
+        label: "Probability & Random Variables",
         difficulty: "beginner",
         concepts: [
           "Probability",
@@ -129,7 +137,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "statistics",
-        label: "Statistics & Inference",
+        label: "Statistical Estimation & Inference",
         difficulty: "intermediate",
         concepts: [
           "Descriptive statistics",
@@ -137,6 +145,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Sampling",
           "Sampling bias",
           "Point estimation",
+          "Likelihood",
           "Maximum likelihood estimation",
           "Maximum a posteriori estimation",
           "Bayesian inference",
@@ -147,6 +156,13 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Statistical power",
           "Effect size",
           "Bootstrap",
+        ],
+      },
+      {
+        id: "causal-inference-experiments",
+        label: "Causal Inference & Experiments",
+        difficulty: "intermediate",
+        concepts: [
           "Causal inference",
           "Confounding",
           "Experimental design",
@@ -154,7 +170,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "information-theory",
-        label: "Information Theory",
+        label: "Information & Coding Theory",
         difficulty: "intermediate",
         concepts: [
           "Information theory",
@@ -176,8 +192,8 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         ],
       },
       {
-        id: "computer-science",
-        label: "Computer Science & Search",
+        id: "algorithms-data-structures",
+        label: "Algorithms & Data Structures",
         difficulty: "beginner",
         concepts: [
           "Algorithms",
@@ -189,15 +205,19 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Graph traversal",
           "Breadth-first search",
           "Depth-first search",
+          "Dynamic programming",
+        ],
+      },
+      {
+        id: "search-games-constraints",
+        label: "Search, Games & Constraints",
+        difficulty: "intermediate",
+        concepts: [
           "A-star search",
           "Heuristics",
-          "Dynamic programming",
           "Minimax",
           "Alpha-beta pruning",
           "Constraint satisfaction",
-          "Knowledge representation",
-          "Logic programming",
-          "Automated theorem proving",
         ],
       },
     ],
@@ -236,7 +256,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "linear-models",
-        label: "Linear & Probabilistic Models",
+        label: "Linear & Generalized Models",
         difficulty: "beginner",
         concepts: [
           "Linear regression",
@@ -244,22 +264,30 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Logistic regression",
           "Multinomial logistic regression",
           "Generalized linear models",
-          "Naive Bayes",
-          "Linear discriminant analysis",
-          "Quadratic discriminant analysis",
           "Perceptron",
           "Ridge regression",
           "Lasso regression",
           "Elastic net",
           "Polynomial regression",
           "Robust regression",
-          "Bayesian linear regression",
           "Isotonic regression",
         ],
       },
       {
-        id: "trees-kernels-instances",
-        label: "Trees, Kernels & Instances",
+        id: "probabilistic-models",
+        label: "Probabilistic Predictive Models",
+        difficulty: "intermediate",
+        concepts: [
+          "Naive Bayes",
+          "Linear discriminant analysis",
+          "Quadratic discriminant analysis",
+          "Bayesian linear regression",
+          "Gaussian processes",
+        ],
+      },
+      {
+        id: "tree-ensembles",
+        label: "Tree Models & Ensembles",
         difficulty: "intermediate",
         concepts: [
           "Decision trees",
@@ -271,18 +299,24 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "AdaBoost",
           "XGBoost",
           "LightGBM",
-          "k-nearest neighbors",
-          "Support vector machines",
-          "Kernel trick",
-          "Radial basis function kernel",
-          "Gaussian processes",
-          "Prototype methods",
           "Ensemble learning",
         ],
       },
       {
-        id: "unsupervised-models",
-        label: "Clustering & Latent Structure",
+        id: "kernel-instance-methods",
+        label: "Kernel & Instance Methods",
+        difficulty: "intermediate",
+        concepts: [
+          "k-nearest neighbors",
+          "Support vector machines",
+          "Kernel trick",
+          "Radial basis function kernel",
+          "Prototype methods",
+        ],
+      },
+      {
+        id: "clustering-density",
+        label: "Clustering & Density Models",
         difficulty: "intermediate",
         concepts: [
           "Clustering",
@@ -291,16 +325,23 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "DBSCAN",
           "Gaussian mixture models",
           "Expectation-maximization",
+          "Spectral clustering",
+          "Anomaly detection",
+          "Density estimation",
+        ],
+      },
+      {
+        id: "latent-structure",
+        label: "Latent Structure & Dimension Reduction",
+        difficulty: "intermediate",
+        concepts: [
           "Latent variable models",
           "Principal component analysis",
           "Independent component analysis",
           "Non-negative matrix factorization",
           "t-SNE",
           "UMAP",
-          "Spectral clustering",
           "Topic modeling",
-          "Anomaly detection",
-          "Density estimation",
         ],
       },
       {
@@ -324,27 +365,16 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Resampling",
           "Data augmentation",
           "Data leakage",
-          "Dataset shift",
-          "Concept drift",
         ],
       },
       {
-        id: "training-generalization",
-        label: "Training & Generalization",
+        id: "model-fitting-generalization",
+        label: "Model Fitting & Generalization",
         difficulty: "intermediate",
         concepts: [
           "Empirical risk minimization",
           "Loss functions",
           "Objective functions",
-          "Training sets",
-          "Validation sets",
-          "Test sets",
-          "Cross-validation",
-          "Hyperparameters",
-          "Hyperparameter optimization",
-          "Grid search",
-          "Random search",
-          "Bayesian optimization",
           "Overfitting",
           "Underfitting",
           "Bias-variance tradeoff",
@@ -354,8 +384,24 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         ],
       },
       {
-        id: "prediction-tasks",
-        label: "Prediction Tasks",
+        id: "validation-model-selection",
+        label: "Validation & Model Selection",
+        difficulty: "intermediate",
+        concepts: [
+          "Training sets",
+          "Validation sets",
+          "Test sets",
+          "Cross-validation",
+          "Hyperparameters",
+          "Hyperparameter optimization",
+          "Grid search",
+          "Random search",
+          "Bayesian optimization",
+        ],
+      },
+      {
+        id: "core-prediction-tasks",
+        label: "Classification & Regression Tasks",
         difficulty: "beginner",
         concepts: [
           "Classification",
@@ -363,17 +409,30 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Multiclass classification",
           "Multi-label classification",
           "Regression",
+          "Structured prediction",
+          "Sequence labeling",
+        ],
+      },
+      {
+        id: "ranking-recommendation",
+        label: "Ranking & Recommendation",
+        difficulty: "intermediate",
+        concepts: [
           "Ranking",
           "Learning to rank",
-          "Forecasting",
-          "Time-series analysis",
-          "Survival analysis",
           "Recommendation systems",
           "Collaborative filtering",
           "Content-based filtering",
-          "Structured prediction",
-          "Sequence labeling",
-          "Out-of-distribution detection",
+        ],
+      },
+      {
+        id: "forecasting-survival",
+        label: "Forecasting & Time-to-Event Modeling",
+        difficulty: "intermediate",
+        concepts: [
+          "Forecasting",
+          "Time-series analysis",
+          "Survival analysis",
         ],
       },
     ],
@@ -389,9 +448,10 @@ export const atlasDomains: AtlasDomainDefinition[] = [
     groups: [
       {
         id: "neural-networks",
-        label: "Neural Networks",
+        label: "Neural Network Fundamentals",
         difficulty: "beginner",
         concepts: [
+          "Neural networks",
           "Neurons",
           "Weights and biases",
           "Linear layers",
@@ -412,7 +472,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "neural-training",
-        label: "Neural Training",
+        label: "Neural Optimization",
         difficulty: "intermediate",
         concepts: [
           "Mini-batch training",
@@ -426,24 +486,42 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Learning-rate schedules",
           "Warmup",
           "Gradient clipping",
-          "Weight initialization",
-          "Xavier initialization",
-          "He initialization",
+          "Gradient accumulation",
           "Vanishing gradients",
           "Exploding gradients",
-          "Mixed-precision training",
-          "Gradient accumulation",
         ],
       },
       {
-        id: "regularization-normalization",
-        label: "Regularization & Normalization",
+        id: "initialization-numerics",
+        label: "Initialization & Training Efficiency",
+        difficulty: "intermediate",
+        concepts: [
+          "Weight initialization",
+          "Xavier initialization",
+          "He initialization",
+          "Mixed-precision training",
+          "Gradient checkpointing",
+        ],
+      },
+      {
+        id: "neural-regularization",
+        label: "Neural Regularization",
         difficulty: "intermediate",
         concepts: [
           "Weight decay",
           "Dropout",
           "Stochastic depth",
           "Label smoothing",
+          "Parameter sharing",
+          "Sparsity",
+          "Lottery ticket hypothesis",
+        ],
+      },
+      {
+        id: "normalization-residuals",
+        label: "Normalization & Residual Design",
+        difficulty: "intermediate",
+        concepts: [
           "Batch normalization",
           "Layer normalization",
           "RMS normalization",
@@ -452,10 +530,6 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Residual connections",
           "Highway networks",
           "Skip connections",
-          "Gradient checkpointing",
-          "Parameter sharing",
-          "Sparsity",
-          "Lottery ticket hypothesis",
         ],
       },
       {
@@ -531,7 +605,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "representation-learning",
-        label: "Representation Learning",
+        label: "Learned Representations",
         difficulty: "advanced",
         concepts: [
           "Representation learning",
@@ -548,8 +622,6 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Disentangled representations",
           "Manifold learning",
           "Neural collapse",
-          "Probing classifiers",
-          "Mechanistic interpretability",
         ],
       },
     ],
@@ -588,7 +660,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "language-models",
-        label: "Language Models",
+        label: "Foundation Models & Pretraining",
         difficulty: "intermediate",
         concepts: [
           "Language modeling",
@@ -597,12 +669,6 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Autoregressive language models",
           "Masked language models",
           "Next-token prediction",
-          "Tokenization",
-          "Byte-pair encoding",
-          "Unigram tokenization",
-          "Vocabulary",
-          "Context windows",
-          "In-context learning",
           "Emergent capabilities",
           "Scaling laws",
           "Compute-optimal training",
@@ -610,8 +676,22 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         ],
       },
       {
+        id: "tokenization-context",
+        label: "Tokenization & Context",
+        difficulty: "beginner",
+        concepts: [
+          "Tokenization",
+          "Byte-pair encoding",
+          "Unigram tokenization",
+          "Vocabulary",
+          "Context windows",
+          "In-context learning",
+          "Context engineering",
+        ],
+      },
+      {
         id: "alignment-posttraining",
-        label: "Post-training & Alignment",
+        label: "Post-training & Preference Learning",
         difficulty: "advanced",
         concepts: [
           "Supervised fine-tuning",
@@ -622,6 +702,14 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Direct preference optimization",
           "Constitutional AI",
           "AI feedback",
+          "Behavioral alignment",
+        ],
+      },
+      {
+        id: "efficient-adaptation",
+        label: "Efficient Adaptation & Model Composition",
+        difficulty: "advanced",
+        concepts: [
           "Parameter-efficient fine-tuning",
           "Low-rank adaptation",
           "Prompt tuning",
@@ -629,12 +717,11 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Model merging",
           "Knowledge distillation",
           "Catastrophic forgetting",
-          "Behavioral alignment",
         ],
       },
       {
         id: "prompting-reasoning",
-        label: "Prompting & Reasoning",
+        label: "Prompting & Inference-time Reasoning",
         difficulty: "beginner",
         concepts: [
           "Prompt engineering",
@@ -644,20 +731,15 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Self-consistency",
           "Tree of thoughts",
           "ReAct prompting",
-          "Tool use",
-          "Function calling",
           "Structured outputs",
           "Constrained decoding",
           "Reasoning models",
           "Test-time compute",
-          "Prompt injection",
-          "Jailbreaking",
-          "Context engineering",
         ],
       },
       {
-        id: "retrieval-agents",
-        label: "Retrieval & Agents",
+        id: "retrieval-grounding",
+        label: "Retrieval & Grounding",
         difficulty: "intermediate",
         concepts: [
           "Retrieval-augmented generation",
@@ -670,6 +752,15 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Reranking",
           "Chunking",
           "Grounding",
+        ],
+      },
+      {
+        id: "agents-tool-use",
+        label: "Agents & Tool Use",
+        difficulty: "intermediate",
+        concepts: [
+          "Tool use",
+          "Function calling",
           "AI agents",
           "Agent planning",
           "Agent memory",
@@ -680,7 +771,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "multimodal-generation",
-        label: "Multimodal Generation",
+        label: "Multimodal Models & Generation",
         difficulty: "advanced",
         concepts: [
           "Multimodal models",
@@ -717,7 +808,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         label: "RL Foundations",
         difficulty: "beginner",
         concepts: [
-          "Reinforcement learning",
+          "Reinforcement learning (RL)",
           "Agent",
           "Environment",
           "State",
@@ -760,7 +851,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "deep-rl",
-        label: "Deep Reinforcement Learning",
+        label: "Deep RL Architectures",
         difficulty: "advanced",
         concepts: [
           "Deep Q-networks",
@@ -774,11 +865,23 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Rainbow DQN",
           "Representation learning for RL",
           "Recurrent RL agents",
+          "Stability in deep RL",
+        ],
+      },
+      {
+        id: "exploration-bandits",
+        label: "Exploration & Bandits",
+        difficulty: "intermediate",
+        concepts: [
+          "Multi-armed bandits",
+          "Contextual bandits",
+          "Exploration-exploitation tradeoff",
+          "Epsilon-greedy exploration",
+          "Upper confidence bounds",
+          "Thompson sampling",
           "Intrinsic motivation",
           "Deep exploration",
           "Sample efficiency",
-          "Stability in deep RL",
-          "Sim-to-real transfer",
         ],
       },
       {
@@ -828,34 +931,34 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         ],
       },
       {
-        id: "rl-frontiers",
-        label: "RL Frontiers",
+        id: "offline-imitation",
+        label: "Offline & Imitation Learning",
         difficulty: "advanced",
         concepts: [
-          "Multi-armed bandits",
-          "Contextual bandits",
-          "Exploration-exploitation tradeoff",
-          "Epsilon-greedy exploration",
-          "Upper confidence bounds",
-          "Thompson sampling",
           "Offline reinforcement learning",
           "Imitation learning",
           "Behavior cloning",
           "Inverse reinforcement learning",
+        ],
+      },
+      {
+        id: "multi-agent-hierarchical",
+        label: "Multi-Agent & Hierarchical RL",
+        difficulty: "advanced",
+        concepts: [
           "Multi-agent reinforcement learning",
           "Cooperative RL",
           "Competitive RL",
           "Hierarchical reinforcement learning",
-          "Safe reinforcement learning",
-          "Reward hacking",
+          "Cooperative game theory",
         ],
       },
     ],
   },
   {
     id: "perception-language-robotics",
-    label: "Perception, Language & Robotics",
-    shortLabel: "Applied AI",
+    label: "AI Capabilities & Applications",
+    shortLabel: "Capabilities",
     color: "#0891b2",
     softColor: "#eafaff",
     summary:
@@ -863,7 +966,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
     groups: [
       {
         id: "natural-language-processing",
-        label: "Natural Language Processing",
+        label: "Language Understanding & NLP",
         difficulty: "beginner",
         concepts: [
           "Natural language processing",
@@ -886,7 +989,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "computer-vision",
-        label: "Computer Vision",
+        label: "Visual Perception & Computer Vision",
         difficulty: "intermediate",
         concepts: [
           "Computer vision",
@@ -932,7 +1035,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "robotics",
-        label: "Robotics",
+        label: "Robotics & Embodied Intelligence",
         difficulty: "advanced",
         concepts: [
           "Robotics",
@@ -951,19 +1054,33 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Navigation",
           "Human-robot interaction",
           "Embodied AI",
+          "Sim-to-real transfer",
         ],
       },
       {
         id: "knowledge-reasoning",
-        label: "Knowledge & Reasoning",
+        label: "Knowledge Representation & Reasoning",
         difficulty: "intermediate",
         concepts: [
+          "Knowledge representation",
           "Knowledge graphs",
           "Ontologies",
           "Semantic networks",
           "Expert systems",
           "Rule-based systems",
           "Fuzzy logic",
+          "Logic programming",
+          "Automated theorem proving",
+          "Classical planning",
+          "Case-based reasoning",
+          "Neuro-symbolic AI",
+        ],
+      },
+      {
+        id: "probabilistic-graphical-models",
+        label: "Graphical Probabilistic Models",
+        difficulty: "advanced",
+        concepts: [
           "Probabilistic graphical models",
           "Bayesian networks",
           "Hidden Markov models",
@@ -971,14 +1088,11 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Factor graphs",
           "Message passing",
           "Belief propagation",
-          "Classical planning",
-          "Case-based reasoning",
-          "Neuro-symbolic AI",
         ],
       },
       {
         id: "graph-learning",
-        label: "Graph Machine Learning",
+        label: "Learning on Graphs",
         difficulty: "advanced",
         concepts: [
           "Graph machine learning",
@@ -1035,16 +1149,33 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "evaluation-methods",
-        label: "Evaluation Methods",
+        label: "Calibration & Decision Quality",
         difficulty: "intermediate",
         concepts: [
           "Calibration",
           "Reliability diagrams",
           "Brier score",
+          "Uncertainty estimation",
+          "Selective prediction",
+        ],
+      },
+      {
+        id: "ranking-retrieval-metrics",
+        label: "Ranking & Retrieval Metrics",
+        difficulty: "intermediate",
+        concepts: [
           "Ranking metrics",
           "Mean reciprocal rank",
           "Normalized discounted cumulative gain",
           "Recall at k",
+          "Retrieval evaluation",
+        ],
+      },
+      {
+        id: "evaluation-design",
+        label: "Evaluation Design & Experimentation",
+        difficulty: "intermediate",
+        concepts: [
           "Human evaluation",
           "Pairwise comparison",
           "A-B testing",
@@ -1058,7 +1189,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "llm-evaluation",
-        label: "Generative AI Evaluation",
+        label: "Generative & Agent Evaluation",
         difficulty: "intermediate",
         concepts: [
           "LLM evaluation",
@@ -1072,7 +1203,6 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Groundedness evaluation",
           "Factuality evaluation",
           "Hallucination detection",
-          "Retrieval evaluation",
           "Agent evaluation",
           "Tool-use evaluation",
           "Safety evaluation",
@@ -1081,7 +1211,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "interpretability",
-        label: "Interpretability",
+        label: "Model Interpretability",
         difficulty: "advanced",
         concepts: [
           "Interpretability",
@@ -1098,13 +1228,15 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Feature visualization",
           "Circuit analysis",
           "Sparse autoencoders",
+          "Mechanistic interpretability",
+          "Probing classifiers",
           "Model editing",
           "Counterfactual explanations",
         ],
       },
       {
-        id: "responsible-ai",
-        label: "Responsible AI",
+        id: "fairness-bias",
+        label: "Responsible AI & Fairness",
         difficulty: "intermediate",
         concepts: [
           "Responsible AI",
@@ -1115,6 +1247,13 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Equal opportunity",
           "Fairness through unawareness",
           "Bias mitigation",
+        ],
+      },
+      {
+        id: "privacy-governance",
+        label: "Privacy, Transparency & Governance",
+        difficulty: "intermediate",
+        concepts: [
           "Transparency",
           "Accountability",
           "Privacy",
@@ -1126,14 +1265,24 @@ export const atlasDomains: AtlasDomainDefinition[] = [
         ],
       },
       {
-        id: "robustness-alignment",
-        label: "Robustness & Alignment",
+        id: "robustness-distribution-shift",
+        label: "Robustness & Distribution Shift",
         difficulty: "advanced",
         concepts: [
           "Robustness",
           "Adversarial examples",
           "Adversarial training",
           "Distributional robustness",
+          "Dataset shift",
+          "Concept drift",
+          "Out-of-distribution detection",
+        ],
+      },
+      {
+        id: "alignment-ai-safety",
+        label: "Alignment & AI Safety",
+        difficulty: "advanced",
+        concepts: [
           "Red teaming",
           "Alignment",
           "Outer alignment",
@@ -1143,9 +1292,21 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Goal misgeneralization",
           "Specification gaming",
           "Reward misspecification",
-          "Uncertainty estimation",
-          "Selective prediction",
+          "Reward hacking",
+          "Safe reinforcement learning",
           "AI incident response",
+        ],
+      },
+      {
+        id: "generative-ai-security",
+        label: "Generative AI Safeguards & Security",
+        difficulty: "advanced",
+        concepts: [
+          "Prompt injection",
+          "Jailbreaking",
+          "Guardrails",
+          "Content moderation",
+          "Tool sandboxes",
         ],
       },
     ],
@@ -1253,7 +1414,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "mlops",
-        label: "MLOps",
+        label: "ML Lifecycle & Operations",
         difficulty: "intermediate",
         concepts: [
           "MLOps",
@@ -1276,7 +1437,7 @@ export const atlasDomains: AtlasDomainDefinition[] = [
       },
       {
         id: "llm-systems",
-        label: "LLM & Agent Systems",
+        label: "LLM Application & Agent Systems",
         difficulty: "advanced",
         concepts: [
           "LLM application architecture",
@@ -1285,13 +1446,10 @@ export const atlasDomains: AtlasDomainDefinition[] = [
           "Model fallbacks",
           "Prompt management",
           "Semantic caching",
-          "Guardrails",
-          "Content moderation",
           "Rate limiting",
           "Token budgets",
           "Cost per request",
           "Agent runtimes",
-          "Tool sandboxes",
           "Durable workflows",
           "Human approval gates",
           "LLM observability",
@@ -1348,7 +1506,7 @@ const coreDetails: Record<
     whyItMatters:
       "It is a simple, influential example of unsupervised learning and alternating optimization.",
   },
-  "Neural Networks": {
+  "Neural networks": {
     description:
       "Layered differentiable models that learn representations by adjusting connected weights.",
     whyItMatters:
@@ -1401,7 +1559,7 @@ const coreDetails: Record<
     whyItMatters:
       "Retrieval can add current or private knowledge and make answers easier to ground in sources.",
   },
-  "Reinforcement learning": {
+  "Reinforcement learning (RL)": {
     description:
       "Learning how to act through interaction so expected long-term reward improves.",
     whyItMatters:
@@ -1469,14 +1627,14 @@ const relationshipLabels: Record<
     prerequisites: ["Linear algebra", "Eigenvectors"],
     related: ["Singular value decomposition", "Low-rank approximation"],
   },
-  "Neural Networks": { prerequisites: ["Linear algebra"] },
+  "Neural networks": { prerequisites: ["Linear algebra"] },
   "Backpropagation": { prerequisites: ["Chain rule", "Computational graphs"] },
   "Automatic differentiation": { prerequisites: ["Chain rule", "Computational graphs"] },
   "Convolutional neural networks": {
-    prerequisites: ["Neural Networks", "Convolution"],
+    prerequisites: ["Neural networks", "Convolution"],
   },
   "Attention": {
-    prerequisites: ["Neural Networks"],
+    prerequisites: ["Neural networks"],
     related: ["Dot product", "Softmax"],
   },
   "Self-attention": { prerequisites: ["Attention"] },
@@ -1498,7 +1656,7 @@ const relationshipLabels: Record<
     prerequisites: ["Large language models", "Tool use", "Agent planning"],
   },
   "Diffusion models": {
-    prerequisites: ["Probability distributions", "Neural Networks"],
+    prerequisites: ["Probability distributions", "Neural networks"],
   },
   "Markov decision processes": {
     prerequisites: ["Markov chains", "Conditional probability"],
@@ -1511,7 +1669,7 @@ const relationshipLabels: Record<
   },
   "Double Q-learning": { prerequisites: ["Q-learning"] },
   "Deep Q-networks": {
-    prerequisites: ["Q-learning", "Neural Networks"],
+    prerequisites: ["Q-learning", "Neural networks"],
   },
   "Policy gradients": {
     prerequisites: ["Policy", "Gradients", "Return"],
@@ -1536,12 +1694,6 @@ const relationshipLabels: Record<
     prerequisites: ["Floating-point arithmetic", "Model inference"],
   },
 };
-
-const virtualFoundationLabels = [
-  "Likelihood",
-  "Floating-point arithmetic",
-  "Cooperative game theory",
-];
 
 function slugify(value: string) {
   return value
@@ -1619,26 +1771,6 @@ for (const domain of atlasDomains) {
   }
 }
 
-const foundationsGroup = baseConcepts.find(
-  (concept) => concept.id === "foundations-computer-science",
-);
-
-for (const label of virtualFoundationLabels) {
-  baseConcepts.push({
-    id: `foundations-computer-science-${slugify(label)}`,
-    label,
-    kind: "concept",
-    domainId: "foundations",
-    groupId: "computer-science",
-    parentId: foundationsGroup?.id ?? "foundations",
-    difficulty: "intermediate",
-    description: `${label} is a supporting mathematical or computational idea used elsewhere in the atlas.`,
-    whyItMatters: `It supplies prerequisite vocabulary for connected AI and machine-learning methods.`,
-    prerequisiteIds: [],
-    relatedIds: [],
-  });
-}
-
 const idByLabel = new Map<string, string>();
 for (const concept of baseConcepts) {
   if (!idByLabel.has(concept.label)) {
@@ -1687,7 +1819,15 @@ export const atlasSources = [
     href: "https://mitpress.mit.edu/9780262039246/reinforcement-learning/",
   },
   {
-    label: "Stanford AI Index",
-    href: "https://hai.stanford.edu/ai-index",
+    label: "Deep Learning",
+    href: "https://www.deeplearningbook.org/",
+  },
+  {
+    label: "NIST AI Risk Management Framework",
+    href: "https://www.nist.gov/itl/ai-risk-management-framework",
+  },
+  {
+    label: "OWASP Top 10 for LLM Applications",
+    href: "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
   },
 ];

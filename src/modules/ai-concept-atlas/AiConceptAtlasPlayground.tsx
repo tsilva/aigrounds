@@ -75,7 +75,7 @@ function SearchBox({
           role="combobox"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder={`Search ${atlasConcepts.length} concepts...`}
+          placeholder={`Search ${atlasConcepts.length} atlas nodes...`}
           autoComplete="off"
           aria-autocomplete="list"
           aria-expanded={showResults}

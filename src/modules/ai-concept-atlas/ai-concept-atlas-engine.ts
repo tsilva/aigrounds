@@ -47,9 +47,9 @@ export type AtlasViewOptions = {
 
 const LEFT_DOMAIN_IDS = new Set<AtlasDomainId>([
   "foundations",
-  "machine-learning",
   "generative-ai",
   "evaluation-safety",
+  "ai-systems",
 ]);
 
 const DOMAIN_GAP = 44;

@@ -541,7 +541,7 @@ export function AutogradGraphsPlayground() {
   return (
     <main className="min-h-screen bg-[#f7faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-[1500px]">
-        <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header className="mb-5">
           <div>
             <h1 className="text-[44px] leading-none font-black tracking-[-0.02em] text-[#050814] sm:text-[56px]">
               Autograd Graphs
@@ -551,12 +551,6 @@ export function AutogradGraphsPlayground() {
               flow backward.
             </p>
           </div>
-          <button
-            type="button"
-            className="self-start rounded-[8px] border border-[#c7ccff] bg-white px-5 py-3 text-[14px] font-black text-[#1638ff] shadow-[0_10px_26px_rgba(44,63,160,0.06)]"
-          >
-            ? What are Autograd Graphs?
-          </button>
         </header>
 
         <div className="grid gap-4">

@@ -481,7 +481,7 @@ export function LayerNormalizationPlayground() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#fbfcff] px-3 py-4 text-[#071024] sm:px-5">
       <div className="mx-auto max-w-[1536px]">
-        <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:pl-2 lg:pl-6">
+        <header className="mb-4 sm:pl-2 lg:pl-6">
           <div>
             <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black tracking-[-0.055em] text-[#030713] sm:text-[52px]">
               Layer Normalization Lab
@@ -490,12 +490,6 @@ export function LayerNormalizationPlayground() {
               Normalize each token&apos;s hidden features using only its own values.
             </p>
           </div>
-          <button
-            type="button"
-            className="self-start rounded-[8px] border border-[#c8d5f6] bg-white px-4 py-2 text-[14px] font-black text-[#1638ff]"
-          >
-            What is Layer Normalization?
-          </button>
         </header>
 
         <div className="grid gap-3 sm:gap-4">

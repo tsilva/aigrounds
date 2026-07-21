@@ -700,19 +700,19 @@ const activePlaygroundDefinitions = [
     kicker:
       "Open a branch from the AI core and move from broad categories to specific concepts.",
     summary:
-      "Navigate a center-out mind map of AI, machine learning, deep learning, generative AI, reinforcement learning, evaluation, safety, and production systems. Expand a category into subcategories and concepts, then inspect prerequisites and useful next steps separately.",
+      "Navigate a center-out mind map of AI, machine learning, deep learning, generative AI, reinforcement learning, evaluation, safety, and production systems. Expand categories into subcategories and concepts, search the atlas, and highlight any concept's path from the AI core.",
     estimatedDuration: "8 to 12 minutes",
     concepts: [
       "AI taxonomy",
-      "Prerequisites",
       "Branch hierarchies",
-      "Learning paths",
+      "Progressive disclosure",
+      "Concept search",
     ],
     learningGoals: [
       "Read an AI concept from the central root through its category and subcategory.",
-      "Control a large taxonomy with branch expansion, collapse, search, and filters.",
-      "Distinguish category membership from a learning prerequisite.",
-      "Trace a separate learning path and identify what a concept can unlock next.",
+      "Control a large taxonomy with local branch expansion, collapse, and search.",
+      "Trace a selected concept through its parent categories to the AI core.",
+      "Explain that a branch shows category membership rather than prerequisite order.",
     ],
   },
 ] satisfies ActivePlaygroundDefinition[];

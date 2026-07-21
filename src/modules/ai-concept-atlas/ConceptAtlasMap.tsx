@@ -1,10 +1,22 @@
 "use client";
 
 import { MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { memo, useEffect, useMemo, useState } from "react";
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+} from "@heroicons/react/24/outline";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Controls,
   Handle,
+  Panel,
   Position,
   ReactFlow,
   type Edge,
@@ -22,6 +34,7 @@ import type {
   AtlasBranchSide,
   AtlasView,
 } from "./ai-concept-atlas-engine";
+import { getAncestorIds } from "./ai-concept-atlas-engine";
 
 type MindMapNodeData = {
   label: string;
@@ -43,6 +56,10 @@ type ConceptAtlasMapProps = {
   onToggleBranch: (conceptId: string) => void;
   focusRequest: number;
   fitRequest: number;
+  branchFitRequest: {
+    conceptId: string;
+    request: number;
+  };
 };
 
 const nodeWidthByDepth = [190, 168, 156, 150] as const;
@@ -189,6 +206,8 @@ function toFlowNodes(
           emphasis: layoutNode.emphasis,
           onToggleBranch,
         },
+        initialWidth: nodeWidthByDepth[Math.min(layoutNode.depth, 3)],
+        initialHeight: nodeHeightByDepth[Math.min(layoutNode.depth, 3)],
         sourcePosition:
           layoutNode.side === "left" ? Position.Left : Position.Right,
         targetPosition:
@@ -205,6 +224,28 @@ function toFlowNodes(
       },
     ];
   });
+}
+
+function getBranchFrameIds(view: AtlasView, branchId: string) {
+  const frameIds = new Set([...getAncestorIds(branchId), branchId]);
+  const targetsBySource = new Map<string, string[]>();
+
+  for (const edge of view.edges) {
+    const targets = targetsBySource.get(edge.source) ?? [];
+    targets.push(edge.target);
+    targetsBySource.set(edge.source, targets);
+  }
+
+  function addDescendants(conceptId: string) {
+    for (const targetId of targetsBySource.get(conceptId) ?? []) {
+      if (frameIds.has(targetId)) continue;
+      frameIds.add(targetId);
+      addDescendants(targetId);
+    }
+  }
+
+  addDescendants(branchId);
+  return frameIds;
 }
 
 function toFlowEdges(view: AtlasView): Edge[] {
@@ -238,14 +279,72 @@ export function ConceptAtlasMap({
   onToggleBranch,
   focusRequest,
   fitRequest,
+  branchFitRequest,
 }: ConceptAtlasMapProps) {
   const [instance, setInstance] =
     useState<ReactFlowInstance<MindMapNode, Edge>>();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
+  const handledBranchFitRequest = useRef(0);
+  const previousFullscreenState = useRef(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const nodes = useMemo(
     () => toFlowNodes(view, onToggleBranch),
     [onToggleBranch, view],
   );
   const edges = useMemo(() => toFlowEdges(view), [view]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const container = mapContainerRef.current;
+    const previouslyFocused = document.activeElement;
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    fullscreenButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsFullscreen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !container) return;
+
+      const focusableElements = Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      const firstFocusable = focusableElements.at(0);
+      const lastFocusable = focusableElements.at(-1);
+      if (!firstFocusable || !lastFocusable) {
+        event.preventDefault();
+        container.focus();
+        return;
+      }
+
+      if (!container.contains(document.activeElement)) {
+        event.preventDefault();
+        firstFocusable.focus();
+      } else if (event.shiftKey && document.activeElement === firstFocusable) {
+        event.preventDefault();
+        lastFocusable.focus();
+      } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    };
+  }, [isFullscreen]);
+
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen((current) => !current);
+  }, []);
 
   useEffect(() => {
     if (!instance || focusRequest === 0) return;
@@ -270,16 +369,99 @@ export function ConceptAtlasMap({
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    void instance.fitView({
-      padding: 0.12,
-      minZoom: 0.14,
-      maxZoom: 0.72,
-      duration: reduceMotion ? 0 : 400,
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        void instance.fitView({
+          padding: 0.12,
+          minZoom: 0.14,
+          maxZoom: 0.72,
+          duration: reduceMotion ? 0 : 400,
+        });
+      });
     });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
   }, [fitRequest, instance]);
 
+  useEffect(() => {
+    if (
+      !instance ||
+      branchFitRequest.request === 0 ||
+      handledBranchFitRequest.current === branchFitRequest.request
+    ) {
+      return;
+    }
+
+    const frameIds = getBranchFrameIds(view, branchFitRequest.conceptId);
+    const frameNodes = nodes
+      .filter(({ id }) => frameIds.has(id))
+      .map(({ id }) => ({ id }));
+    if (frameNodes.length < 2) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        handledBranchFitRequest.current = branchFitRequest.request;
+        void instance.fitView({
+          nodes: frameNodes,
+          padding: 0.14,
+          minZoom: 0.14,
+          maxZoom: 1,
+          duration: reduceMotion ? 0 : 420,
+        });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
+  }, [branchFitRequest, instance, nodes, view]);
+
+  useEffect(() => {
+    if (!instance || previousFullscreenState.current === isFullscreen) return;
+    previousFullscreenState.current = isFullscreen;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        void instance.fitView({
+          padding: 0.12,
+          minZoom: 0.14,
+          maxZoom: 0.72,
+          duration: reduceMotion ? 0 : 400,
+        });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
+  }, [instance, isFullscreen]);
+
   return (
-    <div className="h-[680px] min-h-[560px] w-full overflow-hidden bg-white lg:h-[760px]">
+    <div
+      ref={mapContainerRef}
+      role={isFullscreen ? "dialog" : undefined}
+      aria-modal={isFullscreen || undefined}
+      aria-label={isFullscreen ? "AI Concept Atlas fullscreen mind map" : undefined}
+      tabIndex={isFullscreen ? -1 : undefined}
+      className={`w-full overflow-hidden bg-white ${
+        isFullscreen
+          ? "fixed inset-0 z-[100] h-screen min-h-screen w-screen"
+          : "relative h-[680px] min-h-[560px] lg:h-[760px]"
+      }`}
+    >
       <ReactFlow<MindMapNode, Edge>
         nodes={nodes}
         edges={edges}
@@ -330,6 +512,27 @@ export function ConceptAtlasMap({
           "controls.ariaLabel": "Mind map zoom and fit controls",
         }}
       >
+        <Panel position="top-right" className="m-3!">
+          <div className="flex flex-col items-end gap-2">
+            <button
+              ref={fullscreenButtonRef}
+              type="button"
+              aria-pressed={isFullscreen}
+              onClick={toggleFullscreen}
+              className="inline-flex min-h-10 items-center gap-2 rounded-[7px] border border-[#c9d3e9] bg-white px-3 text-[11px] font-black text-[#30446f] shadow-[0_8px_22px_rgba(26,38,80,0.12)] hover:border-[#8298ee] hover:text-[#173ee8] focus:outline-none focus:ring-4 focus:ring-indigo-100"
+            >
+              {isFullscreen ? (
+                <ArrowsPointingInIcon aria-hidden="true" className="size-4" />
+              ) : (
+                <ArrowsPointingOutIcon
+                  aria-hidden="true"
+                  className="size-4"
+                />
+              )}
+              {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            </button>
+          </div>
+        </Panel>
         <Controls
           showInteractive={false}
           position="bottom-left"

@@ -1616,22 +1616,22 @@ export const playgroundTutorPlans = {
   },
   "ai-concept-atlas": {
     intro:
-      "Use the atlas for three short navigation experiments. Read one center-out branch, control how much detail is visible, and distinguish category membership from a learning prerequisite.",
+      "Use the atlas for three short navigation experiments. Read one center-out branch, control how much detail is visible, and jump directly between distant concepts.",
     whyItMatters:
-      "AI vocabulary is difficult because the field is not a flat list. A branching mind map gives every concept a clear learning home while the detail panel keeps prerequisite chains and useful next steps available without turning the taxonomy into a web of crossing lines.",
+      "AI vocabulary is difficult because the field is not a flat list. A branching mind map gives every concept a clear learning home without turning the taxonomy into a web of crossing lines.",
     openingMessage:
-      "No prior AI knowledge is required. Read the mind map from the blue Artificial Intelligence core outward. Each color-coded category owns subcategories, and those subcategories own increasingly specific concepts. A branch means ‘belongs under,’ not ‘must be learned first.’ Prerequisites live in Learn this first and the separate Learning path strip. Search automatically opens the ancestors of a result.\n\nFirst prediction: Transformer is selected. Which category and subcategory do you expect to contain it? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior AI knowledge is required. Read the mind map from the blue Artificial Intelligence core outward. Each color-coded category owns subcategories, and those subcategories own increasingly specific concepts. A branch means ‘belongs under,’ not ‘must be learned first.’ Search automatically opens the ancestors of a result.\n\nFirst prediction: Transformer is selected. Which category and subcategory do you expect to contain it? Reply with your prediction first. Then I will tell you exactly what to try.",
     masteryCriteria: [
       "Reads a concept's path from Artificial Intelligence through its category and subcategory.",
-      "Uses branch controls, Collapse all, or Expand one level to control visible detail.",
-      "Uses search or a domain filter to locate a concept and reveal its ancestor branch.",
-      "Distinguishes taxonomy membership from a learn-this-first prerequisite.",
+      "Uses branch controls to reveal or hide local detail.",
+      "Uses search to locate a concept and reveal its ancestor branch.",
+      "Explains that a taxonomy branch shows category membership rather than prerequisite order.",
     ],
     steps: [
       {
         title: "Read one taxonomy branch",
         experiment:
-          "Keep Transformer selected. Read its breadcrumb and the blue branch from the Artificial Intelligence core through Deep Learning and Attention & Transformers.",
+          "Keep Transformer selected. Read the highlighted branch from the Artificial Intelligence core through Deep Learning and Attention & Transformers.",
         predictionQuestion:
           "Which category and subcategory do you expect to contain Transformer?",
         observationPrompt:
@@ -1640,26 +1640,26 @@ export const playgroundTutorPlans = {
           "A taxonomy branch answers where an idea belongs: Artificial Intelligence → Deep Learning → Attention & Transformers → Transformer.",
       },
       {
-        title: "Control the amount of detail",
+        title: "Open one local branch",
         experiment:
-          "Choose Collapse all, then choose Expand one level. Finally use Search to find Q-learning and select the exact result.",
+          "Expand Value Learning, then collapse it. Finally use Search to find Q-learning and select the exact result.",
         predictionQuestion:
-          "After Collapse all, which level of the mind map do you expect to remain visible?",
+          "What detail do you expect the Value Learning branch to reveal?",
         observationPrompt:
-          "What changed after each control, and which ancestor branch did Search reopen for Q-learning?",
+          "What changed when you opened and closed the branch, and which ancestor path did Search reveal for Q-learning?",
         takeaway:
-          "Progressive disclosure keeps a very large taxonomy navigable: global controls set the depth, while Search opens only the path needed for a result.",
+          "Progressive disclosure keeps a very large taxonomy navigable: local branch controls reveal detail where you need it, while Search opens the path to a result.",
       },
       {
-        title: "Separate category from prerequisite",
+        title: "Compare distant branches",
         experiment:
-          "Search for Calibration. Compare its taxonomy breadcrumb with Learn this first, then choose Trace this learning path to reveal the separate prerequisite strip.",
+          "Search for Calibration and read its highlighted path. Then search for Sparse autoencoders and compare the two locations.",
         predictionQuestion:
-          "Does being Calibration's parent category mean that category is itself a prerequisite?",
+          "Will Calibration and Sparse autoencoders share a category, a subcategory, or only the Artificial Intelligence core?",
         observationPrompt:
-          "How did the taxonomy path differ from the prerequisite learning path?",
+          "Which category and subcategory contained each concept?",
         takeaway:
-          "A taxonomy path explains classification; a learning path explains dependency. The atlas keeps those claims separate.",
+          "Distant concepts can share the AI core while belonging to different category branches; the branch describes classification, not prerequisite order.",
       },
     ],
   },

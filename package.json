@@ -12,6 +12,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@heroicons/react": "2.2.0",
     "@sentry/nextjs": "^10.51.0",
     "@vercel/analytics": "^1.6.1",
     "@xyflow/react": "12.11.2",

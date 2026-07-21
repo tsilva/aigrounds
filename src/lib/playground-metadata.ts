@@ -698,21 +698,21 @@ const activePlaygroundDefinitions = [
     title: "The AI Concept Atlas",
     tag: "concept map",
     kicker:
-      "Search hundreds of AI ideas and reveal the learning paths that connect them.",
+      "Open a branch from the AI core and move from broad categories to specific concepts.",
     summary:
-      "Navigate a zoomable map of AI, machine learning, deep learning, generative AI, reinforcement learning, evaluation, safety, and production systems. Select any concept to reveal its prerequisites, neighboring ideas, and useful next steps.",
+      "Navigate a center-out mind map of AI, machine learning, deep learning, generative AI, reinforcement learning, evaluation, safety, and production systems. Expand a category into subcategories and concepts, then inspect prerequisites and useful next steps separately.",
     estimatedDuration: "8 to 12 minutes",
     concepts: [
       "AI taxonomy",
       "Prerequisites",
-      "Concept relationships",
+      "Branch hierarchies",
       "Learning paths",
     ],
     learningGoals: [
-      "Locate an AI concept quickly with search, filters, and progressive branch expansion.",
-      "Distinguish prerequisite, related-to, and part-of relationships.",
-      "Trace a concept's learning path and identify what it can unlock next.",
-      "Recognize AI as a connected dependency graph rather than a flat vocabulary list.",
+      "Read an AI concept from the central root through its category and subcategory.",
+      "Control a large taxonomy with branch expansion, collapse, search, and filters.",
+      "Distinguish category membership from a learning prerequisite.",
+      "Trace a separate learning path and identify what a concept can unlock next.",
     ],
   },
 ] satisfies ActivePlaygroundDefinition[];

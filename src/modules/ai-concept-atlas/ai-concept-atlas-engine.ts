@@ -7,20 +7,25 @@ import {
   type AtlasDomainId,
 } from "./ai-concept-atlas-data";
 
-export type AtlasRelationKind = "part-of" | "prerequisite" | "related";
+export type AtlasBranchSide = "left" | "right" | "center";
 
 export type AtlasLayoutNode = {
   id: string;
   x: number;
   y: number;
-  emphasis: "selected" | "path" | "neighbor" | "normal";
+  depth: number;
+  side: AtlasBranchSide;
+  expanded: boolean;
+  hasChildren: boolean;
+  emphasis: "selected" | "trail" | "normal";
 };
 
 export type AtlasLayoutEdge = {
   id: string;
   source: string;
   target: string;
-  relation: AtlasRelationKind;
+  side: Exclude<AtlasBranchSide, "center">;
+  color: string;
   highlighted: boolean;
 };
 
@@ -32,19 +37,39 @@ export type AtlasView = {
   unlockIds: string[];
   relatedIds: string[];
   visibleConceptIds: string[];
-  expandedGroupId?: string;
 };
 
 export type AtlasViewOptions = {
   selectedId?: string;
   domainFilter: AtlasDomainId | "all";
-  showPrerequisites: boolean;
-  showRelated: boolean;
+  expandedIds: ReadonlySet<string>;
 };
 
-const TAU = Math.PI * 2;
-const DOMAIN_RADIUS = 920;
-const GROUP_RADIUS = 1460;
+const LEFT_DOMAIN_IDS = new Set<AtlasDomainId>([
+  "foundations",
+  "machine-learning",
+  "generative-ai",
+  "evaluation-safety",
+]);
+
+const DOMAIN_GAP = 44;
+const LEAF_GAP = 40;
+const DEPTH_X = [0, 330, 600, 850] as const;
+const NODE_WIDTH = [190, 168, 156, 150] as const;
+const NODE_HEIGHT = [64, 52, 34, 30] as const;
+
+const childrenByParent = new Map<string, AtlasConcept[]>();
+
+for (const concept of atlasConcepts) {
+  if (!concept.parentId) continue;
+  const children = childrenByParent.get(concept.parentId) ?? [];
+  children.push(concept);
+  childrenByParent.set(concept.parentId, children);
+}
+
+for (const children of childrenByParent.values()) {
+  children.sort((a, b) => a.label.localeCompare(b.label));
+}
 
 function conceptOrDefault(id?: string) {
   return (
@@ -52,6 +77,10 @@ function conceptOrDefault(id?: string) {
     atlasConceptById.get(defaultAtlasConceptId) ??
     atlasConcepts[0]
   );
+}
+
+export function getAtlasChildren(conceptId: string) {
+  return childrenByParent.get(conceptId) ?? [];
 }
 
 export function getPrerequisiteIds(conceptId: string) {
@@ -80,238 +109,231 @@ export function getUnlockIds(conceptId: string) {
     .map((concept) => concept.id);
 }
 
-function addWithAncestors(ids: Set<string>, conceptId: string) {
+export function getConceptTrail(conceptId: string) {
+  const trail: AtlasConcept[] = [];
   let current = atlasConceptById.get(conceptId);
+
   while (current) {
-    ids.add(current.id);
+    trail.unshift(current);
     current = current.parentId
       ? atlasConceptById.get(current.parentId)
       : undefined;
   }
+
+  return trail;
 }
 
-function getExpandedGroupId(selected: AtlasConcept) {
-  if (selected.kind === "group") return selected.id;
-  if (selected.kind === "concept") return selected.parentId;
-  return undefined;
+export function getAncestorIds(conceptId: string) {
+  return getConceptTrail(conceptId)
+    .slice(0, -1)
+    .map((concept) => concept.id);
 }
 
-function buildVisibleIds(
+function getDomainSide(domainId: AtlasDomainId) {
+  return LEFT_DOMAIN_IDS.has(domainId) ? "left" : "right";
+}
+
+function buildVisibleConcepts(
   selected: AtlasConcept,
   domainFilter: AtlasDomainId | "all",
-  prerequisiteIds: string[],
-  relatedIds: string[],
+  expandedIds: ReadonlySet<string>,
 ) {
   const visibleIds = new Set<string>(["artificial-intelligence"]);
+  const selectedTrail = getConceptTrail(selected.id);
+  const selectedTrailIds = new Set(selectedTrail.map(({ id }) => id));
+  const isExpanded = (id: string) =>
+    id === "artificial-intelligence" || expandedIds.has(id);
+
+  function reveal(concept: AtlasConcept) {
+    visibleIds.add(concept.id);
+    const children = getAtlasChildren(concept.id);
+    if (isExpanded(concept.id)) {
+      for (const child of children) reveal(child);
+      return;
+    }
+
+    if (
+      selected.kind === "concept" &&
+      selected.parentId === concept.id
+    ) {
+      const previewIds = new Set<string>([selected.id]);
+      for (const prerequisiteId of selected.prerequisiteIds) {
+        if (atlasConceptById.get(prerequisiteId)?.parentId === concept.id) {
+          previewIds.add(prerequisiteId);
+        }
+      }
+      for (const unlockId of getUnlockIds(selected.id)) {
+        if (atlasConceptById.get(unlockId)?.parentId === concept.id) {
+          previewIds.add(unlockId);
+        }
+      }
+      for (const child of children) {
+        if (previewIds.size >= 4) break;
+        previewIds.add(child.id);
+      }
+      for (const child of children) {
+        if (previewIds.has(child.id)) reveal(child);
+      }
+      return;
+    }
+
+    if (selectedTrailIds.has(concept.id)) {
+      const selectedChild = children.find((child) =>
+        selectedTrailIds.has(child.id),
+      );
+      if (selectedChild) reveal(selectedChild);
+    }
+  }
 
   for (const domain of atlasDomains) {
     if (domainFilter !== "all" && domain.id !== domainFilter) continue;
-    visibleIds.add(domain.id);
-    for (const group of domain.groups) {
-      visibleIds.add(`${domain.id}-${group.id}`);
-    }
+    const concept = atlasConceptById.get(domain.id);
+    if (concept) reveal(concept);
   }
 
-  const expandedGroupId = getExpandedGroupId(selected);
-  if (expandedGroupId) {
-    for (const concept of atlasConcepts) {
-      if (concept.parentId === expandedGroupId) {
-        visibleIds.add(concept.id);
-      }
-    }
-  }
-
-  addWithAncestors(visibleIds, selected.id);
-  for (const prerequisiteId of prerequisiteIds) {
-    addWithAncestors(visibleIds, prerequisiteId);
-  }
-  for (const relatedId of relatedIds) {
-    addWithAncestors(visibleIds, relatedId);
-  }
-
-  return { visibleIds, expandedGroupId };
+  return { visibleIds, isExpanded };
 }
 
-function domainPosition(domainIndex: number) {
-  const angle = -Math.PI / 2 + (TAU * domainIndex) / atlasDomains.length;
-  return {
-    x: Math.cos(angle) * DOMAIN_RADIUS,
-    y: Math.sin(angle) * DOMAIN_RADIUS,
-    angle,
-  };
-}
-
-function groupPosition(domainIndex: number, groupIndex: number) {
-  const domain = atlasDomains[domainIndex];
-  const domainAngle = -Math.PI / 2 + (TAU * domainIndex) / atlasDomains.length;
-  const wedge = (TAU / atlasDomains.length) * 0.72;
-  const offset =
-    domain.groups.length === 1
-      ? 0
-      : -wedge / 2 + (wedge * groupIndex) / (domain.groups.length - 1);
-  const angle = domainAngle + offset;
-  return {
-    x: Math.cos(angle) * GROUP_RADIUS,
-    y: Math.sin(angle) * GROUP_RADIUS,
-    angle,
-  };
-}
-
-function leafPosition(
-  parentId: string,
-  leafIndex: number,
-  leafCount: number,
+function layoutSide(
+  domainIds: string[],
+  side: "left" | "right",
+  visibleIds: ReadonlySet<string>,
 ) {
-  const parent = atlasConceptById.get(parentId);
-  const domainIndex = atlasDomains.findIndex(
-    (domain) => domain.id === parent?.domainId,
-  );
-  const groupIndex = atlasDomains[domainIndex]?.groups.findIndex(
-    (group) => group.id === parent?.groupId,
-  );
-  const group = groupPosition(
-    Math.max(0, domainIndex),
-    Math.max(0, groupIndex),
-  );
-  const radialX = Math.cos(group.angle);
-  const radialY = Math.sin(group.angle);
-  const tangentX = -radialY;
-  const tangentY = radialX;
-  const columns = leafCount > 12 ? 3 : 2;
-  const rows = Math.ceil(leafCount / columns);
-  const column = leafIndex % columns;
-  const row = Math.floor(leafIndex / columns);
-  const outward = 360 + column * 230;
-  const tangent = (row - (rows - 1) / 2) * 112;
+  const centers = new Map<string, { x: number; y: number; depth: number }>();
+  let cursorY = 0;
 
-  return {
-    x: group.x + radialX * outward + tangentX * tangent,
-    y: group.y + radialY * outward + tangentY * tangent,
-  };
-}
+  function placeSubtree(conceptId: string, depth: number): number {
+    const children = getAtlasChildren(conceptId).filter((child) =>
+      visibleIds.has(child.id),
+    );
 
-function positionVisibleNodes(visibleIds: Set<string>) {
-  const visibleLeavesByParent = new Map<string, AtlasConcept[]>();
-  for (const concept of atlasConcepts) {
-    if (
-      concept.kind !== "concept" ||
-      !visibleIds.has(concept.id) ||
-      !concept.parentId
-    ) {
-      continue;
+    let centerY: number;
+    if (children.length === 0) {
+      centerY = cursorY;
+      cursorY += LEAF_GAP;
+    } else {
+      const childCenters = children.map((child) =>
+        placeSubtree(child.id, depth + 1),
+      );
+      centerY =
+        (childCenters[0] + childCenters[childCenters.length - 1]) / 2;
     }
-    const siblings = visibleLeavesByParent.get(concept.parentId) ?? [];
-    siblings.push(concept);
-    visibleLeavesByParent.set(concept.parentId, siblings);
+
+    const xCenter = (side === "left" ? -1 : 1) * DEPTH_X[depth];
+    centers.set(conceptId, { x: xCenter, y: centerY, depth });
+    return centerY;
   }
 
-  const positions = new Map<string, { x: number; y: number }>([
-    ["artificial-intelligence", { x: 0, y: 0 }],
-  ]);
+  for (const domainId of domainIds) {
+    placeSubtree(domainId, 1);
+    cursorY += DOMAIN_GAP;
+  }
 
-  atlasDomains.forEach((domain, domainIndex) => {
-    positions.set(domain.id, domainPosition(domainIndex));
-    domain.groups.forEach((group, groupIndex) => {
-      const groupId = `${domain.id}-${group.id}`;
-      positions.set(groupId, groupPosition(domainIndex, groupIndex));
-      const leaves = visibleLeavesByParent.get(groupId) ?? [];
-      leaves
-        .toSorted((a, b) => a.label.localeCompare(b.label))
-        .forEach((leaf, leafIndex) => {
-          positions.set(
-            leaf.id,
-            leafPosition(groupId, leafIndex, leaves.length),
-          );
-        });
+  const yValues = [...centers.values()].map((position) => position.y);
+  const offsetY = yValues.length
+    ? -(Math.min(...yValues) + Math.max(...yValues)) / 2
+    : 0;
+
+  for (const position of centers.values()) position.y += offsetY;
+  return centers;
+}
+
+function buildPositions(visibleIds: ReadonlySet<string>) {
+  const leftDomains = atlasDomains
+    .filter(
+      (domain) =>
+        LEFT_DOMAIN_IDS.has(domain.id) && visibleIds.has(domain.id),
+    )
+    .map((domain) => domain.id);
+  const rightDomains = atlasDomains
+    .filter(
+      (domain) =>
+        !LEFT_DOMAIN_IDS.has(domain.id) && visibleIds.has(domain.id),
+    )
+    .map((domain) => domain.id);
+  const centeredPositions = new Map([
+    ["artificial-intelligence", { x: 0, y: 0, depth: 0 }],
+    ...layoutSide(leftDomains, "left", visibleIds),
+    ...layoutSide(rightDomains, "right", visibleIds),
+  ]);
+  const positions = new Map<
+    string,
+    { x: number; y: number; depth: number; side: AtlasBranchSide }
+  >();
+
+  for (const [id, position] of centeredPositions) {
+    const concept = atlasConceptById.get(id);
+    const side =
+      concept?.domainId === "root"
+        ? "center"
+        : getDomainSide(concept?.domainId ?? "foundations");
+    const depth = Math.min(position.depth, 3);
+    positions.set(id, {
+      x: position.x - NODE_WIDTH[depth] / 2,
+      y: position.y - NODE_HEIGHT[depth] / 2,
+      depth,
+      side,
     });
-  });
+  }
 
   return positions;
 }
 
-function addEdge(
-  edges: AtlasLayoutEdge[],
-  seen: Set<string>,
-  edge: Omit<AtlasLayoutEdge, "id">,
-) {
-  const id = `${edge.relation}:${edge.source}->${edge.target}`;
-  if (seen.has(id)) return;
-  seen.add(id);
-  edges.push({ ...edge, id });
-}
-
 export function buildAtlasView(options: AtlasViewOptions): AtlasView {
   const selected = conceptOrDefault(options.selectedId);
-  const prerequisiteIds = options.showPrerequisites
-    ? getPrerequisiteIds(selected.id)
-    : [];
-  const relatedIds = options.showRelated ? selected.relatedIds : [];
+  const prerequisiteIds = getPrerequisiteIds(selected.id);
   const unlockIds = getUnlockIds(selected.id);
-  const { visibleIds, expandedGroupId } = buildVisibleIds(
+  const relatedIds = selected.relatedIds;
+  const { visibleIds, isExpanded } = buildVisibleConcepts(
     selected,
     options.domainFilter,
-    prerequisiteIds,
-    relatedIds,
+    options.expandedIds,
   );
-  const positions = positionVisibleNodes(visibleIds);
-  const pathIds = new Set([...prerequisiteIds, selected.id]);
-  const neighborIds = new Set([...relatedIds, ...unlockIds]);
-
-  const nodes = atlasConcepts.flatMap<AtlasLayoutNode>((concept) => {
-    if (!visibleIds.has(concept.id)) return [];
-    const position = positions.get(concept.id);
-    if (!position) return [];
-
-    const emphasis =
-      concept.id === selected.id
-        ? "selected"
-        : pathIds.has(concept.id)
-          ? "path"
-          : neighborIds.has(concept.id)
-            ? "neighbor"
-            : "normal";
-
-    return [{ id: concept.id, ...position, emphasis }];
-  });
-
-  const edges: AtlasLayoutEdge[] = [];
-  const seenEdges = new Set<string>();
+  const positions = buildPositions(visibleIds);
+  const trailIds = new Set(getConceptTrail(selected.id).map(({ id }) => id));
+  const nodes: AtlasLayoutNode[] = [];
 
   for (const concept of atlasConcepts) {
     if (!visibleIds.has(concept.id)) continue;
-    if (concept.parentId && visibleIds.has(concept.parentId)) {
-      addEdge(edges, seenEdges, {
-        source: concept.parentId,
-        target: concept.id,
-        relation: "part-of",
-        highlighted: false,
-      });
-    }
+    const position = positions.get(concept.id);
+    if (!position) continue;
+    const children = getAtlasChildren(concept.id);
+    nodes.push({
+      id: concept.id,
+      ...position,
+      expanded: isExpanded(concept.id),
+      hasChildren: children.length > 0,
+      emphasis:
+        concept.id === selected.id
+          ? "selected"
+          : trailIds.has(concept.id)
+            ? "trail"
+            : "normal",
+    });
+  }
 
-    if (options.showPrerequisites) {
-      for (const prerequisiteId of concept.prerequisiteIds) {
-        if (!visibleIds.has(prerequisiteId)) continue;
-        addEdge(edges, seenEdges, {
-          source: prerequisiteId,
-          target: concept.id,
-          relation: "prerequisite",
-          highlighted:
-            pathIds.has(prerequisiteId) && pathIds.has(concept.id),
-        });
-      }
+  const edges: AtlasLayoutEdge[] = [];
+  for (const concept of atlasConcepts) {
+    if (
+      concept.id === "artificial-intelligence" ||
+      !concept.parentId ||
+      !visibleIds.has(concept.id) ||
+      !visibleIds.has(concept.parentId) ||
+      concept.domainId === "root"
+    ) {
+      continue;
     }
-
-    if (options.showRelated) {
-      for (const relatedId of concept.relatedIds) {
-        if (!visibleIds.has(relatedId)) continue;
-        addEdge(edges, seenEdges, {
-          source: concept.id,
-          target: relatedId,
-          relation: "related",
-          highlighted: concept.id === selected.id,
-        });
-      }
-    }
+    const domain = atlasDomains.find(({ id }) => id === concept.domainId);
+    const side = getDomainSide(concept.domainId);
+    edges.push({
+      id: `branch:${concept.parentId}->${concept.id}`,
+      source: concept.parentId,
+      target: concept.id,
+      side,
+      color: domain?.color ?? "#94a3b8",
+      highlighted:
+        trailIds.has(concept.parentId) && trailIds.has(concept.id),
+    });
   }
 
   return {
@@ -321,8 +343,7 @@ export function buildAtlasView(options: AtlasViewOptions): AtlasView {
     prerequisiteIds,
     unlockIds,
     relatedIds,
-    visibleConceptIds: nodes.map((node) => node.id),
-    expandedGroupId,
+    visibleConceptIds: nodes.map(({ id }) => id),
   };
 }
 
@@ -345,16 +366,4 @@ export function searchAtlas(query: string, limit = 10) {
     )
     .slice(0, limit)
     .map(({ concept }) => concept);
-}
-
-export function getConceptTrail(conceptId: string) {
-  const trail: AtlasConcept[] = [];
-  let current = atlasConceptById.get(conceptId);
-  while (current) {
-    trail.unshift(current);
-    current = current.parentId
-      ? atlasConceptById.get(current.parentId)
-      : undefined;
-  }
-  return trail;
 }

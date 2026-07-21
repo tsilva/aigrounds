@@ -1616,50 +1616,50 @@ export const playgroundTutorPlans = {
   },
   "ai-concept-atlas": {
     intro:
-      "Use the atlas for three short navigation experiments. Predict where an idea belongs, reveal its prerequisite path, and explain the difference between a category link and a learning dependency.",
+      "Use the atlas for three short navigation experiments. Read one center-out branch, control how much detail is visible, and distinguish category membership from a learning prerequisite.",
     whyItMatters:
-      "AI vocabulary is difficult because the field is not a flat list. A concept map makes the domain structure, prerequisite chains, and useful next steps visible so you can build a learning route instead of collecting disconnected definitions.",
+      "AI vocabulary is difficult because the field is not a flat list. A branching mind map gives every concept a clear learning home while the detail panel keeps prerequisite chains and useful next steps available without turning the taxonomy into a web of crossing lines.",
     openingMessage:
-      "No prior AI knowledge is required. The map uses three relationship types.\n\n- A solid arrow means one concept is a prerequisite for another.\n- A dotted line means the concepts are related but neither is necessarily required first.\n- A thin line means a concept is part of a broader branch.\n- Search selects a concept and expands its local branch.\n- Domain filters reduce the overview without deleting concepts from the atlas.\n\nFirst prediction: Transformer is selected. Which broad foundation do you expect at the beginning of its highlighted learning path? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior AI knowledge is required. Read the mind map from the blue Artificial Intelligence core outward. Each color-coded category owns subcategories, and those subcategories own increasingly specific concepts. A branch means ‘belongs under,’ not ‘must be learned first.’ Prerequisites live in Learn this first and the separate Learning path strip. Search automatically opens the ancestors of a result.\n\nFirst prediction: Transformer is selected. Which category and subcategory do you expect to contain it? Reply with your prediction first. Then I will tell you exactly what to try.",
     masteryCriteria: [
-      "Uses search or domain filters to locate a concept without manually scanning the entire map.",
-      "Distinguishes prerequisite, related-to, and part-of relationships from their labels and line patterns.",
-      "Traces a prerequisite path and identifies a reasonable next concept that it unlocks.",
-      "Explains why the atlas reveals one branch at a time instead of showing every concept label simultaneously.",
+      "Reads a concept's path from Artificial Intelligence through its category and subcategory.",
+      "Uses branch controls, Collapse all, or Expand one level to control visible detail.",
+      "Uses search or a domain filter to locate a concept and reveal its ancestor branch.",
+      "Distinguishes taxonomy membership from a learn-this-first prerequisite.",
     ],
     steps: [
       {
-        title: "Trace one prerequisite path",
+        title: "Read one taxonomy branch",
         experiment:
-          "Keep Transformer selected and choose Trace this learning path. Compare the highlighted map path with Learn this first in the detail panel.",
+          "Keep Transformer selected. Read its breadcrumb and the blue branch from the Artificial Intelligence core through Deep Learning and Attention & Transformers.",
         predictionQuestion:
-          "Which broad foundation do you expect at the beginning of the Transformer path?",
+          "Which category and subcategory do you expect to contain Transformer?",
         observationPrompt:
-          "What sequence did the highlighted prerequisite path reveal?",
+          "What parent-to-child sequence places Transformer in the taxonomy?",
         takeaway:
-          "A learning path crosses domain branches: foundational math can support neural networks, which support attention, which supports transformers.",
+          "A taxonomy branch answers where an idea belongs: Artificial Intelligence → Deep Learning → Attention & Transformers → Transformer.",
       },
       {
-        title: "Jump across the field",
+        title: "Control the amount of detail",
         experiment:
-          "Use Search to find Q-learning. Select it, then compare its branch, Learn this first, and Unlocks next.",
+          "Choose Collapse all, then choose Expand one level. Finally use Search to find Q-learning and select the exact result.",
         predictionQuestion:
-          "Do you expect Q-learning to sit under Machine Learning generally or the Reinforcement Learning branch specifically?",
+          "After Collapse all, which level of the mind map do you expect to remain visible?",
         observationPrompt:
-          "Which branch expanded, and what did Q-learning require and unlock?",
+          "What changed after each control, and which ancestor branch did Search reopen for Q-learning?",
         takeaway:
-          "Search is a direct route into a large map: selecting a result expands its neighborhood and preserves the wider field for orientation.",
+          "Progressive disclosure keeps a very large taxonomy navigable: global controls set the depth, while Search opens only the path needed for a result.",
       },
       {
-        title: "Separate related from required",
+        title: "Separate category from prerequisite",
         experiment:
-          "Search for Calibration. Turn Related off, then on. Compare dotted related links with the solid prerequisite path and the thin part-of links.",
+          "Search for Calibration. Compare its taxonomy breadcrumb with Learn this first, then choose Trace this learning path to reveal the separate prerequisite strip.",
         predictionQuestion:
-          "Should every concept related to calibration be required before learning calibration?",
+          "Does being Calibration's parent category mean that category is itself a prerequisite?",
         observationPrompt:
-          "Which connections disappeared when Related was off, and which remained?",
+          "How did the taxonomy path differ from the prerequisite learning path?",
         takeaway:
-          "Related ideas are useful neighbors, but only prerequisite arrows claim a learn-this-first dependency.",
+          "A taxonomy path explains classification; a learning path explains dependency. The atlas keeps those claims separate.",
       },
     ],
   },

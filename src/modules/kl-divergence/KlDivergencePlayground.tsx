@@ -42,36 +42,6 @@ function LessonTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M9.6 9.3a2.5 2.5 0 0 1 4.7 1.2c0 1.8-2.3 2-2.3 3.7"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.9"
-      />
-      <path
-        d="M12 17.1h.01"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.6"
-      />
-    </svg>
-  );
-}
-
 function BulbIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-8 w-8">
@@ -827,7 +797,6 @@ export function KlDivergencePlayground() {
   );
   const [approximation, setApproximation] = useState(initialApproximation);
   const [direction, setDirection] = useState<KlDirection>("p-to-q");
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const activeScenario =
     referenceScenarios.find((scenario) => scenario.id === activeScenarioId) ??
     referenceScenarios[0];
@@ -836,7 +805,7 @@ export function KlDivergencePlayground() {
   return (
     <main className="min-h-screen bg-[#f8faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1536px]">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header>
           <div>
             <h1 className="text-[42px] leading-none font-black tracking-[-0.04em] text-[#050816] sm:text-[56px]">
               KL Divergence Intuition Lab
@@ -846,42 +815,7 @@ export function KlDivergencePlayground() {
               why direction matters.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsHelpOpen((isOpen) => !isOpen)}
-            aria-expanded={isHelpOpen}
-            aria-controls="kl-divergence-help"
-            className="inline-flex items-center justify-center gap-3 rounded-[8px] border border-[#cfd6ff] bg-white/85 px-5 py-3 text-[15px] font-black text-[#2f2bff] shadow-[0_12px_28px_rgba(47,43,255,0.08)] transition hover:border-[#aeb8ff] hover:bg-white"
-          >
-            <HelpIcon />
-            What is KL Divergence?
-          </button>
         </header>
-
-        {isHelpOpen ? (
-          <aside
-            id="kl-divergence-help"
-            className="mt-5 rounded-[12px] border border-[#c7d2fe] bg-[#eef2ff] p-5 text-[#16264e]"
-            aria-labelledby="kl-divergence-help-title"
-          >
-            <h2
-              id="kl-divergence-help-title"
-              className="text-[18px] font-black text-[#352cff]"
-            >
-              KL divergence in one minute
-            </h2>
-            <p className="mt-2 max-w-[980px] text-[15px] leading-[1.5] font-bold">
-              KL divergence adds source-weighted log-ratios to compare two
-              probability distributions. In D<sub>KL</sub>(P || Q), P supplies
-              the weights and Q is the approximation.
-            </p>
-            <ul className="mt-3 grid gap-2 text-[14px] font-bold md:grid-cols-3">
-              <li>0 means P and Q match.</li>
-              <li>The total is nonnegative, even if one bucket is negative.</li>
-              <li>KL has no fixed maximum and is not a symmetric distance.</li>
-            </ul>
-          </aside>
-        ) : null}
 
         <div className="mt-6 space-y-4">
           <ScenarioSelector

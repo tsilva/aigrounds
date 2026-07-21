@@ -56,35 +56,6 @@ function FactPill({ label, value }: { label: string; value: string }) {
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M9.7 9a2.4 2.4 0 0 1 4.6 1.1c0 1.8-2.3 2-2.3 3.6"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M12 17.4h.01"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.6"
-      />
-    </svg>
-  );
-}
-
 function ScenarioPanel({
   scenario,
   analysis,
@@ -658,7 +629,7 @@ export function BytePairEncodingPlayground() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f8faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto w-full min-w-0 max-w-[1536px]">
-        <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header className="mb-5">
           <div>
             <h1 className="text-[42px] leading-[0.95] font-black tracking-[-0.04em] text-[#050713] sm:text-[56px]">
               Byte Pair Encoding Lab
@@ -668,13 +639,6 @@ export function BytePairEncodingPlayground() {
               tokens.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-[9px] border border-[#cfd5ff] bg-white/80 px-6 text-[15px] font-black text-[#2f2cff] shadow-[0_12px_30px_rgba(43,56,110,0.05)] transition hover:border-[#9ea9ff]"
-          >
-            <HelpIcon />
-            What is BPE?
-          </button>
         </header>
 
         <div className="grid min-w-0 gap-4">

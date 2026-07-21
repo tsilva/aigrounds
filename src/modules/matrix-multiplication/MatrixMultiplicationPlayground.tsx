@@ -703,7 +703,6 @@ export function MatrixMultiplicationPlayground() {
     matrixShapePresets[0].defaultCell,
   );
   const [activeStep, setActiveStep] = useState(0);
-  const [showHelp, setShowHelp] = useState(false);
 
   const activePreset =
     matrixShapePresets.find((preset) => preset.id === activePresetId) ??
@@ -739,7 +738,7 @@ export function MatrixMultiplicationPlayground() {
   return (
     <main className="min-h-screen bg-[#f7f9fd] px-4 py-5 text-[#071024] sm:px-6 lg:px-8 2xl:pr-56">
       <div className="mx-auto max-w-[1500px]">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header>
           <div className="min-w-0">
             <h1 className="text-[44px] leading-[0.95] font-black tracking-[-0.05em] text-[#050912] sm:text-[56px] lg:text-[64px]">
               Matrix Multiplication Lab
@@ -749,24 +748,7 @@ export function MatrixMultiplicationPlayground() {
               column of B.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowHelp((value) => !value)}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-3 rounded-[9px] border border-[#bfd0ff] bg-white px-6 text-[15px] font-black text-[#0a3df0] shadow-[0_8px_24px_rgba(26,38,80,0.05)] transition hover:border-[#7898ff] focus:outline-none focus:ring-4 focus:ring-blue-100"
-          >
-            <InfoIcon />
-            What is Matmul?
-          </button>
         </header>
-
-        {showHelp ? (
-          <div className="mt-5 rounded-[10px] border border-[#d8e0f3] bg-white px-5 py-4 text-[15px] leading-[1.55] text-[#16264e] shadow-[0_18px_42px_rgba(26,38,80,0.05)]">
-            Matmul is matrix multiplication. It combines rows from the left
-            matrix with columns from the right matrix. The inner sizes must
-            match because each output cell needs paired values to multiply and
-            add.
-          </div>
-        ) : null}
 
         <div className="mt-6 grid gap-4">
           <ShapeSelector

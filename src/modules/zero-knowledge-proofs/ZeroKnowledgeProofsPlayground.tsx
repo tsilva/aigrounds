@@ -683,7 +683,7 @@ export function ZeroKnowledgeProofsPlayground() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#f8faff] px-4 py-8 text-[#071024] sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-4 pt-12 sm:pt-16 lg:flex-row lg:items-start lg:justify-between">
+        <header className="pt-12 sm:pt-16">
           <div className="min-w-0">
             <h1 className="text-[44px] leading-[0.95] font-black text-black sm:text-[64px] lg:text-[76px]">
               Zero-Knowledge Proofs
@@ -693,16 +693,6 @@ export function ZeroKnowledgeProofsPlayground() {
               coloring itself.
             </p>
           </div>
-          <button
-            type="button"
-            className="inline-flex w-fit items-center gap-2 rounded-[8px] border border-[#b8c5ff] bg-white px-4 py-3 text-[14px] font-black text-[#1534dc] shadow-[0_8px_20px_rgba(26,38,80,0.05)]"
-            aria-label="How zero-knowledge graph coloring proofs work"
-          >
-            <span className="grid size-5 place-items-center rounded-full border border-[#1534dc] font-mono text-[12px]">
-              ?
-            </span>
-            How does this work?
-          </button>
         </header>
 
         <ProverChoicePanel mode={mode} onSelectMode={setMode} />

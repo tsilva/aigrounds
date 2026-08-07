@@ -1,0 +1,11 @@
+# Credential references only. Store values with `keyenv set ENV_NAME`.
+[keyenv]
+version = 1
+
+[secrets.OPENROUTER_API_KEY]
+account = "aigrounds/OPENROUTER_API_KEY"
+required = true
+
+[secrets.SENTRY_AUTH_TOKEN]
+account = "aigrounds/SENTRY_AUTH_TOKEN"
+required = true

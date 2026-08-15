@@ -30,6 +30,8 @@ pnpm dev      # start the local dev server
 pnpm build    # create a production build
 pnpm start    # serve the production build locally
 pnpm lint     # run ESLint
+pnpm typecheck # run the standalone TypeScript gate
+pnpm test:deps # exercise patched dependency security boundaries
 pnpm check:cycles # verify local imports are acyclic
 ```
 
@@ -65,7 +67,7 @@ Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. S
 - Sentry initializes only when its DSN environment variables are present.
 - The home dashboard is the canonical current and future lesson plan. Live lessons are registered in `activePlaygroundMetadata`, future lesson cards live in `upcomingPlaygrounds`, and `dashboardLessonPlanOrder` controls the combined dashboard order.
 - New live playgrounds are registered in `src/lib/playground-metadata.ts`, wired to components in `src/lib/playgrounds.ts`, and rendered through the dynamic playground route. Sitemap entries are generated from the active playground metadata.
-- No test framework is configured yet.
+- No general-purpose test framework is configured yet; `pnpm test:deps` provides focused dependency security regressions.
 
 ## Local credentials
 

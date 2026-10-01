@@ -12,6 +12,8 @@ AI Grounds supports viewport widths of 768 pixels and above. Smaller screens sho
 
 The Mean, Median & Mode lab pairs a live dataset workspace with guided predict → try → explain experiments. Drag individual points, use the keyboard or an exact value field, and compare aligned summary markers, sorted values, and calculations. The built-in experiments work independently of the optional AI Guide.
 
+The Range, Quartiles & IQR lesson uses an exact shared scale for draggable values, range, and a min/max box plot. Compact sorted halves show the median-of-halves calculation. Three predict → move → explain experiments contrast an extreme moving outward, a quartile contributor moving, and a value changing sorted position; incorrect explanations cannot complete an experiment. The exercises work independently of the optional AI Guide.
+
 The app currently includes labs for Mean, Median & Mode, Range, Quartiles & IQR, Variance & Standard Deviation, Shape, Skew & Outliers, Probability Rules, Conditional Probability & Independence, Bayes Rule, Expected Value & Risk, Bernoulli/Categorical/Binomial distributions, Waiting & Arrival Distributions, Overfitting, Confusion Matrix & Thresholds, Softmax Temperature, Cross Entropy Loss, KL Divergence, Matrix Multiplication, Tensor Shape & Broadcasting, Gradient Descent, Monte Carlo Tree Search, Byte Pair Encoding, Transformer Attention, Batch Normalization, Layer Normalization, MNIST MLP Inference Debugging with WebGPU, Convolution Filter Lab, PyTorch Image Augmentations, Label-Mixing Image Transforms, Autograd Graphs, Backpropagation Inspector, Linear Quantization (INT4), Zero Knowledge Proofs, and the AI Concept Atlas.
 
 ## Install

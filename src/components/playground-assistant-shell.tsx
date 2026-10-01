@@ -607,7 +607,7 @@ export function PlaygroundAssistantShell({
     [pathname],
   );
   const playgroundName = playgroundContext?.title ?? "this playground";
-  const isGuidedDiscovery = playgroundContext?.slug === "mean-median-mode";
+  const isGuidedDiscovery = playgroundContext?.slug === "mean-median-mode" || playgroundContext?.slug === "range-quartiles-iqr";
   const tutorPlan = playgroundContext?.tutorPlan;
   const currentTutorStep = tutorPlan?.steps[tutorStepIndex];
 

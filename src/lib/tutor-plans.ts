@@ -86,51 +86,51 @@ export const playgroundTutorPlans = {
   },
   "range-quartiles-iqr": {
     intro:
-      "Work through three spread experiments. Predict what will stretch, change one view, then connect the box plot to the five-number summary.",
+      "Predict, move one value, and explain the change in range and IQR. Follow the three on-page experiments or discuss them here.",
     whyItMatters:
-      "Spread summaries exist because a center value alone can hide whether data is tightly packed or scattered. Range, quartiles, and IQR make variability visible, which helps compare groups and spot outlier-resistant patterns.",
+      "A center value does not tell you how scattered the data is. Range measures the full span; IQR measures the span between the two quartiles, so the two can react differently to the same change.",
     openingMessage:
-      "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Range is the full span: maximum minus minimum.\n- Quartiles come from sorted data. Q1 is around the lower quarter, the median is the middle, and Q3 is around the upper quarter.\n- IQR is Q3 minus Q1, so it measures the width of the middle 50%.\n- A box plot draws the five-number summary: min, Q1, median, Q3, and max.\n\nFirst prediction: if the smallest and largest values are close together, what should happen to the range? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "You need only number order, subtraction, and averaging two numbers. The on-page experiments work independently of this chat.\n\nRange is maximum minus minimum. The median is the fifth sorted value in this nine-value lesson. To find quartiles, exclude the median: Q1 averages the middle two values of the lower half; Q3 averages the middle two of the upper half. IQR means interquartile range: Q3 minus Q1. The box spans Q1 to Q3, with the median marked inside. This lesson's whiskers show min and max. Other quartile and whisker conventions exist.\n\nChoose Experiment, then Reset to begin Move an edge. Before moving I from 58 to 92, predict which measure changes: only range, only IQR, both, or neither. Choose your prediction on the page, or tell me your reasoning here.",
     masteryCriteria: [
-      "Defines range as maximum minus minimum and connects it to the whisker-to-whisker span.",
-      "Explains quartiles as positions in sorted data that split lower, middle, and upper portions.",
-      "Defines IQR as Q3 minus Q1 and connects it to the width of the middle 50%.",
-      "Explains why a single far outlier changes range more than IQR.",
-      "Can use the box plot and five-number summary together to justify a claim about spread.",
+      "Computes range as maximum minus minimum and connects it to the full span.",
+      "Finds Q1 and Q3 from the middle pairs of the sorted halves, excluding the overall median.",
+      "Computes IQR as Q3 minus Q1 and connects it to the box width.",
+      "Explains why moving the largest value farther outward can change range while preserving IQR.",
+      "Predicts and explains IQR changes when a quartile contributor moves or sorted positions change.",
     ],
     steps: [
       {
-        title: "Read the full span",
+        title: "Move an edge",
         experiment:
-          "Use the starting Compact dataset. Compare the minimum, maximum, range bar, and box plot whiskers.",
+          "Choose Experiment and Reset if starting over. In Move an edge, choose a prediction; this restores the starting values. Move only I from 58 to 92 using its dot, arrow keys, or Point I value. Compare the Range and IQR before/now calculations and the underlined pairs in Sorted values. Choose an explanation, then press Check explanation.",
         predictionQuestion:
-          "If the smallest and largest values are close together, what should happen to the range?",
+          "If I moves from 58 to 92, which spread measure will change?",
         observationPrompt:
-          "How did the whiskers and range read in the compact dataset?",
+          "What changed in range? Did either underlined quartile pair change? Explain before proceeding.",
         takeaway:
-          "Range is only maximum minus minimum, so it describes the full span from the two edge values.",
+          "Range grows from 40 to 74. IQR stays at 20 because Q1 remains 26 and Q3 remains 46. This outward move leaves their contributing pairs unchanged.",
       },
       {
-        title: "Open the middle box",
+        title: "Move a quartile",
         experiment:
-          "Choose Wide Middle. Watch Q1, Q3, IQR, and the box width.",
+          "After explaining the first experiment, press Next: Move a quartile. Choose a prediction, then move only H from 48 to 68 using its dot or Point H value. Read Q3's calculation in Sorted values and compare Range with IQR. Choose an explanation and press Check explanation.",
         predictionQuestion:
-          "What should happen to IQR when the middle half of the values spreads out?",
+          "If H moves from 48 to 68 while I stays at 92, which spread measure will change?",
         observationPrompt:
-          "What changed in the five-number summary and box plot?",
+          "How did H change Q3? Why did the range stay at 74?",
         takeaway:
-          "IQR measures Q3 minus Q1, so it grows when the middle 50% spreads apart.",
+          "Q3 changes from (44 + 48) / 2 = 46 to (44 + 68) / 2 = 56. IQR grows from 20 to 30; range stays at 74 because the extremes are unchanged.",
       },
       {
-        title: "Stretch one edge",
+        title: "Try new data",
         experiment:
-          "Choose Outlier, then move the far point farther right. Compare Range with IQR.",
+          "After explaining Move a quartile, press Next: Try new data. Inspect the new values. Choose a prediction, then move only I from 88 to 30 using its dot or Point I value. Find its new position in Sorted values, identify the new maximum and the new upper-half pair, choose an explanation, and press Check explanation. Wide Middle and Outlier are optional free-exploration presets; Return to experiment restores the current exercise.",
         predictionQuestion:
-          "Which spread summary should react more to one far edge value: range or IQR?",
+          "In this new dataset, I moves from 88 to 30, into the middle. Which spread measure will change?",
         observationPrompt:
-          "What did the outlier do to the whisker and the middle box?",
+          "Which point became the maximum? Which two values now determine Q3? Why did IQR change this time?",
         takeaway:
-          "Range follows the extremes, while IQR focuses on the middle half and resists a single outlier better.",
+          "H at 44 becomes the maximum. Q3 changes from (40 + 44) / 2 = 42 to (36 + 40) / 2 = 38. Range falls from 78 to 34 and IQR from 20 to 16. Resistance to extremes does not mean IQR never changes.",
       },
     ],
   },

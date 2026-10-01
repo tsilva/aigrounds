@@ -57,9 +57,9 @@ const activePlaygroundDefinitions = [
     title: "Range, Quartiles & IQR Explorer",
     tag: "statistics",
     kicker:
-      "Move outliers and watch the full span stretch while the middle 50% stays steady.",
+      "Move one value and compare the full span with the middle half.",
     summary:
-      "Drag values on a number line, inspect the five-number summary, and see how range, quartiles, percentile rank, IQR, and box plots respond when one edge gets extreme.",
+      "Predict, move one value, and explain how range and IQR change. Read aligned number lines, a box plot, and the sorted pairs that determine each quartile.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Range",

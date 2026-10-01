@@ -1,7 +1,7 @@
 export const rangePresets = [
-  { id: "experiment", label: "Experiment", values: [18, 24, 28, 32, 36, 40, 44, 48, 58] },
-  { id: "wide-middle", label: "Wide Middle", values: [10, 18, 26, 34, 46, 58, 70, 78, 86] },
-  { id: "outlier", label: "Outlier", values: [18, 24, 28, 32, 36, 40, 44, 48, 92] },
+  { id: "experiment", label: "Experiment", shortLabel: "Move an edge", values: [18, 24, 28, 32, 36, 40, 44, 48, 58] },
+  { id: "wide-middle", label: "Wide Middle", shortLabel: "Compare spread", values: [10, 18, 26, 34, 46, 58, 70, 78, 86] },
+  { id: "outlier", label: "Outlier", shortLabel: "Extend the range", values: [18, 24, 28, 32, 36, 40, 44, 48, 92] },
 ] as const;
 
 export const predictions = [
@@ -24,7 +24,7 @@ export const learningExperiments = [
       { id: "width", label: "IQR is the distance from minimum to maximum." },
     ],
     correctExplanation: "extreme",
-    retryHint: "Compare the two pairs underlined in Sorted values. Did I belong to either pair?",
+    retryHint: "Compare the two pairs outlined in Sorted values. Did I belong to either pair?",
     takeaway: "Range grew from 40 to 74. IQR stayed at 20 because Q1 and Q3 use the same values as before.",
   },
   {
@@ -54,7 +54,7 @@ export const learningExperiments = [
       { id: "order", label: "I changed sorted position: H became the maximum, and a different pair now determines Q3." },
     ],
     correctExplanation: "order",
-    retryHint: "Find I in Sorted values, then compare the new maximum and the underlined upper-half pair with the starting data.",
+    retryHint: "Find I in Sorted values, then compare the new maximum and the outlined upper-half pair with the starting data.",
     takeaway: "Range fell from 78 to 34 and IQR from 20 to 16. IQR resists an extreme moving farther away, but can change when sorted positions change.",
   },
 ] as const;

@@ -9,3 +9,4 @@ AI Grounds helps people learn artificial intelligence concepts through interacti
 - The home experience must present published and planned lessons in the intended learning sequence.
 - The home experience must clearly distinguish published lessons from planned lessons and let learners open every published lesson.
 - Secrets used by server-backed learning assistance must never be exposed to browser clients.
+- New playgrounds and material playground redesigns must follow the approved shared learning-page design system, with AI Guide access in the experiment rail rather than the top navigation.

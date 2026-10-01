@@ -13,6 +13,7 @@ export type PlaygroundMetadata = {
   concepts: string[];
   learningGoals: string[];
   tutorPlan: TutorPlan;
+  layout?: "guided-discovery";
 };
 
 type UpcomingPlayground = {
@@ -33,6 +34,7 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 const activePlaygroundDefinitions = [
   {
     slug: "mean-median-mode",
+    layout: "guided-discovery",
     title: "Mean, Median & Mode Lab",
     tag: "statistics",
     kicker:
@@ -54,6 +56,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "range-quartiles-iqr",
+    layout: "guided-discovery",
     title: "Range, Quartiles & IQR Explorer",
     tag: "statistics",
     kicker:

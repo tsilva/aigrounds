@@ -1,11 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ExperimentProgress, GuideInvitation, LearningPage, LessonSummaries } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { clientXToPercentValue } from "@/lib/number-line";
 import { fiveNumberSummary, makeRangePoints, movePoint, pointLanes, sortPoints, type FiveNumberSummary, type RangePoint } from "./range-quartiles-iqr-engine";
 import { learningExperiments, predictions, rangePresets } from "./scenario";
-import styles from "./playground.module.css";
+import localStyles from "./playground.module.css";
+
+const styles = { ...sharedStyles, ...localStyles };
 
 const format = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1);
 const position = (value: number) => ({ left: `${value}%` });
@@ -27,15 +31,15 @@ function SpreadChart({ points, summary, selectedId, onSelect, onMove }: {
   }, []);
   const lanes = useMemo(() => pointLanes(points, width), [points, width]);
   return <section className={styles.chart} aria-label="Values, range, and box plot on the same 0 to 100 scale">
-    <p id="range-keyboard-help" className={styles.help}>Drag a dot, or focus it and use ← / →. Shift moves by 10; Home / End moves to 0 / 100.</p>
+    <div className={styles.chartHeading}><h2>Your dataset</h2><span>Drag a dot to change its value</span></div>
     <div className={styles.chartRow}>
       <span className={styles.laneLabel}>Values</span>
-      <div className={styles.track} ref={trackRef} style={{ height: Math.max(92, lanes.count * 42 + 12) }}>
+      <div className={styles.track} ref={trackRef} style={{ height: Math.max(76, lanes.count * 36 + 12) }}>
         <span className={styles.valueAxis} aria-hidden="true" />
         {points.map((point) => <button key={point.id} type="button" role="slider" aria-label={`Point ${point.label}`}
           aria-valuemin={0} aria-valuemax={100} aria-valuenow={point.value} aria-valuetext={`${point.label}: ${point.value}`}
           aria-describedby="range-keyboard-help" className={styles.point} data-selected={selectedId === point.id}
-          style={{ ...position(point.value), bottom: 8 + (lanes.positions.get(point.id) ?? 0) * 42 }}
+          style={{ ...position(point.value), bottom: 8 + (lanes.positions.get(point.id) ?? 0) * 36 }}
           onFocus={() => onSelect(point.id)}
           onPointerDown={(event) => {
             event.preventDefault(); event.currentTarget.focus(); onSelect(point.id);
@@ -79,10 +83,7 @@ function SpreadChart({ points, summary, selectedId, onSelect, onMove }: {
     <div className={styles.chartRow} aria-hidden="true"><span /><div className={styles.axis}>
       {ticks.map((tick) => <span className={styles.tick} key={tick} style={position(tick)}><span>{tick}</span></span>)}
     </div></div>
-    <dl className={styles.fiveNumbers} aria-label="Box plot five-number summary">
-      {[["Min", summary.min], ["Q1", summary.q1], ["Median", summary.median], ["Q3", summary.q3], ["Max", summary.max]].map(([label, value]) =>
-        <div key={label}><dt>{label}</dt><dd>{format(Number(value))}</dd></div>)}
-    </dl>
+    <p className={styles.srOnly}>Box plot: minimum {format(summary.min)}, Q1 {format(summary.q1)}, median {format(summary.median)}, Q3 {format(summary.q3)}, maximum {format(summary.max)}.</p>
     <p className={styles.caption}>IQR (interquartile range) is the box width, from Q1 to Q3. The line inside marks the median; whiskers show min and max.</p>
   </section>;
 }
@@ -90,7 +91,7 @@ function SpreadChart({ points, summary, selectedId, onSelect, onMove }: {
 function QuartileConstruction({ points, summary }: { points: RangePoint[]; summary: FiveNumberSummary }) {
   const sorted = sortPoints(points);
   const groups = [sorted.slice(0, 4), sorted.slice(4, 5), sorted.slice(5)];
-  return <section className={styles.panel} aria-labelledby="quartile-heading">
+  return <section className={styles.quartiles} aria-labelledby="quartile-heading">
     <h2 id="quartile-heading">Sorted values</h2>
     <div className={styles.halves}>
       {groups.map((group, groupIndex) => <div key={groupIndex} className={styles.half}>
@@ -99,24 +100,23 @@ function QuartileConstruction({ points, summary }: { points: RangePoint[]; summa
           aria-label={`${point.label}: ${point.value}${groupIndex !== 1 && (index === 1 || index === 2) ? ", used for the quartile" : ""}`}>
           <span>{point.value}</span><small>{point.label}</small>
         </li>)}</ol>
-        <p className={styles.formula}>{groupIndex === 1 ? `Median = ${format(summary.median)}` :
+        <p className={styles.quartileFormula}>{groupIndex === 1 ? `Median = ${format(summary.median)}` :
           `${groupIndex === 0 ? "Q1" : "Q3"} = (${group[1]!.value} + ${group[2]!.value}) / 2 = ${format(groupIndex === 0 ? summary.q1 : summary.q3)}`}</p>
       </div>)}
     </div>
-    <p className={styles.caption}>Sort first. The median is the fifth value. Exclude it, then average the middle two of each half to find Q1 and Q3.</p>
-    <p className={styles.convention}>Median-of-halves rule. Other quartile conventions can give different results.</p>
+    <p className={styles.convention}>Median-of-halves rule: exclude the fifth value, then average each half’s middle pair. Other conventions can differ.</p>
   </section>;
 }
 
 function SummaryTiles({ summary, before }: { summary: FiveNumberSummary; before: FiveNumberSummary }) {
-  return <section className={styles.metrics} aria-label="Live spread calculations">
-    <div className={styles.rangeMetric}><h3>Range <span>full span</span></h3><p className={styles.metricValue}>{format(summary.range)}</p>
-      <p className={styles.formula}>{format(summary.max)} − {format(summary.min)} = {format(summary.range)}</p>
-      <p className={styles.before}>Before {format(before.range)} → now {format(summary.range)}</p></div>
-    <div className={styles.iqrMetric}><h3>IQR <span>middle 50%</span></h3><p className={styles.metricValue}>{format(summary.iqr)}</p>
-      <p className={styles.formula}>{format(summary.q3)} − {format(summary.q1)} = {format(summary.iqr)}</p>
-      <p className={styles.before}>Before {format(before.iqr)} → now {format(summary.iqr)}</p></div>
-  </section>;
+  return <LessonSummaries label="Live spread calculations" summaries={[
+    { label: "Range", color: "#ad4508", definition: "The full span.", value: format(summary.range),
+      formula: `${format(summary.max)} − ${format(summary.min)} = ${format(summary.range)}`,
+      comparison: `Before ${format(before.range)} → now ${format(summary.range)}` },
+    { label: "IQR", color: "#5031dc", definition: "The middle 50%.", value: format(summary.iqr),
+      formula: `${format(summary.q3)} − ${format(summary.q1)} = ${format(summary.iqr)}`,
+      comparison: `Before ${format(before.iqr)} → now ${format(summary.iqr)}` },
+  ]} />;
 }
 
 export function RangeQuartilesIqrPlayground() {
@@ -137,7 +137,7 @@ export function RangeQuartilesIqrPlayground() {
   const reachedTarget = isExperiment && prediction !== null && points.every((point, index) =>
     point.value === (point.id === experiment.pointId ? experiment.target : experiment.values[index]));
   const complete = reachedTarget && checked && explanation === experiment.correctExplanation;
-  const phase = !prediction ? "Predict" : !reachedTarget ? "Move" : "Explain";
+  const phase = !prediction ? 0 : !reachedTarget ? 1 : 2;
 
   function clearAnswers() { setPrediction(null); setExplanation(null); setChecked(false); }
   function reset(nextPresetId = presetId, nextIndex = experimentIndex) {
@@ -157,28 +157,14 @@ export function RangeQuartilesIqrPlayground() {
     setPoints(makeRangePoints(experiment.values)); setSelectedId(experiment.pointId);
     editorRef.current?.focus();
   }
-  return <main className={styles.page}>
-    <nav className={styles.nav} aria-label="Playground navigation"><Link href="/">AI Grounds</Link><Link href="/" className={styles.allLessons}>← All lessons</Link></nav>
-    <div className={styles.content}>
-      <header className={styles.header}><h1>Range, quartiles &amp; IQR</h1><p>What changes when you move one value?</p></header>
-      <div className={styles.layout}>
-        <div className={styles.workbench}>
-          <section className={styles.panel} aria-labelledby="spread-heading">
-            <div className={styles.toolbar}><h2 id="spread-heading">Explore the spread</h2>
-              <div className={styles.presets} aria-label="Dataset scenarios">{rangePresets.map((preset) => <button key={preset.id} type="button" aria-pressed={presetId === preset.id} onClick={() => reset(preset.id)}>{preset.label}</button>)}</div>
-              <button type="button" className={styles.secondary} onClick={() => reset()}>Reset</button>
-            </div>
-            <SpreadChart points={points} summary={summary} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
-            <SummaryTiles summary={summary} before={before} />
-          </section>
-          <QuartileConstruction points={points} summary={summary} />
-          <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">Point {selected.label}: {selected.value}. Range {format(summary.range)}; Q1 {format(summary.q1)}; median {format(summary.median)}; Q3 {format(summary.q3)}; IQR {format(summary.iqr)}.</p>
-        </div>
-        <aside className={`${styles.panel} ${styles.rail}`} aria-label={isExperiment ? "Guided experiment" : "Free exploration"}>
+  const rail = (
+        <aside className={styles.rail} aria-label={isExperiment ? "Guided experiment" : "Free exploration"}>
           <p className={styles.eyebrow}>{isExperiment ? `Experiment ${experimentIndex + 1} of 3` : "Free exploration"}</p>
           <h2 className={styles.experimentTitle}>{isExperiment ? experiment.title : "Change one value"}</h2>
-          {isExperiment && <ol className={styles.steps} aria-label="Experiment progress">{["Predict", "Move", "Explain"].map((step) => <li key={step} aria-current={phase === step ? "step" : undefined}>{step}</li>)}</ol>}
+          {isExperiment && <ExperimentProgress phase={phase} />}
+          <div className={styles.exercise}>
           {isExperiment && !prediction && <>
+            <h3>Make a prediction</h3>
             <p className={styles.question}>{experiment.question}</p>
             <fieldset className={styles.choices}><legend className={styles.srOnly}>Your prediction</legend>
               {predictions.map((choice) => <label key={choice.id}><input type="radio" name="prediction" value={choice.id} checked={false} onChange={() => predict(choice.id)} />{choice.label}</label>)}
@@ -189,11 +175,8 @@ export function RangeQuartilesIqrPlayground() {
             <p className={styles.recorded}>Your prediction: <strong>{predictions.find((choice) => choice.id === prediction)!.label.replace(/^[A-Z]/, (first) => first.toLowerCase())}</strong></p>
             <p className={styles.question}>Move {experiment.pointLabel} from {experiment.from} to {experiment.target}. Change only this point.</p>
           </>}
-          {!isExperiment && <p className={styles.question}>Select any dot, then change its value. Compare range, IQR, and the underlined quartile pairs.</p>}
-          <div className={styles.editor}><label htmlFor="range-point-value">Point {selected.label} value</label>
-            <input ref={editorRef} id="range-point-value" type="number" min={0} max={100} step={1} value={selected.value} onChange={(event) => move(selectedId, event.currentTarget.valueAsNumber)} />
-            {reachedTarget && <span className={styles.target} role="status">✓ Target reached</span>}
-          </div>
+          {!isExperiment && <p className={styles.question}>Select any dot, then change its value. Compare range, IQR, and the outlined quartile pairs.</p>}
+          {reachedTarget && <p className={styles.target} role="status">✓ Target reached</p>}
           {isExperiment && prediction && !reachedTarget && <p className={styles.caption}>Use the dot or value field for the target. Reset starts this experiment again.</p>}
           {reachedTarget && <div className={styles.explanation}>
             <h3>{experiment.explanationQuestion}</h3>
@@ -206,8 +189,24 @@ export function RangeQuartilesIqrPlayground() {
             {complete && <button type="button" className={styles.primary} onClick={() => reset("experiment", (experimentIndex + 1) % learningExperiments.length)}>{experimentIndex === 2 ? "Start again" : `Next: ${learningExperiments[experimentIndex + 1]!.title}`} →</button>}
           </div>}
           {!isExperiment && <button type="button" className={styles.primary} onClick={() => reset("experiment")}>Return to experiment →</button>}
+          </div>
+          <GuideInvitation />
         </aside>
-      </div>
+  );
+  return <LearningPage title="Range, Quartiles & IQR" subtitle="Move one point. Watch two measures of spread." rail={rail}>
+    <div className={styles.toolbar}>
+      <div className={styles.presets} aria-label="Dataset scenarios">{rangePresets.map((preset) => <button key={preset.id} type="button" aria-pressed={presetId === preset.id} onClick={() => reset(preset.id)}><strong>{preset.label}</strong><span>{preset.id === "experiment" ? experiment.title : preset.shortLabel}</span></button>)}</div>
+      <button type="button" className={styles.reset} onClick={() => reset()}><ArrowPathIcon aria-hidden="true" />Reset</button>
     </div>
-  </main>;
+    <SpreadChart points={points} summary={summary} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
+    <div className={styles.pointEditor}>
+      <label htmlFor="range-point-value">Point {selected.label} value
+        <input ref={editorRef} id="range-point-value" type="number" min={0} max={100} step={1} value={selected.value} onChange={(event) => move(selectedId, event.currentTarget.valueAsNumber)} />
+      </label>
+      <p id="range-keyboard-help">Focus a dot and use arrow keys. Shift moves by 10; Home / End moves to 0 / 100.</p>
+    </div>
+    <QuartileConstruction points={points} summary={summary} />
+    <SummaryTiles summary={summary} before={before} />
+    <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">Point {selected.label}: {selected.value}. Range {format(summary.range)}; Q1 {format(summary.q1)}; median {format(summary.median)}; Q3 {format(summary.q3)}; IQR {format(summary.iqr)}.</p>
+  </LearningPage>;
 }

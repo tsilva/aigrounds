@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Grounds Curriculum"
+  short_description: "Review or update lesson sequencing and prerequisites"
+  default_prompt: "Use $aigrounds-curriculum to review the dashboard curriculum for live/planned status, prerequisite gaps, and lesson sequencing, and report proposed changes."

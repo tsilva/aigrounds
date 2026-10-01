@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRightIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
-import type { CSSProperties, ReactNode } from "react";
+import { ArrowPathIcon, ArrowRightIcon, ChatBubbleLeftRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
 import styles from "./learning-page.module.css";
 
@@ -37,6 +37,93 @@ export function ExperimentProgress({ phase }: { phase: number }) {
         <span>{index + 1}</span>{step}
       </li>)}
   </ol>;
+}
+
+export function LessonToolbar({ scenarios, selectedId, onSelect, onReset }: {
+  scenarios: readonly { id: string; label: string; shortLabel: string }[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+  onReset: () => void;
+}) {
+  return <div className={styles.toolbar}>
+    <div className={styles.presets} aria-label="Dataset scenarios">
+      {scenarios.map((scenario) => <button key={scenario.id} type="button"
+        aria-pressed={selectedId === scenario.id} onClick={() => onSelect(scenario.id)}>
+        <strong>{scenario.label}</strong><span>{scenario.shortLabel}</span>
+      </button>)}
+    </div>
+    <button type="button" className={styles.reset} onClick={onReset}><ArrowPathIcon aria-hidden="true" />Reset</button>
+  </div>;
+}
+
+export function DatasetHeading() {
+  return <div className={styles.chartHeading}><h2>Your dataset</h2><span>Drag a dot to change its value</span></div>;
+}
+
+export function PointValueEditor({ label, value, helpId, onChange, inputRef, inputId }: {
+  label: string;
+  value: number;
+  helpId: string;
+  onChange: (value: number) => void;
+  inputRef?: Ref<HTMLInputElement>;
+  inputId?: string;
+}) {
+  return <div className={styles.pointEditor}>
+    <label>Point {label} value<input ref={inputRef} id={inputId} type="number"
+      min={0} max={100} step={1} value={value} onChange={(event) => {
+        if (Number.isFinite(event.currentTarget.valueAsNumber)) onChange(event.currentTarget.valueAsNumber);
+      }} /></label>
+    <p id={helpId}>Focus a dot and use arrow keys. Shift moves by 10; Home / End moves to 0 / 100.</p>
+  </div>;
+}
+
+// The lesson owns its experiment state and content; the shell owns placement.
+export function ExperimentRail({ label, title, phase, children }: {
+  label: string;
+  title: string;
+  phase?: 0 | 1 | 2;
+  children: ReactNode;
+}) {
+  return <aside className={styles.rail} aria-label={phase === undefined ? "Free exploration" : "Guided experiment"}>
+    <p className={styles.eyebrow}>{label}</p><h2 className={styles.experimentTitle}>{title}</h2>
+    {phase !== undefined && <ExperimentProgress phase={phase} />}
+    <div className={styles.exercise}>{children}</div>
+    <GuideInvitation />
+  </aside>;
+}
+
+export function ExperimentChoices({ legend, name, choices, value, onChange }: {
+  legend: string;
+  name: string;
+  choices: readonly { id: string; label: string }[];
+  value: string | null;
+  onChange: (id: string) => void;
+}) {
+  return <fieldset className={styles.choices}><legend className={styles.srOnly}>{legend}</legend>
+    {choices.map((choice) => <label key={choice.id} data-checked={value === choice.id}>
+      <input type="radio" name={name} value={choice.id} checked={value === choice.id} onChange={() => onChange(choice.id)} />{choice.label}
+    </label>)}
+  </fieldset>;
+}
+
+export function ExperimentResult({ title = "Experiment explained", children, compact = false }: {
+  title?: string;
+  children: ReactNode;
+  compact?: boolean;
+}) {
+  if (compact) return <div className={styles.success} role="status"><strong>{title}</strong><p>{children}</p></div>;
+  return <div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>{title}</h3><p>{children}</p></div></div>;
+}
+
+export function ExperimentButton({ children, onClick, disabled, arrow = false }: {
+  children: ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  arrow?: boolean;
+}) {
+  return <button type="button" className={arrow ? styles.nextButton : styles.primary} disabled={disabled} onClick={onClick}>
+    {children}{arrow && <ArrowRightIcon aria-hidden="true" />}
+  </button>;
 }
 
 export function GuideInvitation() {

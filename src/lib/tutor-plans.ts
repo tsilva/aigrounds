@@ -887,7 +887,7 @@ export const playgroundTutorPlans = {
     whyItMatters:
       "Matrix multiplication exists because many linear transformations can be expressed as rows meeting columns. It is useful because neural networks, graphics, statistics, and data pipelines all rely on this compact way to combine many numbers at once.",
     openingMessage:
-      "No prior linear algebra knowledge needed. We will build matrix multiplication by predicting, trying one small output cell, and explaining the pattern.\n\n- Matrix shape is rows x columns.\n- A product A x B works only when A's columns match B's rows.\n- Each output cell C[i,j] comes from row i of A dotted with column j of B.\n- The shared inner dimension tells how many multiply-add terms each output cell uses.\n- What is Matmul? is optional help if the word matmul is new.\n- The other shape presets are optional practice after the guide.\n\nFirst prediction: for a 2 x 2 matrix times a 2 x 3 matrix, what shape should the output have? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior linear algebra knowledge needed. We will build matrix multiplication by predicting, trying one small output cell, and explaining the pattern.\n\n- Matrix shape is rows x columns.\n- A product A x B works only when A's columns match B's rows.\n- Each output cell C[i,j] comes from row i of A dotted with column j of B.\n- The shared inner dimension tells how many multiply-add terms each output cell uses.\n- The other shape presets are optional practice after the guide.\n\nFirst prediction: for a 2 x 2 matrix times a 2 x 3 matrix, what shape should the output have? Choose a prediction in the experiment rail, or discuss it here. The rail checks your actions and explanation before offering the next experiment.",
     masteryCriteria: [
       "Reads matrix shape as rows x columns.",
       "Explains why A columns must match B rows before multiplication is possible.",
@@ -899,18 +899,18 @@ export const playgroundTutorPlans = {
       {
         title: "Check the shapes",
         experiment:
-          "Open What is Matmul? once if the word matmul is new. Then choose 2x2 x 2x3 in 1. Set The Shapes. Compare the A shape, B shape, shared inner dimension, output C shape, and the locked incompatible example.",
+          "In Check the shapes, choose a prediction in the rail. Then choose 2x2 x 2x3 in the scenario toolbar. Compare Your matrices, Output shape, Terms per cell, and the Incompatible example below the formulas. Choose an explanation and use Check explanation.",
         predictionQuestion:
           "For a 2 x 2 matrix times a 2 x 3 matrix, what shape should the output have?",
         observationPrompt:
-          "What matched, what did the output shape keep from A and B, and why is the locked red example blocked?",
+          "What matched, what did the output shape keep from A and B, and why is the Incompatible example blocked?",
         takeaway:
           "In (m x n) times (n x p), the two n values must match and the output shape is m x p.",
       },
       {
-        title: "Compute one cell",
+        title: "Build one cell",
         experiment:
-          "In 2. Pick One Output Cell, select C[1,2]. Step through k = 1 and k = 2 in 3. Watch The Dot Product. Watch each product reveal and the running sum grow.",
+          "In Build one cell, choose a prediction in the rail. Use 2x2 x 2x3. Select C[1,2] in C, then select k = 1 and k = 2 in Build C[1,2]. Watch each product and the running sum. Choose an explanation and use Check explanation.",
         predictionQuestion:
           "Which values should multiply together for C[1,2]: a row with a column, two rows, or two columns?",
         observationPrompt:
@@ -921,7 +921,7 @@ export const playgroundTutorPlans = {
       {
         title: "Repeat across C",
         experiment:
-          "In 4. See The Full Product, click the formula chip for C[1,2], then click the formula chip for C[2,1]. Compare the formula chips and the repeated A/B highlights inside that same panel.",
+          "In Repeat across C, choose a prediction in the rail. Use 2x2 x 2x3. Under Every output cell follows the same rule, select the C[1,2] formula and then C[2,1]. Compare the formulas and the A row/B column labels above. Choose an explanation and use Check explanation. After Lesson explained, use Try another shape: predict the output shape and term count for 3x2 x 2x1, then select C[3,1] and reveal both terms.",
         predictionQuestion:
           "What should change when you move from C[1,2] to C[2,1]?",
         observationPrompt:
@@ -1239,63 +1239,63 @@ export const playgroundTutorPlans = {
   },
   "backpropagation-inspector": {
     intro:
-      "Work through four backprop experiments. Predict the error direction, compare cached activations, follow hidden-unit credit, inspect the gradient table, then change the learning rate to see how credit becomes an update.",
+      "Inspect one sigmoid output layer through four Predict → Try → Explain experiments. Compare local gradients, flip only the target, scale a previewed step, and follow signals to cached hidden activations. Calculation view offers Scalars and Matrices without changing the case or experiment progress.",
     whyItMatters:
-      "Backpropagation is the mechanism that lets one loss value train many weights. It matters because each weight needs a local blame signal, not just a final wrong-or-right score.",
+      "Backprop computes how sensitive loss is to each parameter. Gradient descent separately turns those sensitivities into weight changes. Keeping these jobs distinct makes neural-network training easier to reason about.",
     openingMessage:
-      "No prior backprop details needed. We will inspect one output layer with cached hidden activations.\n\n- The forward pass stores activations such as h1 and h2.\n- Binary cross entropy with a sigmoid output gives output delta = p - y.\n- Each output weight gradient is cached activation times downstream error.\n- A weight update moves opposite the gradient: w = w - eta * dL/dw.\n\nFirst prediction: in Case A, h1 is larger than h2. Which output weight do you expect to receive the bigger absolute update? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "We need weighted sums, probabilities, and loss; no calculus derivation is required. A gradient tells us how loss responds to a tiny increase. h1 and h2 are outputs cached from an earlier layer. This lesson uses a sigmoid probability and unweighted binary cross entropy, so the output gradient is p − y. Bias and cached activations stay fixed during each update preview. Calculation view offers optional Matrices for the same single example, with shapes and notation explained beside each calculation. You can switch back to Scalars at any time without losing experiment progress.\n\nUse Underprediction, or Reset if you have edited the case. Before selecting Backward, predict: h1 is 0.80 and h2 is 0.35. Which output weight should have the larger absolute gradient? Give your prediction and reason first.",
     masteryCriteria: [
-      "Explains output delta as p - y for sigmoid binary cross entropy.",
-      "Connects dL/dw_out to cached activation times downstream error.",
-      "Recognizes dL/dh as hidden-unit credit that would keep flowing backward.",
-      "Uses the gradient sign to explain why an output weight moves up or down.",
-      "Explains why larger cached activations create larger output-weight gradients when downstream error matches.",
-      "Shows how the learning rate scales gradient into an update without changing the gradient itself.",
+      "Uses dL/dw = h × (p − y) to compare the two weight gradients for the same example.",
+      "Explains that p − y is specific to this sigmoid and binary-cross-entropy combination, not every loss.",
+      "Connects target 0, positive gradients, negative weight changes, and lower probability/loss in the fixed example.",
+      "Distinguishes unchanged starting gradients from learning-rate-scaled weight changes; a new pass after updating weights generally has new gradients.",
+      "Distinguishes dL/dh = w × (p − y) from output-weight gradients and earlier-weight updates.",
+      "Explains the same gradients and outcomes in either view; switching representation alone is not evidence of understanding.",
     ],
     steps: [
       {
-        title: "Trace one error backward",
+        title: "Which gradient is larger?",
         experiment:
-          "Use Case A. Select Forward once to see the cached activations and prediction, then select Backward. Compare p, target y, dL/dz = p - y, and the two output-weight gradient rows.",
+          "Choose Underprediction. Record a prediction in the rail and select Reveal gradients, or select Backward after predicting. Compare the weight-gradient entries and their absolute sizes. Scalars shows h1 × (p − y) and h2 × (p − y); Matrices shows ∇W L = δ × hᵀ. Use either view; do not require switching. Do not reveal the explanation before the learner tries.",
         predictionQuestion:
-          "In Case A, h1 is larger than h2. Which output weight should receive the bigger absolute update?",
+          "h1 is 0.80 and h2 is 0.35. Which weight will have the larger absolute gradient?",
         observationPrompt:
-          "How did cached activation size show up in the output-weight gradients?",
+          "Report both gradients and identify the local multiplier in each formula.",
         takeaway:
-          "The same output error flows through both output weights, so the larger cached activation gets more credit.",
+          "Each activation multiplies the same output gradient p − y. With the same error, the larger nonnegative activation produces a larger absolute weight gradient.",
       },
       {
-        title: "Follow hidden-unit credit",
+        title: "Flip only the target",
         experiment:
-          "Stay on Case A with Backward selected. Compare the dL/dh1 and dL/dh2 rows. These are hidden-unit credit signals, not output-weight updates: each one is output weight times dL/dz.",
+          "Use Next experiment or choose False alarm. The activations and starting weights are unchanged, but y is now 0. Record a prediction and select Preview update. Compare Gradient and Change in Scalars, or ∇W L and ΔW in Matrices, then probability/loss before and after one step.",
         predictionQuestion:
-          "In Case A, dL/dz is negative and w_out2 is also negative. Should dL/dh2 be positive or negative?",
+          "Should a gradient-descent step raise or lower both weights when y changes to 0?",
         observationPrompt:
-          "Why did dL/dh1 and dL/dh2 end up with different signs?",
+          "Explain the gradient and change signs, including why the negative weight also moves down.",
         takeaway:
-          "Backprop keeps moving one local step at a time: output-weight gradients use cached activation times error, while hidden-unit credit uses output weight times the same downstream error.",
+          "p − y is positive and the activations are positive, so both weight gradients are positive. Subtracting them lowers both weights and lowers probability and loss for this example.",
       },
       {
-        title: "Flip the target",
+        title: "Gradient or step size?",
         experiment:
-          "Choose Case B. Compare the graph, p - y value, gradient signs, and weight update table with Case A. Case C is an optional extra comparison after this step.",
+          "Use Next experiment from Flip only the target; the starting learning rate is 0.10. Predict, then select Set learning rate to 0.50, or use Exact learning rate. Compare the Gradient column and Change at η = 0.10 / 0.50 in Scalars; Matrices shows the same comparison as ∇W L and the two ΔW rows. Each preview starts from the same original weights, not the preceding preview.",
         predictionQuestion:
-          "If the target is 0 and the prediction is above 0, should p - y become positive or negative?",
+          "When η goes from 0.10 to 0.50, do the starting gradients or the weight changes become five times larger?",
         observationPrompt:
-          "What changed in the signs of the gradients and updates after switching to Case B?",
+          "Which values stayed fixed? Which values scaled, and why?",
         takeaway:
-          "Changing the target changes the error sign, and the gradient sign decides whether each weight should move up or down.",
+          "Backprop computes gradients at the starting state; η scales the optimizer step. Recomputing after a real update generally gives new gradients. This example does not prove larger rates always improve training.",
       },
       {
-        title: "Scale credit into an update",
+        title: "Two kinds of gradients",
         experiment:
-          "Select Update. Use eta 0.10, then eta 0.50, or move the learning-rate slider between those values. Watch the gradient column, change column, and after column.",
+          "Use Next experiment or choose Equal activations. Predict the hidden-signal signs, then select Reveal hidden signals. Compare the equal output-weight gradients with dL/dh1 and dL/dh2 in How gradients reach the hidden layer; Matrices shows those as ∇W L = δ × hᵀ and ∇h L = Wᵀ × δ. For near transfer, Explore freely and set Hidden activation h1 to 0; inspect its weight gradient and explain it.",
         predictionQuestion:
-          "When learning rate increases, should the gradients themselves change or only the update size?",
+          "With equal activations but opposite signed output weights, do the two hidden-activation signals have the same or opposite signs?",
         observationPrompt:
-          "Which table columns changed as learning rate moved?",
+          "Explain why weight gradients are equal while hidden-activation signals differ, and why dL/dh is not an earlier-weight update.",
         takeaway:
-          "Backprop computes the gradient first. The learning rate only scales how much the optimizer moves the weight.",
+          "Output-weight gradients use h × (p − y); hidden-activation signals use w × (p − y). Reaching an earlier weight requires its layer’s local derivatives. With h1 = 0, the output weight 1 gradient is zero for this example.",
       },
     ],
   },

@@ -4,7 +4,37 @@ This is the canonical visual and layout scheme for new playgrounds and material 
 
 ## Shared implementation
 
-Use `LearningPage`, `ExperimentProgress`, `LessonSummaries`, and `GuideInvitation` from `src/components/learning-page/learning-page.tsx`. Use `learning-page.module.css` for shared surfaces and controls. Mark the lesson's metadata `layout: "guided-discovery"` so the assistant shell leaves Guide access to the rail CTA. Module CSS should contain only concept-specific representations and arrangements. Change shared styling centrally instead of copying or overriding it in each lesson.
+The first three lessons share the components in `src/components/learning-page/`; use them as the starting shell for future lessons. Mark the lesson's metadata `layout: "guided-discovery"` so the assistant shell leaves Guide access to the rail CTA.
+
+| Shared component | Responsibility |
+| --- | --- |
+| `LearningPage` | Navigation, title/subtitle, workbench, responsive rail placement |
+| `LessonToolbar` | Two-line scenario buttons, selected state, Reset |
+| `DatasetHeading`, `PointValueEditor` | Dataset heading, finite numeric input, keyboard instructions |
+| `ExperimentRail` | Experiment label/title, optional progress, exercise container, single Guide CTA |
+| `ExperimentChoices` | Accessible prediction/explanation radio groups |
+| `ExperimentResult`, `ExperimentButton` | Completion feedback and exercise actions |
+| `LessonSummaries` | Labeled values, definitions, formulas and comparisons |
+| `NumberLinePoint`, `useNumberLineLayout` | 0–100 sliders, pointer capture, keyboard editing, responsive collision packing |
+
+Page and experiment components are exported from `learning-page.tsx`; number-line controls are in `number-line-controls.tsx`. `ExperimentRail` places `ExperimentProgress` and `GuideInvitation` automatically. Omit its `phase` for free exploration. Keep scenario datasets, experiment state, answer checking, chart geometry and supporting mathematical evidence in the module. In particular, a lesson can check explanations immediately or require an explicit check action without duplicating the rail.
+
+Module CSS should contain only concept-specific representations and arrangements. Shared components own their control styles; import `learning-page.module.css` directly for shared instructional text classes when needed. Do not merge shared and module CSS objects, copy shell markup, or override shared control classes. Change shared styling and interactions centrally.
+
+```tsx
+<LearningPage title={title} subtitle={subtitle} rail={
+  <ExperimentRail label="Experiment 1 of 3" title={experiment.title} phase={phase}>
+    {/* Lesson-owned prediction, action, explanation and feedback. */}
+  </ExperimentRail>
+}>
+  <LessonToolbar scenarios={scenarios} selectedId={scenarioId} onSelect={selectScenario} onReset={reset} />
+  {/* Lesson-owned chart using DatasetHeading and, for a 0–100 scale, NumberLinePoint. */}
+  <PointValueEditor label={selected.label} value={selected.value} helpId="point-help" onChange={editSelected} />
+  {/* Lesson-owned construction evidence and shared LessonSummaries. */}
+</LearningPage>
+```
+
+Connect every `NumberLinePoint`'s `helpId` to the editor's instruction ID and pass the measured track ref from `useNumberLineLayout`. Preserve the lesson's point spacing and vertical lane geometry. `PointValueEditor` accepts an input ref for experiment-directed focus.
 
 ## Page anatomy
 

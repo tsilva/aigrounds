@@ -1,790 +1,203 @@
 "use client";
 
-import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import {
-  analyzeProduct,
-  formatShape,
-  formatTerm,
-  getDotProductTerms,
-  type CellPosition,
-  type Matrix,
-} from "./matrix-multiplication-engine";
-import {
-  incompatibleExample,
-  matrixShapePresets,
-  type MatrixShapePreset,
-} from "./scenario";
+  ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult,
+  LearningPage, LessonSummaries, LessonToolbar,
+} from "@/components/learning-page/learning-page";
+import shared from "@/components/learning-page/learning-page.module.css";
+import { analyzeProduct, formatShape, formatTerm, getDotProductTerms, type CellPosition, type Matrix } from "./matrix-multiplication-engine";
+import { incompatibleExample, matrixShapePresets } from "./scenario";
+import { guidedPresetId, matrixExperiments } from "./learning-experiments";
+import styles from "./playground.module.css";
 
-function Panel({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
+const cellName = ({ row, col }: CellPosition) => `C[${row + 1},${col + 1}]`;
+const cellKey = ({ row, col }: CellPosition) => `${row},${col}`;
+const guidedPreset = matrixShapePresets.find((preset) => preset.id === guidedPresetId)!;
+const scenarios = matrixShapePresets.map((preset, index) => ({
+  id: preset.id, label: preset.label,
+  shortLabel: ["Three terms", "Two terms", "One output column"][index],
+}));
+
+function MatrixGrid({ name, matrix, kind, selected, onSelect }: {
+  name: string; matrix: Matrix; kind: "left" | "right" | "product";
+  selected: CellPosition; onSelect?: (cell: CellPosition) => void;
 }) {
-  return (
-    <section
-      className={`rounded-[14px] border border-[#d8e0f3] bg-white/92 shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
-
-function LessonTitle({ children }: { children: ReactNode }) {
-  return (
-    <h2 className="text-[18px] leading-none font-black text-[#0648d9] uppercase">
-      {children}
-    </h2>
-  );
-}
-
-function InfoIcon({ className = "size-5" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 10v7" />
-      <path d="M12 7h.01" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2.2"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="m8 12.4 2.5 2.5L16.5 9" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <rect x="5" y="10" width="14" height="10" rx="2" />
-      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
-
-function formatCellName(cell: CellPosition) {
-  return `C[${cell.row + 1},${cell.col + 1}]`;
-}
-
-function formatEquationForCell({
-  left,
-  right,
-  cell,
-}: {
-  left: Matrix;
-  right: Matrix;
-  cell: CellPosition;
-}) {
-  const terms = getDotProductTerms({ left, right, cell });
-  const total = terms.at(-1)?.runningTotal ?? 0;
-
-  return `${formatCellName(cell)}: ${terms
-    .map((term) => formatTerm(term.left, term.right))
-    .join(" + ")} = ${total}`;
-}
-
-function ShapeSummary({
-  analysis,
-}: {
-  analysis: ReturnType<typeof analyzeProduct>;
-}) {
-  const leftInner = analysis.leftShape[1];
-  const rightInner = analysis.rightShape[0];
-
-  return (
-    <div className="overflow-hidden rounded-[10px] border border-[#d8e0f3] bg-[#fbfcff]">
-      <div className="grid divide-y divide-[#d8e0f3] text-center text-[#071024] sm:grid-cols-[1fr_auto_1fr_1.15fr_1fr] sm:divide-x sm:divide-y-0">
-        <div className="px-4 py-3">
-          <p className="text-[13px] font-bold text-[#1b2c5d]">A shape</p>
-          <p className="mt-1 font-mono text-[28px] font-black">
-            {formatShape(analysis.leftShape)}
-          </p>
-          <p className="font-serif text-[14px] text-[#223869]">(m x n)</p>
-        </div>
-        <div className="hidden items-center px-3 font-mono text-[26px] sm:flex">
-          x
-        </div>
-        <div className="px-4 py-3">
-          <p className="text-[13px] font-bold text-[#1b2c5d]">B shape</p>
-          <p className="mt-1 font-mono text-[28px] font-black">
-            {formatShape(analysis.rightShape)}
-          </p>
-          <p className="font-serif text-[14px] text-[#223869]">(n x p)</p>
-        </div>
-        <div className="px-4 py-3">
-          <p className="text-[13px] font-bold text-[#1b2c5d]">
-            Shared inner dimension
-          </p>
-          <p className="mt-1 font-mono text-[26px] font-black text-[#0f8b42]">
-            {leftInner} = {rightInner}
-          </p>
-          <p className="font-serif text-[14px] text-[#223869]">(n)</p>
-        </div>
-        <div className="px-4 py-3">
-          <p className="text-[13px] font-bold text-[#1b2c5d]">
-            Output C shape
-          </p>
-          <p className="mt-1 font-mono text-[28px] font-black">
-            {analysis.outputShape ? formatShape(analysis.outputShape) : "-"}
-          </p>
-          <p className="font-serif text-[14px] text-[#223869]">(m x p)</p>
-        </div>
-      </div>
-      <div className="flex items-center justify-center gap-2 border-t border-[#d8e0f3] px-4 py-3 text-[15px] font-semibold text-[#087137]">
-        <CheckIcon />
-        compatible: {leftInner} multiply-adds per output cell
-      </div>
-    </div>
-  );
-}
-
-function ShapeSelector({
-  activePreset,
-  onSelectPreset,
-}: {
-  activePreset: MatrixShapePreset;
-  onSelectPreset: (preset: MatrixShapePreset) => void;
-}) {
-  const analysis = analyzeProduct(activePreset.left, activePreset.right);
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.5fr)_minmax(220px,0.55fr)] 2xl:items-center">
-        <div className="min-w-0">
-          <LessonTitle>1. Set The Shapes</LessonTitle>
-          <p className="mt-4 text-[15px] leading-[1.45] text-[#16264e]">
-            Choose compatible shapes:
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3 2xl:grid-cols-1">
-            {matrixShapePresets.map((preset) => {
-              const isSelected = preset.id === activePreset.id;
-
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => onSelectPreset(preset)}
-                  className={`min-h-12 rounded-[9px] border px-4 text-center font-mono text-[15px] font-black transition ${
-                    isSelected
-                      ? "border-[#075ee7] bg-[#075ee7] text-white shadow-[0_12px_22px_rgba(7,94,231,0.18)]"
-                      : "border-[#d8e0f3] bg-white text-[#071024] hover:border-[#aebdea] hover:bg-[#f8fbff]"
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-3 text-[13px] leading-[1.35] font-semibold text-[#52658e]">
-            The guide starts with 2x2 x 2x3. Use the other presets as optional
-            practice once the rule clicks.
-          </p>
-        </div>
-
-        <ShapeSummary analysis={analysis} />
-
-        <div className="min-w-0">
-          <p className="text-[15px] font-semibold text-[#16264e]">
-            Try an incompatible shape:
-          </p>
-          <div className="mt-3 flex min-h-12 items-center justify-center gap-3 rounded-[9px] border border-[#ffb2a8] bg-[#fffafa] px-4 font-mono text-[16px] font-black text-[#c11d13]">
-            {formatShape(incompatibleExample.leftShape)} x{" "}
-            {formatShape(incompatibleExample.rightShape)}
-            <LockIcon />
-          </div>
-          <p className="mt-3 text-[14px] font-semibold text-[#d42117]">
-            blocked: inner sizes {incompatibleExample.leftShape[1]} and{" "}
-            {incompatibleExample.rightShape[0]} differ
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function MatrixGrid({
-  label,
-  matrix,
-  role,
-  selectedCell,
-  selectedRow,
-  selectedCol,
-  onSelectCell,
-}: {
-  label: string;
-  matrix: Matrix;
-  role: "left" | "right" | "product";
-  selectedCell?: CellPosition;
-  selectedRow?: number;
-  selectedCol?: number;
-  onSelectCell?: (cell: CellPosition) => void;
-}) {
-  const columns = matrix[0]?.length ?? 0;
-  const columnLabels = Array.from({ length: columns }, (_, index) => index);
-
-  return (
-    <div className="min-w-0">
-      <p className="text-center text-[15px] font-black text-[#071024]">
-        {label}
-      </p>
-      <div
-        className="mt-3 grid items-center gap-x-1 gap-y-1"
-        style={
-          {
-            gridTemplateColumns: `34px repeat(${columns}, minmax(48px, 1fr))`,
-          } as CSSProperties
-        }
-      >
-        <div />
-        {columnLabels.map((columnIndex) => (
-          <div
-            key={columnIndex}
-            className={`text-center font-serif text-[13px] italic ${
-              role === "right" && selectedCol === columnIndex
-                ? "text-[#f59e0b]"
-                : "text-[#172b5e]"
-            }`}
-          >
-            {role === "right" || role === "product"
-              ? `j = ${columnIndex + 1}`
-              : `k = ${columnIndex + 1}`}
-          </div>
-        ))}
-        {matrix.map((row, rowIndex) => (
-          row.map((value, columnIndex) => {
-            const isSelected =
-              selectedCell?.row === rowIndex && selectedCell.col === columnIndex;
-            const highlightsSelectedRow =
-              role === "left" && selectedRow === rowIndex;
-            const highlightsSelectedCol =
-              role === "right" && selectedCol === columnIndex;
-            const rowLabel =
-              columnIndex === 0 ? (
-                <div
-                  className={`pr-2 text-right font-serif text-[14px] italic ${
-                    (role === "left" || role === "product") &&
-                    selectedRow === rowIndex
-                      ? "font-bold text-[#075ee7]"
-                      : "text-[#172b5e]"
-                  }`}
-                >
-                  {role === "left" || role === "product"
-                    ? `i = ${rowIndex + 1}`
-                    : `k = ${rowIndex + 1}`}
-                </div>
-              ) : null;
-            const cellClassName = [
-              "grid min-h-14 place-items-center border border-[#bdc9df] px-3 font-mono text-[22px] font-black transition",
-              highlightsSelectedRow
-                ? "border-[#4f8cf7] bg-[#eaf2ff] text-[#071024]"
-                : "",
-              highlightsSelectedCol
-                ? "border-[#f3aa34] bg-[#fff5df] text-[#071024]"
-                : "",
-              isSelected
-                ? "border-[#069247] bg-[#e9f9ef] text-[#087137] ring-2 ring-[#069247]"
-                : "",
-              role === "product" && !isSelected
-                ? value < 0
-                  ? "bg-[#fff0ed] text-[#071024]"
-                  : value > 0
-                    ? "bg-[#effbf3] text-[#071024]"
-                    : "bg-white text-[#071024]"
-                : highlightsSelectedRow || highlightsSelectedCol || isSelected
-                  ? ""
-                  : "bg-white",
-            ].join(" ");
-            const contents = onSelectCell ? (
-              <button
-                type="button"
-                onClick={() => onSelectCell({ row: rowIndex, col: columnIndex })}
-                className={`${cellClassName} w-full hover:border-[#069247] focus:outline-none focus:ring-4 focus:ring-green-100`}
-                aria-label={`Select ${formatCellName({
-                  row: rowIndex,
-                  col: columnIndex,
-                })} in ${label}`}
-              >
-                {value}
-              </button>
-            ) : (
-              <div className={cellClassName}>{value}</div>
-            );
-
-            return (
-              <div
-                key={`${rowIndex}-${columnIndex}`}
-                className="contents"
-              >
-                {rowLabel}
-                {contents}
-              </div>
-            );
-          })
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MatrixSelectionPanel({
-  preset,
-  product,
-  selectedCell,
-  onSelectCell,
-}: {
-  preset: MatrixShapePreset;
-  product: Matrix;
-  selectedCell: CellPosition;
-  onSelectCell: (cell: CellPosition) => void;
-}) {
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>2. Pick One Output Cell</LessonTitle>
-      <p className="mt-4 text-[15px] leading-[1.45] text-[#16264e]">
-        Select a cell in C. The matching row of A and column of B light up.
-      </p>
-
-      <div className="mt-6 grid gap-7 lg:grid-cols-[minmax(240px,0.95fr)_auto_minmax(220px,0.8fr)_auto_minmax(220px,0.85fr)] lg:items-center">
-        <MatrixGrid
-          label={`Matrix A (${formatShape(analyzeProduct(preset.left, preset.right).leftShape)})`}
-          matrix={preset.left}
-          role="left"
-          selectedRow={selectedCell.row}
-        />
-        <div className="hidden text-center font-mono text-[28px] font-black text-[#071024] lg:block">
-          x
-        </div>
-        <MatrixGrid
-          label={`Matrix B (${formatShape(analyzeProduct(preset.left, preset.right).rightShape)})`}
-          matrix={preset.right}
-          role="right"
-          selectedCol={selectedCell.col}
-        />
-        <div className="hidden text-center font-mono text-[28px] font-black text-[#071024] lg:block">
-          =
-        </div>
-        <div className="min-w-0">
-          <MatrixGrid
-            label={`Matrix C = A x B (${product.length}x${product[0]?.length ?? 0})`}
-            matrix={product}
-            role="product"
-            selectedCell={selectedCell}
-            selectedRow={selectedCell.row}
-            selectedCol={selectedCell.col}
-            onSelectCell={onSelectCell}
-          />
-          <div className="mt-3 rounded-[9px] border border-[#bce4ca] bg-[#f1fff6] px-3 py-2 text-[13px] leading-[1.35] font-semibold text-[#075f32]">
-            Selected cell:{" "}
-            <span className="font-mono text-[#071024]">
-              {formatCellName(selectedCell)}
-            </span>{" "}
-            = row {selectedCell.row + 1} dot column {selectedCell.col + 1}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 flex items-center gap-3 rounded-[8px] border border-[#d8e0f3] bg-[#fbfcff] px-4 py-3 text-[15px] font-semibold text-[#142755]">
-        <InfoIcon className="size-5 shrink-0 text-[#075ee7]" />
-        {formatCellName(selectedCell)} = row {selectedCell.row + 1} of A dot
-        column {selectedCell.col + 1} of B
-      </div>
-    </Panel>
-  );
-}
-
-function DotProductPanel({
-  cell,
-  terms,
-  activeStep,
-  onSelectStep,
-}: {
-  cell: CellPosition;
-  terms: ReturnType<typeof getDotProductTerms>;
-  activeStep: number;
-  onSelectStep: (step: number) => void;
-}) {
-  const finalTotal = terms.at(-1)?.runningTotal ?? 0;
-  const revealedTerms = terms.slice(0, activeStep + 1);
-  const visibleTotal = revealedTerms.at(-1)?.runningTotal ?? 0;
-  const formula = `${formatCellName(cell)} = ${revealedTerms
-    .map((term) => formatTerm(term.left, term.right))
-    .join(" + ")}${activeStep < terms.length - 1 ? " + ..." : ""} = ${
-    activeStep < terms.length - 1 ? `${visibleTotal} so far` : finalTotal
-  }`;
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>3. Watch The Dot Product</LessonTitle>
-      <p className="mt-4 text-[15px] leading-[1.45] text-[#16264e]">
-        Compute {formatCellName(cell)} step by step.
-      </p>
-
-      <div className="mt-5 flex items-center justify-between gap-3">
-        {terms.map((term) => {
-          const isActive = term.index === activeStep;
-
-          return (
-            <button
-              key={term.index}
-              type="button"
-              onClick={() => onSelectStep(term.index)}
-              className="group flex min-w-0 flex-1 flex-col items-center gap-2"
-            >
-              <span
-                className={`grid size-9 place-items-center rounded-full border font-mono text-[15px] font-black transition ${
-                  isActive
-                    ? "border-[#075ee7] bg-[#075ee7] text-white"
-                    : "border-[#aeb8cc] bg-white text-[#172b5e] group-hover:border-[#075ee7]"
-                }`}
-              >
-                {term.index + 1}
-              </span>
-              <span
-                className={`font-serif text-[13px] italic ${
-                  isActive ? "font-bold text-[#075ee7]" : "text-[#172b5e]"
-                }`}
-              >
-                k = {term.index + 1}
-              </span>
-            </button>
-          );
+  const shape = [matrix.length, matrix[0].length] as [number, number];
+  return <div className={styles.matrix}>
+    <h3>{name} ({formatShape(shape)})</h3>
+    <table aria-label={`Matrix ${name}`}>
+      <thead><tr><th aria-label="Row and column indices" />{matrix[0].map((_, col) =>
+        <th scope="col" key={col}>{kind === "left" ? "k" : "j"} = {col + 1}</th>)}</tr></thead>
+      <tbody>{matrix.map((row, rowIndex) => <tr key={rowIndex}>
+        <th scope="row">{kind === "right" ? "k" : "i"} = {rowIndex + 1}</th>
+        {row.map((value, col) => {
+          const cell = { row: rowIndex, col };
+          const isSelected = cellKey(cell) === cellKey(selected);
+          return <td key={col} data-highlight={kind === "left" && selected.row === rowIndex ? "row" : kind === "right" && selected.col === col ? "column" : undefined}>
+            {onSelect ? <button type="button" className={styles.outputCell}
+              aria-label={`Select ${cellName(cell)}, value ${value}`} aria-pressed={isSelected}
+              aria-describedby="matrix-keyboard-help" onClick={() => onSelect(cell)}>{value}</button> : value}
+          </td>;
         })}
-      </div>
-
-      <p className="mt-5 text-[15px] text-[#16264e]">
-        Multiply A[{cell.row + 1},k] by B[k,{cell.col + 1}] and add to the
-        running sum.
-      </p>
-
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {terms.map((term) => {
-          const isActive = term.index === activeStep;
-          const isRevealed = term.index <= activeStep;
-
-          return (
-            <button
-              key={term.index}
-              type="button"
-              onClick={() => onSelectStep(term.index)}
-              className={`rounded-[8px] border px-3 py-3 text-center transition ${
-                isActive
-                  ? "border-[#f59e0b] bg-[#fff8ed] text-[#071024] shadow-[0_10px_22px_rgba(245,158,11,0.12)]"
-                  : "border-[#d8e0f3] bg-white text-[#16264e] hover:border-[#b9c4de]"
-              }`}
-            >
-              <span className="block font-mono text-[17px] font-black">
-                {isRevealed
-                  ? `${formatTerm(term.left, term.right)} = ${term.product}`
-                  : `Reveal k = ${term.index + 1}`}
-              </span>
-              <span
-                className={`mt-1 block font-serif text-[13px] italic ${
-                  isActive ? "text-[#d97706]" : "text-[#52658e]"
-                }`}
-              >
-                k = {term.index + 1}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <span className="text-[15px] font-semibold text-[#16264e]">
-          Running sum:
-        </span>
-        {revealedTerms.map((term, index) => (
-          <div key={term.index} className="flex items-center gap-3">
-            {index > 0 ? (
-              <span className="font-mono text-[18px] text-[#172b5e]">-&gt;</span>
-            ) : null}
-            <span
-              className={`min-w-16 rounded-[8px] border px-4 py-2 text-center font-mono text-[18px] font-black ${
-                term.index === activeStep
-                  ? "border-[#f59e0b] bg-[#fff8ed] text-[#d97706]"
-                  : index === terms.length - 1
-                    ? "border-[#b8e7c8] bg-[#f0fff5] text-[#087137]"
-                    : "border-[#d8e0f3] bg-white text-[#071024]"
-              }`}
-            >
-              {term.runningTotal}
-            </span>
-          </div>
-        ))}
-        {activeStep < terms.length - 1 ? (
-          <span className="rounded-[8px] border border-dashed border-[#c8d2e6] px-4 py-2 font-mono text-[15px] font-black text-[#52658e]">
-            ...
-          </span>
-        ) : null}
-      </div>
-
-      <div className="mt-4 rounded-[8px] border border-[#8bd9a8] bg-[#f4fff8] px-4 py-3 text-center font-mono text-[16px] font-black break-words text-[#071024] sm:text-[18px]">
-        {formula}
-      </div>
-      <div className="mt-3 flex items-center gap-3 rounded-[8px] border border-[#d8e0f3] bg-[#fbfcff] px-4 py-2 text-[14px] font-semibold text-[#075ee7]">
-        <InfoIcon className="size-5 shrink-0" />
-        k walks across the row and down the column together.
-      </div>
-    </Panel>
-  );
-}
-
-function FullProductPanel({
-  left,
-  right,
-  product,
-  selectedCell,
-  onSelectCell,
-}: {
-  left: Matrix;
-  right: Matrix;
-  product: Matrix;
-  selectedCell: CellPosition;
-  onSelectCell: (cell: CellPosition) => void;
-}) {
-  const cells = product.flatMap((row, rowIndex) =>
-    row.map((_, colIndex) => ({ row: rowIndex, col: colIndex })),
-  );
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>4. See The Full Product</LessonTitle>
-      <p className="mt-4 text-[15px] leading-[1.45] text-[#16264e]">
-        Each formula chip is a row-column dot product.
-      </p>
-      <div className="mt-5 grid gap-5">
-        <div className="grid gap-5 lg:grid-cols-2">
-          <MatrixGrid
-            label={`A row ${selectedCell.row + 1}`}
-            matrix={left}
-            role="left"
-            selectedRow={selectedCell.row}
-          />
-          <MatrixGrid
-            label={`B column ${selectedCell.col + 1}`}
-            matrix={right}
-            role="right"
-            selectedCol={selectedCell.col}
-          />
-        </div>
-        <div className="grid gap-5 lg:grid-cols-[minmax(190px,0.6fr)_minmax(0,1fr)] lg:items-start">
-          <MatrixGrid
-            label={`C = A x B (${product.length}x${product[0]?.length ?? 0})`}
-            matrix={product}
-            role="product"
-            selectedCell={selectedCell}
-            selectedRow={selectedCell.row}
-            selectedCol={selectedCell.col}
-            onSelectCell={onSelectCell}
-          />
-          <div className="grid gap-3 sm:grid-cols-2">
-            {cells.map((cell) => {
-              const isSelected =
-                selectedCell.row === cell.row && selectedCell.col === cell.col;
-
-              return (
-                <button
-                  key={`${cell.row}-${cell.col}`}
-                  type="button"
-                  onClick={() => onSelectCell(cell)}
-                  className={`min-w-0 rounded-[8px] border px-3 py-3 text-left font-mono text-[13px] font-bold leading-[1.35] break-words transition ${
-                    isSelected
-                      ? "border-[#069247] bg-[#f1fff6] text-[#071024]"
-                      : product[cell.row][cell.col] < 0
-                        ? "border-[#ffc3bc] bg-[#fffafa] text-[#071024] hover:border-[#f5988e]"
-                        : "border-[#d8e0f3] bg-white text-[#071024] hover:border-[#b9c4de]"
-                  }`}
-                >
-                  {formatEquationForCell({ left, right, cell })}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      <div className="mt-5 flex items-center gap-3 rounded-[8px] border border-[#d8e0f3] bg-[#fbfcff] px-4 py-3 text-[15px] font-semibold text-[#142755]">
-        <InfoIcon className="size-5 shrink-0 text-[#075ee7]" />
-        {product.length * (product[0]?.length ?? 0)} output cells means{" "}
-        {product.length * (product[0]?.length ?? 0)} row-column dot products.
-      </div>
-    </Panel>
-  );
-}
-
-function RulePanel() {
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>5. The Rule</LessonTitle>
-      <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] 2xl:items-center">
-        <div>
-          <p className="text-[15px] font-semibold text-[#16264e]">
-            Matrix multiplication rule:
-          </p>
-          <div className="mt-3 rounded-[9px] border border-[#d8e0f3] bg-[#fbfcff] px-4 py-5 text-center font-serif text-[28px] text-[#071024] sm:text-[34px]">
-            (AB)<sub className="text-[14px]">ij</sub> ={" "}
-            <span className="inline-flex flex-col items-center px-1 align-middle leading-none">
-              <sup className="text-[12px]">n</sup>
-              <span className="text-[34px] leading-[0.8]">Σ</span>
-              <sub className="text-[12px]">k=1</sub>
-            </span>{" "}
-            A
-            <sub className="text-[14px]">ik</sub> B
-            <sub className="text-[14px]">kj</sub>
-          </div>
-        </div>
-        <div>
-          <p className="text-[15px] font-semibold text-[#16264e]">
-            Dimension rule:
-          </p>
-          <div className="mt-3 rounded-[9px] border border-[#d8e0f3] bg-white px-4 py-5">
-            <div className="flex flex-wrap items-center justify-center gap-3 font-serif text-[25px] text-[#071024] sm:text-[30px]">
-              <span className="rounded-[8px] border border-[#d8e0f3] px-4 py-2">
-                (m x <span className="text-[#087137]">n</span>)
-              </span>
-              <span className="font-mono text-[20px]">x</span>
-              <span className="rounded-[8px] border border-[#d8e0f3] px-4 py-2">
-                (<span className="text-[#087137]">n</span> x p)
-              </span>
-              <span className="font-mono text-[20px]">-&gt;</span>
-              <span className="rounded-[8px] border border-[#d8e0f3] px-4 py-2">
-                (m x p)
-              </span>
-            </div>
-            <div className="mx-auto mt-4 w-fit rounded-[8px] border border-[#bfe9cc] bg-[#f3fff7] px-4 py-2 text-center text-[14px] font-semibold text-[#087137]">
-              shared n: number of terms
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-5 flex items-center gap-3 rounded-[9px] border border-[#a8dfbb] bg-[#f2fff7] px-4 py-3 text-[15px] font-semibold text-[#087137]">
-        <CheckIcon />
-        Rows choose i. Columns choose j. The shared dimension tells how many
-        products get added.
-      </div>
-    </Panel>
-  );
+      </tr>)}</tbody>
+    </table>
+    <p className={styles.matrixCaption}>{kind === "left" ? `Row ${selected.row + 1} of A` : kind === "right" ? `Column ${selected.col + 1} of B` : `Selected: ${cellName(selected)}`}</p>
+  </div>;
 }
 
 export function MatrixMultiplicationPlayground() {
-  const [activePresetId, setActivePresetId] = useState(matrixShapePresets[0].id);
-  const [selectedCell, setSelectedCell] = useState<CellPosition>(
-    matrixShapePresets[0].defaultCell,
-  );
+  const [presetId, setPresetId] = useState(matrixShapePresets[0].id);
+  const [selected, setSelected] = useState<CellPosition>(matrixShapePresets[0].defaultCell);
   const [activeStep, setActiveStep] = useState(0);
+  const [experimentIndex, setExperimentIndex] = useState(0);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const [checked, setChecked] = useState(false);
+  const [shapeTried, setShapeTried] = useState(false);
+  const [visitedTerms, setVisitedTerms] = useState<number[]>([]);
+  const [visitedFormulas, setVisitedFormulas] = useState<string[]>([]);
+  const [cellTried, setCellTried] = useState(false);
+  const [freeExplore, setFreeExplore] = useState(false);
+  const preset = matrixShapePresets.find((item) => item.id === presetId)!;
+  const analysis = useMemo(() => analyzeProduct(preset.left, preset.right), [preset]);
+  const product = analysis.product!;
+  const terms = useMemo(() => getDotProductTerms({ left: preset.left, right: preset.right, cell: selected }), [preset, selected]);
+  const experiment = matrixExperiments[experimentIndex];
+  const guidedShape = presetId === guidedPresetId;
+  const reachedTarget = prediction !== null && guidedShape && (experimentIndex === 0 ? shapeTried : experimentIndex === 1
+    ? cellTried && cellKey(selected) === "0,1" && visitedTerms.includes(0) && visitedTerms.includes(1) && activeStep === 1
+    : visitedFormulas.includes("0,1") && visitedFormulas.includes("1,0") && cellKey(selected) === "1,0");
+  const complete = reachedTarget && checked && explanation === "correct";
+  const phase = prediction === null ? 0 : reachedTarget ? 2 : 1;
+  const revealedTerms = terms.slice(0, activeStep + 1);
+  const runningTotal = revealedTerms.at(-1)!.runningTotal;
+  const total = terms.at(-1)!.runningTotal;
+  const equation = `${cellName(selected)} = ${revealedTerms.map((term) => formatTerm(term.left, term.right)).join(" + ")}${activeStep < terms.length - 1 ? " + …" : ""} = ${runningTotal}${activeStep < terms.length - 1 ? " so far" : ""}`;
 
-  const activePreset =
-    matrixShapePresets.find((preset) => preset.id === activePresetId) ??
-    matrixShapePresets[0];
-
-  const analysis = useMemo(
-    () => analyzeProduct(activePreset.left, activePreset.right),
-    [activePreset],
-  );
-  const product = analysis.product ?? [];
-  const terms = useMemo(
-    () =>
-      getDotProductTerms({
-        left: activePreset.left,
-        right: activePreset.right,
-        cell: selectedCell,
-      }),
-    [activePreset, selectedCell],
-  );
-  const clampedStep = Math.min(activeStep, Math.max(terms.length - 1, 0));
-
-  function handlePresetSelect(preset: MatrixShapePreset) {
-    setActivePresetId(preset.id);
-    setSelectedCell(preset.defaultCell);
-    setActiveStep(0);
+  function clearEvidence() {
+    setShapeTried(false); setVisitedTerms([]); setVisitedFormulas([]); setCellTried(false);
+    setExplanation(null); setChecked(false);
+  }
+  function restoreStartingState(index = experimentIndex, exploring = freeExplore) {
+    const start = exploring ? preset : index === 0 ? matrixShapePresets[0] : guidedPreset;
+    setPresetId(start.id); setSelected(index === 2 && !exploring ? { row: 0, col: 1 } : start.defaultCell);
+    setActiveStep(0); clearEvidence();
+  }
+  function reset() { restoreStartingState(); setPrediction(null); }
+  function predict(value: string) { restoreStartingState(); setPrediction(value); }
+  function selectPreset(id: string) {
+    const next = matrixShapePresets.find((item) => item.id === id)!;
+    setPresetId(id); setSelected(next.defaultCell); setActiveStep(0); clearEvidence();
+    if (prediction !== null && experimentIndex === 0 && id === guidedPresetId) setShapeTried(true);
+  }
+  function selectCell(cell: CellPosition, formula = false) {
+    setSelected(cell); setActiveStep(0); setVisitedTerms([]); setExplanation(null); setChecked(false);
+    if (prediction !== null && guidedShape) {
+      if (experimentIndex === 1 && cellKey(cell) === "0,1") setCellTried(true);
+      if (experimentIndex === 2 && formula) {
+        setVisitedFormulas((previous) => [...new Set([...previous, cellKey(cell)])]);
+      }
+    }
+  }
+  function selectStep(step: number) {
+    setActiveStep(step); setExplanation(null); setChecked(false);
+    if (prediction !== null && guidedShape && experimentIndex === 1 && cellKey(selected) === "0,1" && cellTried) {
+      setVisitedTerms((previous) => [...new Set([...previous, step])]);
+    }
+  }
+  function changeExperiment(index: number) {
+    setExperimentIndex(index); setFreeExplore(false); setPrediction(null); restoreStartingState(index, false);
   }
 
-  function handleCellSelect(cell: CellPosition) {
-    setSelectedCell(cell);
-    setActiveStep(0);
-  }
-
-  return (
-    <main className="min-h-screen bg-[#f7f9fd] px-4 py-5 text-[#071024] sm:px-6 lg:px-8 2xl:pr-56">
-      <div className="mx-auto max-w-[1500px]">
-        <header>
-          <div className="min-w-0">
-            <h1 className="text-[44px] leading-[0.95] font-black tracking-[-0.05em] text-[#050912] sm:text-[56px] lg:text-[64px]">
-              Matrix Multiplication Lab
-            </h1>
-            <p className="mt-3 max-w-3xl text-[18px] leading-[1.35] font-semibold text-[#17366f] sm:text-[20px]">
-              Every cell in the product comes from a row of A dotted with a
-              column of B.
-            </p>
-          </div>
-        </header>
-
-        <div className="mt-6 grid gap-4">
-          <ShapeSelector
-            activePreset={activePreset}
-            onSelectPreset={handlePresetSelect}
-          />
-          {analysis.product ? (
-            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.45fr)_minmax(420px,0.9fr)]">
-              <MatrixSelectionPanel
-                preset={activePreset}
-                product={product}
-                selectedCell={selectedCell}
-                onSelectCell={handleCellSelect}
-              />
-              <DotProductPanel
-                cell={selectedCell}
-                terms={terms}
-                activeStep={clampedStep}
-                onSelectStep={setActiveStep}
-              />
-            </div>
-          ) : null}
-          {analysis.product ? (
-            <div className="grid gap-4 2xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)]">
-              <FullProductPanel
-                left={activePreset.left}
-                right={activePreset.right}
-                product={product}
-                selectedCell={selectedCell}
-                onSelectCell={handleCellSelect}
-              />
-              <RulePanel />
-            </div>
-          ) : null}
+  return <LearningPage title="Matrix Multiplication Lab"
+    subtitle="Select a cell. Follow its row and column. Add the products."
+    rail={<ExperimentRail label={freeExplore ? "Optional practice" : `Experiment ${experimentIndex + 1} of 3`}
+      title={freeExplore ? "Try another shape" : experiment.title} phase={freeExplore ? undefined : phase}>
+      {freeExplore ? <>
+        <h3>Transfer the rule</h3>
+        <p>Before choosing 3x2 x 2x1, predict the output shape and how many products each cell uses. Then select C[3,1] and reveal both terms. Explain why its result is 30 even though one factor is zero.</p>
+        <p className={shared.small}>The fixed matrices let you focus on shapes and row-column pairing. Use the other presets for more practice.</p>
+        <ExperimentButton onClick={() => changeExperiment(0)}>Restart the experiments</ExperimentButton>
+      </> : <>
+        {!reachedTarget && <>
+          <h3>Make a prediction</h3><p>{experiment.question}</p>
+          <ExperimentChoices legend="Your prediction" name="matrix-prediction" choices={experiment.predictions}
+            value={prediction} onChange={predict} />
+          <p className={shared.small}>Choosing a prediction restores the starting matrices.</p>
+        </>}
+        {prediction !== null && !reachedTarget && <div className={shared.actionPrompt}>
+          <p><strong>Now try it.</strong> {experiment.action}</p>
+          {experimentIndex === 1 && <p className={shared.small}>Select each k button after selecting C[1,2], including k = 1.</p>}
+        </div>}
+        {reachedTarget && <>
+          <h3>What did you notice?</h3>
+          <p role="status" className={shared.observation}>{prediction === "correct" ? "Your prediction matches the evidence." : "The evidence differed from your prediction. Use it to revise your explanation."}</p>
+          <h3>{experiment.explanationQuestion}</h3>
+          <ExperimentChoices legend="Your explanation" name="matrix-explanation" choices={experiment.explanations}
+            value={explanation} onChange={(value) => { setExplanation(value); setChecked(false); }} />
+          {!complete && <ExperimentButton disabled={explanation === null} onClick={() => setChecked(true)}>Check explanation</ExperimentButton>}
+          {checked && !complete && <p className={shared.feedback} role="status">Try again. {experiment.recovery}</p>}
+        </>}
+        {complete && <>
+          <ExperimentResult title={experimentIndex === 2 ? "Lesson explained" : "Experiment explained"}>{experiment.takeaway}</ExperimentResult>
+          <ExperimentButton arrow onClick={() => {
+            if (experimentIndex < 2) changeExperiment(experimentIndex + 1);
+            else { setFreeExplore(true); setPrediction(null); clearEvidence(); }
+          }}>{experimentIndex < 2 ? `Next: ${matrixExperiments[experimentIndex + 1].title}` : "Try another shape"}</ExperimentButton>
+        </>}
+        <div className={styles.experimentNavigation}>
+          <button type="button" disabled={experimentIndex === 0} onClick={() => changeExperiment(experimentIndex - 1)}>← Previous experiment</button>
+          <button type="button" onClick={() => { setFreeExplore(true); setPrediction(null); clearEvidence(); }}>Explore freely</button>
         </div>
+      </>}
+    </ExperimentRail>}>
+    <LessonToolbar scenarios={scenarios} selectedId={presetId} onSelect={selectPreset} onReset={reset} />
+    <section className={styles.matricesSection} aria-label="Matrix multiplication workbench">
+      <div className={styles.heading}><h2>Your matrices</h2><span>Select a cell in C to trace how it is built</span></div>
+      <p className={styles.shape}>({analysis.leftShape[0]} × <strong>{analysis.leftShape[1]}</strong>) × (<strong>{analysis.rightShape[0]}</strong> × {analysis.rightShape[1]}) → ({formatShape(analysis.outputShape!)})</p>
+      <p className={shared.small}>Inner sizes match: {analysis.leftShape[1]} terms per output cell. Shape means rows × columns.</p>
+      <div className={styles.matrices}>
+        <MatrixGrid name="A" matrix={preset.left} kind="left" selected={selected} />
+        <span className={styles.operator} aria-hidden="true">×</span>
+        <MatrixGrid name="B" matrix={preset.right} kind="right" selected={selected} />
+        <span className={styles.operator} aria-hidden="true">=</span>
+        <MatrixGrid name="C = A × B" matrix={product} kind="product" selected={selected} onSelect={selectCell} />
       </div>
-    </main>
-  );
+      <p id="matrix-keyboard-help" className={styles.keyboardHelp}>Tab to an output cell; Enter or Space to select.</p>
+    </section>
+    <section className={styles.construction} aria-label="Selected cell calculation">
+      <h2>Build {cellName(selected)}</h2><p>A dot product multiplies matching pairs, then adds their products.</p>
+      <div className={styles.terms} style={{ "--term-count": terms.length } as CSSProperties}>
+        {terms.map((term) => <div className={styles.term} key={term.index}>
+          <button type="button" aria-pressed={activeStep === term.index} onClick={() => selectStep(term.index)}>k = {term.index + 1}</button>
+          <p>{term.index <= activeStep ? `${formatTerm(term.left, term.right)} = ${term.product}` : `Reveal pair ${term.index + 1}`}</p>
+          <small>Pair {term.index + 1}</small>
+        </div>)}
+      </div>
+      <p>Running sum: {revealedTerms.map((term) => term.runningTotal).join(" → ")}{activeStep < terms.length - 1 ? " → …" : ""}</p>
+      <div className={styles.equation}>{equation}</div>
+      <p className={shared.small}>k pairs each position in the row with the same position in the column.</p>
+      <p className={shared.liveUpdate} role="status" aria-live="polite">{cellName(selected)} uses row {selected.row + 1} and column {selected.col + 1}. Step {activeStep + 1} of {terms.length}; running sum {runningTotal}.</p>
+    </section>
+    <LessonSummaries label="Live matrix summaries" summaries={[
+      { label: "Output shape", color: "#5031dc", value: formatShape(analysis.outputShape!), definition: "A’s rows × B’s columns.", formula: `(${formatShape(analysis.leftShape)}) × (${formatShape(analysis.rightShape)}) → (${formatShape(analysis.outputShape!)})` },
+      { label: "Terms per cell", color: "#5031dc", value: String(terms.length), definition: "The shared inner size.", formula: `${analysis.leftShape[1]} A columns = ${analysis.rightShape[0]} B rows` },
+      { label: "Selected result", color: "#5031dc", value: String(total), definition: `Row ${selected.row + 1} · Column ${selected.col + 1}.`, formula: `${cellName(selected)} = ${total}` },
+    ]} />
+    <section className={styles.fullProduct} aria-label="All output formulas and multiplication rules">
+      <h2>Every output cell follows the same rule</h2>
+      <div className={styles.formulas}>{product.flatMap((row, rowIndex) => row.map((value, col) => {
+        const cell = { row: rowIndex, col };
+        const formula = `${cellName(cell)}: ${getDotProductTerms({ left: preset.left, right: preset.right, cell }).map((term) => formatTerm(term.left, term.right)).join(" + ")} = ${value}`;
+        return <button type="button" key={cellKey(cell)} aria-pressed={cellKey(selected) === cellKey(cell)} onClick={() => selectCell(cell, true)}>{formula}</button>;
+      }))}</div>
+      <p className={shared.small}>{product.length * product[0].length} output cells means {product.length * product[0].length} row-column dot products.</p>
+      <div className={styles.rules}>
+        <p><strong>Incompatible example:</strong> ({formatShape(incompatibleExample.leftShape)}) × ({formatShape(incompatibleExample.rightShape)})<br />Blocked: inner sizes {incompatibleExample.leftShape[1]} and {incompatibleExample.rightShape[0]} differ.</p>
+        <p><strong>Dimension rule</strong><br />(m × n) × (n × p) → (m × p)</p>
+      </div>
+      <p className={styles.ruleNote}>C[i,j] = Σ A[i,k] × B[k,j], for k = 1 to n. Σ means add all the products. i chooses a row, j a column, and n is the shared size.</p>
+    </section>
+  </LearningPage>;
 }

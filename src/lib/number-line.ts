@@ -5,6 +5,20 @@ export type NumericValuePoint = {
   value: number;
 };
 
+// Pack nearby handles into rows without changing their horizontal numeric position.
+export function pointLanes(points: readonly NumericValuePoint[], width: number, spacing = 36) {
+  const ends: number[] = [];
+  const positions = new Map<string, number>();
+  for (const point of [...points].sort((a, b) => a.value - b.value)) {
+    const x = point.value / 100 * Math.max(1, width);
+    let lane = ends.findIndex((end) => x - end >= spacing);
+    if (lane < 0) lane = ends.length;
+    ends[lane] = x;
+    positions.set(point.id, lane);
+  }
+  return { positions, count: ends.length };
+}
+
 export function useStackedPointLayout<T extends NumericValuePoint>(
   points: T[],
   spacing = 20,

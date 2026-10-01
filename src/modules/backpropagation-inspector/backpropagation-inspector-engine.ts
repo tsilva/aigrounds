@@ -20,6 +20,7 @@ export type BackpropAnalysis = {
     wOut1: WeightUpdate;
     wOut2: WeightUpdate;
   };
+  afterUpdate: { z: number; probability: number; loss: number };
 };
 
 export type WeightUpdate = {
@@ -45,13 +46,18 @@ export function analyzeBackprop(
 ): BackpropAnalysis {
   const [h1, h2] = example.hiddenActivations;
   const z = outputWeights.wOut1 * h1 + outputWeights.wOut2 * h2 + outputWeights.bias;
-  const probability = roundTo(sigmoid(z), 3);
-  const loss = binaryCrossEntropy(probability, example.target);
+  const probability = sigmoid(z);
+  const loss = lossFromLogit(z, example.target);
   const outputDelta = probability - example.target;
   const dWOut1 = h1 * outputDelta;
   const dWOut2 = h2 * outputDelta;
   const dH1 = outputWeights.wOut1 * outputDelta;
   const dH2 = outputWeights.wOut2 * outputDelta;
+  const updates = {
+    wOut1: buildUpdate(outputWeights.wOut1, dWOut1, learningRate),
+    wOut2: buildUpdate(outputWeights.wOut2, dWOut2, learningRate),
+  };
+  const updatedZ = updates.wOut1.after * h1 + updates.wOut2.after * h2 + outputWeights.bias;
 
   return {
     h1,
@@ -69,17 +75,14 @@ export function analyzeBackprop(
       h1: dH1,
       h2: dH2,
     },
-    updates: {
-      wOut1: buildUpdate(outputWeights.wOut1, dWOut1, learningRate),
-      wOut2: buildUpdate(outputWeights.wOut2, dWOut2, learningRate),
-    },
+    updates,
+    afterUpdate: { z: updatedZ, probability: sigmoid(updatedZ), loss: lossFromLogit(updatedZ, example.target) },
   };
 }
 
-function roundTo(value: number, digits: number) {
-  const factor = 10 ** digits;
-
-  return Math.round(value * factor) / factor;
+export function lossFromLogit(z: number, target: 0 | 1) {
+  // Stable sigmoid binary cross entropy, with no clipped or rounded prediction.
+  return Math.max(z, 0) - target * z + Math.log1p(Math.exp(-Math.abs(z)));
 }
 
 function buildUpdate(
@@ -103,8 +106,8 @@ export function formatFixed(value: number, digits = 2) {
 
 export function formatSigned(value: number, digits = 3) {
   const formatted = Math.abs(value).toFixed(digits);
-
-  if (Object.is(value, -0) || value < 0) {
+  if (Number(formatted) === 0) return (0).toFixed(digits);
+  if (value < 0) {
     return `-${formatted}`;
   }
 

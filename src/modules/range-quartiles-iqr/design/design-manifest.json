@@ -5,6 +5,13 @@
   "modulePath": "src/modules/range-quartiles-iqr",
   "acceptedMockupPath": "src/modules/range-quartiles-iqr/design/accepted-mockup.png",
   "promptPath": "src/modules/range-quartiles-iqr/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f718-d20c-79a0-a1b8-d42099171ce1/exec-b2575171-6bf9-4560-bbe8-3fc97717afdc.png",
-  "approval": "User requested implementation of the recommended shared-scale design, with compact quartile calculations. Chart positions are computed exactly in implementation; the raster mockup is a layout reference."
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f75d-5c6f-7631-a7b0-9ea821a1e141/exec-cbf743c6-45fa-45d1-9d75-95854dad2f8b.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User approved the paired shared-layout mockup and requested removal of the redundant top AI Guide launcher.",
+  "approvedRefinements": [
+    "One shared learning-page frame, controls, summaries, experiment progress and Guide CTA",
+    "Guide access only below the exercise, no top navigation launcher",
+    "Exact chart geometry computed from existing engines, not raster positions",
+    "Preserve existing experiments and feedback, including Range before/now evidence"
+  ]
 }

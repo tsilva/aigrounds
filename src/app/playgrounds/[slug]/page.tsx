@@ -44,7 +44,7 @@ export default async function PlaygroundPage({
 
   const ModuleComponent = playground.component;
 
-  if (slug === "mean-median-mode" || slug === "range-quartiles-iqr") {
+  if (playground.layout === "guided-discovery") {
     return <ModuleComponent />;
   }
 

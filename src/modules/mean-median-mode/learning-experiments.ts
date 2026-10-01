@@ -19,7 +19,7 @@ export type LearningExperiment = {
 
 export const learningExperiments: Record<string, LearningExperiment> = {
   balanced: {
-    title: "Can one point break the balance?",
+    title: "Move an edge",
     question: "If you move I from 66 to 90, which summary values will change?",
     pointLabel: "I",
     target: 90,

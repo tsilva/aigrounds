@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Grounds Lesson Redesign"
+  short_description: "Bring older lessons into the shared design system"
+  default_prompt: "Use $aigrounds-redesign-lesson to redesign the selected existing AI Grounds lesson using the approved shared design system while preserving its teaching behavior."

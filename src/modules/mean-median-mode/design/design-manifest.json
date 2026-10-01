@@ -1,15 +1,17 @@
 {
   "lessonPlanStep": 1,
-  "lessonPlanTitle": "Mean, Median & Mode Lab",
+  "title": "Mean, Median & Mode",
   "slug": "mean-median-mode",
   "modulePath": "src/modules/mean-median-mode",
-  "acceptedMockup": "src/modules/mean-median-mode/design/accepted-mockup.png",
-  "prompt": "src/modules/mean-median-mode/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0f6c9-7475-75c1-8ba2-d578a735bce0/exec-e8fd19f8-edf1-49d7-b063-bb6a1d06ecbf.png",
+  "acceptedMockupPath": "src/modules/mean-median-mode/design/accepted-mockup.png",
+  "promptPath": "src/modules/mean-median-mode/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f75d-5c6f-7631-a7b0-9ea821a1e141/exec-cbf743c6-45fa-45d1-9d75-95854dad2f8b.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User approved the paired shared-layout mockup and requested removal of the redundant top AI Guide launcher.",
   "approvedRefinements": [
-    "Predict, try, explain sequence",
-    "Remove duplicate readouts",
-    "Separate overlapping markers",
-    "Implement in aigrounds repository"
+    "One shared learning-page frame, controls, summaries, experiment progress and Guide CTA",
+    "Guide access only below the exercise, no top navigation launcher",
+    "Exact chart geometry computed from existing engines, not raster positions",
+    "Preserve existing experiments and feedback, including Range before/now evidence"
   ]
 }

@@ -102,11 +102,11 @@ export const playgroundTutorPlans = {
       {
         title: "Move an edge",
         experiment:
-          "Choose Experiment and Reset if starting over. In Move an edge, choose a prediction; this restores the starting values. Move only I from 58 to 92 using its dot, arrow keys, or Point I value. Compare the Range and IQR before/now calculations and the underlined pairs in Sorted values. Choose an explanation, then press Check explanation.",
+          "Choose Experiment and Reset if starting over. In Move an edge, choose a prediction; this restores the starting values. Move only I from 58 to 92 using its dot, arrow keys, or Point I value. Compare the Range and IQR before/now calculations and the outlined pairs in Sorted values. Choose an explanation, then press Check explanation.",
         predictionQuestion:
           "If I moves from 58 to 92, which spread measure will change?",
         observationPrompt:
-          "What changed in range? Did either underlined quartile pair change? Explain before proceeding.",
+          "What changed in range? Did either outlined quartile pair change? Explain before proceeding.",
         takeaway:
           "Range grows from 40 to 74. IQR stays at 20 because Q1 remains 26 and Q3 remains 46. This outward move leaves their contributing pairs unchanged.",
       },

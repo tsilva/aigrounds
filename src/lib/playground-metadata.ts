@@ -394,6 +394,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "matrix-multiplication",
+    layout: "guided-discovery",
     title: "Matrix Multiplication Lab",
     tag: "linear algebra",
     kicker:
@@ -659,10 +660,11 @@ const activePlaygroundDefinitions = [
     slug: "backpropagation-inspector",
     title: "Backpropagation Inspector",
     tag: "neural networks",
+    layout: "guided-discovery",
     kicker:
-      "Trace one output error backward and see how cached activations assign credit to weights.",
+      "Follow local gradients backward, then test a separate gradient-descent step.",
     summary:
-      "Pick a training case, inspect the sigmoid output delta, compare signed output-weight gradients, and scale those gradients into before/after updates with a learning-rate slider.",
+      "Predict, reveal, and explain output-weight gradients, target changes, learning-rate scaling, and hidden-activation signals in one live computation graph. Preview a step and compare its probability and loss.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Backpropagation",
@@ -673,7 +675,8 @@ const activePlaygroundDefinitions = [
     learningGoals: [
       "Explain output delta as p - y for sigmoid binary cross entropy.",
       "Connect each output-weight gradient to cached activation times downstream error.",
-      "Use gradient sign and learning rate to explain a before/after weight update.",
+      "Use gradient sign and learning rate to explain a before/after weight update and its effect on loss.",
+      "Distinguish output-weight gradients from signals sent back to hidden activations.",
     ],
   },
   {

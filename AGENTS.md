@@ -8,13 +8,22 @@ AI Grounds is an interactive educational web app for learning AI concepts throug
 
 ## Commands
 
-- `pnpm dev` — start dev server (localhost:3000)
-- `pnpm build` — production build (also validates TypeScript and ESLint)
+- `pnpm dev --port auto` — start a dev server on an available port
+- `pnpm build` — production build (also validates TypeScript)
+- `pnpm typecheck` — standalone TypeScript check
 - `pnpm lint` — run ESLint
 - `pnpm check:cycles` — verify local imports are acyclic
 - `pnpm start` — serve production build locally
 
 No test framework is configured yet.
+
+After application changes, run `pnpm typecheck`, `pnpm lint`, `pnpm check:cycles`, and `pnpm build`. For instruction-only changes, validate skill metadata, reference paths, and the Git diff instead.
+
+## Browser and Server Verification
+
+Reuse an existing development server. Otherwise run `pnpm dev --port auto` and report its printed URL. Never kill or restart an existing server; if startup or automatic port selection fails, stop and warn instead of choosing a fixed port.
+
+Use the native Codex Desktop in-app Browser for rendered checks. Load its bundled Browser skill/runtime, initialize `browser-client`, select `agent.browsers.get("iab")`, and use documented Playwright/CUA APIs. Follow its recovery guidance before falling back to another browser surface.
 
 ## Architecture
 
@@ -66,10 +75,18 @@ Before every task in this repository, use the `$specs-author` skill to read the 
 
 ## Learning Page Workflows
 
-Use `$aigrounds-learning-page` when creating, optimizing, fixing, or auditing an individual playground and its AI Guide. Use `$aigrounds-lesson-plan-review` only for cross-lesson sequencing, prerequisite-lesson creation, and lesson splits or merges.
+Use `$aigrounds-lesson` at `.codex/skills/aigrounds-lesson/SKILL.md` for creating, auditing, fixing, optimizing, or redesigning an individual playground and its AI Guide. Its Redesign mode handles migrations of older lessons to the shared scheme. Use `$aigrounds-curriculum` at `.codex/skills/aigrounds-curriculum/SKILL.md` for cross-lesson sequencing, live/planned reconciliation, prerequisite gaps, and lesson splits or merges.
 
 ## Learning Page Design System
 
-Use `$aigrounds-redesign-lesson` at `.codex/skills/aigrounds-redesign-lesson/SKILL.md` when redesigning an existing lesson to match the shared scheme, including migrations of older playgrounds. It adds design-system migration guidance to the `$aigrounds-learning-page` lifecycle.
+Before creating a playground or materially redesigning one, read `DESIGN_SYSTEM.md`, the canonical scheme backed by `src/components/learning-page/`. Apply its component, layout metadata, and Guide-placement rules through the lesson skill; older mockups are historical when they conflict with this scheme.
 
-Before creating a playground or materially redesigning one, read `DESIGN_SYSTEM.md` and follow its approved shared learning-page scheme. Reuse `src/components/learning-page/` for the frame, controls, summaries, experiment progress, and Guide CTA; keep module styling focused on the concept's visualization. Set `layout: "guided-discovery"` in lesson metadata. The Guide CTA belongs below the exercise in the experiment rail, not in the top navigation. Treat older lesson mockups as historical when they conflict with the current design system. Preserve teaching-specific representations and calculate chart geometry from the engine.
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

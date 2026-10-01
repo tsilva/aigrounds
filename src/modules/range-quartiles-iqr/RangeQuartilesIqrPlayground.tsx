@@ -1,15 +1,12 @@
 "use client";
 
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import { ExperimentProgress, GuideInvitation, LearningPage, LessonSummaries } from "@/components/learning-page/learning-page";
+import { DatasetHeading, ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonSummaries, LessonToolbar, PointValueEditor } from "@/components/learning-page/learning-page";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { clientXToPercentValue } from "@/lib/number-line";
-import { fiveNumberSummary, makeRangePoints, movePoint, pointLanes, sortPoints, type FiveNumberSummary, type RangePoint } from "./range-quartiles-iqr-engine";
+import { useMemo, useRef, useState } from "react";
+import { NumberLinePoint, useNumberLineLayout } from "@/components/learning-page/number-line-controls";
+import { fiveNumberSummary, makeRangePoints, movePoint, sortPoints, type FiveNumberSummary, type RangePoint } from "./range-quartiles-iqr-engine";
 import { learningExperiments, predictions, rangePresets } from "./scenario";
-import localStyles from "./playground.module.css";
-
-const styles = { ...sharedStyles, ...localStyles };
+import styles from "./playground.module.css";
 
 const format = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1);
 const position = (value: number) => ({ left: `${value}%` });
@@ -19,46 +16,16 @@ function SpreadChart({ points, summary, selectedId, onSelect, onMove }: {
   points: RangePoint[]; summary: FiveNumberSummary; selectedId: string;
   onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef<string | null>(null);
-  const [width, setWidth] = useState(600);
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const observer = new ResizeObserver(([entry]) => { if (entry) setWidth(entry.contentRect.width); });
-    observer.observe(track);
-    return () => observer.disconnect();
-  }, []);
-  const lanes = useMemo(() => pointLanes(points, width), [points, width]);
+  const { trackRef, lanes } = useNumberLineLayout(points, 38);
   return <section className={styles.chart} aria-label="Values, range, and box plot on the same 0 to 100 scale">
-    <div className={styles.chartHeading}><h2>Your dataset</h2><span>Drag a dot to change its value</span></div>
+    <DatasetHeading />
     <div className={styles.chartRow}>
       <span className={styles.laneLabel}>Values</span>
       <div className={styles.track} ref={trackRef} style={{ height: Math.max(76, lanes.count * 36 + 12) }}>
         <span className={styles.valueAxis} aria-hidden="true" />
-        {points.map((point) => <button key={point.id} type="button" role="slider" aria-label={`Point ${point.label}`}
-          aria-valuemin={0} aria-valuemax={100} aria-valuenow={point.value} aria-valuetext={`${point.label}: ${point.value}`}
-          aria-describedby="range-keyboard-help" className={styles.point} data-selected={selectedId === point.id}
-          style={{ ...position(point.value), bottom: 8 + (lanes.positions.get(point.id) ?? 0) * 36 }}
-          onFocus={() => onSelect(point.id)}
-          onPointerDown={(event) => {
-            event.preventDefault(); event.currentTarget.focus(); onSelect(point.id);
-            event.currentTarget.setPointerCapture(event.pointerId); dragging.current = point.id;
-          }}
-          onPointerMove={(event) => {
-            if (dragging.current !== point.id || !trackRef.current) return;
-            onMove(point.id, clientXToPercentValue(event.clientX, trackRef.current.getBoundingClientRect()));
-          }}
-          onPointerUp={() => { dragging.current = null; }} onPointerCancel={() => { dragging.current = null; }}
-          onLostPointerCapture={() => { dragging.current = null; }}
-          onKeyDown={(event) => {
-            const step = event.shiftKey ? 10 : 1;
-            const deltas: Record<string, number> = { ArrowLeft: -step, ArrowDown: -step, ArrowRight: step, ArrowUp: step };
-            if (event.key in deltas || event.key === "Home" || event.key === "End") {
-              event.preventDefault();
-              onMove(point.id, event.key === "Home" ? 0 : event.key === "End" ? 100 : point.value + deltas[event.key]!);
-            }
-          }}><span>{point.value}</span><small>{point.label}</small></button>)}
+        {points.map((point) => <NumberLinePoint key={point.id} point={point} selected={selectedId === point.id}
+          helpId="range-keyboard-help" trackRef={trackRef} onSelect={onSelect} onMove={onMove}
+          style={{ bottom: 8 + (lanes.positions.get(point.id) ?? 0) * 36 }} />)}
       </div>
     </div>
     <div className={styles.chartRow} aria-hidden="true">
@@ -83,8 +50,8 @@ function SpreadChart({ points, summary, selectedId, onSelect, onMove }: {
     <div className={styles.chartRow} aria-hidden="true"><span /><div className={styles.axis}>
       {ticks.map((tick) => <span className={styles.tick} key={tick} style={position(tick)}><span>{tick}</span></span>)}
     </div></div>
-    <p className={styles.srOnly}>Box plot: minimum {format(summary.min)}, Q1 {format(summary.q1)}, median {format(summary.median)}, Q3 {format(summary.q3)}, maximum {format(summary.max)}.</p>
-    <p className={styles.caption}>IQR (interquartile range) is the box width, from Q1 to Q3. The line inside marks the median; whiskers show min and max.</p>
+    <p className={sharedStyles.srOnly}>Box plot: minimum {format(summary.min)}, Q1 {format(summary.q1)}, median {format(summary.median)}, Q3 {format(summary.q3)}, maximum {format(summary.max)}.</p>
+    <p className={sharedStyles.caption}>IQR (interquartile range) is the box width, from Q1 to Q3. The line inside marks the median; whiskers show min and max.</p>
   </section>;
 }
 
@@ -158,55 +125,38 @@ export function RangeQuartilesIqrPlayground() {
     editorRef.current?.focus();
   }
   const rail = (
-        <aside className={styles.rail} aria-label={isExperiment ? "Guided experiment" : "Free exploration"}>
-          <p className={styles.eyebrow}>{isExperiment ? `Experiment ${experimentIndex + 1} of 3` : "Free exploration"}</p>
-          <h2 className={styles.experimentTitle}>{isExperiment ? experiment.title : "Change one value"}</h2>
-          {isExperiment && <ExperimentProgress phase={phase} />}
-          <div className={styles.exercise}>
+        <ExperimentRail label={isExperiment ? `Experiment ${experimentIndex + 1} of 3` : "Free exploration"} title={isExperiment ? experiment.title : "Change one value"} phase={isExperiment ? phase : undefined}>
           {isExperiment && !prediction && <>
             <h3>Make a prediction</h3>
-            <p className={styles.question}>{experiment.question}</p>
-            <fieldset className={styles.choices}><legend className={styles.srOnly}>Your prediction</legend>
-              {predictions.map((choice) => <label key={choice.id}><input type="radio" name="prediction" value={choice.id} checked={false} onChange={() => predict(choice.id)} />{choice.label}</label>)}
-            </fieldset>
-            <p className={styles.caption}>Choose a prediction first. This restores the starting values.</p>
+            <p className={sharedStyles.question}>{experiment.question}</p>
+            <ExperimentChoices legend="Your prediction" name="prediction" choices={predictions} value={null} onChange={predict} />
+            <p className={sharedStyles.caption}>Choose a prediction first. This restores the starting values.</p>
           </>}
           {isExperiment && prediction && <>
-            <p className={styles.recorded}>Your prediction: <strong>{predictions.find((choice) => choice.id === prediction)!.label.replace(/^[A-Z]/, (first) => first.toLowerCase())}</strong></p>
-            <p className={styles.question}>Move {experiment.pointLabel} from {experiment.from} to {experiment.target}. Change only this point.</p>
+            <p className={sharedStyles.recorded}>Your prediction: <strong>{predictions.find((choice) => choice.id === prediction)!.label.replace(/^[A-Z]/, (first) => first.toLowerCase())}</strong></p>
+            <p className={sharedStyles.question}>Move {experiment.pointLabel} from {experiment.from} to {experiment.target}. Change only this point.</p>
           </>}
-          {!isExperiment && <p className={styles.question}>Select any dot, then change its value. Compare range, IQR, and the outlined quartile pairs.</p>}
+          {!isExperiment && <p className={sharedStyles.question}>Select any dot, then change its value. Compare range, IQR, and the outlined quartile pairs.</p>}
           {reachedTarget && <p className={styles.target} role="status">✓ Target reached</p>}
-          {isExperiment && prediction && !reachedTarget && <p className={styles.caption}>Use the dot or value field for the target. Reset starts this experiment again.</p>}
-          {reachedTarget && <div className={styles.explanation}>
+          {isExperiment && prediction && !reachedTarget && <p className={sharedStyles.caption}>Use the dot or value field for the target. Reset starts this experiment again.</p>}
+          {reachedTarget && <div className={sharedStyles.explanation}>
             <h3>{experiment.explanationQuestion}</h3>
-            <fieldset className={styles.choices}><legend className={styles.srOnly}>Your explanation</legend>{experiment.explanations.map((choice) =>
-              <label key={choice.id} data-checked={explanation === choice.id}><input type="radio" name="explanation" value={choice.id} checked={explanation === choice.id} onChange={() => { setExplanation(choice.id); setChecked(false); }} />{choice.label}</label>)}
-            </fieldset>
-            <button type="button" className={styles.primary} disabled={!explanation || complete} onClick={() => setChecked(true)}>Check explanation</button>
-            {checked && !complete && <p className={styles.feedback} role="status">Try again. {experiment.retryHint}</p>}
-            {complete && <div className={styles.success} role="status"><strong>{experimentIndex === 2 ? "All three experiments explained" : "Experiment explained"}</strong><p>{experiment.takeaway}</p></div>}
-            {complete && <button type="button" className={styles.primary} onClick={() => reset("experiment", (experimentIndex + 1) % learningExperiments.length)}>{experimentIndex === 2 ? "Start again" : `Next: ${learningExperiments[experimentIndex + 1]!.title}`} →</button>}
+            <ExperimentChoices legend="Your explanation" name="explanation" choices={experiment.explanations} value={explanation} onChange={(id) => { setExplanation(id); setChecked(false); }} />
+            <ExperimentButton disabled={!explanation || complete} onClick={() => setChecked(true)}>Check explanation</ExperimentButton>
+            {checked && !complete && <p className={sharedStyles.feedback} role="status">Try again. {experiment.retryHint}</p>}
+            {complete && <ExperimentResult compact title={experimentIndex === 2 ? "All three experiments explained" : "Experiment explained"}>{experiment.takeaway}</ExperimentResult>}
+            {complete && <ExperimentButton onClick={() => reset("experiment", (experimentIndex + 1) % learningExperiments.length)}>{experimentIndex === 2 ? "Start again" : `Next: ${learningExperiments[experimentIndex + 1]!.title}`} →</ExperimentButton>}
           </div>}
-          {!isExperiment && <button type="button" className={styles.primary} onClick={() => reset("experiment")}>Return to experiment →</button>}
-          </div>
-          <GuideInvitation />
-        </aside>
+          {!isExperiment && <ExperimentButton onClick={() => reset("experiment")}>Return to experiment →</ExperimentButton>}
+          </ExperimentRail>
   );
   return <LearningPage title="Range, Quartiles & IQR" subtitle="Move one point. Watch two measures of spread." rail={rail}>
-    <div className={styles.toolbar}>
-      <div className={styles.presets} aria-label="Dataset scenarios">{rangePresets.map((preset) => <button key={preset.id} type="button" aria-pressed={presetId === preset.id} onClick={() => reset(preset.id)}><strong>{preset.label}</strong><span>{preset.id === "experiment" ? experiment.title : preset.shortLabel}</span></button>)}</div>
-      <button type="button" className={styles.reset} onClick={() => reset()}><ArrowPathIcon aria-hidden="true" />Reset</button>
-    </div>
+    <LessonToolbar scenarios={rangePresets.map((preset) => ({ ...preset, shortLabel: preset.id === "experiment" ? experiment.title : preset.shortLabel }))} selectedId={presetId}
+      onSelect={(id) => reset(id)} onReset={() => reset()} />
     <SpreadChart points={points} summary={summary} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
-    <div className={styles.pointEditor}>
-      <label htmlFor="range-point-value">Point {selected.label} value
-        <input ref={editorRef} id="range-point-value" type="number" min={0} max={100} step={1} value={selected.value} onChange={(event) => move(selectedId, event.currentTarget.valueAsNumber)} />
-      </label>
-      <p id="range-keyboard-help">Focus a dot and use arrow keys. Shift moves by 10; Home / End moves to 0 / 100.</p>
-    </div>
+    <PointValueEditor label={selected.label} value={selected.value} helpId="range-keyboard-help" inputRef={editorRef} inputId="range-point-value" onChange={(value) => move(selectedId, value)} />
     <QuartileConstruction points={points} summary={summary} />
     <SummaryTiles summary={summary} before={before} />
-    <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">Point {selected.label}: {selected.value}. Range {format(summary.range)}; Q1 {format(summary.q1)}; median {format(summary.median)}; Q3 {format(summary.q3)}; IQR {format(summary.iqr)}.</p>
+    <p className={sharedStyles.srOnly} role="status" aria-live="polite" aria-atomic="true">Point {selected.label}: {selected.value}. Range {format(summary.range)}; Q1 {format(summary.q1)}; median {format(summary.median)}; Q3 {format(summary.q3)}; IQR {format(summary.iqr)}.</p>
   </LearningPage>;
 }

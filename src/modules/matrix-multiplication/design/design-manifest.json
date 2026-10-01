@@ -5,5 +5,25 @@
   "modulePath": "src/modules/matrix-multiplication",
   "acceptedMockup": "src/modules/matrix-multiplication/design/accepted-mockup.png",
   "prompt": "src/modules/matrix-multiplication/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e16c7-577a-7f42-9542-8c175536255b/ig_0a0d8c264ccaf56a016a01bd7191248191aeed1886d73e3be1.png"
+  "sourceGeneratedImage": null,
+  "historicalSourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e16c7-577a-7f42-9542-8c175536255b/ig_0a0d8c264ccaf56a016a01bd7191248191aeed1886d73e3be1.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": {
+    "date": "2026-10-01",
+    "statement": "approved",
+    "scope": "Workbench/rail redesign and in-page prediction/action/explanation checks"
+  },
+  "previewMethod": "browser-rendered HTML after imagegen network failure",
+  "approvedPreviewSource": "/Users/tsilva/.codex/visualizations/2026/10/01/01a0f7ec-5669-7313-8aab-f4c479df224c/matrix-redesign-preview.html",
+  "refinements": "See imagegen-prompt.md",
+  "teachingContract": {
+    "prerequisites": "No prior linear algebra; basic signed arithmetic is the provisional minimum",
+    "coreIntuition": "One A row and one B column build each output cell by adding matching products",
+    "outcomes": [
+      "Predict compatibility and output shape",
+      "Trace one output cell and its running sum",
+      "Relate shared inner size to term count",
+      "Repeat the same rule across cells and transfer to an alternate preset"
+    ]
+  }
 }

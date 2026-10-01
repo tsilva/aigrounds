@@ -51,17 +51,3 @@ export function fiveNumberSummary(values: readonly number[]): FiveNumberSummary 
   const q3 = median(sortedValues.slice(middle + sortedValues.length % 2));
   return { sortedValues, min, q1, median: median(sortedValues), q3, max, range: max - min, iqr: q3 - q1 };
 }
-
-// Collision packing preserves each value's exact horizontal position.
-export function pointLanes(points: RangePoint[], width: number, spacing = 38) {
-  const ends: number[] = [];
-  const positions = new Map<string, number>();
-  for (const point of sortPoints(points)) {
-    const x = point.value / 100 * width;
-    let lane = ends.findIndex((end) => x - end >= spacing);
-    if (lane === -1) lane = ends.length;
-    ends[lane] = x;
-    positions.set(point.id, lane);
-  }
-  return { positions, count: ends.length };
-}

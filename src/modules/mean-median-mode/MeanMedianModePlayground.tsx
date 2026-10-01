@@ -1,16 +1,14 @@
 "use client";
 
-import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { clientXToPercentValue } from "@/lib/number-line";
-import { ExperimentProgress, GuideInvitation, LearningPage, LessonSummaries } from "@/components/learning-page/learning-page";
+import { useMemo, useState, type CSSProperties } from "react";
+import { NumberLinePoint, useNumberLineLayout } from "@/components/learning-page/number-line-controls";
+import { pointLanes } from "@/lib/number-line";
+import { DatasetHeading, ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonSummaries, LessonToolbar, PointValueEditor } from "@/components/learning-page/learning-page";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { analyzeTypicalValues, clampValue, movePoint, type DataPoint, type TypicalValuesAnalysis } from "./mean-median-mode-engine";
 import { initialTypicalPreset, pointsForPreset, typicalPresets, type TypicalPreset } from "./scenario";
-import { isExperimentDataset, learningExperiments, pointLanes, type LearningExperiment } from "./learning-experiments";
-import localStyles from "./playground.module.css";
-
-const styles = { ...sharedStyles, ...localStyles };
+import { isExperimentDataset, learningExperiments, type LearningExperiment } from "./learning-experiments";
+import styles from "./playground.module.css";
 
 const ticks = [0, 25, 50, 75, 100];
 const colors = { mean: "#1760db", median: "#5031dc", mode: "#976000" };
@@ -21,17 +19,7 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
   points: DataPoint[]; analysis: TypicalValuesAnalysis; selectedId: string;
   onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef<string | null>(null);
-  const [width, setWidth] = useState(800);
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const observer = new ResizeObserver(([entry]) => { if (entry) setWidth(entry.contentRect.width); });
-    observer.observe(track);
-    return () => observer.disconnect();
-  }, []);
-  const lanes = useMemo(() => pointLanes(points, width), [points, width]);
+  const { trackRef, width, lanes } = useNumberLineLayout(points, 36, 800);
   const chartHeight = Math.max(132, lanes.count * 36 + 16);
   const markers = [
     { label: "Mean", values: [analysis.mean], color: colors.mean },
@@ -40,37 +28,14 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
   ];
   return (
     <section className={styles.chart} aria-label="Interactive dataset and summary number lines">
-      <div className={styles.chartHeading}><h2>Your dataset</h2><span>Drag a dot to change its value</span></div>
+      <DatasetHeading />
       <div className={styles.plotFrame}>
         <div ref={trackRef} className={styles.plot} style={{ height: chartHeight }}>
           <div className={styles.axis} />
           {ticks.map((tick) => <span key={tick} className={styles.tick} style={position(tick)}><span>{tick}</span></span>)}
-          {points.map((point) => (
-            <button key={point.id} type="button" role="slider" aria-label={`Point ${point.label}`}
-              aria-valuemin={0} aria-valuemax={100} aria-valuenow={point.value} aria-valuetext={`${point.label}: ${point.value}`}
-              aria-describedby="dataset-keyboard-help" className={styles.point}
-              data-selected={selectedId === point.id} data-mode={analysis.modeValues.includes(point.value)}
-              style={{ ...position(point.value), bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 36, "--point-color": point.color } as CSSProperties}
-              onFocus={() => onSelect(point.id)}
-              onPointerDown={(event) => {
-                event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture(event.pointerId);
-                dragging.current = point.id; onSelect(point.id);
-              }}
-              onPointerMove={(event) => {
-                if (dragging.current !== point.id || !trackRef.current) return;
-                onMove(point.id, clampValue(clientXToPercentValue(event.clientX, trackRef.current.getBoundingClientRect())));
-              }}
-              onPointerUp={() => { dragging.current = null; }} onPointerCancel={() => { dragging.current = null; }}
-              onLostPointerCapture={() => { dragging.current = null; }}
-              onKeyDown={(event) => {
-                const step = event.shiftKey ? 10 : 1;
-                const changes: Record<string, number> = { ArrowLeft: -step, ArrowDown: -step, ArrowRight: step, ArrowUp: step };
-                if (event.key in changes || event.key === "Home" || event.key === "End") {
-                  event.preventDefault();
-                  onMove(point.id, event.key === "Home" ? 0 : event.key === "End" ? 100 : point.value + changes[event.key]!);
-                }
-              }}><span>{point.value}</span><small>{point.label}</small></button>
-          ))}
+          {points.map((point) => <NumberLinePoint key={point.id} point={point} selected={selectedId === point.id} mode={analysis.modeValues.includes(point.value)}
+          helpId="dataset-keyboard-help" trackRef={trackRef} onSelect={onSelect} onMove={onMove}
+          style={{ bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 36 }} />)}
         </div>
         <div className={styles.markerTracks} aria-hidden="true">
           {markers.map((marker) => {
@@ -94,46 +59,33 @@ function Summaries({ analysis }: { analysis: TypicalValuesAnalysis }) {
     ]} />;
 }
 
-function ExperimentRail({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext }: {
+function TypicalExperiment({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext }: {
   experiment: LearningExperiment; points: DataPoint[]; preset: TypicalPreset; prediction: string | null; explanation: string | null;
   onPredict: (id: string) => void; onExplain: (id: string) => void; onNext: () => void;
 }) {
   const reachedTarget = prediction !== null && isExperimentDataset(points, preset, experiment);
   const complete = reachedTarget && explanation === experiment.correctExplanation;
   const phase = !prediction ? 0 : !reachedTarget ? 1 : 2;
-  return <aside className={styles.rail} aria-label="Guided experiment">
-    <p className={styles.eyebrow}>Experiment {typicalPresets.findIndex((item) => item.id === preset.id) + 1} of {typicalPresets.length}</p><h2 className={styles.experimentTitle}>{experiment.title}</h2>
-    <ExperimentProgress phase={phase} />
-    <div className={styles.exercise}>
+  return <ExperimentRail label={`Experiment ${typicalPresets.findIndex((item) => item.id === preset.id) + 1} of ${typicalPresets.length}`} title={experiment.title} phase={phase}>
       <h3>{reachedTarget ? "What did you notice?" : "Make a prediction"}</h3>
       {!reachedTarget && <>
         <p>{experiment.question}</p>
-        <fieldset className={styles.choices}><legend className="sr-only">Your prediction</legend>
-          {experiment.predictions.map((choice) => <label key={choice.id} data-checked={prediction === choice.id}>
-            <input type="radio" name="prediction" value={choice.id} checked={prediction === choice.id} onChange={() => onPredict(choice.id)} />{choice.label}
-          </label>)}
-        </fieldset>
-        <p className={styles.small}>Choosing a prediction restores the starting dataset.</p>
+        <ExperimentChoices legend="Your prediction" name="prediction" choices={experiment.predictions} value={prediction} onChange={onPredict} />
+        <p className={sharedStyles.small}>Choosing a prediction restores the starting dataset.</p>
       </>}
-      {prediction && !reachedTarget && <div className={styles.actionPrompt}>
+      {prediction && !reachedTarget && <div className={sharedStyles.actionPrompt}>
         <p><strong>Now try it.</strong> Move point {experiment.pointLabel} to {experiment.target}. Watch the three summaries.</p>
-        <p className={styles.small}>Change only this point. Use its value field for an exact position, or Reset to start again.</p>
+        <p className={sharedStyles.small}>Change only this point. Use its value field for an exact position, or Reset to start again.</p>
       </div>}
       {reachedTarget && <>
-        <p className={styles.observation} role="status">{prediction === experiment.correctPrediction ? "Your prediction matches the result." : "The result differed from your prediction. Use the live values to investigate."}</p>
+        <p className={sharedStyles.observation} role="status">{prediction === experiment.correctPrediction ? "Your prediction matches the result." : "The result differed from your prediction. Use the live values to investigate."}</p>
         <h3>{experiment.explanationQuestion}</h3>
-        <fieldset className={styles.choices}><legend className="sr-only">Your explanation</legend>
-          {experiment.explanations.map((choice) => <label key={choice.id} data-checked={explanation === choice.id}>
-            <input type="radio" name="explanation" value={choice.id} checked={explanation === choice.id} onChange={() => onExplain(choice.id)} />{choice.label}
-          </label>)}
-        </fieldset>
-        {explanation && !complete && <p className={styles.feedback} role="status">Try again. {experiment.retryHint}</p>}
+        <ExperimentChoices legend="Your explanation" name="explanation" choices={experiment.explanations} value={explanation} onChange={onExplain} />
+        {explanation && !complete && <p className={sharedStyles.feedback} role="status">Try again. {experiment.retryHint}</p>}
       </>}
-      {complete && <div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>Experiment explained</h3><p>{experiment.takeaway}</p></div></div>}
-      {complete && <button type="button" className={styles.nextButton} onClick={onNext}>Try another dataset<ArrowRightIcon aria-hidden="true" /></button>}
-    </div>
-    <GuideInvitation />
-  </aside>;
+      {complete && <ExperimentResult>{experiment.takeaway}</ExperimentResult>}
+      {complete && <ExperimentButton arrow onClick={onNext}>Try another dataset</ExperimentButton>}
+    </ExperimentRail>;
 }
 
 export function MeanMedianModePlayground() {
@@ -155,25 +107,18 @@ export function MeanMedianModePlayground() {
     setPoints((current) => movePoint(current, id, value)); setExplanation(null);
   }
   return <LearningPage title="Mean, Median & Mode" subtitle="Move one point. Watch three ideas of typical change."
-    rail={<ExperimentRail experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
+    rail={<TypicalExperiment experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
       setPrediction(id); setExplanation(null); setPoints(pointsForPreset(preset)); setSelectedId(preset.id === "repeated-peak" ? "point-1" : "point-9");
     }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} />}>
-        <div className={styles.toolbar}>
-          <div className={styles.presets} aria-label="Dataset scenarios">{typicalPresets.map((item) => <button key={item.id} type="button" aria-pressed={item.id === preset.id} onClick={() => reset(item)}><strong>{item.label}</strong><span>{item.shortLabel}</span></button>)}</div>
-          <button type="button" className={styles.reset} onClick={() => reset()}><ArrowPathIcon aria-hidden="true" />Reset</button>
-        </div>
+        <LessonToolbar scenarios={typicalPresets} selectedId={preset.id}
+      onSelect={(id) => reset(typicalPresets.find((item) => item.id === id)!)} onReset={() => reset()} />
         <DatasetChart points={points} analysis={analysis} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
-        <div className={styles.pointEditor}>
-          <label>Point {selected.label} value<input type="number" min={0} max={100} step={1} value={selected.value} onChange={(event) => {
-            if (Number.isFinite(event.currentTarget.valueAsNumber)) move(selectedId, event.currentTarget.valueAsNumber);
-          }} /></label>
-          <p id="dataset-keyboard-help">Focus a dot and use arrow keys. Shift moves by 10; Home / End moves to 0 / 100.</p>
-        </div>
+        <PointValueEditor label={selected.label} value={selected.value} helpId="dataset-keyboard-help" onChange={(value) => move(selectedId, value)} />
         <section className={styles.sorted} aria-label="Sorted values">
           <div><h2>Sorted values <span>({analysis.count} points)</span></h2><p>The outlined value is the middle.</p></div>
           <ol>{sorted.map((point, index) => <li key={point.id} data-middle={index === Math.floor(points.length / 2)} data-mode={analysis.modeValues.includes(point.value)} aria-label={`${point.label}: ${point.value}${index === Math.floor(points.length / 2) ? ", middle value" : ""}`}><span>{point.value}</span><small>{point.label}</small></li>)}</ol>
         </section>
         <Summaries analysis={analysis} />
-        <p className={styles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">Mean {analysis.mean.toFixed(1)}; median {formatValue(analysis.median)}; {analysis.modeValues.length ? `mode ${analysis.modeValues.join(", ")}, each appearing ${analysis.modeFrequency} times` : "no mode: no values repeat"}.</p>
+        <p className={sharedStyles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">Mean {analysis.mean.toFixed(1)}; median {formatValue(analysis.median)}; {analysis.modeValues.length ? `mode ${analysis.modeValues.join(", ")}, each appearing ${analysis.modeFrequency} times` : "no mode: no values repeat"}.</p>
   </LearningPage>;
 }

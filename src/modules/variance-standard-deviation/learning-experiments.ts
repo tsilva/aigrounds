@@ -72,15 +72,3 @@ export function isEdgeExperiment(points: DataPoint[]) {
   return changed.length === 1 && points.every((point, index) => point.id === `point-${index + 1}`) &&
     ((changed[0]!.id === "point-1" && changed[0]!.value < 10) || (changed[0]!.id === "point-7" && changed[0]!.value > 90));
 }
-
-export function pointLanes(points: Pick<DataPoint, "id" | "value">[], width: number) {
-  const lanes: number[] = [];
-  const positions = new Map<string, number>();
-  for (const point of [...points].sort((a, b) => a.value - b.value)) {
-    let lane = lanes.findIndex((value) => (point.value - value) / 100 * Math.max(1, width) >= 40);
-    if (lane < 0) lane = lanes.length;
-    lanes[lane] = point.value;
-    positions.set(point.id, lane);
-  }
-  return { positions, count: lanes.length };
-}

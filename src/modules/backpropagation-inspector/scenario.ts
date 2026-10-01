@@ -22,26 +22,26 @@ export const backpropCases: BackpropCase[] = [
   {
     id: "case-a",
     label: "Case A",
-    name: "Confident miss",
+    name: "Underprediction",
     hiddenActivations: [0.8, 0.35],
     target: 1,
-    note: "High h1 should receive the larger output-weight update.",
+    note: "The target is 1; how should the probability change?",
   },
   {
     id: "case-b",
     label: "Case B",
     name: "False alarm",
-    hiddenActivations: [0.2, 0.8],
+    hiddenActivations: [0.8, 0.35],
     target: 0,
     note: "The same weights now need to push probability down.",
   },
   {
     id: "case-c",
     label: "Case C",
-    name: "Both units active",
+    name: "Equal activations",
     hiddenActivations: [0.9, 0.9],
     target: 1,
-    note: "Equal cached activations split output-weight credit evenly.",
+    note: "Equal activations, different signed weights: compare the two kinds of gradients.",
   },
 ];
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Grounds Lesson"
+  short_description: "Create, audit, fix, optimize, or redesign one lesson"
+  default_prompt: "Use $aigrounds-lesson to work on the selected lesson in the requested mode, following the shared design system; for Redesign, audit conceptual correctness and reformulate the entire teaching experience to minimize learner friction."

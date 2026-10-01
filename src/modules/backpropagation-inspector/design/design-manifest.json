@@ -5,5 +5,15 @@
   "modulePath": "src/modules/backpropagation-inspector",
   "acceptedMockup": "src/modules/backpropagation-inspector/design/accepted-mockup.png",
   "prompt": "src/modules/backpropagation-inspector/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e3020-e6b6-78d2-b92e-6d4e8856a5bc/ig_0994ca07535b0afb016a083baa53bc8191b625615b84402b4c.png"
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0f7ec-f42f-7a93-b16a-678258a2e29a/exec-8b39f68d-bc6f-4668-9043-e8f028a7a38a.png",
+  "approval": "User: implement the one you prefer (2026-10-01)",
+  "refinements": [
+    "One progress row; prediction precedes evidence and explanations.",
+    "Real backward arrows and text equivalents; target never feeds prediction.",
+    "Hidden-activation signals are expandable, and required in experiment 4.",
+    "Update preview recomputes probability and loss; bias and cached activations fixed.",
+    "False alarm uses the same activations as Underprediction to isolate the target change.",
+    "At narrow supported desktop widths with the Guide open, use a readable compact computation flow and stacked summary values.",
+    "User-requested optional Scalars / Matrices view (2026-10-01): equivalent single-example matrix products, explicit shapes and transpose, with case and experiment progress preserved."
+  ]
 }

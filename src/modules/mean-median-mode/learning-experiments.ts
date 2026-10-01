@@ -94,17 +94,3 @@ export function isExperimentDataset(
     point.value === (point.label === experiment.pointLabel ? experiment.target : preset.values[index]),
   );
 }
-
-// Keep exact horizontal values while placing nearby handles in separate rows.
-export function pointLanes(points: Pick<DataPoint, "id" | "value">[], trackWidth: number, minimumSpacing = 36) {
-  const lanes: number[] = [];
-  const positions = new Map<string, number>();
-  const spacing = minimumSpacing / Math.max(1, trackWidth) * 100;
-  for (const point of [...points].sort((a, b) => a.value - b.value)) {
-    let lane = lanes.findIndex((lastValue) => point.value - lastValue >= spacing);
-    if (lane < 0) lane = lanes.length;
-    lanes[lane] = point.value;
-    positions.set(point.id, lane);
-  }
-  return { positions, count: lanes.length };
-}

@@ -39,7 +39,7 @@ export const playgroundTutorPlans = {
     whyItMatters:
       "Typical values exist because raw lists are hard to compare at a glance. Mean, median, and mode give compact center summaries, and choosing the right one helps avoid being fooled by repeats or outliers.",
     openingMessage:
-      "No prior statistics knowledge needed. We will build three ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Mean is the average: add all values, then divide by how many values there are.\n- Median is the middle value after sorting the data.\n- Mode is the most common value. A dataset can have no mode, one mode, or more than one mode.\n- Outliers are far-away values that can pull some summaries more than others.\n\nFirst prediction: when the values are fairly even, which typical value do you expect to best describe the middle: mean, median, or mode? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "No prior statistics knowledge needed. The Guided experiment walks you through predict, try, and explain. You can use it independently or talk through your reasoning here.\n\n- Mean is the average: add all values, then divide by how many values there are.\n- Median is the middle value after sorting the data.\n- Mode is the most common value. A dataset can have no mode, one mode, or more than one mode.\n- Outliers are far-away values that can pull some summaries more than others.\n\nStart with Balanced. First prediction: if you move I from 66 to 90, which summary values will change? Reply with your prediction first, or share the prediction you already chose in the Guided experiment.",
     masteryCriteria: [
       "Defines mean as the average that uses every value.",
       "Defines median as the middle after sorting the values.",
@@ -52,33 +52,33 @@ export const playgroundTutorPlans = {
       {
         title: "Compare one calm center",
         experiment:
-          "Choose Balanced if it is not already selected. Watch the number line, sorted values, and the Mean, Median, and Mode panels.",
+          "Choose Balanced if it is not already selected. Compare the mean and median in Live summaries. In Guided experiment, choose a prediction, then move point I from 66 to 90 using its dot or Point I value field. Watch the summary marker lanes and the outlined middle in Sorted values.",
         predictionQuestion:
-          "When the values are fairly even, which typical value do you expect to best describe the middle?",
+          "In Balanced, if you move I from 66 to 90, which summary values will change?",
         observationPrompt:
-          "What did you notice about the mean and median in the balanced data?",
+          "How did the mean and median compare before and after point I moved to 90?",
         takeaway:
-          "When data is fairly symmetric, the mean and median tell a similar center story.",
+          "The original Balanced dataset has equal mean and median. Moving I changes the sum and mean, while the fifth sorted value and median stay at 42.",
       },
       {
         title: "Create a mode",
         experiment:
-          "Choose Repeated Peak. Compare the repeated value pill with the Mode panel.",
+          "Choose Repeated Peak. Predict what happens if A joins 24, then move point A to 24 using its dot or Point A value field. Compare Sorted values with the Mode summary and its occurrence count.",
         predictionQuestion:
-          "What do you expect the mode to do when one value appears several times?",
+          "In Repeated Peak, if A joins the group at 24, what happens to the mode?",
         observationPrompt:
-          "Which summary changed because a value repeated?",
+          "Did the mode's value change, or did its occurrence count change when A joined 24?",
         takeaway:
           "Mode is about frequency, not balance or position, so repeats can make it the clearest typical value.",
       },
       {
         title: "Pull with an outlier",
         experiment:
-          "Choose Add Outlier, then nudge the far-right point. Watch the mean marker and median marker.",
+          "Choose Add Outlier. In Guided experiment, choose a prediction, then move point I from 92 to 28 using its dot or Point I value field. Watch the Mean, Median, and Mode marker lanes and Live summaries. Explain the result before trying another dataset.",
         predictionQuestion:
-          "Which should move more when one extreme value moves: mean or median?",
+          "In Add Outlier, if you move I from 92 to 28, which summary values will change?",
         observationPrompt:
-          "What happened to the center summaries when the outlier was far away?",
+          "Which summary changed when I moved from 92 to 28, and why did the other two stay at 24?",
         takeaway:
           "The mean uses every value and gets pulled by extremes; the median uses sorted position and is more resistant.",
       },

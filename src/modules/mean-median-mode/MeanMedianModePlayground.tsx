@@ -1,635 +1,194 @@
 "use client";
 
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  clientXToPercentValue,
-  useStackedPointLayout,
-} from "@/lib/number-line";
-import {
-  analyzeTypicalValues,
-  clampValue,
-  movePoint,
-  type DataPoint,
-  type TypicalValuesAnalysis,
-} from "./mean-median-mode-engine";
-import {
-  initialTypicalPreset,
-  pointsForPreset,
-  typicalPresets,
-  type TypicalPreset,
-} from "./scenario";
+import Link from "next/link";
+import { ArrowPathIcon, ArrowRightIcon, ChatBubbleLeftRightIcon, CheckCircleIcon, LightBulbIcon } from "@heroicons/react/24/outline";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { clientXToPercentValue } from "@/lib/number-line";
+import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
+import { analyzeTypicalValues, clampValue, movePoint, type DataPoint, type TypicalValuesAnalysis } from "./mean-median-mode-engine";
+import { initialTypicalPreset, pointsForPreset, typicalPresets, type TypicalPreset } from "./scenario";
+import { isExperimentDataset, learningExperiments, pointLanes, type LearningExperiment } from "./learning-experiments";
+import styles from "./playground.module.css";
 
-function formatValue(value: number) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(1);
-}
+const ticks = [0, 25, 50, 75, 100];
+const colors = { mean: "#1760db", median: "#5031dc", mode: "#976000" };
+const formatValue = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1);
+const position = (value: number) => ({ left: `${value}%` });
 
-function formatSigned(value: number) {
-  const formatted = Math.abs(value).toFixed(1);
-
-  if (value > 0) {
-    return `+${formatted}`;
-  }
-
-  if (value < 0) {
-    return `-${formatted}`;
-  }
-
-  return "0.0";
-}
-
-function Panel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
+function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
+  points: DataPoint[]; analysis: TypicalValuesAnalysis; selectedId: string;
+  onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef<string | null>(null);
+  const [width, setWidth] = useState(800);
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const observer = new ResizeObserver(([entry]) => { if (entry) setWidth(entry.contentRect.width); });
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, []);
+  const lanes = useMemo(() => pointLanes(points, width), [points, width]);
+  const chartHeight = Math.max(132, lanes.count * 36 + 16);
+  const markers = [
+    { label: "Mean", values: [analysis.mean], color: colors.mean },
+    { label: "Median", values: [analysis.median], color: colors.median },
+    { label: "Mode", values: analysis.modeValues, color: colors.mode },
+  ];
   return (
-    <section
-      className={`rounded-[14px] border border-[#d8e0f3] bg-white/92 shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
+    <section className={styles.chart} aria-label="Interactive dataset and summary number lines">
+      <div className={styles.chartHeading}><h2>Your dataset</h2><span>Drag a dot to change its value</span></div>
+      <div className={styles.plotFrame}>
+        <div ref={trackRef} className={styles.plot} style={{ height: chartHeight }}>
+          <div className={styles.axis} />
+          {ticks.map((tick) => <span key={tick} className={styles.tick} style={position(tick)}><span>{tick}</span></span>)}
+          {points.map((point) => (
+            <button key={point.id} type="button" role="slider" aria-label={`Point ${point.label}`}
+              aria-valuemin={0} aria-valuemax={100} aria-valuenow={point.value} aria-valuetext={`${point.label}: ${point.value}`}
+              aria-describedby="dataset-keyboard-help" className={styles.point}
+              data-selected={selectedId === point.id} data-mode={analysis.modeValues.includes(point.value)}
+              style={{ ...position(point.value), bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 36, "--point-color": point.color } as CSSProperties}
+              onFocus={() => onSelect(point.id)}
+              onPointerDown={(event) => {
+                event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture(event.pointerId);
+                dragging.current = point.id; onSelect(point.id);
+              }}
+              onPointerMove={(event) => {
+                if (dragging.current !== point.id || !trackRef.current) return;
+                onMove(point.id, clampValue(clientXToPercentValue(event.clientX, trackRef.current.getBoundingClientRect())));
+              }}
+              onPointerUp={() => { dragging.current = null; }} onPointerCancel={() => { dragging.current = null; }}
+              onLostPointerCapture={() => { dragging.current = null; }}
+              onKeyDown={(event) => {
+                const step = event.shiftKey ? 10 : 1;
+                const changes: Record<string, number> = { ArrowLeft: -step, ArrowDown: -step, ArrowRight: step, ArrowUp: step };
+                if (event.key in changes || event.key === "Home" || event.key === "End") {
+                  event.preventDefault();
+                  onMove(point.id, event.key === "Home" ? 0 : event.key === "End" ? 100 : point.value + changes[event.key]!);
+                }
+              }}><span>{point.value}</span><small>{point.label}</small></button>
+          ))}
+        </div>
+        <div className={styles.markerTracks} aria-hidden="true">
+          {markers.map((marker) => {
+            const layout = pointLanes(marker.values.map((value) => ({ id: String(value), value })), width, 18);
+            return <div key={marker.label} className={styles.markerLane} style={{ "--marker-color": marker.color, height: 16 + Math.max(0, layout.count - 1) * 18 } as CSSProperties}>
+            <span className={styles.markerLabel}>{marker.label}</span><div className={styles.markerAxis} />
+            {marker.values.map((value) => <span key={value} className={styles.marker} style={{ ...position(value), top: 7 + (layout.positions.get(String(value)) ?? 0) * 18 }} />)}
+            {!marker.values.length && <span className={styles.noMarker}>No repeated value</span>}
+          </div>; })}
+        </div>
+      </div>
     </section>
   );
 }
 
-function LessonTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[18px] leading-none font-black text-[#352cff] uppercase">
-      {children}
-    </h2>
-  );
+function Summaries({ analysis }: { analysis: TypicalValuesAnalysis }) {
+  return <section className={styles.summaries} aria-label="Live summaries">
+    {[
+      { label: "Mean", color: colors.mean, value: analysis.mean.toFixed(1), definition: "The average of all values.", formula: `${analysis.sum} ÷ ${analysis.count} = ${analysis.mean.toFixed(1)}` },
+      { label: "Median", color: colors.median, value: formatValue(analysis.median), definition: "The middle value when sorted.", formula: `${Math.floor(analysis.count / 2) + 1}th sorted value = ${formatValue(analysis.median)}` },
+      { label: "Mode", color: colors.mode, value: analysis.modeValues.length ? analysis.modeValues.join(", ") : "None", definition: "The most frequent value.", formula: analysis.modeValues.length ? `Each appears ${analysis.modeFrequency} times` : "No values repeat" },
+    ].map((summary) => <div key={summary.label} className={styles.summary} style={{ "--summary-color": summary.color } as CSSProperties}>
+      <h2>{summary.label}</h2><p className={styles.definition}>{summary.definition}</p>
+      <p className={styles.summaryValue}>{summary.value}</p><p className={styles.formula}>{summary.formula}</p>
+    </div>)}
+  </section>;
 }
 
-const numberLineInsetPx = 16;
-
-function FactPill({
-  label,
-  value,
-  wrap = false,
-}: {
-  label: string;
-  value: string;
-  wrap?: boolean;
+function ExperimentRail({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext, onGuide }: {
+  experiment: LearningExperiment; points: DataPoint[]; preset: TypicalPreset; prediction: string | null; explanation: string | null;
+  onPredict: (id: string) => void; onExplain: (id: string) => void; onNext: () => void; onGuide: () => void;
 }) {
-  return (
-    <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
-      <p className="text-[11px] font-black tracking-[0.03em] text-[#7180a5] uppercase">
-        {label}
-      </p>
-      <p
-        className={`mt-1 font-mono text-[13px] leading-[1.35] font-bold text-[#071024] ${
-          wrap ? "break-words" : "truncate"
-        }`}
-      >
-        {value}
-      </p>
+  const reachedTarget = prediction !== null && isExperimentDataset(points, preset, experiment);
+  const complete = reachedTarget && explanation === experiment.correctExplanation;
+  const phase = !prediction ? 0 : !reachedTarget ? 1 : 2;
+  return <aside className={styles.rail} aria-label="Guided experiment">
+    <p className={styles.eyebrow}>Try this</p><h2 className={styles.experimentTitle}>{experiment.title}</h2>
+    <ol className={styles.steps} aria-label="Experiment progress">{["Predict", "Try", "Explain"].map((step, index) =>
+      <li key={step} aria-current={phase === index ? "step" : undefined} data-active={phase >= index}><span>{index + 1}</span>{step}</li>)}</ol>
+    <div className={styles.exercise}>
+      <h3>{reachedTarget ? "What did you notice?" : "Make a prediction"}</h3>
+      {!reachedTarget && <>
+        <p>{experiment.question}</p>
+        <fieldset className={styles.choices}><legend className="sr-only">Your prediction</legend>
+          {experiment.predictions.map((choice) => <label key={choice.id} data-checked={prediction === choice.id}>
+            <input type="radio" name="prediction" value={choice.id} checked={prediction === choice.id} onChange={() => onPredict(choice.id)} />{choice.label}
+          </label>)}
+        </fieldset>
+        <p className={styles.small}>Choosing a prediction restores the starting dataset.</p>
+      </>}
+      {prediction && !reachedTarget && <div className={styles.actionPrompt}>
+        <p><strong>Now try it.</strong> Move point {experiment.pointLabel} to {experiment.target}. Watch the three summaries.</p>
+        <p className={styles.small}>Change only this point. Use its value field for an exact position, or Reset to start again.</p>
+      </div>}
+      {reachedTarget && <>
+        <p className={styles.observation} role="status">{prediction === experiment.correctPrediction ? "Your prediction matches the result." : "The result differed from your prediction. Use the live values to investigate."}</p>
+        <h3>{experiment.explanationQuestion}</h3>
+        <fieldset className={styles.choices}><legend className="sr-only">Your explanation</legend>
+          {experiment.explanations.map((choice) => <label key={choice.id} data-checked={explanation === choice.id}>
+            <input type="radio" name="explanation" value={choice.id} checked={explanation === choice.id} onChange={() => onExplain(choice.id)} />{choice.label}
+          </label>)}
+        </fieldset>
+        {explanation && !complete && <p className={styles.feedback} role="status">Try again. {experiment.retryHint}</p>}
+      </>}
+      {complete && <div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>Experiment explained</h3><p>{experiment.takeaway}</p></div></div>}
+      {complete && <button type="button" className={styles.nextButton} onClick={onNext}>Try another dataset<ArrowRightIcon aria-hidden="true" /></button>}
     </div>
-  );
-}
-
-function datasetHint(preset: TypicalPreset) {
-  if (preset.id === "balanced") {
-    return "Start here for the guide: mean and median should land on the same center.";
-  }
-
-  if (preset.id === "repeated-peak") {
-    return "Look for the value that repeats. The mode follows frequency, not distance.";
-  }
-
-  return "Drag the far-right value left or right and watch the mean move more than the median.";
-}
-
-function PresetButton({
-  preset,
-  isSelected,
-  onSelect,
-}: {
-  preset: TypicalPreset;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`min-w-0 rounded-[10px] border p-4 text-left transition ${
-        isSelected
-          ? "border-[#5636f5] bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white shadow-[0_14px_24px_rgba(70,39,232,0.2)]"
-          : "border-[#d8e0f0] bg-white text-[#0d1429] hover:border-[#b9c4de] hover:bg-[#fbfaff]"
-      }`}
-    >
-      <span className="block text-[13px] font-black uppercase tracking-[0.02em]">
-        {preset.label}
-      </span>
-      <span className="mt-2 block text-[16px] leading-[1.25] font-black">
-        {preset.shortLabel}
-      </span>
-      <span
-        className={`mt-2 block text-[13px] leading-[1.35] ${
-          isSelected ? "text-white/85" : "text-[#30446f]"
-        }`}
-      >
-        {preset.description}
-      </span>
-    </button>
-  );
-}
-
-function NumberLine({
-  points,
-  modeValues,
-  activePointId,
-  trackRef,
-  onPointStart,
-  onPointStep,
-}: {
-  points: DataPoint[];
-  modeValues: number[];
-  activePointId: string | null;
-  trackRef: RefObject<HTMLDivElement | null>;
-  onPointStart: (pointId: string, clientX: number) => void;
-  onPointStep: (pointId: string, delta: number) => void;
-}) {
-  const stackOffsets = useStackedPointLayout(points);
-  const modeSet = new Set(modeValues);
-
-  return (
-    <div className="mt-6 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-      <div
-        ref={trackRef}
-        className="relative h-[180px] select-none overflow-hidden rounded-[10px] bg-white px-4"
-      >
-        <div className="absolute right-4 left-4 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#cfd8ec]" />
-        {[0, 25, 50, 75, 100].map((tick) => (
-          <div
-            key={tick}
-            className="absolute top-1/2 h-4 w-px -translate-y-1/2 bg-[#9aa8c5]"
-            style={{ left: `calc(1rem + (100% - 2rem) * ${tick / 100})` }}
-          >
-            <span className="absolute top-5 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-[#52628a]">
-              {tick}
-            </span>
-          </div>
-        ))}
-        {points.map((point) => {
-          const isActive = activePointId === point.id;
-          const isMode = modeSet.has(point.value);
-          const topOffset = stackOffsets.get(point.id) ?? 0;
-
-          return (
-            <button
-              key={point.id}
-              type="button"
-              aria-label={`${point.label} value ${point.value}`}
-              onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => {
-                const step = event.shiftKey ? 10 : 1;
-
-                if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-                  event.preventDefault();
-                  onPointStep(point.id, -step);
-                }
-
-                if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-                  event.preventDefault();
-                  onPointStep(point.id, step);
-                }
-              }}
-              onPointerDown={(event) => {
-                event.preventDefault();
-                onPointStart(point.id, event.clientX);
-              }}
-              className={`absolute z-10 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border-2 bg-white font-mono text-[12px] font-black text-[#071024] shadow-[0_10px_20px_rgba(26,38,80,0.13)] transition active:cursor-grabbing ${
-                isActive ? "scale-110 border-[#352cff]" : "border-white"
-              } ${isMode ? "ring-4 ring-[#f59e0b]/20" : ""}`}
-              style={
-                {
-                  left: `calc(1rem + (100% - 2rem) * ${point.value / 100})`,
-                  top: `calc(50% + ${topOffset}px)`,
-                  background: `linear-gradient(180deg, #ffffff 0%, ${point.color} 270%)`,
-                } as CSSProperties
-              }
-            >
-              {point.label}
-            </button>
-          );
-        })}
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {points
-          .slice()
-          .sort((left, right) => left.value - right.value)
-          .map((point) => (
-            <span
-              key={point.id}
-              className={`rounded-full border px-2.5 py-1 font-mono text-[12px] font-black ${
-                modeSet.has(point.value)
-                  ? "border-[#f2c96b] bg-[#fff7df] text-[#9a6500]"
-                  : "border-[#dfe4f4] bg-white text-[#263a68]"
-              }`}
-            >
-              {point.label}:{point.value}
-            </span>
-          ))}
-      </div>
+    <div className={styles.guideInvitation}><ChatBubbleLeftRightIcon aria-hidden="true" /><h3>Talk it through</h3>
+      <p>Ask the AI Guide about your prediction or what changed.</p>
+      <button type="button" onClick={onGuide}>Ask the AI Guide<ArrowRightIcon aria-hidden="true" /></button>
     </div>
-  );
-}
-
-function DatasetPanel({
-  activePreset,
-  points,
-  analysis,
-  activePointId,
-  trackRef,
-  onSelectPreset,
-  onPointStart,
-  onPointStep,
-}: {
-  activePreset: TypicalPreset;
-  points: DataPoint[];
-  analysis: TypicalValuesAnalysis;
-  activePointId: string | null;
-  trackRef: RefObject<HTMLDivElement | null>;
-  onSelectPreset: (preset: TypicalPreset) => void;
-  onPointStart: (pointId: string, clientX: number) => void;
-  onPointStep: (pointId: string, delta: number) => void;
-}) {
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.94fr)_minmax(320px,0.56fr)]">
-        <div className="min-w-0">
-          <LessonTitle>1. Build The Dataset</LessonTitle>
-          <p className="mt-4 max-w-[820px] text-[16px] leading-[1.45] text-[#16264e]">
-            Move the dots along the number line. Each summary answers a
-            different version of typical.
-          </p>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {typicalPresets.map((preset) => (
-              <PresetButton
-                key={preset.id}
-                preset={preset}
-                isSelected={preset.id === activePreset.id}
-                onSelect={() => onSelectPreset(preset)}
-              />
-            ))}
-          </div>
-          <NumberLine
-            points={points}
-            modeValues={analysis.modeValues}
-            activePointId={activePointId}
-            trackRef={trackRef}
-            onPointStart={onPointStart}
-            onPointStep={onPointStep}
-          />
-        </div>
-
-        <div className="min-w-0 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-          <p className="text-[13px] font-black tracking-[0.03em] text-[#352cff] uppercase">
-            Current Dataset
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-            <FactPill label="Count" value={String(analysis.count)} />
-            <FactPill label="Range" value={`${analysis.min} to ${analysis.max}`} />
-            <FactPill
-              label="Sorted values"
-              value={analysis.sortedValues.join(", ")}
-              wrap
-            />
-            <FactPill
-              label="Repeated value"
-              value={
-                analysis.modeValues.length > 0
-                  ? `${analysis.modeValues.join(", ")} appears ${analysis.modeFrequency}x`
-                  : "none"
-              }
-            />
-          </div>
-          <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
-            {datasetHint(activePreset)}
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function MarkerTrack({
-  title,
-  value,
-  color,
-  formula,
-  story,
-  modeValues,
-}: {
-  title: string;
-  value: number | null;
-  color: string;
-  formula: string;
-  story: string;
-  modeValues?: number[];
-}) {
-  const markerValues = modeValues && modeValues.length > 0 ? modeValues : [];
-
-  return (
-    <div className="rounded-[10px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-[13px] font-black tracking-[0.04em] text-[#52628a] uppercase">
-            {title}
-          </p>
-          <p className="mt-1 text-[14px] leading-[1.35] text-[#263a68]">
-            {story}
-          </p>
-        </div>
-        <p className="font-mono text-[26px] leading-none font-black" style={{ color }}>
-          {value === null ? "none" : formatValue(value)}
-        </p>
-      </div>
-
-      <div className="relative mt-5 h-12 rounded-[8px] bg-white px-3">
-        <div className="absolute right-3 left-3 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#d4dcef]" />
-        {value !== null && markerValues.length === 0 ? (
-          <div
-            className="absolute top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white shadow-[0_8px_14px_rgba(26,38,80,0.16)]"
-            style={{
-              left: `calc(0.75rem + (100% - 1.5rem) * ${value / 100})`,
-              backgroundColor: color,
-            }}
-          />
-        ) : null}
-        {markerValues.map((markerValue) => (
-          <div
-            key={markerValue}
-            className="absolute top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white shadow-[0_8px_14px_rgba(26,38,80,0.16)]"
-            style={{
-              left: `calc(0.75rem + (100% - 1.5rem) * ${markerValue / 100})`,
-              backgroundColor: color,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="mt-4 rounded-[7px] border border-[#e4e8f4] bg-white px-3 py-2 font-mono text-[12px] leading-[1.45] font-bold text-[#071024] sm:text-[13px]">
-        {formula}
-      </div>
-    </div>
-  );
-}
-
-function SummaryPanel({ analysis }: { analysis: TypicalValuesAnalysis }) {
-  const modeValue =
-    analysis.modeValues.length === 1 ? analysis.modeValues[0] ?? null : null;
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>2. Watch The Summaries Move</LessonTitle>
-      <p className="mt-4 max-w-[860px] text-[16px] leading-[1.45] text-[#16264e]">
-        The same dataset can have three honest typical values. The marker tracks
-        show what each summary pays attention to.
-      </p>
-      <div className="mt-5 grid gap-4 xl:grid-cols-3">
-        <MarkerTrack
-          title="Mean"
-          value={analysis.mean}
-          color="#2563eb"
-          story={analysis.story.mean}
-          formula={`x̄ = Σx / n = ${analysis.sum} / ${analysis.count} = ${analysis.mean.toFixed(1)}`}
-        />
-        <MarkerTrack
-          title="Median"
-          value={analysis.median}
-          color="#5335f4"
-          story={analysis.story.median}
-          formula={`median = middle sorted value = ${formatValue(analysis.median)}`}
-        />
-        <MarkerTrack
-          title="Mode"
-          value={modeValue}
-          color="#f59e0b"
-          story={analysis.story.mode}
-          formula={
-            analysis.modeValues.length > 0
-              ? `mode = ${analysis.modeValues.join(", ")} appears ${analysis.modeFrequency}×`
-              : "mode = no repeated value"
-          }
-          modeValues={analysis.modeValues}
-        />
-      </div>
-    </Panel>
-  );
-}
-
-function StoryRow({
-  label,
-  value,
-  color,
-  phrase,
-  detail,
-}: {
-  label: string;
-  value: string;
-  color: string;
-  phrase: string;
-  detail: string;
-}) {
-  return (
-    <div className="grid gap-3 border-b border-[#e4e8f4] py-4 last:border-b-0 md:grid-cols-[160px_120px_minmax(0,1fr)] md:items-center">
-      <div className="flex items-center gap-3">
-        <span className="h-3.5 w-3.5 rounded-full" style={{ backgroundColor: color }} />
-        <p className="text-[16px] font-black text-[#071024]">{label}</p>
-      </div>
-      <p className="font-mono text-[22px] leading-none font-black" style={{ color }}>
-        {value}
-      </p>
-      <p className="text-[15px] leading-[1.4] text-[#263a68]">
-        <span className="font-black text-[#071024]">{phrase}</span> {detail}
-      </p>
-    </div>
-  );
-}
-
-function ComparePanel({ analysis }: { analysis: TypicalValuesAnalysis }) {
-  const modeCopy =
-    analysis.modeValues.length > 0
-      ? analysis.modeValues.join(", ")
-      : "none";
-  const meanPhrase =
-    Math.abs(analysis.meanMedianGap) < 0.5
-      ? "Matches the middle."
-      : "Pulled by extremes.";
-  const meanDetail =
-    Math.abs(analysis.meanMedianGap) < 0.5
-      ? "It balances the values at the same point as the sorted median."
-      : `It sits ${formatSigned(analysis.meanMedianGap)} away from the median.`;
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.5fr)] xl:items-start">
-        <div className="min-w-0">
-          <LessonTitle>3. Compare The Story</LessonTitle>
-          <div className="mt-4 overflow-hidden rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] px-4">
-            <StoryRow
-              label="Mean"
-              value={analysis.mean.toFixed(1)}
-              color="#2563eb"
-              phrase={meanPhrase}
-              detail={meanDetail}
-            />
-            <StoryRow
-              label="Median"
-              value={formatValue(analysis.median)}
-              color="#5335f4"
-              phrase="Resists extremes."
-              detail="Only the order and the middle position matter."
-            />
-            <StoryRow
-              label="Mode"
-              value={modeCopy}
-              color="#f59e0b"
-              phrase="Finds repetition."
-              detail="It ignores distance and looks for the most frequent value."
-            />
-          </div>
-        </div>
-
-        <div className="rounded-[12px] border border-[#dedcff] bg-[#f8f7ff] p-5">
-          <p className="text-[13px] font-black tracking-[0.04em] text-[#352cff] uppercase">
-            Takeaway
-          </p>
-          <p className="mt-4 text-[26px] leading-[1.08] font-black text-[#071024]">
-            Typical depends on the question.
-          </p>
-          <p className="mt-3 text-[16px] leading-[1.45] text-[#263a68]">
-            Balance point, middle point, or most common point can all be right.
-            Pick the one that matches the story you need to tell.
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
+  </aside>;
 }
 
 export function MeanMedianModePlayground() {
-  const [activePreset, setActivePreset] = useState(initialTypicalPreset);
+  const [preset, setPreset] = useState(initialTypicalPreset);
   const [points, setPoints] = useState(() => pointsForPreset(initialTypicalPreset));
-  const [activePointId, setActivePointId] = useState<string | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [selectedId, setSelectedId] = useState("point-9");
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
   const analysis = useMemo(() => analyzeTypicalValues(points), [points]);
-
-  const updatePointFromClientX = useCallback(
-    (clientX: number) => {
-      if (!activePointId || !trackRef.current) {
-        return;
-      }
-
-      const nextValue = clampValue(
-        clientXToPercentValue(
-          clientX,
-          trackRef.current.getBoundingClientRect(),
-          numberLineInsetPx,
-        ),
-      );
-
-      setPoints((currentPoints) =>
-        movePoint(currentPoints, activePointId, nextValue),
-      );
-    },
-    [activePointId],
-  );
-
-  useEffect(() => {
-    if (!activePointId) {
-      return;
-    }
-
-    function handlePointerMove(event: PointerEvent) {
-      updatePointFromClientX(event.clientX);
-    }
-
-    function handlePointerUp() {
-      setActivePointId(null);
-    }
-
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", handlePointerUp);
-
-    return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUp);
-    };
-  }, [activePointId, updatePointFromClientX]);
-
-  function handleSelectPreset(preset: TypicalPreset) {
-    setActivePreset(preset);
-    setPoints(pointsForPreset(preset));
-    setActivePointId(null);
+  const experiment = learningExperiments[preset.id]!;
+  const selected = points.find((point) => point.id === selectedId)!;
+  const sorted = [...points].sort((a, b) => a.value - b.value);
+  const openGuide = useOpenPlaygroundAssistant();
+  function reset(nextPreset = preset) {
+    setPreset(nextPreset); setPoints(pointsForPreset(nextPreset));
+    setSelectedId(nextPreset.id === "repeated-peak" ? "point-1" : "point-9"); setPrediction(null); setExplanation(null);
   }
-
-  function handlePointStart(pointId: string, clientX: number) {
-    setActivePointId(pointId);
-    const rect = trackRef.current?.getBoundingClientRect();
-
-    if (!rect) {
-      return;
-    }
-
-    const nextValue = clampValue(
-      clientXToPercentValue(clientX, rect, numberLineInsetPx),
-    );
-
-    setPoints((currentPoints) => movePoint(currentPoints, pointId, nextValue));
+  function move(id: string, value: number) {
+    if (points.find((point) => point.id === id)?.value === clampValue(value)) return;
+    setPoints((current) => movePoint(current, id, value)); setExplanation(null);
   }
-
-  function handlePointStep(pointId: string, delta: number) {
-    setActivePointId(pointId);
-    setPoints((currentPoints) => {
-      const point = currentPoints.find((item) => item.id === pointId);
-
-      if (!point) {
-        return currentPoints;
-      }
-
-      return movePoint(currentPoints, pointId, point.value + delta);
-    });
-  }
-
-  return (
-    <main className="min-h-screen overflow-x-clip bg-[#f7f9ff] px-4 py-5 text-[#071024] sm:px-7 lg:px-10">
-      <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-4">
-        <header className="py-1">
-          <div>
-            <h1 className="text-[42px] leading-[0.95] font-black tracking-[-0.05em] text-[#070b1a] sm:text-[56px]">
-              {"Mean, Median & Mode Lab"}
-            </h1>
-            <p className="mt-3 max-w-3xl text-[18px] leading-[1.35] font-semibold text-[#30446f] sm:text-[21px]">
-              Drag a dataset around and watch three ideas of typical disagree.
-            </p>
-          </div>
-        </header>
-
-        <DatasetPanel
-          activePreset={activePreset}
-          points={points}
-          analysis={analysis}
-          activePointId={activePointId}
-          trackRef={trackRef}
-          onSelectPreset={handleSelectPreset}
-          onPointStart={handlePointStart}
-          onPointStep={handlePointStep}
-        />
-        <SummaryPanel analysis={analysis} />
-        <ComparePanel analysis={analysis} />
+  return <main className={styles.page}>
+    <nav className={styles.nav} aria-label="Playground navigation"><Link href="/" aria-label="AI Grounds home">AI Grounds</Link><span>Statistics</span></nav>
+    <div className={styles.layout}>
+      <div className={styles.workbench}>
+        <header className={styles.header}><p className={styles.eyebrow}>Guided discovery</p><h1>Mean, Median &amp; Mode</h1><p>Move one point. Watch three ideas of typical change.</p></header>
+        <div className={styles.toolbar}>
+          <div className={styles.presets} aria-label="Dataset scenarios">{typicalPresets.map((item) => <button key={item.id} type="button" aria-pressed={item.id === preset.id} onClick={() => reset(item)}><strong>{item.label}</strong><span>{item.shortLabel}</span></button>)}</div>
+          <button type="button" className={styles.reset} onClick={() => reset()}><ArrowPathIcon aria-hidden="true" />Reset</button>
+        </div>
+        <DatasetChart points={points} analysis={analysis} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
+        <div className={styles.pointEditor}>
+          <label>Point {selected.label} value<input type="number" min={0} max={100} step={1} value={selected.value} onChange={(event) => {
+            if (Number.isFinite(event.currentTarget.valueAsNumber)) move(selectedId, event.currentTarget.valueAsNumber);
+          }} /></label>
+          <p id="dataset-keyboard-help">Focus a dot and use arrow keys. Shift moves by 10; Home / End moves to 0 / 100.</p>
+        </div>
+        <section className={styles.sorted} aria-label="Sorted values">
+          <div><h2>Sorted values <span>({analysis.count} points)</span></h2><p>The outlined value is the middle.</p></div>
+          <ol>{sorted.map((point, index) => <li key={point.id} data-middle={index === Math.floor(points.length / 2)} data-mode={analysis.modeValues.includes(point.value)} aria-label={`${point.label}: ${point.value}${index === Math.floor(points.length / 2) ? ", middle value" : ""}`}><span>{point.value}</span><small>{point.label}</small></li>)}</ol>
+        </section>
+        <Summaries analysis={analysis} />
+        <p className={styles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">Mean {analysis.mean.toFixed(1)}; median {formatValue(analysis.median)}; {analysis.modeValues.length ? `mode ${analysis.modeValues.join(", ")}, each appearing ${analysis.modeFrequency} times` : "no mode: no values repeat"}.</p>
+        <div className={styles.insight}><LightBulbIcon aria-hidden="true" /><p><strong>Three questions, three summaries.</strong> Average, middle, or most common? Choose the one that fits what you want to know.</p></div>
       </div>
-    </main>
-  );
+      <ExperimentRail experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
+        setPrediction(id); setExplanation(null); setPoints(pointsForPreset(preset)); setSelectedId(preset.id === "repeated-peak" ? "point-1" : "point-9");
+      }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} onGuide={openGuide} />
+    </div>
+  </main>;
 }

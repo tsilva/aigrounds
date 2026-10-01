@@ -1,0 +1,10 @@
+{
+  "lessonPlanStep": 2,
+  "title": "Range, Quartiles & IQR",
+  "slug": "range-quartiles-iqr",
+  "modulePath": "src/modules/range-quartiles-iqr",
+  "acceptedMockupPath": "src/modules/range-quartiles-iqr/design/accepted-mockup.png",
+  "promptPath": "src/modules/range-quartiles-iqr/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f718-d20c-79a0-a1b8-d42099171ce1/exec-b2575171-6bf9-4560-bbe8-3fc97717afdc.png",
+  "approval": "User requested implementation of the recommended shared-scale design, with compact quartile calculations. Chart positions are computed exactly in implementation; the raster mockup is a layout reference."
+}

@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import { PlaygroundAssistantContext } from "@/lib/playground-assistant-context";
 import {
   useEffect,
@@ -607,7 +606,7 @@ export function PlaygroundAssistantShell({
     [pathname],
   );
   const playgroundName = playgroundContext?.title ?? "this playground";
-  const isGuidedDiscovery = playgroundContext?.slug === "mean-median-mode" || playgroundContext?.slug === "range-quartiles-iqr";
+  const isGuidedDiscovery = playgroundContext?.layout === "guided-discovery";
   const tutorPlan = playgroundContext?.tutorPlan;
   const currentTutorStep = tutorPlan?.steps[tutorStepIndex];
 
@@ -996,18 +995,15 @@ export function PlaygroundAssistantShell({
         </aside>
       ) : null}
 
-      {!isAssistantOpen ? (
+      {!isAssistantOpen && !isGuidedDiscovery ? (
         <button
           type="button"
           onClick={() => setIsAssistantOpen(true)}
-          className={isGuidedDiscovery
-            ? "absolute top-3 right-6 z-40 inline-flex h-10 items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 text-sm font-semibold text-indigo-900 hover:bg-indigo-100 focus:ring-4 focus:ring-indigo-200 focus:outline-none"
-            : "fixed top-4 right-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 p-2 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none xl:px-5 xl:py-3"}
+          className="fixed bottom-4 right-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-white/70 bg-slate-950 p-2 text-left text-white shadow-[0_18px_50px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:ring-4 focus:ring-indigo-200 focus:outline-none xl:px-5 xl:py-3"
           aria-expanded={isAssistantOpen}
           aria-controls="playground-assistant-panel"
           aria-label="Open chat"
         >
-          {isGuidedDiscovery ? <><QuestionMarkCircleIcon aria-hidden="true" className="size-5 text-indigo-600" />AI Guide</> : <>
           <span
             aria-hidden="true"
             className="grid h-8 w-8 place-items-center rounded-full bg-indigo-500 font-mono text-base font-bold"
@@ -1020,7 +1016,6 @@ export function PlaygroundAssistantShell({
             </span>
             <span className="mt-1 text-sm font-semibold">Open chat</span>
           </span>
-          </>}
         </button>
       ) : null}
 

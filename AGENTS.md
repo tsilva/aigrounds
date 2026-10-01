@@ -67,3 +67,9 @@ Before every task in this repository, use the `$specs-author` skill to read the 
 ## Learning Page Workflows
 
 Use `$aigrounds-learning-page` when creating, optimizing, fixing, or auditing an individual playground and its AI Guide. Use `$aigrounds-lesson-plan-review` only for cross-lesson sequencing, prerequisite-lesson creation, and lesson splits or merges.
+
+## Learning Page Design System
+
+Use `$aigrounds-redesign-lesson` at `.codex/skills/aigrounds-redesign-lesson/SKILL.md` when redesigning an existing lesson to match the shared scheme, including migrations of older playgrounds. It adds design-system migration guidance to the `$aigrounds-learning-page` lifecycle.
+
+Before creating a playground or materially redesigning one, read `DESIGN_SYSTEM.md` and follow its approved shared learning-page scheme. Reuse `src/components/learning-page/` for the frame, controls, summaries, experiment progress, and Guide CTA; keep module styling focused on the concept's visualization. Set `layout: "guided-discovery"` in lesson metadata. The Guide CTA belongs below the exercise in the experiment rail, not in the top navigation. Treat older lesson mockups as historical when they conflict with the current design system. Preserve teaching-specific representations and calculate chart geometry from the engine.

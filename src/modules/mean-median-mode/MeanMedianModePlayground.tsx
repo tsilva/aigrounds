@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowPathIcon, ArrowRightIcon, ChatBubbleLeftRightIcon, CheckCircleIcon, LightBulbIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { clientXToPercentValue } from "@/lib/number-line";
-import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
+import { ExperimentProgress, GuideInvitation, LearningPage, LessonSummaries } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { analyzeTypicalValues, clampValue, movePoint, type DataPoint, type TypicalValuesAnalysis } from "./mean-median-mode-engine";
 import { initialTypicalPreset, pointsForPreset, typicalPresets, type TypicalPreset } from "./scenario";
 import { isExperimentDataset, learningExperiments, pointLanes, type LearningExperiment } from "./learning-experiments";
-import styles from "./playground.module.css";
+import localStyles from "./playground.module.css";
+
+const styles = { ...sharedStyles, ...localStyles };
 
 const ticks = [0, 25, 50, 75, 100];
 const colors = { mean: "#1760db", median: "#5031dc", mode: "#976000" };
@@ -85,29 +87,23 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
 }
 
 function Summaries({ analysis }: { analysis: TypicalValuesAnalysis }) {
-  return <section className={styles.summaries} aria-label="Live summaries">
-    {[
+  return <LessonSummaries label="Live summaries" summaries={[
       { label: "Mean", color: colors.mean, value: analysis.mean.toFixed(1), definition: "The average of all values.", formula: `${analysis.sum} ÷ ${analysis.count} = ${analysis.mean.toFixed(1)}` },
       { label: "Median", color: colors.median, value: formatValue(analysis.median), definition: "The middle value when sorted.", formula: `${Math.floor(analysis.count / 2) + 1}th sorted value = ${formatValue(analysis.median)}` },
       { label: "Mode", color: colors.mode, value: analysis.modeValues.length ? analysis.modeValues.join(", ") : "None", definition: "The most frequent value.", formula: analysis.modeValues.length ? `Each appears ${analysis.modeFrequency} times` : "No values repeat" },
-    ].map((summary) => <div key={summary.label} className={styles.summary} style={{ "--summary-color": summary.color } as CSSProperties}>
-      <h2>{summary.label}</h2><p className={styles.definition}>{summary.definition}</p>
-      <p className={styles.summaryValue}>{summary.value}</p><p className={styles.formula}>{summary.formula}</p>
-    </div>)}
-  </section>;
+    ]} />;
 }
 
-function ExperimentRail({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext, onGuide }: {
+function ExperimentRail({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext }: {
   experiment: LearningExperiment; points: DataPoint[]; preset: TypicalPreset; prediction: string | null; explanation: string | null;
-  onPredict: (id: string) => void; onExplain: (id: string) => void; onNext: () => void; onGuide: () => void;
+  onPredict: (id: string) => void; onExplain: (id: string) => void; onNext: () => void;
 }) {
   const reachedTarget = prediction !== null && isExperimentDataset(points, preset, experiment);
   const complete = reachedTarget && explanation === experiment.correctExplanation;
   const phase = !prediction ? 0 : !reachedTarget ? 1 : 2;
   return <aside className={styles.rail} aria-label="Guided experiment">
-    <p className={styles.eyebrow}>Try this</p><h2 className={styles.experimentTitle}>{experiment.title}</h2>
-    <ol className={styles.steps} aria-label="Experiment progress">{["Predict", "Try", "Explain"].map((step, index) =>
-      <li key={step} aria-current={phase === index ? "step" : undefined} data-active={phase >= index}><span>{index + 1}</span>{step}</li>)}</ol>
+    <p className={styles.eyebrow}>Experiment {typicalPresets.findIndex((item) => item.id === preset.id) + 1} of {typicalPresets.length}</p><h2 className={styles.experimentTitle}>{experiment.title}</h2>
+    <ExperimentProgress phase={phase} />
     <div className={styles.exercise}>
       <h3>{reachedTarget ? "What did you notice?" : "Make a prediction"}</h3>
       {!reachedTarget && <>
@@ -136,10 +132,7 @@ function ExperimentRail({ experiment, points, preset, prediction, explanation, o
       {complete && <div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>Experiment explained</h3><p>{experiment.takeaway}</p></div></div>}
       {complete && <button type="button" className={styles.nextButton} onClick={onNext}>Try another dataset<ArrowRightIcon aria-hidden="true" /></button>}
     </div>
-    <div className={styles.guideInvitation}><ChatBubbleLeftRightIcon aria-hidden="true" /><h3>Talk it through</h3>
-      <p>Ask the AI Guide about your prediction or what changed.</p>
-      <button type="button" onClick={onGuide}>Ask the AI Guide<ArrowRightIcon aria-hidden="true" /></button>
-    </div>
+    <GuideInvitation />
   </aside>;
 }
 
@@ -153,7 +146,6 @@ export function MeanMedianModePlayground() {
   const experiment = learningExperiments[preset.id]!;
   const selected = points.find((point) => point.id === selectedId)!;
   const sorted = [...points].sort((a, b) => a.value - b.value);
-  const openGuide = useOpenPlaygroundAssistant();
   function reset(nextPreset = preset) {
     setPreset(nextPreset); setPoints(pointsForPreset(nextPreset));
     setSelectedId(nextPreset.id === "repeated-peak" ? "point-1" : "point-9"); setPrediction(null); setExplanation(null);
@@ -162,11 +154,10 @@ export function MeanMedianModePlayground() {
     if (points.find((point) => point.id === id)?.value === clampValue(value)) return;
     setPoints((current) => movePoint(current, id, value)); setExplanation(null);
   }
-  return <main className={styles.page}>
-    <nav className={styles.nav} aria-label="Playground navigation"><Link href="/" aria-label="AI Grounds home">AI Grounds</Link><span>Statistics</span></nav>
-    <div className={styles.layout}>
-      <div className={styles.workbench}>
-        <header className={styles.header}><p className={styles.eyebrow}>Guided discovery</p><h1>Mean, Median &amp; Mode</h1><p>Move one point. Watch three ideas of typical change.</p></header>
+  return <LearningPage title="Mean, Median & Mode" subtitle="Move one point. Watch three ideas of typical change."
+    rail={<ExperimentRail experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
+      setPrediction(id); setExplanation(null); setPoints(pointsForPreset(preset)); setSelectedId(preset.id === "repeated-peak" ? "point-1" : "point-9");
+    }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} />}>
         <div className={styles.toolbar}>
           <div className={styles.presets} aria-label="Dataset scenarios">{typicalPresets.map((item) => <button key={item.id} type="button" aria-pressed={item.id === preset.id} onClick={() => reset(item)}><strong>{item.label}</strong><span>{item.shortLabel}</span></button>)}</div>
           <button type="button" className={styles.reset} onClick={() => reset()}><ArrowPathIcon aria-hidden="true" />Reset</button>
@@ -184,11 +175,5 @@ export function MeanMedianModePlayground() {
         </section>
         <Summaries analysis={analysis} />
         <p className={styles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">Mean {analysis.mean.toFixed(1)}; median {formatValue(analysis.median)}; {analysis.modeValues.length ? `mode ${analysis.modeValues.join(", ")}, each appearing ${analysis.modeFrequency} times` : "no mode: no values repeat"}.</p>
-        <div className={styles.insight}><LightBulbIcon aria-hidden="true" /><p><strong>Three questions, three summaries.</strong> Average, middle, or most common? Choose the one that fits what you want to know.</p></div>
-      </div>
-      <ExperimentRail experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
-        setPrediction(id); setExplanation(null); setPoints(pointsForPreset(preset)); setSelectedId(preset.id === "repeated-peak" ? "point-1" : "point-9");
-      }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} onGuide={openGuide} />
-    </div>
-  </main>;
+  </LearningPage>;
 }

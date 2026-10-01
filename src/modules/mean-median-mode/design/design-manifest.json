@@ -1,0 +1,15 @@
+{
+  "lessonPlanStep": 1,
+  "lessonPlanTitle": "Mean, Median & Mode Lab",
+  "slug": "mean-median-mode",
+  "modulePath": "src/modules/mean-median-mode",
+  "acceptedMockup": "src/modules/mean-median-mode/design/accepted-mockup.png",
+  "prompt": "src/modules/mean-median-mode/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0f6c9-7475-75c1-8ba2-d578a735bce0/exec-e8fd19f8-edf1-49d7-b063-bb6a1d06ecbf.png",
+  "approvedRefinements": [
+    "Predict, try, explain sequence",
+    "Remove duplicate readouts",
+    "Separate overlapping markers",
+    "Implement in aigrounds repository"
+  ]
+}

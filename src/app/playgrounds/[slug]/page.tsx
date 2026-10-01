@@ -44,6 +44,10 @@ export default async function PlaygroundPage({
 
   const ModuleComponent = playground.component;
 
+  if (slug === "mean-median-mode") {
+    return <ModuleComponent />;
+  }
+
   return (
     <PlaygroundPageWithHomeButton>
       <ModuleComponent />

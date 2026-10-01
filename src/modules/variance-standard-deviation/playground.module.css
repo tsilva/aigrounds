@@ -1,0 +1,30 @@
+.chart { margin-top: 22px; }
+.plotFrame { margin: 0 22px 40px; }
+.meanCaption { font-size: 12px; color: var(--muted); margin: 12px 0 8px; }
+.plot { position: relative; user-select: none; }
+.axis { position: absolute; bottom: 0; height: 2px; width: 100%; background: #7a8cae; }
+.tick { position: absolute; bottom: -5px; width: 1px; height: 12px; background: #6d7fa4; }
+.tick > span { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); }
+.meanMarker { position: absolute; top: 0; bottom: 0; width: 1px; background: #0c1230; }
+.evidence { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 0; }
+.evidence h2, .comparison h2 { font-size: 16px; font-weight: 700; }
+.evidence > p, .comparison > p { font-size: 13px; color: var(--muted); line-height: 1.5; margin-top: 5px; }
+.deviations { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; font-family: var(--font-ibm-plex-mono), monospace; font-size: 12px; }
+.deviations th, .deviations td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); }
+.deviations th { font-weight: 500; }
+.deviations th:first-child, .deviations td:first-child { padding-left: 0; }
+.deviations th:last-child, .deviations td:last-child { text-align: right; padding-right: 0; }
+.deviations tr[data-selected="true"] { background: #f6f5ff; }
+.deviations tfoot th, .deviations tfoot td { border: 0; padding-top: 10px; font-weight: 600; }
+.barColumn { width: 32%; }
+.deviationTrack { position: relative; height: 14px; }
+.deviationTrack::before { content: ""; position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: #9faec7; }
+.deviationTrack > span { position: absolute; top: 3px; height: 8px; }
+.populationNote { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+.comparison { border-top: 1px solid var(--line); padding-top: 16px; }
+.comparison dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
+.comparison dl > div { text-align: center; border-left: 1px solid var(--line); padding: 0 8px; }
+.comparison dl > div:first-child { border: 0; }
+.comparison dt { font-size: 12px; }
+.comparison dd { font-size: 20px; font-weight: 600; }
+.comparison dd:last-child { font-size: 11px; font-weight: 400; margin-top: 3px; }

@@ -1,720 +1,168 @@
 "use client";
 
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { ExperimentProgress, GuideInvitation, LearningPage, LessonSummaries } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { clientXToPercentValue } from "@/lib/number-line";
-import {
-  analyzeSpread,
-  clampValue,
-  movePoint,
-  type DataPoint,
-  type DeviationRow,
-  type SpreadAnalysis,
-} from "./variance-standard-deviation-engine";
-import {
-  initialSpreadPreset,
-  pointsForPreset,
-  spreadPresets,
-  type SpreadPreset,
-} from "./scenario";
+import { analyzeSpread, clampValue, movePoint, type DataPoint, type SpreadAnalysis } from "./variance-standard-deviation-engine";
+import { initialSpreadPreset, pointsForPreset, spreadPresets, type SpreadPreset } from "./scenario";
+import { isEdgeExperiment, matchesPreset, pointLanes, spreadExperiments } from "./learning-experiments";
+import localStyles from "./playground.module.css";
 
-function formatValue(value: number, digits = 1) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(digits);
-}
+const styles = { ...sharedStyles, ...localStyles };
+const position = (value: number) => ({ left: `${value}%` });
+const signed = (value: number) => `${value > 0 ? "+" : ""}${Math.abs(value) < 0.05 ? "0.0" : value.toFixed(1)}`;
 
-function formatSigned(value: number) {
-  if (Math.abs(value) < 0.05) {
-    return "0.0";
-  }
-
-  return `${value > 0 ? "+" : "-"}${Math.abs(value).toFixed(1)}`;
-}
-
-function Panel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
+function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
+  points: DataPoint[]; analysis: SpreadAnalysis; selectedId: string;
+  onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
-  return (
-    <section
-      className={`rounded-[14px] border border-[#d8e0f3] bg-white shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
-
-function LessonTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[18px] leading-none font-black text-[#352cff] uppercase">
-      {children}
-    </h2>
-  );
-}
-
-function FactPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
-      <p className="text-[11px] font-black text-[#7180a5] uppercase">{label}</p>
-      <p className="mt-1 truncate font-mono text-[13px] font-bold text-[#071024]">
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function PresetButton({
-  preset,
-  isSelected,
-  onSelect,
-}: {
-  preset: SpreadPreset;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`min-w-0 rounded-[10px] border p-4 text-left transition ${
-        isSelected
-          ? "border-[#5636f5] bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white shadow-[0_14px_24px_rgba(70,39,232,0.2)]"
-          : "border-[#d8e0f0] bg-white text-[#0d1429] hover:border-[#b9c4de] hover:bg-[#fbfaff]"
-      }`}
-    >
-      <span className="block text-[13px] font-black uppercase">
-        {preset.label}
-      </span>
-      <span className="mt-2 block text-[16px] leading-[1.25] font-black">
-        {preset.shortLabel}
-      </span>
-      <span
-        className={`mt-2 block text-[13px] leading-[1.35] ${
-          isSelected ? "text-white/85" : "text-[#30446f]"
-        }`}
-      >
-        {preset.description}
-      </span>
-    </button>
-  );
-}
-
-function NumberLine({
-  points,
-  analysis,
-  activePointId,
-  trackRef,
-  onPointStart,
-  onPointStep,
-}: {
-  points: DataPoint[];
-  analysis: SpreadAnalysis;
-  activePointId: string | null;
-  trackRef: RefObject<HTMLDivElement | null>;
-  onPointStart: (pointId: string) => void;
-  onPointStep: (pointId: string, delta: number) => void;
-}) {
-  const stackOffsets = useMemo(() => {
-    const sortedPoints = points
-      .slice()
-      .sort((left, right) => left.value - right.value);
-    const laneValues: number[] = [];
-    const offsets = new Map<string, number>();
-    const laneOffsets = [0, -46, -92, -138, 46, 92, 138];
-
-    for (const point of sortedPoints) {
-      const laneIndex = laneValues.findIndex(
-        (value) => Math.abs(point.value - value) >= 9,
-      );
-      const nextLaneIndex = laneIndex === -1 ? laneValues.length : laneIndex;
-
-      laneValues[nextLaneIndex] = point.value;
-      offsets.set(
-        point.id,
-        laneOffsets[nextLaneIndex] ?? -(nextLaneIndex * 30),
-      );
-    }
-
-    return offsets;
-  }, [points]);
-  const rowsByPoint = new Map(
-    analysis.rows.map((row) => [row.point.id, row]),
-  );
-  const axisTop = 76;
-
-  return (
-    <div className="mt-6 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-      <div
-        ref={trackRef}
-        className="relative h-[260px] select-none overflow-hidden rounded-[10px] bg-white px-4"
-      >
-        <div className="absolute top-5 right-4 left-4 bottom-[68px] rounded-[10px] border border-[#eef2fb] bg-[#fbfcff]" />
-        <div
-          className="absolute right-4 left-4 h-1 -translate-y-1/2 rounded-full bg-[#cfd8ec]"
-          style={{ top: `${axisTop}%` }}
-        />
-        {[0, 25, 50, 75, 100].map((tick) => (
-          <div
-            key={tick}
-            className="absolute h-4 w-px -translate-y-1/2 bg-[#9aa8c5]"
-            style={{
-              left: `calc(1rem + (100% - 2rem) * ${tick / 100})`,
-              top: `${axisTop}%`,
-            }}
-          >
-            <span className="absolute top-7 left-1/2 -translate-x-1/2 font-mono text-[11px] font-bold text-[#52628a]">
-              {tick}
-            </span>
-          </div>
-        ))}
-        <div
-          className="absolute top-[22px] bottom-[38px] z-[1] w-1 -translate-x-1/2 rounded-full bg-[#071024]"
-          style={{
-            left: `calc(1rem + (100% - 2rem) * ${analysis.mean / 100})`,
-          }}
-        >
-          <span className="absolute -top-1 left-2 rounded-[7px] border border-[#dfe4f4] bg-white px-2 py-1 font-mono text-[11px] font-black whitespace-nowrap text-[#071024] shadow-[0_8px_16px_rgba(26,38,80,0.08)]">
-            mean {formatValue(analysis.mean)}
-          </span>
-        </div>
-        {analysis.rows.map((row, index) => {
-          const start = Math.min(row.point.value, analysis.mean);
-          const width = Math.abs(row.point.value - analysis.mean);
-          const isLarge =
-            row.point.id === analysis.largestDeviationPointId ||
-            row.absoluteDeviation >= analysis.standardDeviation;
-          const laneTop = 48 + index * 15;
-
-          return (
-            <div key={row.point.id}>
-              <div
-                className="absolute right-4 left-4 z-[1] h-px bg-[#edf1fa]"
-                style={{ top: `${laneTop}px` }}
-              />
-              <div
-                className="absolute z-[2] h-2 -translate-y-1/2 rounded-full"
-                style={{
-                  left: `calc(1rem + (100% - 2rem) * ${start / 100})`,
-                  top: `${laneTop}px`,
-                  width: `calc((100% - 2rem) * ${Math.max(width, 0.8) / 100})`,
-                  backgroundColor: row.point.color,
-                  opacity: isLarge ? 0.9 : 0.58,
-                }}
-              />
-            </div>
-          );
-        })}
-        {points.map((point) => {
-          const row = rowsByPoint.get(point.id);
-          const isActive = activePointId === point.id;
-          const isLargest = point.id === analysis.largestDeviationPointId;
-          const topOffset = stackOffsets.get(point.id) ?? 0;
-
-          return (
-            <button
-              key={point.id}
-              type="button"
-              aria-label={`${point.label} value ${point.value}`}
-              onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => {
-                const step = event.shiftKey ? 10 : 1;
-
-                if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-                  event.preventDefault();
-                  onPointStep(point.id, -step);
-                }
-
-                if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-                  event.preventDefault();
-                  onPointStep(point.id, step);
-                }
-              }}
-              onPointerDown={(event) => {
-                event.preventDefault();
-                event.currentTarget.setPointerCapture(event.pointerId);
-                onPointStart(point.id);
-              }}
-              className={`absolute z-10 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 cursor-grab place-items-center rounded-full border-2 bg-white font-mono text-[11px] font-black text-[#071024] shadow-[0_10px_20px_rgba(26,38,80,0.13)] transition active:cursor-grabbing ${
-                isActive ? "scale-110 border-[#352cff]" : "border-white"
-              } ${isLargest ? "ring-4 ring-[#ef4444]/20" : ""}`}
-              style={
-                {
-                  left: `calc(1rem + (100% - 2rem) * ${point.value / 100})`,
-                  top: `calc(${axisTop}% + ${topOffset}px)`,
-                  background: `linear-gradient(180deg, #ffffff 0%, ${point.color} 270%)`,
-                } as CSSProperties
-              }
-            >
-              {point.label}
-              <span className="sr-only">
-                deviation {row ? formatSigned(row.deviation) : "0.0"}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {points
-          .slice()
-          .sort((left, right) => left.value - right.value)
-          .map((point) => {
-            const row = rowsByPoint.get(point.id);
-            const isLargest = point.id === analysis.largestDeviationPointId;
-
-            return (
-              <span
-                key={point.id}
-                className={`rounded-full border px-2.5 py-1 font-mono text-[12px] font-black ${
-                  isLargest
-                    ? "border-[#fecaca] bg-[#fff1f1] text-[#b91c1c]"
-                    : "border-[#dfe4f4] bg-white text-[#263a68]"
-                }`}
-              >
-                {point.label}:{point.value} ({row ? formatSigned(row.deviation) : "0.0"})
-              </span>
-            );
-          })}
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef<string | null>(null);
+  const [width, setWidth] = useState(600);
+  useEffect(() => {
+    if (!trackRef.current) return;
+    const observer = new ResizeObserver(([entry]) => { if (entry) setWidth(entry.contentRect.width); });
+    observer.observe(trackRef.current);
+    return () => observer.disconnect();
+  }, []);
+  const lanes = useMemo(() => pointLanes(points, width), [points, width]);
+  return <section className={styles.chart} aria-label="Interactive dataset">
+    <div className={styles.chartHeading}><h2>Your dataset</h2><span>Drag a dot to change its value</span></div>
+    <div className={styles.plotFrame}>
+      <div className={styles.meanCaption}>Mean (average) <strong>{analysis.mean.toFixed(1)}</strong> · {analysis.count} points · values {analysis.min}–{analysis.max}</div>
+      <div ref={trackRef} className={styles.plot} style={{ height: Math.max(96, lanes.count * 40 + 16) }}>
+        <div className={styles.axis} />
+        {[0, 25, 50, 75, 100].map((tick) => <span key={tick} className={styles.tick} style={position(tick)}><span>{tick}</span></span>)}
+        <div className={styles.meanMarker} style={position(analysis.mean)} aria-hidden="true" />
+        {points.map((point) => <button key={point.id} type="button" role="slider" aria-label={`Point ${point.label}`}
+          aria-valuemin={0} aria-valuemax={100} aria-valuenow={point.value} aria-valuetext={`${point.label}: ${point.value}; deviation ${signed(point.value - analysis.mean)}`}
+          aria-describedby="spread-keyboard-help" className={styles.point} data-selected={selectedId === point.id}
+          style={{ ...position(point.value), bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 40, "--point-color": point.color } as CSSProperties}
+          onFocus={() => onSelect(point.id)} onPointerDown={(event) => {
+            event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture(event.pointerId);
+            dragging.current = point.id; onSelect(point.id);
+          }} onPointerMove={(event) => {
+            if (dragging.current === point.id && trackRef.current) onMove(point.id, clientXToPercentValue(event.clientX, trackRef.current.getBoundingClientRect()));
+          }} onPointerUp={() => { dragging.current = null; }} onPointerCancel={() => { dragging.current = null; }}
+          onLostPointerCapture={() => { dragging.current = null; }} onKeyDown={(event) => {
+            const step = event.shiftKey ? 10 : 1;
+            const changes: Record<string, number> = { ArrowLeft: -step, ArrowDown: -step, ArrowRight: step, ArrowUp: step };
+            if (event.key in changes || event.key === "Home" || event.key === "End") {
+              event.preventDefault(); onMove(point.id, event.key === "Home" ? 0 : event.key === "End" ? 100 : point.value + changes[event.key]!);
+            }
+          }}><span>{point.value}</span><small>{point.label}</small></button>)}
       </div>
     </div>
-  );
+  </section>;
 }
 
-function DatasetPanel({
-  activePreset,
-  points,
-  analysis,
-  activePointId,
-  trackRef,
-  onSelectPreset,
-  onPointStart,
-  onPointStep,
-}: {
-  activePreset: SpreadPreset;
-  points: DataPoint[];
-  analysis: SpreadAnalysis;
-  activePointId: string | null;
-  trackRef: RefObject<HTMLDivElement | null>;
-  onSelectPreset: (preset: SpreadPreset) => void;
-  onPointStart: (pointId: string) => void;
-  onPointStep: (pointId: string, delta: number) => void;
-}) {
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.94fr)_minmax(320px,0.56fr)]">
-        <div className="min-w-0">
-          <LessonTitle>1. Set The Data</LessonTitle>
-          <p className="mt-4 max-w-[820px] text-[16px] leading-[1.45] text-[#16264e]">
-            Pick a same-mean shape or drag a dot. The bars show every distance
-            from the mean.
-          </p>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {spreadPresets.map((preset) => (
-              <PresetButton
-                key={preset.id}
-                preset={preset}
-                isSelected={preset.id === activePreset.id}
-                onSelect={() => onSelectPreset(preset)}
-              />
-            ))}
-          </div>
-          <NumberLine
-            points={points}
-            analysis={analysis}
-            activePointId={activePointId}
-            trackRef={trackRef}
-            onPointStart={onPointStart}
-            onPointStep={onPointStep}
-          />
-        </div>
-
-        <div className="min-w-0 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-          <p className="text-[13px] font-black text-[#352cff] uppercase">
-            Current Dataset
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-            <FactPill label="Count" value={String(analysis.count)} />
-            <FactPill label="Mean" value={analysis.mean.toFixed(1)} />
-            <FactPill label="Range" value={`${analysis.min} to ${analysis.max}`} />
-            <FactPill
-              label="Values"
-              value={points.map((point) => point.value).join(", ")}
-            />
-          </div>
-          <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
-            The presets keep the mean at 50. Watch spread change without moving
-            the center.
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
+function DeviationEvidence({ analysis, selectedId }: { analysis: SpreadAnalysis; selectedId: string }) {
+  return <section className={styles.evidence} aria-labelledby="spread-evidence-title">
+    <h2 id="spread-evidence-title">Distances from the mean</h2>
+    <p>Subtract the mean, then square each deviation. Longer bars show larger distances.</p>
+    <table className={styles.deviations}>
+      <caption className={styles.srOnly}>Each point’s value, signed distance from the mean, and squared contribution to variance.</caption>
+      <thead><tr><th scope="col">Point</th><th scope="col">Value</th><th scope="col">Deviation</th><th scope="col" className={styles.barColumn}>Distance</th><th scope="col">Squared</th></tr></thead>
+      <tbody>{analysis.rows.map((row) => <tr key={row.point.id} data-selected={row.point.id === selectedId}>
+        <th scope="row">{row.point.label}</th><td>{row.point.value}</td><td>{signed(row.deviation)}</td>
+        <td className={styles.barColumn}><div className={styles.deviationTrack} aria-hidden="true"><span style={{ left: `${50 + Math.min(0, row.deviation) / 2}%`, width: `${Math.abs(row.deviation) / 2}%`, background: row.point.color }} /></div></td>
+        <td>{row.squaredDeviation.toFixed(1)}</td>
+      </tr>)}</tbody>
+      <tfoot><tr><th colSpan={4} scope="row">Sum of squared deviations</th><td>{analysis.squaredDeviationSum.toFixed(1)}</td></tr></tfoot>
+    </table>
+    <p className={styles.small}>Deviation = value − mean. Negative means left of the mean; positive means right. The bars share a −100 to +100 scale with zero in the center.</p>
+  </section>;
 }
 
-function DeviationTile({ row, isLargest }: { row: DeviationRow; isLargest: boolean }) {
-  return (
-    <div
-      className={`rounded-[10px] border px-3 py-3 ${
-        isLargest
-          ? "border-[#fecaca] bg-[#fff1f1]"
-          : "border-[#dfe4f4] bg-white"
-      }`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-mono text-[16px] font-black text-[#071024]">
-          {row.point.label}
-        </p>
-        <p className="font-mono text-[13px] font-black text-[#52628a]">
-          x = {row.point.value}
-        </p>
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <div className="rounded-[7px] border border-[#e5e9f5] bg-[#fbfbff] px-2 py-2">
-          <p className="text-[10px] font-black text-[#7180a5] uppercase">
-            x - mean
-          </p>
-          <p
-            className="mt-1 font-mono text-[14px] font-black"
-            style={{ color: row.deviation < 0 ? "#2563eb" : "#ef4444" }}
-          >
-            {formatSigned(row.deviation)}
-          </p>
-        </div>
-        <div className="rounded-[7px] border border-[#e5e9f5] bg-[#fbfbff] px-2 py-2">
-          <p className="text-[10px] font-black text-[#7180a5] uppercase">
-            squared
-          </p>
-          <p className="mt-1 font-mono text-[14px] font-black text-[#071024]">
-            {row.squaredDeviation.toFixed(1)}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DeviationPanel({ analysis }: { analysis: SpreadAnalysis }) {
-  const dominanceHeading =
-    analysis.variance < 70
-      ? "No term dominates yet."
-      : analysis.variance < 320
-        ? "Edge terms matter most."
-        : "Far points dominate.";
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="min-w-0">
-          <LessonTitle>2. Watch Each Deviation</LessonTitle>
-          <p className="mt-4 max-w-[860px] text-[16px] leading-[1.45] text-[#16264e]">
-            Subtract the mean from each value. Then square the distance so far
-            points count more.
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {analysis.rows.map((row) => (
-              <DeviationTile
-                key={row.point.id}
-                row={row}
-                isLargest={row.point.id === analysis.largestDeviationPointId}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-          <p className="text-[13px] font-black text-[#352cff] uppercase">
-            Biggest Squared Term
-          </p>
-          <p className="mt-4 text-[28px] leading-none font-black text-[#071024]">
-            {dominanceHeading}
-          </p>
-          <p className="mt-3 text-[15px] leading-[1.45] text-[#263a68]">
-            {analysis.story.variance}
-          </p>
-          <div className="mt-5 rounded-[8px] border border-[#dedcff] bg-white px-4 py-3 font-mono text-[13px] leading-[1.5] font-bold text-[#071024]">
-            Σ(x − x̄)²
-            <br />= {analysis.squaredDeviationSum.toFixed(1)}
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function FormulaPanel({ analysis }: { analysis: SpreadAnalysis }) {
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.45fr)] xl:items-start">
-        <div className="min-w-0">
-          <LessonTitle>3. Build The Formula</LessonTitle>
-          <p className="mt-4 max-w-[820px] text-[16px] leading-[1.45] text-[#16264e]">
-            Variance averages the squared distances. Standard deviation takes
-            the square root to return to the original units.
-          </p>
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-              <p className="text-[13px] font-black text-[#52628a] uppercase">
-                Variance
-              </p>
-              <div className="mt-4 rounded-[8px] border border-[#e4e8f4] bg-white px-4 py-4 font-mono text-[15px] leading-[1.6] font-bold text-[#071024]">
-                σ² = mean((x − x̄)²)
-                <br />= {analysis.squaredDeviationSum.toFixed(1)} /{" "}
-                {analysis.count}
-                <br />= <span className="text-[#ef4444]">{analysis.variance.toFixed(1)}</span>
-              </div>
-            </div>
-            <div className="rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-              <p className="text-[13px] font-black text-[#52628a] uppercase">
-                Standard Deviation
-              </p>
-              <div className="mt-4 rounded-[8px] border border-[#e4e8f4] bg-white px-4 py-4 font-mono text-[15px] leading-[1.6] font-bold text-[#071024]">
-                σ = √σ²
-                <br />= √{analysis.variance.toFixed(1)}
-                <br />= <span className="text-[#16a34a]">{analysis.standardDeviation.toFixed(1)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-[12px] border border-[#dedcff] bg-[#f8f7ff] p-5">
-          <p className="text-[13px] font-black text-[#352cff] uppercase">
-            Live Readout
-          </p>
-          <p className="mt-4 font-mono text-[46px] leading-none font-black text-[#16a34a]">
-            {analysis.standardDeviation.toFixed(1)}
-          </p>
-          <p className="mt-3 text-[16px] leading-[1.45] text-[#263a68]">
-            {analysis.story.standardDeviation} Values typically sit about this
-            far from the mean.
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function MiniSpread({
-  label,
-  description,
-  analysis,
-  color,
-}: {
-  label: string;
-  description: string;
-  analysis: SpreadAnalysis;
-  color: string;
-}) {
-  return (
-    <div className="rounded-[10px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-[13px] font-black text-[#52628a] uppercase">
-            {label}
-          </p>
-          <p className="mt-1 text-[14px] leading-[1.35] text-[#263a68]">
-            {description}
-          </p>
-          <p className="mt-1 text-[14px] leading-[1.35] text-[#263a68]">
-            mean = {analysis.mean.toFixed(1)}
-          </p>
-        </div>
-        <p
-          className="font-mono text-[26px] leading-none font-black"
-          style={{ color }}
-        >
-          {analysis.standardDeviation.toFixed(1)}
-        </p>
-      </div>
-      <div className="relative mt-5 h-12 rounded-[8px] bg-white px-3">
-        <div className="absolute right-3 left-3 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#d4dcef]" />
-        <div
-          className="absolute top-1/2 h-5 -translate-y-1/2 rounded-full"
-          style={{
-            left: `calc(0.75rem + (100% - 1.5rem) * ${analysis.min / 100})`,
-            width: `calc((100% - 1.5rem) * ${Math.max(analysis.range, 1) / 100})`,
-            backgroundColor: color,
-          }}
-        />
-        <div
-          className="absolute top-1/2 h-7 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#071024]"
-          style={{
-            left: `calc(0.75rem + (100% - 1.5rem) * ${analysis.mean / 100})`,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function PresetMiniSpread({ preset }: { preset: SpreadPreset }) {
-  const analysis = analyzeSpread(pointsForPreset(preset));
-  const color =
-    preset.id === "tight"
-      ? "#16a34a"
-      : preset.id === "balanced"
-        ? "#f59e0b"
-        : "#ef4444";
-
-  return (
-    <MiniSpread
-      label={preset.label}
-      description="reference preset"
-      analysis={analysis}
-      color={color}
-    />
-  );
-}
-
-function ComparePanel({ analysis }: { analysis: SpreadAnalysis }) {
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>4. Compare The Spread</LessonTitle>
-      <p className="mt-4 max-w-[860px] text-[16px] leading-[1.45] text-[#16264e]">
-        Your current data stays in the comparison so dragging a point changes
-        this panel too. The reference presets show how the same center can hide
-        very different spread.
-      </p>
-      <div className="mt-5 grid gap-4 lg:grid-cols-4">
-        <MiniSpread
-          label="Current data"
-          description="live after your drags"
-          analysis={analysis}
-          color="#352cff"
-        />
-        {spreadPresets.map((preset) => (
-          <PresetMiniSpread key={preset.id} preset={preset} />
-        ))}
-      </div>
-    </Panel>
-  );
-}
-
-function TakeawayPanel() {
-  return (
-    <Panel className="border-[#dedcff] bg-[#f8f7ff] px-5 py-4 sm:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p className="text-[13px] font-black text-[#352cff] uppercase">
-          Takeaway
-        </p>
-        <p className="max-w-5xl text-[18px] leading-[1.35] font-black text-[#071024]">
-          Same mean can hide different spread. Std dev tells how far values
-          typically sit from the mean.
-        </p>
-      </div>
-    </Panel>
-  );
+function SpreadComparison({ analysis }: { analysis: SpreadAnalysis }) {
+  const comparisons = [{ label: "Current", analysis }, ...spreadPresets.map((preset) => ({ label: preset.label, analysis: analyzeSpread(pointsForPreset(preset)) }))];
+  return <section className={styles.comparison} aria-labelledby="spread-comparison-title">
+    <h2 id="spread-comparison-title">Same mean, different spread</h2><p>Standard deviation · preset means are 50; your edits may move the mean.</p>
+    <dl>{comparisons.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.analysis.standardDeviation.toFixed(1)}</dd><dd className={styles.small}>mean {item.analysis.mean.toFixed(1)}</dd></div>)}</dl>
+  </section>;
 }
 
 export function VarianceStandardDeviationPlayground() {
-  const [activePreset, setActivePreset] = useState(initialSpreadPreset);
-  const [points, setPoints] = useState(() =>
-    pointsForPreset(initialSpreadPreset),
-  );
-  const [activePointId, setActivePointId] = useState<string | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [preset, setPreset] = useState(initialSpreadPreset);
+  const [points, setPoints] = useState(() => pointsForPreset(initialSpreadPreset));
+  const [selectedId, setSelectedId] = useState("point-1");
+  const [step, setStep] = useState(0);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const [triedTight, setTriedTight] = useState(false);
+  const [comparisonStage, setComparisonStage] = useState(0);
+  const [finished, setFinished] = useState(false);
   const analysis = useMemo(() => analyzeSpread(points), [points]);
+  const selected = points.find((point) => point.id === selectedId)!;
+  const experiment = spreadExperiments[step]!;
+  const reachedTarget = prediction !== null && (step === 0 ? triedTight && matchesPreset(points, "tight") : step === 1 ? comparisonStage === 2 && matchesPreset(points, "wide") : preset.id === "wide" && isEdgeExperiment(points));
+  const complete = reachedTarget && explanation === experiment.correctExplanation;
 
-  const updatePointFromClientX = useCallback(
-    (clientX: number) => {
-      if (!activePointId || !trackRef.current) {
-        return;
-      }
-
-      const nextValue = clampValue(
-        clientXToPercentValue(clientX, trackRef.current.getBoundingClientRect()),
-      );
-
-      setPoints((currentPoints) =>
-        movePoint(currentPoints, activePointId, nextValue),
-      );
-    },
-    [activePointId],
-  );
-
-  useEffect(() => {
-    if (!activePointId) {
-      return;
-    }
-
-    function handlePointerMove(event: PointerEvent) {
-      updatePointFromClientX(event.clientX);
-    }
-
-    function handlePointerUp() {
-      setActivePointId(null);
-    }
-
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", handlePointerUp);
-
-    return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUp);
-    };
-  }, [activePointId, updatePointFromClientX]);
-
-  function handleSelectPreset(preset: SpreadPreset) {
-    setActivePreset(preset);
-    setPoints(pointsForPreset(preset));
-    setActivePointId(null);
+  function clearProgress() {
+    setPrediction(null); setExplanation(null); setTriedTight(false); setComparisonStage(0); setFinished(false);
   }
-
-  function handlePointStart(pointId: string) {
-    setActivePointId(pointId);
+  function restore(nextPreset: SpreadPreset) {
+    setPreset(nextPreset); setPoints(pointsForPreset(nextPreset)); setSelectedId("point-1"); setExplanation(null); setFinished(false);
   }
-
-  function handlePointStep(pointId: string, delta: number) {
-    setActivePointId(pointId);
-    setPoints((currentPoints) => {
-      const point = currentPoints.find((item) => item.id === pointId);
-
-      if (!point) {
-        return currentPoints;
-      }
-
-      return movePoint(currentPoints, pointId, point.value + delta);
-    });
+  function selectPreset(nextPreset: SpreadPreset) {
+    restore(nextPreset);
+    if (prediction) {
+      setTriedTight(step === 0 && nextPreset.id === "tight");
+      if (step === 1) setComparisonStage(nextPreset.id === "balanced" ? 1 : nextPreset.id === "wide" && comparisonStage >= 1 ? 2 : 0);
+    }
   }
-
-  return (
-    <main className="min-h-screen overflow-x-clip bg-[#f7f9ff] px-4 pt-5 pb-28 text-[#071024] sm:px-7 lg:px-10">
-      <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-4">
-        <header className="py-1">
-          <div>
-            <h1 className="text-[40px] leading-[0.98] font-black text-[#070b1a] sm:text-[56px]">
-              {"Variance & Standard Deviation Lab"}
-            </h1>
-            <p className="mt-3 max-w-4xl text-[18px] leading-[1.35] font-semibold text-[#30446f] sm:text-[21px]">
-              Move values and watch squared distances turn spread into a
-              typical distance.
-            </p>
-          </div>
-        </header>
-
-        <DatasetPanel
-          activePreset={activePreset}
-          points={points}
-          analysis={analysis}
-          activePointId={activePointId}
-          trackRef={trackRef}
-          onSelectPreset={handleSelectPreset}
-          onPointStart={handlePointStart}
-          onPointStep={handlePointStep}
-        />
-        <DeviationPanel analysis={analysis} />
-        <FormulaPanel analysis={analysis} />
-        <ComparePanel analysis={analysis} />
-        <TakeawayPanel />
-      </div>
-    </main>
-  );
+  function predict(id: string) {
+    restore(spreadPresets[step === 2 ? 2 : 0]!); setPrediction(id); setTriedTight(false); setComparisonStage(0);
+  }
+  function move(id: string, value: number) {
+    if (!Number.isFinite(value) || points.find((point) => point.id === id)?.value === clampValue(value)) return;
+    setPoints((current) => movePoint(current, id, value)); setExplanation(null); setFinished(false);
+    setTriedTight(false); setComparisonStage(0);
+  }
+  function reset() { restore(preset); clearProgress(); }
+  function next() {
+    const nextStep = step + 1; setStep(nextStep); restore(spreadPresets[nextStep === 2 ? 2 : 0]!); clearProgress();
+  }
+  const rail = <aside className={styles.rail} aria-label="Guided experiment">
+    <p className={styles.eyebrow}>Experiment {step + 1} of 3</p><h2 className={styles.experimentTitle}>{experiment.title}</h2>
+    <ExperimentProgress phase={!prediction ? 0 : !reachedTarget ? 1 : 2} />
+    <div className={styles.exercise}>
+      {!reachedTarget && <><h3>Make a prediction</h3><p>{experiment.question}</p>
+        <fieldset className={styles.choices}><legend className={styles.srOnly}>Your prediction</legend>
+          {experiment.predictions.map((choice) => <label key={choice.id}><input type="radio" name="spread-prediction" checked={prediction === choice.id} onChange={() => predict(choice.id)} />{choice.label}</label>)}
+        </fieldset><p className={styles.small}>Choosing a prediction restores this experiment’s starting data.</p></>}
+      {prediction && !reachedTarget && <div className={styles.actionPrompt}><strong>Now try it.</strong> {experiment.action}
+        {step === 1 && comparisonStage === 1 && <p role="status">Balanced observed. Now choose Wide.</p>}
+        <p className={styles.small}>Use the value field or arrow keys for an exact edit. Reset clears this attempt.</p>
+      </div>}
+      {reachedTarget && <><p className={styles.observation} role="status">{prediction === experiment.correctPrediction ? "Your prediction matches the result." : "The result differed from your prediction. Use the live evidence to investigate."}</p>
+        <h3>{experiment.explanationQuestion}</h3>
+        <fieldset className={styles.choices}><legend className={styles.srOnly}>Your explanation</legend>
+          {experiment.explanations.map((choice) => <label key={choice.id}><input type="radio" name="spread-explanation" checked={explanation === choice.id} onChange={() => setExplanation(choice.id)} />{choice.label}</label>)}
+        </fieldset>{explanation && !complete && <p className={styles.feedback} role="status">Try again. {experiment.retryHint}</p>}
+      </>}
+      {complete && <div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>{finished ? "All three experiments explained" : "Experiment explained"}</h3><p>{experiment.takeaway}</p></div></div>}
+      {complete && !finished && <button type="button" className={styles.nextButton} onClick={() => step < 2 ? next() : setFinished(true)}>{step < 2 ? "Next experiment" : "Finish experiments"}<ArrowRightIcon aria-hidden="true" /></button>}
+      {finished && complete && <button type="button" className={styles.nextButton} onClick={() => { setStep(0); restore(initialSpreadPreset); clearProgress(); }}>Start again<ArrowRightIcon aria-hidden="true" /></button>}
+    </div><GuideInvitation />
+  </aside>;
+  return <LearningPage title="Variance & Standard Deviation" subtitle="Move values. See distances become a measure of spread." rail={rail}>
+    <div className={styles.toolbar}><div className={styles.presets} aria-label="Dataset scenarios">
+      {spreadPresets.map((item) => <button key={item.id} type="button" aria-pressed={preset.id === item.id} onClick={() => selectPreset(item)}><strong>{item.label}</strong><span>{item.shortLabel}</span></button>)}
+    </div><button type="button" className={styles.reset} onClick={reset}><ArrowPathIcon aria-hidden="true" />Reset</button></div>
+    <DatasetChart points={points} analysis={analysis} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
+    <div className={styles.pointEditor}><label>Point {selected.label} value<input type="number" min={0} max={100} step={1} value={selected.value} onChange={(event) => move(selectedId, event.currentTarget.valueAsNumber)} /></label>
+      <p id="spread-keyboard-help">Focus a dot and use arrow keys. Shift moves by 10; Home / End moves to 0 / 100.</p>
+    </div>
+    <DeviationEvidence analysis={analysis} selectedId={selectedId} />
+    <LessonSummaries label="Live spread summaries" summaries={[
+      { label: "Variance", color: "#ad4508", value: analysis.variance.toFixed(1), definition: "Average squared distance.", formula: `${analysis.squaredDeviationSum.toFixed(1)} ÷ ${analysis.count} = ${analysis.variance.toFixed(1)}`, comparison: "Measured in squared units." },
+      { label: "Standard deviation", color: "#5031dc", value: analysis.standardDeviation.toFixed(1), definition: "Spread in the original units.", formula: `√${analysis.variance.toFixed(1)} ≈ ${analysis.standardDeviation.toFixed(1)}`, comparison: "A typical distance based on squared distances." },
+    ]} />
+    <p className={styles.populationNote}>These {analysis.count} values are the whole population here, so divide by {analysis.count}. This lesson describes the dataset; it does not estimate spread from a sample.</p>
+    <SpreadComparison analysis={analysis} />
+    <p className={styles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">Mean {analysis.mean.toFixed(1)}; variance {analysis.variance.toFixed(1)} squared units; standard deviation {analysis.standardDeviation.toFixed(1)} original units.</p>
+  </LearningPage>;
 }

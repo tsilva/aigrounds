@@ -78,6 +78,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "variance-standard-deviation",
+    layout: "guided-discovery",
     title: "Variance & Standard Deviation Lab",
     tag: "statistics",
     kicker:

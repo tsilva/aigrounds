@@ -23,8 +23,8 @@ export function MatrixComputation({ analysis, phase }: { analysis: BackpropAnaly
   const values = updated ? analysis.afterUpdate : analysis;
   const weights = updated ? [[analysis.updates.wOut1.after, analysis.updates.wOut2.after]] : [[outputWeights.wOut1, outputWeights.wOut2]];
   return <section className={styles.matrixFlow} aria-label="Matrix computation">
-    <h2>{phase === "backward" ? "← Backward through the same output layer" : updated ? "Forward with the previewed weight matrix" : "Forward as a matrix product"}</h2>
-    <p className={shared.small}>One example: h is a 2 × 1 column of cached activations; W is a 1 × 2 row of weights. W × h gives one value, z. Bias b, probability p, and target y are scalars. These are the same calculations as Scalars.</p>
+    <h2>Matrix view</h2>
+    <p className={shared.small}>One example: h is a 2 × 1 column of cached activations; W is a 1 × 2 row of weights. W × h gives one value, z. Bias b, probability p, and target y are scalars. Each entry matches the corresponding value in the visual view above.</p>
     <p className={shared.formula}>{updated ? "z′ = W′ × h + b" : "z = W × h + b"}</p>
     <Equation label="Weighted sum matrix product"><Matrix label={updated ? "W′" : "W"} values={weights} /><span>×</span><Matrix label="h" values={[[analysis.h1], [analysis.h2]]} /><span>+ b ({formatSigned(outputWeights.bias)}) = {updated ? "z′" : "z"} {formatFixed(values.z, 3)}</span></Equation>
     <p className={shared.formula}>{updated ? "p′ = sigmoid(z′)" : "p = sigmoid(z)"} = {formatProbability(values.probability)}<br />{updated ? "L′" : "L"} = {analysis.target === 1 ? updated ? "−ln(p′)" : "−ln(p)" : updated ? "−ln(1 − p′)" : "−ln(1 − p)"} = {formatFixed(values.loss, 3)} · y = {analysis.target}</p>
@@ -33,8 +33,8 @@ export function MatrixComputation({ analysis, phase }: { analysis: BackpropAnaly
 }
 
 export function MatrixWeightGradients({ analysis }: { analysis: BackpropAnalysis }) {
-  return <section className={styles.evidence} aria-label="Output weight gradients">
-    <h2>One output gradient, two local multipliers</h2>
+  return <section className={styles.matrixEvidence} aria-label="Weight gradient matrix form">
+    <h3 className={styles.formHeading}>Matrix form</h3>
     <p className={shared.small}>δ = p − y = {formatSigned(analysis.outputDelta)} uses the starting prediction for sigmoid with binary cross entropy. ∇W L means the matrix of loss gradients for W. The superscript T transposes a column into a row.</p>
     <p className={shared.formula}>∇W L = δ × hᵀ · (1 × 1) × (1 × 2) → (1 × 2)</p>
     <Equation label="Output weight gradient matrix"><span>δ {formatSigned(analysis.outputDelta)} ×</span><Matrix label="hᵀ" values={[[analysis.h1, analysis.h2]]} /><span>=</span><Matrix label="∇W L" values={[[analysis.outputGradients.wOut1, analysis.outputGradients.wOut2]]} /></Equation>

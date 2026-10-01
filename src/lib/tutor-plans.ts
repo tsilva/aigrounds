@@ -1239,24 +1239,24 @@ export const playgroundTutorPlans = {
   },
   "backpropagation-inspector": {
     intro:
-      "Inspect one sigmoid output layer through four Predict → Try → Explain experiments. Compare local gradients, flip only the target, scale a previewed step, and follow signals to cached hidden activations. Calculation view offers Scalars and Matrices without changing the case or experiment progress.",
+      "Inspect one sigmoid output layer through four Predict → Try → Explain experiments. Compare local gradients, flip only the target, scale a previewed step, and follow signals to cached hidden activations. The visual computation sits above its equivalent matrix form so learners can compare the same values.",
     whyItMatters:
       "Backprop computes how sensitive loss is to each parameter. Gradient descent separately turns those sensitivities into weight changes. Keeping these jobs distinct makes neural-network training easier to reason about.",
     openingMessage:
-      "We need weighted sums, probabilities, and loss; no calculus derivation is required. A gradient tells us how loss responds to a tiny increase. h1 and h2 are outputs cached from an earlier layer. This lesson uses a sigmoid probability and unweighted binary cross entropy, so the output gradient is p − y. Bias and cached activations stay fixed during each update preview. Calculation view offers optional Matrices for the same single example, with shapes and notation explained beside each calculation. You can switch back to Scalars at any time without losing experiment progress.\n\nUse Underprediction, or Reset if you have edited the case. Before selecting Backward, predict: h1 is 0.80 and h2 is 0.35. Which output weight should have the larger absolute gradient? Give your prediction and reason first.",
+      "We need weighted sums, probabilities, and loss; no calculus derivation is required. A gradient tells us how loss responds to a tiny increase. h1 and h2 are outputs cached from an earlier layer. This lesson uses a sigmoid probability and unweighted binary cross entropy, so the output gradient is p − y. Bias and cached activations stay fixed during each update preview. The visual view and matrix view are stacked for the same single example. Matrix shapes and notation are explained beside the calculations; compare matching entries as you go.\n\nUse Underprediction, or Reset if you have edited the case. Before selecting Backward, predict: h1 is 0.80 and h2 is 0.35. Which output weight should have the larger absolute gradient? Give your prediction and reason first.",
     masteryCriteria: [
       "Uses dL/dw = h × (p − y) to compare the two weight gradients for the same example.",
       "Explains that p − y is specific to this sigmoid and binary-cross-entropy combination, not every loss.",
       "Connects target 0, positive gradients, negative weight changes, and lower probability/loss in the fixed example.",
       "Distinguishes unchanged starting gradients from learning-rate-scaled weight changes; a new pass after updating weights generally has new gradients.",
       "Distinguishes dL/dh = w × (p − y) from output-weight gradients and earlier-weight updates.",
-      "Explains the same gradients and outcomes in either view; switching representation alone is not evidence of understanding.",
+      "Connects individual gradient values to their matching entries in the matrix form.",
     ],
     steps: [
       {
         title: "Which gradient is larger?",
         experiment:
-          "Choose Underprediction. Record a prediction in the rail and select Reveal gradients, or select Backward after predicting. Compare the weight-gradient entries and their absolute sizes. Scalars shows h1 × (p − y) and h2 × (p − y); Matrices shows ∇W L = δ × hᵀ. Use either view; do not require switching. Do not reveal the explanation before the learner tries.",
+          "Choose Underprediction. Record a prediction in the rail and select Reveal gradients, or select Backward after predicting. Compare the weight-gradient entries and their absolute sizes. The scalar formulas show h1 × (p − y) and h2 × (p − y); the matrix form directly below shows ∇W L = δ × hᵀ with the same two entries. Do not reveal the explanation before the learner tries.",
         predictionQuestion:
           "h1 is 0.80 and h2 is 0.35. Which weight will have the larger absolute gradient?",
         observationPrompt:
@@ -1267,7 +1267,7 @@ export const playgroundTutorPlans = {
       {
         title: "Flip only the target",
         experiment:
-          "Use Next experiment or choose False alarm. The activations and starting weights are unchanged, but y is now 0. Record a prediction and select Preview update. Compare Gradient and Change in Scalars, or ∇W L and ΔW in Matrices, then probability/loss before and after one step.",
+          "Use Next experiment or choose False alarm. The activations and starting weights are unchanged, but y is now 0. Record a prediction and select Preview update. Compare Gradient and Change in the table with ∇W L and ΔW directly below, then probability/loss before and after one step.",
         predictionQuestion:
           "Should a gradient-descent step raise or lower both weights when y changes to 0?",
         observationPrompt:
@@ -1278,7 +1278,7 @@ export const playgroundTutorPlans = {
       {
         title: "Gradient or step size?",
         experiment:
-          "Use Next experiment from Flip only the target; the starting learning rate is 0.10. Predict, then select Set learning rate to 0.50, or use Exact learning rate. Compare the Gradient column and Change at η = 0.10 / 0.50 in Scalars; Matrices shows the same comparison as ∇W L and the two ΔW rows. Each preview starts from the same original weights, not the preceding preview.",
+          "Use Next experiment from Flip only the target; the starting learning rate is 0.10. Predict, then select Set learning rate to 0.50, or use Exact learning rate. Compare the Gradient column and Change at η = 0.10 / 0.50; the matrix form directly below shows the same comparison as ∇W L and the two ΔW rows. Each preview starts from the same original weights, not the preceding preview.",
         predictionQuestion:
           "When η goes from 0.10 to 0.50, do the starting gradients or the weight changes become five times larger?",
         observationPrompt:
@@ -1289,7 +1289,7 @@ export const playgroundTutorPlans = {
       {
         title: "Two kinds of gradients",
         experiment:
-          "Use Next experiment or choose Equal activations. Predict the hidden-signal signs, then select Reveal hidden signals. Compare the equal output-weight gradients with dL/dh1 and dL/dh2 in How gradients reach the hidden layer; Matrices shows those as ∇W L = δ × hᵀ and ∇h L = Wᵀ × δ. For near transfer, Explore freely and set Hidden activation h1 to 0; inspect its weight gradient and explain it.",
+          "Use Next experiment or choose Equal activations. Predict the hidden-signal signs, then select Reveal hidden signals. Compare the equal output-weight gradients with dL/dh1 and dL/dh2 in How gradients reach the hidden layer; the matrix form directly below shows those as ∇W L = δ × hᵀ and ∇h L = Wᵀ × δ. For near transfer, Explore freely and set Hidden activation h1 to 0; inspect its weight gradient and explain it.",
         predictionQuestion:
           "With equal activations but opposite signed output weights, do the two hidden-activation signals have the same or opposite signs?",
         observationPrompt:

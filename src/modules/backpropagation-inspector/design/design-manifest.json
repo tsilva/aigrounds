@@ -14,6 +14,6 @@
     "Update preview recomputes probability and loss; bias and cached activations fixed.",
     "False alarm uses the same activations as Underprediction to isolate the target change.",
     "At narrow supported desktop widths with the Guide open, use a readable compact computation flow and stacked summary values.",
-    "User-requested optional Scalars / Matrices view (2026-10-01): equivalent single-example matrix products, explicit shapes and transpose, with case and experiment progress preserved."
+    "User-requested stacked comparison (2026-10-01): visual above matrix, paired scalar and matrix gradient/update/hidden-signal evidence, one shared set of controls, no representation switch."
   ]
 }

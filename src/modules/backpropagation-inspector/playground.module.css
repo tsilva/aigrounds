@@ -34,9 +34,11 @@
   .gradientColumns > div + div { border-left: 0; border-top: 1px solid #dfe4f4; padding: 16px 0 0; }
 }
 
-.representation { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 22px; font-size: 13px; font-weight: 600; }
-.representation button[aria-pressed="true"] { background: #5031dc; color: #fff; border-color: #5031dc; }
-.matrixFlow { margin: 20px 0; }
+.visualFlow { margin-top: 20px; }
+.visualFlow > h2 { font-size: 16px; font-weight: 700; }
+.matrixFlow { margin: 20px 0; padding-top: 20px; border-top: 1px solid #dfe4f4; }
+.matrixEvidence { padding: 0 0 20px; }
+.formHeading { margin: 16px 0 10px; font-size: 14px; font-weight: 600; }
 .matrixFlow h2 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
 .matrixFlow > p { margin-top: 12px; }
 .matrixEquation { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 18px 0; font-family: var(--font-ibm-plex-mono), monospace; font-size: 13px; line-height: 1.6; }

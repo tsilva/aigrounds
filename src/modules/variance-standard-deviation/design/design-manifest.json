@@ -1,0 +1,18 @@
+{
+  "lessonPlanStep": 3,
+  "title": "Variance & Standard Deviation",
+  "slug": "variance-standard-deviation",
+  "modulePath": "src/modules/variance-standard-deviation",
+  "acceptedMockupPath": "src/modules/variance-standard-deviation/design/accepted-mockup.png",
+  "promptPath": "src/modules/variance-standard-deviation/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f7c4-9121-7973-abf1-a91cd445177d/exec-0c5a66ba-89f8-4b67-9104-9ccbd8bb9cc8.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User approved the recommended latest mockup with: now implement your favorite one.",
+  "approvedRefinements": [
+    "Engine-derived numeric mapping and width-aware handle stacking",
+    "Preserve Tight, Balanced and Wide presets and the three existing Guide activities",
+    "Compact signed/squared evidence table, population convention and live comparison",
+    "Exact-value editor, Reset, keyboard-equivalent sliders and explanation recovery",
+    "One active sequential experiment and one Guide CTA in the rail"
+  ]
+}

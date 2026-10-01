@@ -153,7 +153,7 @@ export const playgroundTutorPlans = {
       {
         title: "Start with short deviations",
         experiment:
-          "Choose Tight. Look at the deviation bars, the Watch Each Deviation cards, and the formula totals.",
+          "Choose Tight. Look at the Distances from the mean table, its Deviation and Squared columns, and the Variance and Standard deviation summaries.",
         predictionQuestion:
           "If most points sit near the mean, what should happen to variance and standard deviation?",
         observationPrompt:
@@ -175,7 +175,7 @@ export const playgroundTutorPlans = {
       {
         title: "Watch squaring amplify edges",
         experiment:
-          "Choose Wide, then nudge point A left or point G right. Compare that point's deviation with its squared deviation in the Watch Each Deviation cards.",
+          "Choose Wide, then move A below 10 or G above 90. Change only that point. Use the Point A value or Point G value field, or focus a dot and use arrow keys. Compare its Deviation and Squared entries in Distances from the mean.",
         predictionQuestion:
           "What should squaring do to a point that is very far from the mean?",
         observationPrompt:

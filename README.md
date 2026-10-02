@@ -26,6 +26,8 @@ Project-local Codex workflows are [aigrounds-lesson](.codex/skills/aigrounds-les
 
 The Matrix Multiplication lesson uses the shared workbench and experiment rail for shape compatibility, stepwise row-column products, and comparisons across output cells. It retains three matrix presets, all output formulas, and the incompatible-shape example, with prediction/action/explanation checks and optional transfer practice.
 
+The Shape, Skew & Outliers lesson uses the shared workbench and rail for four experiments and a transfer check. Its histogram, exact points, min-to-max box plot, and same-count summary comparisons distinguish tail direction, binning, unusual points, robust summaries, and hidden clusters. Quartiles follow the same median-of-halves convention as the Range, Quartiles & IQR lesson.
+
 The app currently includes labs for Mean, Median & Mode, Range, Quartiles & IQR, Variance & Standard Deviation, Shape, Skew & Outliers, Probability Rules, Conditional Probability & Independence, Bayes Rule, Expected Value & Risk, Bernoulli/Categorical/Binomial distributions, Waiting & Arrival Distributions, Overfitting, Confusion Matrix & Thresholds, Softmax Temperature, Cross Entropy Loss, KL Divergence, Matrix Multiplication, Tensor Shape & Broadcasting, Gradient Descent, Monte Carlo Tree Search, Byte Pair Encoding, Transformer Attention, Batch Normalization, Layer Normalization, MNIST MLP Inference Debugging with WebGPU, Convolution Filter Lab, PyTorch Image Augmentations, Label-Mixing Image Transforms, Autograd Graphs, Backpropagation Inspector, Linear Quantization (INT4), Zero Knowledge Proofs, and the AI Concept Atlas.
 
 ## Install

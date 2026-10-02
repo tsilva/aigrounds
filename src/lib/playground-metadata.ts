@@ -342,6 +342,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "kl-divergence",
+    layout: "guided-discovery",
     title: "KL Divergence Intuition Lab",
     tag: "loss",
     kicker:

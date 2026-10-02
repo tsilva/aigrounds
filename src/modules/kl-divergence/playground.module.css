@@ -1,0 +1,37 @@
+.context { color:#536487; font-size:14px; line-height:1.7; margin:18px 0; }
+.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; padding:14px 0; }
+.evidence,.optional { border-top:1px solid #dfe4f4; }
+.evidence { padding:22px 0; }
+.evidence h2 { font-size:21px; font-weight:600; }
+.evidence p,.optional p { color:#536487; font-size:14px; line-height:1.7; margin:8px 0; }
+.axis,.barRow { display:grid; grid-template-columns:74px minmax(0,1fr) 78px; gap:10px; align-items:center; }
+.axis { margin:18px 0 10px; color:#536487; font-size:12px; }
+.axis div { display:flex; justify-content:space-between; }
+.barRow { margin:14px 0; font-size:14px; }
+.barRow strong { font-weight:500; }
+.barRow output { text-align:right; font-family:var(--font-ibm-plex-mono),monospace; font-size:13px; }
+.track { height:16px; background:#edf0f7; }
+.track span { display:block; height:100%; background:#5031dc; }
+.optional details { padding:16px 0; border-bottom:1px solid #dfe4f4; }
+.optional summary { color:#0c1230; font-size:15px; font-weight:500; cursor:pointer; }
+.scroller { overflow-x:auto; margin-top:14px; }
+.scroller table { width:100%; min-width:580px; border-collapse:collapse; font-size:13px; text-align:left; }
+.scroller caption { text-align:left; font-size:13px; color:#536487; line-height:1.7; margin:8px 0 12px; }
+.scroller th,.scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
+.scroller td { white-space:nowrap; font-family:var(--font-ibm-plex-mono),monospace; }
+@container (max-width:699px) { .controls { grid-template-columns:minmax(0,1fr); } }
+
+.controlHeading {font-size:14px;font-weight:600;margin:18px 0 10px;}
+.actions {display:flex;flex-wrap:wrap;gap:10px;}
+.barRow,.axis {grid-template-columns:24px minmax(0,1fr) 54px;}
+.track span[data-distribution="P"] {background:#1760db;}
+.track span[data-distribution="Q"] {background:#5031dc;}
+.termRow>strong {font-size:14px;font-weight:600;}
+.signedRow {display:grid;grid-template-columns:24px minmax(0,1fr) 84px;gap:10px;align-items:center;margin:16px 0;font-size:13px;}
+.signedRow output {font-family:var(--font-ibm-plex-mono),monospace;text-align:right;}
+.signedTrack {height:18px;background:#edf0f7;position:relative;}
+.zero {position:absolute;left:10%;top:-4px;bottom:-4px;width:1px;background:#536487;}
+.signedBar {position:absolute;height:100%;background:#5031dc;}
+.signedBar[data-sign="negative"] {background:#1760db;}
+.signedAxis {display:flex;justify-content:space-between;margin:16px 94px 10px 34px;font-size:12px;color:#536487;position:relative;}
+.signedAxis span:nth-child(2) {position:absolute;left:10%;}

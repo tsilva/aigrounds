@@ -8,13 +8,28 @@ export const baseImage: Matrix = [
   [1, 2, 3, 4, 5],
 ];
 
+export const imageScenarios = [
+  { id: "ramp", label: "Ramp", shortLabel: "Steady change", image: baseImage },
+  {
+    id: "step", label: "Step edge", shortLabel: "Sudden jump",
+    image: Array.from({ length: 5 }, () => [1, 1, 5, 5, 5]),
+  },
+  {
+    id: "spot", label: "Single spot", shortLabel: "Local contrast",
+    image: Array.from({ length: 5 }, (_, row) =>
+      Array.from({ length: 5 }, (_, col) => row === 2 && col === 2 ? 9 : 0)),
+  },
+] as const;
+
+export type ImageId = typeof imageScenarios[number]["id"];
+
 export const kernelOptions: KernelOption[] = [
   {
     id: "edge",
     label: "Edge (vertical)",
     shortLabel: "Edge",
     description:
-      "Positive right column minus negative left column detects left-to-right changes.",
+      "Right column minus left column: positive for a rise, negative for a fall, zero when they match.",
     kernel: [
       [-1, 0, 1],
       [-1, 0, 1],
@@ -26,7 +41,7 @@ export const kernelOptions: KernelOption[] = [
     label: "Blur",
     shortLabel: "Blur",
     description:
-      "Averaging nearby pixels softens local jumps by spreading each value across its neighborhood.",
+      "All nine weights are 1/9. The output is the average of the nine patch values, including any padded zeros.",
     kernel: [
       [1 / 9, 1 / 9, 1 / 9],
       [1 / 9, 1 / 9, 1 / 9],

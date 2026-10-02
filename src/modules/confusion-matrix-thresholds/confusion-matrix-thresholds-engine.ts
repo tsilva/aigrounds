@@ -22,7 +22,7 @@ type ThresholdMetrics = {
   precision: number | null;
   recall: number | null;
   f1: number | null;
-  accuracy: number;
+  accuracy: number | null;
   predictedPositive: number;
   predictedNegative: number;
   actualPositive: number;
@@ -37,7 +37,7 @@ export type ThresholdAnalysis = {
 };
 
 function clampThreshold(value: number) {
-  return Math.min(0.95, Math.max(0.05, value));
+  return Number.isFinite(value) ? Math.min(0.95, Math.max(0.05, value)) : .62;
 }
 
 export function formatPercent(value: number | null, digits = 0) {
@@ -45,7 +45,7 @@ export function formatPercent(value: number | null, digits = 0) {
     return "n/a";
   }
 
-  return `${Math.round(value * 100).toFixed(digits)}%`;
+  return `${(value * 100).toFixed(digits)}%`;
 }
 
 export function formatDecimal(value: number | null, digits = 2) {
@@ -110,37 +110,17 @@ function calculateMetrics(counts: ConfusionCounts): ThresholdMetrics {
   const precision =
     predictedPositive === 0 ? null : counts.tp / predictedPositive;
   const recall = actualPositive === 0 ? null : counts.tp / actualPositive;
-  const f1 =
-    precision === null || recall === null || precision + recall === 0
-      ? null
-      : (2 * precision * recall) / (precision + recall);
+  const f1Denominator = 2 * counts.tp + counts.fp + counts.fn;
+  const f1 = f1Denominator === 0 ? null : 2 * counts.tp / f1Denominator;
 
   return {
     precision,
     recall,
     f1,
-    accuracy: total === 0 ? 0 : (counts.tp + counts.tn) / total,
+    accuracy: total === 0 ? null : (counts.tp + counts.tn) / total,
     predictedPositive,
     predictedNegative,
     actualPositive,
     actualNegative,
   };
-}
-
-export function describeTradeoff(analysis: ThresholdAnalysis) {
-  const { counts, metrics } = analysis;
-
-  if (counts.fn > counts.fp + 1) {
-    return "This cutoff is strict: fewer reviews, but true positives are slipping below the line.";
-  }
-
-  if (counts.fp > counts.fn + 1) {
-    return "This cutoff is generous: recall improves, but the positive queue now contains more false alarms.";
-  }
-
-  if (metrics.f1 !== null && metrics.f1 >= 0.75) {
-    return "This cutoff is balanced for this batch: precision and recall are both pulling their weight.";
-  }
-
-  return "The threshold is near the tradeoff point: one small move can swap a false positive for a false negative.";
 }

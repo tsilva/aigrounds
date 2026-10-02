@@ -276,6 +276,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "confusion-matrix-thresholds",
+    layout: "guided-discovery",
     title: "Confusion Matrix & Thresholds",
     tag: "evaluation",
     kicker:

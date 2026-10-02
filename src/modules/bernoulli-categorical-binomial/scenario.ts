@@ -33,7 +33,7 @@ export const modeFacts: Record<DistributionMode, DistributionModeFact> = {
     simplified: "P(X = 1) = p, P(X = 0) = 1 - p",
     simulatorTitle: "One trial has two places for mass.",
     takeaway:
-      "Bernoulli is the smallest probability model: one repeat, two outcomes, one success chance.",
+      "Bernoulli assigns probability to failure (0) and success (1) on one trial.",
   },
   categorical: {
     mode: "categorical",
@@ -41,9 +41,9 @@ export const modeFacts: Record<DistributionMode, DistributionModeFact> = {
     title: "Categorical Choice",
     question: "Which single class happened?",
     targetShape: "one label from K classes",
-    parameter: "pi = probability vector",
+    parameter: "one probability per class",
     support: "{A, B, C, D}",
-    formula: "P(X = class i) = pi_i, sum pi_i = 1",
+    formula: "P(class i) = probability assigned to class i; all class probabilities sum to 1",
     simplified: "one draw, many buckets, total mass = 1",
     simulatorTitle: "One choice spreads mass across classes.",
     takeaway:
@@ -61,7 +61,7 @@ export const modeFacts: Record<DistributionMode, DistributionModeFact> = {
     simplified: "repeat Bernoulli n times, then count successes",
     simulatorTitle: "Repeated trials turn yes/no mass into a count shape.",
     takeaway:
-      "Binomial stacks identical Bernoulli trials and asks for the count, not the exact order.",
+      "Binomial repeats independent Bernoulli trials with the same success probability and asks for the count, not the exact order.",
   },
 };
 

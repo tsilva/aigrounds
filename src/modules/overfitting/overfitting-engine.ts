@@ -18,8 +18,6 @@ export type FittedPoint = DataPoint & {
   residual: number;
 };
 
-export type ComplexityStatus = "underfit" | "sweet-spot" | "overfit";
-
 export type OverfittingAnalysis = {
   scenario: OverfittingScenario;
   degree: number;
@@ -30,14 +28,14 @@ export type OverfittingAnalysis = {
   trainMse: number;
   testMse: number;
   gap: number;
-  status: ComplexityStatus;
-  narrative: string;
+  plotMinY: number;
+  plotMaxY: number;
   curve: Array<{ x: number; y: number; trueY: number }>;
   lossByDegree: Array<{
     degree: number;
     trainMse: number;
     testMse: number;
-    status: ComplexityStatus;
+    curve: Array<{ x: number; y: number; trueY: number }>;
   }>;
 };
 
@@ -88,11 +86,11 @@ export function analyzeOverfitting(
       degree: nextDegree,
       trainMse: nextTrainMse,
       testMse: nextTestMse,
-      status: getStatus(nextDegree, nextTrainMse, nextTestMse, scenario),
+      curve: sampleCurve(nextCoefficients),
     };
   });
-  const status = getStatus(safeDegree, trainMse, testMse, scenario);
 
+  const allY = [...trainPoints, ...testPoints].map((point) => point.y).concat(lossByDegree.flatMap((fit) => fit.curve.flatMap((point) => [point.y, point.trueY])));
   return {
     scenario,
     degree: safeDegree,
@@ -103,8 +101,8 @@ export function analyzeOverfitting(
     trainMse,
     testMse,
     gap,
-    status,
-    narrative: describeFit(status, trainMse, testMse, safeDegree),
+    plotMinY: Math.floor(Math.min(-1, ...allY) * 1.1 * 2) / 2,
+    plotMaxY: Math.ceil(Math.max(1, ...allY) * 1.1 * 2) / 2,
     curve: sampleCurve(coefficients),
     lossByDegree,
   };
@@ -144,31 +142,37 @@ function trueFunction(x: number) {
   return 0.58 * Math.sin(Math.PI * (x + 0.12)) + 0.34 * x - 0.24 * x * x;
 }
 
+// A fixed tiny coefficient penalty keeps underdetermined fits unique.
+// Reorthogonalized QR avoids squaring the design matrix's condition number.
+export const coefficientPenalty = 0.0000001;
 function fitPolynomial(points: DataPoint[], degree: number) {
   const size = degree + 1;
-  const matrix = Array.from({ length: size }, () =>
-    Array.from({ length: size }, () => 0),
-  );
-  const vector = Array.from({ length: size }, () => 0);
-  const ridge = degree >= points.length - 1 ? 0.00002 : 0.0000001;
-
-  points.forEach((point) => {
-    const powers = powersFor(point.x, degree);
-
-    for (let row = 0; row < size; row += 1) {
-      vector[row] += powers[row] * point.y;
-
-      for (let column = 0; column < size; column += 1) {
-        matrix[row][column] += powers[row] * powers[column];
+  const matrix = [
+    ...points.map((point) => powersFor(point.x, degree)),
+    ...Array.from({ length: size }, (_, row) => Array.from({ length: size }, (_, column) => row === column ? Math.sqrt(coefficientPenalty * (row === 0 ? .1 : 1)) : 0)),
+  ];
+  const targets = [...points.map((point) => point.y), ...Array(size).fill(0)];
+  const q: number[][] = [];
+  const r = Array.from({ length: size }, () => Array(size).fill(0) as number[]);
+  for (let column = 0; column < size; column += 1) {
+    const vector = matrix.map((row) => row[column]);
+    for (let pass = 0; pass < 2; pass += 1) {
+      for (let previous = 0; previous < column; previous += 1) {
+        const projection = vector.reduce((sum, value, index) => sum + value * q[previous][index], 0);
+        r[previous][column] += projection;
+        for (let row = 0; row < vector.length; row += 1) vector[row] -= projection * q[previous][row];
       }
     }
-  });
-
-  for (let index = 0; index < size; index += 1) {
-    matrix[index][index] += index === 0 ? ridge * 0.1 : ridge;
+    const norm = Math.hypot(...vector);
+    r[column][column] = norm;
+    q.push(vector.map((value) => value / norm));
   }
-
-  return solveLinearSystem(matrix, vector);
+  const transformed = q.map((column) => column.reduce((sum, value, index) => sum + value * targets[index], 0));
+  const coefficients = Array(size).fill(0) as number[];
+  for (let row = size - 1; row >= 0; row -= 1) {
+    coefficients[row] = (transformed[row] - r[row].slice(row + 1).reduce((sum, value, index) => sum + value * coefficients[row + 1 + index], 0)) / r[row][row];
+  }
+  return coefficients;
 }
 
 function powersFor(x: number, degree: number) {
@@ -179,49 +183,6 @@ function powersFor(x: number, degree: number) {
   }
 
   return powers;
-}
-
-function solveLinearSystem(matrix: number[][], vector: number[]) {
-  const size = vector.length;
-  const augmented = matrix.map((row, index) => [...row, vector[index]]);
-
-  for (let pivotIndex = 0; pivotIndex < size; pivotIndex += 1) {
-    let bestRow = pivotIndex;
-
-    for (let row = pivotIndex + 1; row < size; row += 1) {
-      if (
-        Math.abs(augmented[row][pivotIndex]) >
-        Math.abs(augmented[bestRow][pivotIndex])
-      ) {
-        bestRow = row;
-      }
-    }
-
-    [augmented[pivotIndex], augmented[bestRow]] = [
-      augmented[bestRow],
-      augmented[pivotIndex],
-    ];
-
-    const pivot = augmented[pivotIndex][pivotIndex] || 1e-12;
-
-    for (let column = pivotIndex; column <= size; column += 1) {
-      augmented[pivotIndex][column] /= pivot;
-    }
-
-    for (let row = 0; row < size; row += 1) {
-      if (row === pivotIndex) {
-        continue;
-      }
-
-      const factor = augmented[row][pivotIndex];
-
-      for (let column = pivotIndex; column <= size; column += 1) {
-        augmented[row][column] -= factor * augmented[pivotIndex][column];
-      }
-    }
-  }
-
-  return augmented.map((row) => row[size] ?? 0);
 }
 
 function applyFit(points: DataPoint[], coefficients: number[]): FittedPoint[] {
@@ -266,46 +227,10 @@ function sampleCurve(coefficients: number[]) {
   });
 }
 
-function getStatus(
-  degree: number,
-  trainMse: number,
-  testMse: number,
-  scenario: OverfittingScenario,
-): ComplexityStatus {
-  if (degree <= scenario.underfitUntil || trainMse > 0.14) {
-    return "underfit";
-  }
-
-  if (degree >= scenario.overfitFrom || testMse > trainMse + 0.16) {
-    return "overfit";
-  }
-
-  return "sweet-spot";
-}
-
-function describeFit(
-  status: ComplexityStatus,
-  trainMse: number,
-  testMse: number,
-  degree: number,
-) {
-  if (status === "underfit") {
-    return "The curve is too simple, so both training and future examples miss the same broad pattern.";
-  }
-
-  if (status === "overfit") {
-    return `Degree ${degree} chases training noise: train MSE is ${formatMetric(
-      trainMse,
-    )}, but test MSE has climbed to ${formatMetric(testMse)}.`;
-  }
-
-  return "This is the useful middle: the curve follows the signal without memorizing every noisy bump.";
-}
-
 function clampInteger(value: number, min: number, max: number) {
   return Math.round(clamp(value, min, max));
 }
 
 function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
+  return Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
 }

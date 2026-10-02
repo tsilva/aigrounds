@@ -254,6 +254,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "overfitting",
+    layout: "guided-discovery",
     title: "Overfitting Lab",
     tag: "generalization",
     kicker:

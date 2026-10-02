@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowPathIcon, ArrowRightIcon, ChatBubbleLeftRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
-import type { CSSProperties, ReactNode, Ref } from "react";
+import { useId, useState, type CSSProperties, type ReactNode, type Ref } from "react";
 import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
 import styles from "./learning-page.module.css";
 
@@ -155,6 +155,38 @@ export function LessonAction({ children, onClick, disabled = false }: {
   children: ReactNode; onClick: () => void; disabled?: boolean;
 }) {
   return <button type="button" className={styles.lessonAction} onClick={onClick} disabled={disabled}>{children}</button>;
+}
+
+export function LessonRangeControl({ label, value, min, max, step, unit = "", help, onChange }: {
+  label: string; value: number; min: number; max: number; step: number;
+  unit?: string; help: string; onChange: (value: number) => void;
+}) {
+  const helpId = useId();
+  const [draft, setDraft] = useState(String(value));
+  const [previousValue, setPreviousValue] = useState(value);
+  if (value !== previousValue) {
+    setPreviousValue(value);
+    setDraft(String(value));
+  }
+  function normalize(next: number) {
+    const bounded = Math.min(max, Math.max(min, next));
+    const snapped = Number((min + Math.round((bounded - min) / step + 1e-9) * step).toFixed(10));
+    return Math.min(max, Math.max(min, snapped));
+  }
+  function commit() {
+    if (!draft.trim() || !Number.isFinite(Number(draft))) { setDraft(String(value)); return; }
+    const next = normalize(Number(draft));
+    setDraft(String(next));
+    if (next !== value) onChange(next);
+  }
+  return <div className={styles.rangeControl}>
+    <label>{label}{unit && ` (${unit})`}<input type="number" min={min} max={max} step={step}
+      value={draft} aria-describedby={helpId} onChange={(event) => setDraft(event.currentTarget.value)}
+      onBlur={commit} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); commit(); } }} /></label>
+    <input type="range" aria-label={`${label} slider`} aria-describedby={helpId}
+      min={min} max={max} step={step} value={value} onChange={(event) => onChange(normalize(event.currentTarget.valueAsNumber))} />
+    <p id={helpId}>{help} Use arrow keys on the slider. Press Enter or leave the number field to apply an exact edit.</p>
+  </div>;
 }
 
 export function GuideInvitation() {

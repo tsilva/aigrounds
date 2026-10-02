@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": null,
+  "title": "Bayes Rule Playground",
+  "slug": "bayes-rule",
+  "modulePath": "src/modules/bayes-rule",
+  "mockupPath": "src/modules/bayes-rule/design/accepted-mockup.png",
+  "promptPath": "src/modules/bayes-rule/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5cc5938f-684c-410c-9bf5-a0c00e12f2db.png",
+  "approval": "User authorized autonomous mockup review for the legacy redesign batch.",
+  "refinements": [
+    "Use canonical shared shell, typography, progress and Guide invitation.",
+    "Pair percentage sliders with bounded exact editors and explicit conditional-rate definitions.",
+    "Use full-precision expected frequencies, replacing rounded sample glyphs.",
+    "Put bar labels outside the bar so tiny positive shares remain readable.",
+    "Keep three presets and both scenarios, with prediction/action/explanation and transfer feedback."
+  ]
+}

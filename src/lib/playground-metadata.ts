@@ -188,12 +188,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "expected-value-risk",
+    layout: "guided-discovery",
     title: "Expected Value & Risk Lab",
     tag: "probability",
     kicker:
       "Tune two bets and see why the best long-run average can still swing hard.",
     summary:
-      "Build a safe bet and a risky bet, then compare expected value, spread, break-even probability, and deterministic long-run simulations as the payoff sliders move.",
+      "Weight two fictional bets by their probabilities, separate average payoff from per-round spread, cross break-even and compare repeatable finite samples with model expectations.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Random variables",

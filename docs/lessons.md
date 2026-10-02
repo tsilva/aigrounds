@@ -24,6 +24,8 @@ The Conditional Probability & Independence lesson uses an exact four-cell count 
 
 The Bayes Rule lesson preserves both signal scenarios, three presets, and all rate ranges while replacing rounded person counts with exact expected frequencies. Three guided experiments and a fraud transfer check connect the prior, sensitivity, and false-positive rate to the two positive-result pools. Native sliders pair with exact percentage editors; the count table and proportional bar use the same full-precision model. Fractional expectations are explicitly distinguished from sample counts.
 
+The Expected Value & Risk lesson preserves three two-bet presets, six payoff/probability controls and three sample lengths. Four guided experiments and a transfer check connect weighted payoffs, per-round spread, break-even and finite sample averages. Exact editors pair with native sliders; probability bars, arithmetic and accessible sample tables replace ambiguous spread bars and unlabeled outcome ticks. Seeded streams preserve wins/losses across payoff edits and shared prefixes across sample lengths, making non-monotonic sample behavior visible.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

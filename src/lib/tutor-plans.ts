@@ -1,3 +1,4 @@
+import { payoffTutorPlan } from "@/modules/expected-value-risk/learning-experiments";
 import { bayesTutorPlan } from "@/modules/bayes-rule/learning-experiments";
 import { conditionalTutorPlan } from "@/modules/conditional-probability/learning-experiments";
 import { probabilityTutorPlan } from "@/modules/probability-rules/learning-experiments";
@@ -507,47 +508,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "expected-value-risk": {
-    intro:
-      "Work through three payoff experiments. Predict which bet should win on average, move the sliders, then compare expected value with the outcome swings.",
-    whyItMatters:
-      "Expected value exists because uncertain choices need an average long-run yardstick. It is useful for comparing options, but pairing it with risk shows when a good average still comes with painful swings.",
-    steps: [
-      {
-        title: "Weight the outcomes",
-        experiment:
-          "Choose Steady vs Swingy. Compare each bet's win probability, win amount, loss amount, and EV formula.",
-        predictionQuestion:
-          "Which part should matter more for expected value: the biggest payoff or the probability-weighted payoff?",
-        observationPrompt:
-          "What happened to EV when probability and payoff were multiplied together?",
-        takeaway:
-          "Expected value is a weighted average, so each outcome only counts as much as its probability allows.",
-      },
-      {
-        title: "Separate average from risk",
-        experiment:
-          "Choose Higher EV, Wider Swings. Compare the EV markers with the red-to-green spread bars.",
-        predictionQuestion:
-          "Can the bet with the higher expected value still have rougher short-run outcomes?",
-        observationPrompt:
-          "What did the spread bar show that EV alone did not show?",
-        takeaway:
-          "EV describes the center of the long run; risk describes how far individual outcomes can land from that center.",
-      },
-      {
-        title: "Watch the long run",
-        experiment:
-          "Switch between 24, 60, and 120 rounds. Compare simulated average with expected average for both bets.",
-        predictionQuestion:
-          "Should a short simulation match expected value exactly, or only drift toward it over many repeats?",
-        observationPrompt:
-          "How did the simulated average behave as the number of rounds changed?",
-        takeaway:
-          "Expected value is a long-run target, not a promise about the next few outcomes.",
-      },
-    ],
-  },
+  "expected-value-risk": payoffTutorPlan,
   "bernoulli-categorical-binomial": {
     intro:
       "Work through three probability-mass experiments. Predict which outcome gets mass, change p or n, then connect the visible shape to the question being asked.",

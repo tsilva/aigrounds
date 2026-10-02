@@ -232,12 +232,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "waiting-arrival-distributions",
+    layout: "guided-discovery",
     title: "Waiting & Arrival Distributions Lab",
     tag: "probability",
     kicker:
       "Tune one event chance and watch waits stretch while arrival counts shift.",
     summary:
-      "Move a per-second event chance, change the time window, and compare a geometric waiting-time view with a Poisson rate-model count view.",
+      "Move a per-second event chance, change the time window, and compare exact geometric waits with a Poisson count approximation and exact tick probabilities.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Geometric distribution",
@@ -248,7 +249,7 @@ const activePlaygroundDefinitions = [
     learningGoals: [
       "Understand geometric waiting time as the question of how long until the next event.",
       "See how a Poisson rate model describes counts inside a fixed time window.",
-      "Recognize when the rare-event approximation is useful and when the exact formula is safer.",
+      "Distinguish exact tick probability from Poisson approximation and the small-expected-count probability shortcut.",
     ],
   },
   {

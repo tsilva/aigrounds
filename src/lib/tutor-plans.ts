@@ -1,3 +1,4 @@
+import { arrivalTutorPlan } from "@/modules/waiting-arrival-distributions/learning-experiments";
 import { distributionTutorPlan } from "@/modules/bernoulli-categorical-binomial/learning-experiments";
 import { payoffTutorPlan } from "@/modules/expected-value-risk/learning-experiments";
 import { bayesTutorPlan } from "@/modules/bayes-rule/learning-experiments";
@@ -511,47 +512,7 @@ export const playgroundTutorPlans = {
   },
   "expected-value-risk": payoffTutorPlan,
   "bernoulli-categorical-binomial": distributionTutorPlan,
-  "waiting-arrival-distributions": {
-    intro:
-      "Work through three arrival experiments. Predict how one event chance changes waits and counts, then connect the tick model to the Poisson rate view.",
-    whyItMatters:
-      "Waiting and arrival distributions exist because many systems are about when events happen and how many arrive. They are useful for planning capacity, estimating rare-event risk, and translating a rate into wait-time or count predictions.",
-    steps: [
-      {
-        title: "Split one rate into two questions",
-        experiment:
-          "Start with Website Visits. Compare the geometric wait formula, Poisson count formula, and the bridge from p to lambda T.",
-        predictionQuestion:
-          "If the per-second event chance increases, what should happen to both the typical wait and expected count?",
-        observationPrompt:
-          "What changed together when the same rate fed both views?",
-        takeaway:
-          "The same arrival rate can answer a wait question and a count question, as long as the model assumptions stay clear.",
-      },
-      {
-        title: "Read the waiting tail",
-        experiment:
-          "Move p lower and watch the waiting-time histogram. Compare P(wait <= 20s) with P(wait > 60s).",
-        predictionQuestion:
-          "When events become rarer, should the long-wait bucket shrink or grow?",
-        observationPrompt:
-          "How did the waiting histogram change when arrivals became less likely?",
-        takeaway:
-          "In a geometric waiting model, rare per-tick events put more probability into long waits.",
-      },
-      {
-        title: "Compare exact and rare-event shortcuts",
-        experiment:
-          "Use the Rare Defects scenario, then compare the exact at-least-one formula with the rare-event approximation.",
-        predictionQuestion:
-          "When lambda T is tiny, should P(at least one event) be close to lambda T?",
-        observationPrompt:
-          "What did the rare-event panel show about the approximation?",
-        takeaway:
-          "For very rare arrivals, lambda T is a useful quick estimate; otherwise use 1 - e^-lambda T.",
-      },
-    ],
-  },
+  "waiting-arrival-distributions": arrivalTutorPlan,
   "monte-carlo-tree-search": {
     intro:
       "Work through three search experiments. Predict which move gets the next rollout, change the exploration pressure, then connect the result to the counters that flow back up the tree.",

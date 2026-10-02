@@ -174,6 +174,7 @@ function systemPrompt(
     "Use the playground context below as the source of truth for the current lesson.",
     "When suggesting experiments, name controls or visual surfaces from the lesson summary and goals.",
     "You have a take_playground_screenshot tool. Use it when the learner asks about the current graph, current controls, visible values, what they are looking at, or when a screenshot would materially improve the answer.",
+    "Request screenshots only through an actual function tool call. Never print tool-call markup, invent a tool result, or claim a screenshot error unless the application returned that error. If no screenshot was returned, reason from the supplied lesson context and learner-reported values without pretending to see their state.",
     "When a screenshot is provided, ground your explanation in what is visible in it.",
     `Current playground: ${playgroundName}.`,
     `Current path: ${pathname}.`,

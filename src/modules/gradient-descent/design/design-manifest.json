@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": null,
+  "title": "Gradient Descent Playground",
+  "slug": "gradient-descent",
+  "modulePath": "src/modules/gradient-descent",
+  "mockupPath": "src/modules/gradient-descent/design/accepted-mockup.png",
+  "promptPath": "src/modules/gradient-descent/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-3908ac8c-da79-4013-928a-5926ec0ab680.png",
+  "approval": "Self-reviewed under explicit user authorization.",
+  "refinements": [
+    "Use shared anatomy: Guided discovery inside workbench, active indigo toolbar, open summaries and three-step rail progress.",
+    "Replace raster chat composer with the single canonical Guide CTA.",
+    "Derive all curve and point geometry from actual recurrence; raster illustration is not a mathematical oracle.",
+    "Omit invented gradient vector and tangent; show actual recorded path, current circle and proposed diamond, with exact signed arithmetic.",
+    "Keep four controlled experiments and a transfer check; no heuristic convergence badge or hidden clamp/rounding.",
+    "Use adaptive documented axes and readable plot horizontal scrolling at narrow container widths.",
+    "Restart path preserves current parameters; toolbar Reset restores current experiment baseline."
+  ]
+}

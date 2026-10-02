@@ -40,6 +40,8 @@ Cross Entropy Loss compares binary complements, one-hot categorical targets, and
 
 KL Divergence Intuition Lab compares the original three reference distributions with exact, normalized Q edits. Three prediction → try → explanation experiments expose signed source-weighted terms, a full match and direction, then transfer to a changed reference with Q fixed. Optional worked calculations and a fixed-scale signed chart accompany the paired probability bars. The engine handles zero-source and zero-target limits without clipping.
 
+Gradient Descent Playground preserves the scalar quadratic, three original presets and rate/momentum ranges while following the full-precision update without clamps. Four controlled experiments distinguish slow descent, a rate-only comparison, crossing with lower loss and momentum raising one loss; a new-rate transfer follows. The actual curve, proposed point, signed arithmetic and optional history replace heuristic convergence badges. Run checks both position and stored velocity before stopping.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

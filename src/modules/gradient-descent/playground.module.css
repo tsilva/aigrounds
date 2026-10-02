@@ -1,0 +1,20 @@
+.context {color:#536487;font-size:14px;line-height:1.7;margin:18px 0;}
+.controls {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;padding:14px 0;}
+.actions {display:flex;flex-wrap:wrap;gap:10px;}
+.evidence,.optional {border-top:1px solid #dfe4f4;}
+.evidence {padding:22px 0;}
+.evidence h2 {font-size:21px;font-weight:600;}
+.evidence p,.optional p {color:#536487;font-size:14px;line-height:1.7;margin:8px 0;}
+.chartScroller {overflow-x:auto;margin-top:20px;}
+.chartScroller svg {width:100%;min-width:560px;height:auto;}
+.chartScroller text {font-size:18px;fill:#536487;}
+.arithmetic {border-top:1px solid #dfe4f4;padding-top:16px;}
+.arithmetic p {font-family:var(--font-ibm-plex-mono),monospace;font-size:13px;overflow-wrap:anywhere;}
+.optional details {padding:16px 0;border-bottom:1px solid #dfe4f4;}
+.optional summary {font-size:15px;font-weight:500;cursor:pointer;}
+.scroller {overflow-x:auto;margin-top:14px;}
+.scroller table {width:100%;min-width:580px;border-collapse:collapse;font-size:13px;text-align:left;}
+.scroller caption {text-align:left;font-size:13px;color:#536487;line-height:1.7;margin:8px 0 12px;}
+.scroller th,.scroller td {padding:10px 8px;border-bottom:1px solid #dfe4f4;}
+.scroller td {white-space:nowrap;font-family:var(--font-ibm-plex-mono),monospace;}
+@container (max-width:699px) {.controls {grid-template-columns:minmax(0,1fr);}}

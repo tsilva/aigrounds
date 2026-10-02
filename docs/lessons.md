@@ -22,6 +22,8 @@ The Probability Rules lesson retains every dice event pair and six set-operation
 
 The Conditional Probability & Independence lesson uses an exact four-cell count table, an optional 100-person grid, and three guided experiments plus a transfer check. Learners change the eligible reference group while retaining the overlap, compare independence as equal rates rather than equal counts, and distinguish a higher conditional rate from a changed population. Incorrect explanations and stale answers cannot complete the exercises.
 
+The Bayes Rule lesson preserves both signal scenarios, three presets, and all rate ranges while replacing rounded person counts with exact expected frequencies. Three guided experiments and a fraud transfer check connect the prior, sensitivity, and false-positive rate to the two positive-result pools. Native sliders pair with exact percentage editors; the count table and proportional bar use the same full-precision model. Fractional expectations are explicitly distinguished from sample counts.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

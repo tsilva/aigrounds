@@ -8,6 +8,11 @@
 .toggleGroup button, .lessonAction { padding: 9px 13px; border: 1px solid #9faec9; border-radius: 7px; background: white; color: var(--ink); font-size: 14px !important; }
 .toggleGroup button[aria-pressed="true"] { background: var(--indigo); color: white; border-color: var(--indigo); }
 .lessonAction:disabled { opacity: .6; cursor: default; }
+.rangeControl { min-width: 0; }
+.rangeControl label { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.rangeControl input[type="number"] { width: 76px; flex: none; padding: 8px; border: 1px solid #9faec9; border-radius: 7px; font-size: 14px; }
+.rangeControl input[type="range"] { width: 100%; margin-top: 12px; accent-color: var(--indigo); }
+.rangeControl p { font-size: 12px; line-height: 1.6; color: var(--muted); margin-top: 8px; }
 .nav { height: 64px; display: flex; gap: 24px; align-items: center; border-bottom: 1px solid var(--line); padding: 0 32px; }
 .nav > a:first-child { font-size: 22px; font-weight: 700; letter-spacing: -.04em; }
 .allLessons { border-left: 1px solid var(--line); padding-left: 24px; color: var(--muted); font-size: 14px; }

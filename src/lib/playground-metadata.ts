@@ -298,12 +298,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "softmax-temperature",
+    layout: "guided-discovery",
     title: "Softmax Temperature Lab",
     tag: "probability",
     kicker:
-      "Adjust logits and temperature to see confidence sharpen without changing the winner.",
+      "Separate score changes from temperature changes and compare normalized probabilities.",
     summary:
-      "Move raw class logits, tune temperature, and watch softmax convert scores into probabilities. The lab shows why low temperature gets overconfident and high temperature spreads probability mass back out.",
+      "Edit four class logits and tune positive temperature to explore normalization, concentration, ranking and ties. Compare equal-score and close-call cases without treating a sharp distribution as proof of correctness.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Raw logits",

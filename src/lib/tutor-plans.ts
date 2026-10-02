@@ -1,3 +1,4 @@
+import { softmaxTutorPlan } from "@/modules/softmax-temperature/learning-experiments";
 import { thresholdTutorPlan } from "@/modules/confusion-matrix-thresholds/learning-experiments";
 import { fitTutorPlan } from "@/modules/overfitting/learning-experiments";
 import { arrivalTutorPlan } from "@/modules/waiting-arrival-distributions/learning-experiments";
@@ -419,47 +420,7 @@ export const playgroundTutorPlans = {
   "probability-rules": probabilityTutorPlan,
   "conditional-probability": conditionalTutorPlan,
   "bayes-rule": bayesTutorPlan,
-  "softmax-temperature": {
-    intro:
-      "Work through three softmax experiments. Predict the ranking and confidence, change logits or temperature, then explain what temperature actually controls.",
-    whyItMatters:
-      "Softmax temperature exists because raw model scores need to become probabilities with controllable confidence. It is useful for making predictions sharper or more exploratory without changing the underlying score ranking.",
-    steps: [
-      {
-        title: "Convert logits to probabilities",
-        experiment:
-          "Choose Clear Winner. Compare raw logits, scaled logits, and probability bars.",
-        predictionQuestion:
-          "Which class should receive the highest probability before temperature changes anything?",
-        observationPrompt:
-          "What stayed connected between the largest logit and the probability chart?",
-        takeaway:
-          "Softmax preserves the ranking from logits while converting the scores into probabilities that sum to 1.",
-      },
-      {
-        title: "Sharpen the winner",
-        experiment:
-          "Lower Temperature toward the left. Watch confidence, entropy, and the winner probability.",
-        predictionQuestion:
-          "What should low temperature do to the probability mass around the top class?",
-        observationPrompt:
-          "How did confidence and entropy change at low temperature?",
-        takeaway:
-          "Low temperature sharpens the distribution by pushing more probability onto the leading class.",
-      },
-      {
-        title: "Soften without changing the winner",
-        experiment:
-          "Raise Temperature toward the right. Watch whether the top class changes while probabilities spread out.",
-        predictionQuestion:
-          "Should high temperature usually change the winner, or mostly change confidence?",
-        observationPrompt:
-          "What happened to the ranking and the probability spread?",
-        takeaway:
-          "Temperature changes confidence and entropy, but it does not usually change class ranking because all logits are scaled together.",
-      },
-    ],
-  },
+  "softmax-temperature": softmaxTutorPlan,
   "gradient-descent": {
     intro:
       "Work through four tiny experiments. Predict first, change the controls, observe the graph, then explain what you learned.",

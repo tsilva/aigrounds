@@ -1,0 +1,26 @@
+.histogram, .numberLine, .boxSection { padding: 24px 0; border-bottom: 1px solid #dfe4f4; }
+.histogram h2, .numberLine h2, .boxSection h2 { font-size: 18px; margin: 0 0 8px; }
+.histogram p, .numberLine p, .boxSection p { color: #536487; font-size: 14px; line-height: 1.5; }
+.histogram svg, .boxSection svg { display: block; width: 100%; height: auto; }
+.histogram svg text, .boxSection svg text { font-family: var(--font-ibm-plex-mono), monospace; font-size: 12px; fill: #0c1230; }
+.gridLine { stroke: #dfe4f4; }
+.bar { fill: #c8bfff; stroke: #5031dc; }
+.movableBar { fill: #5031dc; }
+.histogram svg .movableLabel { fill: white; font-weight: 700; }
+.trackFrame { padding: 0 24px 30px; margin-top: 24px; }
+.track { position: relative; }
+.axis { position: absolute; left: 0; right: 0; bottom: 20px; height: 1px; background: #8d9abb; }
+.tick { position: absolute; bottom: -20px; transform: translateX(-50%); font: 12px var(--font-ibm-plex-mono), monospace; color: #536487; }
+.fixedPoint { position: absolute; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #e2e6f3; color: #0c1230; transform: translateX(-50%); font: 11px var(--font-ibm-plex-mono), monospace; }
+.fixedPoint small { position: absolute; top: 31px; font-size: 10px; color: #536487; }
+.values { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
+.rangeLine { stroke: #0c1230; stroke-width: 2; }
+.box { fill: #e3deff; stroke: #5031dc; stroke-width: 2; }
+.boxSection dl { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin: 8px 0; }
+.boxSection dt { font-size: 12px; color: #536487; }
+.boxSection dd { margin: 4px 0; font: 16px var(--font-ibm-plex-mono), monospace; }
+.histogram details, .boxSection details { margin: 16px 0 0; font-size: 14px; }
+.histogram summary, .boxSection summary { cursor: pointer; color: #5031dc; }
+.histogram summary:focus-visible, .boxSection summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.histogram table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+.histogram th, .histogram td { padding: 8px; text-align: left; border-bottom: 1px solid #dfe4f4; }

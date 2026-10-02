@@ -100,12 +100,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "shape-skew-outliers",
+    layout: "guided-discovery",
     title: "Shape, Skew & Outliers Lab",
     tag: "statistics",
     kicker:
-      "Move one outlier and watch the histogram, box plot, and summaries disagree.",
+      "Move one point and read piles, tails, and gaps before choosing a summary.",
     summary:
-      "Choose a distribution shape, slide an outlier across the scale, and compare how mean, median, range, and IQR respond when tails stretch.",
+      "Explore four distribution shapes, compare the same points before and after a move, and discover what histograms, box plots, and robust summaries reveal or hide.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Histograms",

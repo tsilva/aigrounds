@@ -277,51 +277,44 @@ export const playgroundTutorPlans = {
     ],
   },
   "shape-skew-outliers": {
-    intro:
-      "Work through three distribution-shape experiments. Predict the shape first, move the outlier, then decide which summary is trustworthy.",
-    whyItMatters:
-      "Distribution shape exists as a concept because summary numbers can hide piles, tails, gaps, and unusual values. It is useful because shape tells you whether a center or spread statistic is trustworthy for the story in the data.",
-    openingMessage:
-      "No prior statistics knowledge needed. We will build the ideas by predicting, trying one small experiment, and explaining what changed.\n\n- Shape is the visible pattern of a dataset: piles, gaps, clusters, and tails.\n- Skew means one tail stretches farther than the main pile. Right skew stretches toward larger values.\n- An outlier is a far-away value that can pull summaries like mean and range.\n- Robust summaries, such as median and IQR, are designed to move less when one value is extreme.\n\nFirst prediction: where do you expect most values to sit when a distribution is right-skewed? Reply with your prediction first. Then I will tell you exactly what to try.",
+    intro: "Four experiments and a transfer check compare shape and summaries while moving only point M.",
+    whyItMatters: "A center or spread number can hide tails, gaps and groups. Seeing the distribution helps choose evidence for the question instead of treating one statistic as the whole story.",
+    openingMessage: "You need averages, sorted middles and subtraction. A histogram groups values into intervals; skew names the direction of a sparse tail. IQR is Q3 minus Q1, the spread of the middle half. Robust means less sensitive to extreme points, not unchanging.\n\nThere are 12 fixed points and one movable point M. Choose a rail prediction to restore the experiment’s start, move M with its dot or Point M value, then explain. Reset restarts the current experiment. Start comparisons always use the same 13 points.\n\nExperiment 1 starts at Right Skew with M = 94. Predict what changes when M moves to 100 before trying it. Share your prediction here or in the rail.",
     masteryCriteria: [
-      "Identifies skew by the direction of the long tail.",
-      "Explains why a histogram can reveal piles, gaps, and clusters that one center hides.",
-      "Explains why outliers pull mean and range more than median and IQR.",
-      "Chooses median or IQR when one extreme value would make mean or range misleading.",
+      "Reads skew direction from the tail rather than the main pile or a mean cutoff.",
+      "Explains why moving within one histogram bin can leave counts unchanged.",
+      "Compares mean/range sensitivity with median/IQR without claiming invariance.",
+      "Uses histogram and exact values to identify groups and gaps hidden by a center or box.",
+      "Distinguishes a movable point from an outlier flag and chooses evidence for a new point.",
     ],
     steps: [
       {
-        title: "Read a skewed tail",
-        experiment:
-          "Choose Right Skew. Compare the histogram pile-up zone with the long tail direction.",
-        predictionQuestion:
-          "Where do you expect most values to sit when a distribution is right-skewed?",
-        observationPrompt:
-          "What did the histogram show about pile-up and tail direction?",
-        takeaway:
-          "Skew describes tail direction: right skew means most values are lower with a long tail toward high values.",
+        title: "Follow a tail",
+        experiment: "In Right Skew, choose a prediction and move Point M value from 94 to 100. Compare the last histogram bin and M on the number line.",
+        predictionQuestion: "What changes when M moves from 94 to 100?",
+        observationPrompt: "Did the bin count change? Which exact endpoint moved?",
+        takeaway: "The high-value endpoint extends but the 90–100 bin still contains one point. Skew refers to the tail direction; bins hide movement within their interval.",
       },
       {
-        title: "Move the outlier",
-        experiment:
-          "Click Center under Outlier position, then move the outlier slider toward High tail. Watch mean, median, range, and IQR.",
-        predictionQuestion:
-          "Which summaries should react most when one value moves far into the tail?",
-        observationPrompt:
-          "What changed most when the outlier moved away from the pile-up?",
-        takeaway:
-          "Outliers pull summaries that use extremes or every value, while median and IQR stay more robust.",
+        title: "Stretch one edge",
+        experiment: "Choose Balanced or Next experiment. Predict, then move M from 50 to 100. Compare all four Start values and changes in Live shape summaries.",
+        predictionQuestion: "Which pair changes more here: mean/range or median/IQR?",
+        observationPrompt: "What changed in the extremes, sum and middle sorted positions?",
+        takeaway: "Mean uses every value and range uses extremes. Median and IQR follow middle positions and can change less without being fixed.",
       },
       {
-        title: "Spot hidden clusters",
-        experiment:
-          "Choose Two Clusters. Compare the histogram with the mean and median markers.",
-        predictionQuestion:
-          "Can one center value describe a dataset split into two piles?",
-        observationPrompt:
-          "What did the histogram reveal that the center summaries hid?",
-        takeaway:
-          "Shape matters because one summary number can hide clusters, gaps, skew, and outliers.",
+        title: "Read the other direction",
+        experiment: "In Left Skew, predict then move M from 6 to 0. Locate the main high-value pile and the sparse low-value tail.",
+        predictionQuestion: "Which direction does the tail extend?",
+        observationPrompt: "Where are most values and where does the sparse tail reach?",
+        takeaway: "The left tail reaches toward small values. The mean–median gap alone cannot prove shape.",
+      },
+      {
+        title: "Find what a center hides",
+        experiment: "In Two Clusters, predict then move M from 96 to 50. Compare the histogram and sorted values with the center and box. Then use Try the transfer check and set M to 60.",
+        predictionQuestion: "Does placing one point in the gap merge the two groups?",
+        observationPrompt: "How many points remain below 40 and above 60? What evidence would you report for M = 60?",
+        takeaway: "The two groups remain. A center or box cannot reveal every gap. Report shape alongside appropriate center and spread. The optional screening rule flags values beyond 1.5 IQR fences for investigation; the displayed whiskers span min to max, not Tukey fences.",
       },
     ],
   },

@@ -1,0 +1,18 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Shape, Skew & Outliers",
+  "slug": "shape-skew-outliers",
+  "modulePath": "src/modules/shape-skew-outliers",
+  "acceptedMockup": "src/modules/shape-skew-outliers/design/accepted-mockup.png",
+  "prompt": "src/modules/shape-skew-outliers/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-a3fc3c07-efe5-4671-884d-023f819e3f39.png",
+  "approval": "Self-review authorized by the user for all legacy redesigns",
+  "approvedRefinements": [
+    "Use canonical white shared navigation and three-step progress.",
+    "Derive every chart position from the engine rather than generated marks.",
+    "Show fixed values with packed lanes and a distinct movable M.",
+    "Retain accessible bin table and exact five-number values.",
+    "Use four experiments plus a near-transfer check.",
+    "Keep outlier screening optional and distinguish min-to-max from Tukey whiskers."
+  ]
+}

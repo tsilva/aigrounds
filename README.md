@@ -28,6 +28,8 @@ The Matrix Multiplication lesson uses the shared workbench and experiment rail f
 
 The Shape, Skew & Outliers lesson uses the shared workbench and rail for four experiments and a transfer check. Its histogram, exact points, min-to-max box plot, and same-count summary comparisons distinguish tail direction, binning, unusual points, robust summaries, and hidden clusters. Quartiles follow the same median-of-halves convention as the Range, Quartiles & IQR lesson.
 
+The Probability Rules lesson retains every dice event pair and six set-operation views in an accessible sample-space table. Four guided experiments and a new-event transfer check connect exact counts to complements, intersections, inclusive unions, set differences, and simulated frequencies. Shared workbench controls keep selects, mode buttons, and compact actions consistent across lessons.
+
 The app currently includes labs for Mean, Median & Mode, Range, Quartiles & IQR, Variance & Standard Deviation, Shape, Skew & Outliers, Probability Rules, Conditional Probability & Independence, Bayes Rule, Expected Value & Risk, Bernoulli/Categorical/Binomial distributions, Waiting & Arrival Distributions, Overfitting, Confusion Matrix & Thresholds, Softmax Temperature, Cross Entropy Loss, KL Divergence, Matrix Multiplication, Tensor Shape & Broadcasting, Gradient Descent, Monte Carlo Tree Search, Byte Pair Encoding, Transformer Attention, Batch Normalization, Layer Normalization, MNIST MLP Inference Debugging with WebGPU, Convolution Filter Lab, PyTorch Image Augmentations, Label-Mixing Image Transforms, Autograd Graphs, Backpropagation Inspector, Linear Quantization (INT4), Zero Knowledge Proofs, and the AI Concept Atlas.
 
 ## Install

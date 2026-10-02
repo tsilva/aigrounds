@@ -1,0 +1,18 @@
+{
+  "lessonPlanStep": null,
+  "lessonPlanTitle": "Probability Rules",
+  "slug": "probability-rules",
+  "modulePath": "src/modules/probability-rules",
+  "acceptedMockup": "src/modules/probability-rules/design/accepted-mockup.png",
+  "prompt": "src/modules/probability-rules/design/imagegen-prompt.md",
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-e7f8261b-feb3-4e28-99b7-e59a1aa16329.png",
+  "approval": "Self-reviewed under the user\u2019s batch-redesign authorization",
+  "approvedRefinements": [
+    "Use canonical Reset control rather than an additional scenario.",
+    "Include Simulation as a fourth experiment starting point.",
+    "Render every ordered pair and membership from engine data.",
+    "Add checkmarks and accessible cell labels to selected outcomes.",
+    "Use shared components for labeled selects, workbench modes and compact simulation actions.",
+    "Keep simulation in the workbench and one Guide CTA in the rail."
+  ]
+}

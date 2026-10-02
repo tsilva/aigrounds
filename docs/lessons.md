@@ -34,6 +34,8 @@ The Overfitting lesson compares polynomial fits on training circles and held-out
 
 Confusion Matrix & Thresholds uses fixed score lanes, an inclusive cutoff, a complete confusion matrix, and separate precision/recall denominators. Its three guided experiments cover catching more cases, a stricter-cutoff precision counterexample, and undefined precision; the transfer check applies equality to Spam Filter. All twelve example decisions and F1/accuracy formulas remain available as supporting evidence.
 
+Softmax Temperature Lab separates positive temperature scaling from score edits, using four exact logit controls and probability bars on a fixed scale. Three guided experiments cover preserved ranking, competition through normalization, and uniform probabilities for equal logits; a close-call transfer check distinguishes concentration from certainty or correctness. Supporting normalization and entropy evidence defines shifted weights, natural-log units, and relative spread.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

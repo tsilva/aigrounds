@@ -26,6 +26,8 @@ The Bayes Rule lesson preserves both signal scenarios, three presets, and all ra
 
 The Expected Value & Risk lesson preserves three two-bet presets, six payoff/probability controls and three sample lengths. Four guided experiments and a transfer check connect weighted payoffs, per-round spread, break-even and finite sample averages. Exact editors pair with native sliders; probability bars, arithmetic and accessible sample tables replace ambiguous spread bars and unlabeled outcome ticks. Seeded streams preserve wins/losses across payoff edits and shared prefixes across sample lengths, making non-monotonic sample behavior visible.
 
+The Bernoulli, Categorical & Binomial lesson distinguishes a single yes/no outcome, one nominal class label and a count of independent equal-probability trials. Three guided experiments and a one-trial transfer check use fixed-scale probability bars, exact parameter editors, full-precision mass and tied modes. Categorical summaries avoid invented numerical moments; optional formulas and a keyboard-scrollable probability table preserve the supporting evidence.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

@@ -1,198 +1,36 @@
 export type DistributionMode = "bernoulli" | "categorical" | "binomial";
-
-export type MassPoint = {
-  id: string;
-  label: string;
-  detail: string;
-  probability: number;
-  tone: string;
-  isTarget: boolean;
-};
-
+export type MassPoint = { id: string; label: string; detail: string; probability: number; isTarget: boolean };
 export type DistributionAnalysis = {
-  mode: DistributionMode;
-  p: number;
-  trials: number;
-  massPoints: MassPoint[];
-  expectedValue: number;
-  variance: number;
-  targetProbability: number;
-  mostLikelyLabel: string;
+  mode: DistributionMode; p: number; trials: number; massPoints: MassPoint[];
+  expectedValue: number | null; variance: number | null; totalMass: number; mostLikelyLabel: string;
 };
-
-const categoryRemainderWeights = [0.52, 0.3, 0.18];
-const categoryTones = ["#16a34a", "#3078f2", "#f59e0b", "#ff4545"];
-
-export function clampProbability(value: number) {
-  if (Number.isNaN(value)) {
-    return 0.5;
-  }
-
-  return Math.min(0.95, Math.max(0.05, value));
-}
-
-export function clampTrials(value: number) {
-  if (Number.isNaN(value)) {
-    return 8;
-  }
-
-  return Math.min(16, Math.max(1, Math.round(value)));
-}
-
+export function clampProbability(value: number) { return Number.isNaN(value) ? 0.5 : Math.min(0.95, Math.max(0.05, value)); }
+export function clampTrials(value: number) { return Number.isNaN(value) ? 8 : Math.min(16, Math.max(1, Math.round(value))); }
 export function binomialCoefficient(n: number, k: number) {
-  if (k < 0 || k > n) {
-    return 0;
-  }
-
-  const smallerK = Math.min(k, n - k);
-  let coefficient = 1;
-
-  for (let i = 1; i <= smallerK; i += 1) {
-    coefficient = (coefficient * (n - smallerK + i)) / i;
-  }
-
+  if (!Number.isInteger(n) || !Number.isInteger(k) || n < 0 || k < 0 || k > n) return 0;
+  const smallerK = Math.min(k, n - k); let coefficient = 1;
+  for (let i = 1; i <= smallerK; i++) coefficient = coefficient * (n - smallerK + i) / i;
   return coefficient;
 }
-
 export function binomialProbability(n: number, k: number, p: number) {
-  const probability = clampProbability(p);
-
-  return (
-    binomialCoefficient(n, k) *
-    probability ** k *
-    (1 - probability) ** (n - k)
-  );
+  if (!Number.isFinite(p) || p < 0 || p > 1) return 0;
+  return binomialCoefficient(n, k) * p ** k * (1 - p) ** (n - k);
 }
-
-function roundProbability(value: number) {
-  return Math.round(value * 1000) / 1000;
-}
-
-function formatSuccessCount(count: number) {
-  return `${count} success${count === 1 ? "" : "es"}`;
-}
-
-function analyzeBernoulli(p: number, trials: number): DistributionAnalysis {
-  const probability = clampProbability(p);
-  const massPoints: MassPoint[] = [
-    {
-      id: "failure",
-      label: "0",
-      detail: "failure",
-      probability: roundProbability(1 - probability),
-      tone: "#94a3b8",
-      isTarget: false,
-    },
-    {
-      id: "success",
-      label: "1",
-      detail: "success",
-      probability: roundProbability(probability),
-      tone: "#16a34a",
-      isTarget: true,
-    },
-  ];
-
-  return {
-    mode: "bernoulli",
-    p: probability,
-    trials,
-    massPoints,
-    expectedValue: probability,
-    variance: probability * (1 - probability),
-    targetProbability: probability,
-    mostLikelyLabel: probability >= 0.5 ? "1 success" : "0 failure",
-  };
-}
-
-function analyzeCategorical(p: number, trials: number): DistributionAnalysis {
-  const probability = clampProbability(p);
-  const remainder = 1 - probability;
-  const probabilities = [
-    probability,
-    ...categoryRemainderWeights.map((weight) => remainder * weight),
-  ];
-  const labels = ["A", "B", "C", "D"];
-  const details = ["target class", "near class", "middle class", "rare class"];
-  const massPoints = labels.map((label, index) => ({
-    id: label.toLowerCase(),
-    label,
-    detail: details[index],
-    probability: roundProbability(probabilities[index]),
-    tone: categoryTones[index],
-    isTarget: index === 0,
-  }));
-  const mostLikelyPoint = massPoints.reduce((best, point) =>
-    point.probability > best.probability ? point : best,
-  );
-
-  return {
-    mode: "categorical",
-    p: probability,
-    trials,
-    massPoints,
-    expectedValue: probability,
-    variance: 1 - probabilities.reduce((sum, item) => sum + item ** 2, 0),
-    targetProbability: probability,
-    mostLikelyLabel: `class ${mostLikelyPoint.label}`,
-  };
-}
-
-function analyzeBinomial(p: number, trials: number): DistributionAnalysis {
-  const probability = clampProbability(p);
-  const n = clampTrials(trials);
-  const mean = n * probability;
-  const rawMassPoints = Array.from({ length: n + 1 }, (_, k) => {
-    const probabilityMass = binomialProbability(n, k, probability);
-
-    return {
-      id: String(k),
-      label: String(k),
-      detail: formatSuccessCount(k),
-      probability: roundProbability(probabilityMass),
-      tone: "#3078f2",
-      isTarget: false,
-    };
-  });
-  const mostLikelyPoint = rawMassPoints.reduce((best, point) =>
-    point.probability > best.probability ? point : best,
-  );
-  const massPoints = rawMassPoints.map((point) => {
-    const isTarget = point.id === mostLikelyPoint.id;
-
-    return {
-      ...point,
-      tone: isTarget ? "#16a34a" : point.tone,
-      isTarget,
-    };
-  });
-
-  return {
-    mode: "binomial",
-    p: probability,
-    trials: n,
-    massPoints,
-    expectedValue: mean,
-    variance: n * probability * (1 - probability),
-    targetProbability: mostLikelyPoint.probability,
-    mostLikelyLabel: formatSuccessCount(Number(mostLikelyPoint.label)),
-  };
-}
-
-export function analyzeDistribution(
-  mode: DistributionMode,
-  p: number,
-  trials: number,
-): DistributionAnalysis {
-  const clampedTrials = clampTrials(trials);
-
+export function analyzeDistribution(mode: DistributionMode, p: number, trials: number): DistributionAnalysis {
+  p = clampProbability(p); trials = clampTrials(trials);
+  let massPoints: MassPoint[];
   if (mode === "categorical") {
-    return analyzeCategorical(p, clampedTrials);
+    const values = [p, (1 - p) * .52, (1 - p) * .30, (1 - p) * .18];
+    massPoints = ["A", "B", "C", "D"].map((label, i) => ({ id: label, label, detail: `class ${label}`, probability: values[i], isTarget: false }));
+  } else if (mode === "binomial") {
+    massPoints = Array.from({ length: trials + 1 }, (_, k) => ({ id: String(k), label: String(k), detail: `${k} success${k === 1 ? "" : "es"}`, probability: binomialProbability(trials, k, p), isTarget: false }));
+  } else {
+    massPoints = [{ id: "0", label: "0", detail: "failure", probability: 1 - p, isTarget: false }, { id: "1", label: "1", detail: "success", probability: p, isTarget: false }];
   }
-
-  if (mode === "binomial") {
-    return analyzeBinomial(p, clampedTrials);
-  }
-
-  return analyzeBernoulli(p, clampedTrials);
+  const largestMass = Math.max(...massPoints.map((point) => point.probability));
+  // A small relative tolerance resolves floating-point arithmetic at exact
+  // equal-mass modes (for example n=9,p=.5). UI probabilities step by .01.
+  massPoints = massPoints.map((point) => ({ ...point, isTarget: Math.abs(point.probability - largestMass) <= largestMass * 1e-12 }));
+  const numerical = mode !== "categorical", multiplier = mode === "binomial" ? trials : 1;
+  return { mode, p, trials, massPoints, totalMass: massPoints.reduce((sum, point) => sum + point.probability, 0), expectedValue: numerical ? multiplier * p : null, variance: numerical ? multiplier * p * (1 - p) : null, mostLikelyLabel: massPoints.filter((point) => point.isTarget).map((point) => point.label).join(" & ") };
 }

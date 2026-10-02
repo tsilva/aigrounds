@@ -1,547 +1,69 @@
 "use client";
 
-import { type CSSProperties, useMemo, useState } from "react";
-import {
-  analyzeDistribution,
-  clampProbability,
-  clampTrials,
-  type DistributionAnalysis,
-  type DistributionMode,
-  type MassPoint,
-} from "./bernoulli-categorical-binomial-engine";
-import { comparisonRows, modeFacts, modeOrder } from "./scenario";
+import { useMemo, useState } from "react";
+import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToolbar } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
+import { analyzeDistribution, type DistributionMode } from "./bernoulli-categorical-binomial-engine";
+import { modeFacts, modeOrder } from "./scenario";
+import { distributionDefaults, distributionExperiments, type DistributionState } from "./learning-experiments";
+import styles from "./playground.module.css";
 
-function formatProbability(value: number) {
-  return value.toFixed(2);
+function probability(value: number) {
+  if (value > 0 && value * 100 < .01) return "< 0.01%";
+  const rounded = Number((value * 100).toFixed(2));
+  return `${Math.abs(value * 100 - rounded) > 1e-9 ? "≈ " : ""}${rounded}%`;
 }
-
-function formatMetric(value: number) {
-  return value.toFixed(3);
-}
-
-function Panel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={`rounded-[14px] border border-[#d8e0f3] bg-white/95 shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
-
-function LessonTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[18px] leading-none font-black text-[#352cff] uppercase">
-      {children}
-    </h2>
-  );
-}
-
-function FactPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
-      <p className="text-[11px] font-black tracking-[0.03em] text-[#7180a5] uppercase">
-        {label}
-      </p>
-      <p className="mt-1 break-words font-mono text-[13px] leading-tight font-bold text-[#071024]">
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function ModeButton({
-  mode,
-  isSelected,
-  onSelect,
-}: {
-  mode: DistributionMode;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  const fact = modeFacts[mode];
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`min-w-0 rounded-[10px] border p-4 text-left transition ${
-        isSelected
-          ? "border-[#5636f5] bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white shadow-[0_14px_24px_rgba(70,39,232,0.2)]"
-          : "border-[#d8e0f0] bg-white text-[#0d1429] hover:border-[#b9c4de] hover:bg-[#fbfaff]"
-      }`}
-    >
-      <span className="block text-[12px] font-black uppercase tracking-[0.02em]">
-        {fact.eyebrow}
-      </span>
-      <span className="mt-2 block text-[16px] leading-[1.2] font-black">
-        {fact.title}
-      </span>
-      <span
-        className={`mt-2 block text-[13px] leading-[1.35] ${
-          isSelected ? "text-white/85" : "text-[#30446f]"
-        }`}
-      >
-        {fact.question}
-      </span>
-    </button>
-  );
-}
-
-function ShapePanel({
-  mode,
-  onSelectMode,
-}: {
-  mode: DistributionMode;
-  onSelectMode: (mode: DistributionMode) => void;
-}) {
-  const fact = modeFacts[mode];
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-        <div className="min-w-0">
-          <LessonTitle>1. Choose The Outcome Shape</LessonTitle>
-          <p className="mt-4 max-w-[760px] text-[16px] leading-[1.45] text-[#16264e]">
-            The same probability mass can answer three different questions:
-            one yes/no trial, one many-way choice, or a count after repeats.
-          </p>
-          <div className="mt-4 grid gap-3 lg:grid-cols-3">
-            {modeOrder.map((entryMode) => (
-              <ModeButton
-                key={entryMode}
-                mode={entryMode}
-                isSelected={entryMode === mode}
-                onSelect={() => onSelectMode(entryMode)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="min-w-0 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-          <p className="text-[13px] font-black tracking-[0.02em] text-[#352cff] uppercase">
-            Current Contract
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <FactPill label="Outcome" value={fact.targetShape} />
-            <FactPill label="Parameter" value={fact.parameter} />
-            <FactPill label="Support" value={fact.support} />
-            <FactPill label="Question" value={fact.question} />
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function FormulaPanel({ mode }: { mode: DistributionMode }) {
-  const fact = modeFacts[mode];
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <div className="min-w-0">
-          <LessonTitle>2. Watch The Formula Morph</LessonTitle>
-          <p className="mt-4 text-[16px] leading-[1.45] text-[#071024]">
-            Change the shape first. The probability rule changes because the
-            random variable asks for a different kind of outcome.
-          </p>
-          <div className="mt-4 min-w-0 overflow-hidden rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-4 py-5 text-center font-serif text-[22px] leading-[1.25] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:text-[27px]">
-            {fact.formula}
-          </div>
-          <div className="mt-3 min-w-0 rounded-[8px] border border-[#dbe2f2] bg-white px-4 py-3 text-center font-mono text-[15px] leading-[1.35] font-black text-[#352cff]">
-            {fact.simplified}
-          </div>
-        </div>
-
-        <div className="min-w-0">
-          <LessonTitle>Same Mass, Different Question</LessonTitle>
-          <div className="mt-4 overflow-hidden rounded-[10px] border border-[#dfe4f4]">
-            <div className="grid grid-cols-[1fr_1.15fr_1fr_0.8fr] bg-[#f7f8ff] text-[11px] font-black tracking-[0.03em] text-[#52628a] uppercase">
-              <span className="p-3">Model</span>
-              <span className="p-3">Asks</span>
-              <span className="p-3">Parameter</span>
-              <span className="p-3">Support</span>
-            </div>
-            {comparisonRows.map((row) => (
-              <div
-                key={row.mode}
-                className={`grid grid-cols-[1fr_1.15fr_1fr_0.8fr] border-t border-[#dfe4f4] text-[13px] leading-[1.3] ${
-                  row.mode === mode ? "bg-[#f6f4ff]" : "bg-white"
-                }`}
-              >
-                <span className="p-3 font-black text-[#071024]">{row.label}</span>
-                <span className="p-3 text-[#263a68]">{row.asks}</span>
-                <span className="p-3 font-mono text-[#263a68]">
-                  {row.parameter}
-                </span>
-                <span className="p-3 font-mono text-[#263a68]">
-                  {row.support}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-[#f8f7ff] px-5 py-3 text-[15px] leading-[1.35] text-[#2924ff]">
-            {fact.takeaway}
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function SliderControl({
-  label,
-  valueAriaLabel,
-  value,
-  onChange,
-}: {
-  label: string;
-  valueAriaLabel: string;
-  value: number;
-  onChange: (value: number) => void;
-}) {
-  const progress = ((value - 0.05) / 0.9) * 100;
-
-  return (
-    <label className="block rounded-[10px] border border-[#dbe2f2] bg-[#fbfbff] px-4 py-3">
-      <span className="flex items-baseline justify-between gap-3">
-        <span className="text-[13px] font-black text-[#071024]">
-          {label}
-        </span>
-        <input
-          type="number"
-          min={0.05}
-          max={0.95}
-          step={0.01}
-          aria-label={valueAriaLabel}
-          value={formatProbability(value)}
-          onChange={(event) =>
-            onChange(clampProbability(Number(event.target.value)))
-          }
-          className="h-8 w-20 rounded-[8px] border border-[#d7def0] bg-white px-2 text-center font-mono text-[13px] font-black text-[#352cff] outline-none transition focus:border-[#6b55ff]"
-        />
-      </span>
-      <input
-        type="range"
-        min={0.05}
-        max={0.95}
-        step={0.01}
-        value={value}
-        onChange={(event) => onChange(clampProbability(Number(event.target.value)))}
-        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-[#dce1ec] accent-[#352cff] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[#352cff] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#352cff]"
-        style={
-          {
-            background: `linear-gradient(90deg, #352cff 0%, #352cff ${progress}%, #dce1ec ${progress}%, #dce1ec 100%)`,
-          } as CSSProperties
-        }
-      />
-    </label>
-  );
-}
-
-function TrialStepper({
-  value,
-  isActive,
-  onChange,
-}: {
-  value: number;
-  isActive: boolean;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <div
-      className={`rounded-[10px] border px-4 py-3 ${
-        isActive
-          ? "border-[#dbe2f2] bg-[#fbfbff]"
-          : "border-[#e6eaf4] bg-[#f8fafc] text-[#7280a0]"
-      }`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[13px] font-black text-[#071024]">Trials n</p>
-          <p className="mt-1 text-[12px] leading-tight text-[#52628a]">
-            Only the count model repeats the trial.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={!isActive}
-            onClick={() => onChange(clampTrials(value - 1))}
-            className="grid size-9 place-items-center rounded-[8px] border border-[#ccd5eb] bg-white text-[20px] leading-none font-black text-[#352cff] disabled:cursor-not-allowed disabled:text-[#aab4c8]"
-            aria-label="Decrease trials"
-          >
-            -
-          </button>
-          <span className="w-10 text-center font-mono text-[17px] font-black text-[#071024]">
-            {value}
-          </span>
-          <button
-            type="button"
-            disabled={!isActive}
-            onClick={() => onChange(clampTrials(value + 1))}
-            className="grid size-9 place-items-center rounded-[8px] border border-[#ccd5eb] bg-white text-[20px] leading-none font-black text-[#352cff] disabled:cursor-not-allowed disabled:text-[#aab4c8]"
-            aria-label="Increase trials"
-          >
-            +
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function OutcomeChips({ points }: { points: MassPoint[] }) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {points.map((point) => (
-        <span
-          key={point.id}
-          className={`rounded-full border px-3 py-1.5 font-mono text-[12px] font-black ${
-            point.isTarget
-              ? "border-[#9ee8b9] bg-[#effdf4] text-[#12823a]"
-              : "border-[#dbe2f2] bg-white text-[#34466f]"
-          }`}
-        >
-          {point.label}: {formatProbability(point.probability)}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function MassChart({ analysis }: { analysis: DistributionAnalysis }) {
-  const maxProbability = Math.max(
-    ...analysis.massPoints.map((point) => point.probability),
-    0.01,
-  );
-  const columnWidth =
-    analysis.mode === "binomial" ? "minmax(30px,1fr)" : "minmax(70px,1fr)";
-  const chartMinWidth =
-    analysis.mode === "binomial"
-      ? `${Math.max(420, analysis.massPoints.length * 42)}px`
-      : "100%";
-
-  return (
-    <div className="min-w-0">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-[15px] font-black text-[#121a35]">
-          {modeFacts[analysis.mode].simulatorTitle}
-        </h3>
-        <span className="font-mono text-[12px] font-black text-[#52628a]">
-          total mass = 1.00
-        </span>
-      </div>
-      <div className="overflow-x-auto rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] p-4">
-        <div
-          className="grid items-end gap-2"
-          style={{
-            gridTemplateColumns: `repeat(${analysis.massPoints.length}, ${columnWidth})`,
-            minWidth: chartMinWidth,
-          }}
-        >
-          {analysis.massPoints.map((point) => {
-            const height = Math.max(8, (point.probability / maxProbability) * 178);
-
-            return (
-              <div
-                key={point.id}
-                className="grid h-[244px] grid-rows-[34px_184px_26px] justify-items-center"
-              >
-                <span
-                  className="font-mono text-[12px] font-black"
-                  style={{ color: point.isTarget ? point.tone : "#071024" }}
-                >
-                  {formatProbability(point.probability)}
-                </span>
-                <div className="flex h-[184px] items-end">
-                  <div
-                    className="w-8 rounded-t-[5px] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]"
-                    style={{
-                      height,
-                      background: point.isTarget
-                        ? `linear-gradient(180deg, ${point.tone}, #13a044)`
-                        : `linear-gradient(180deg, ${point.tone}, #a8b3c8)`,
-                    }}
-                  />
-                </div>
-                <span className="text-center font-mono text-[12px] font-black text-[#071024]">
-                  {point.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <div
-          className="mt-1 h-px bg-[#8b99bb]"
-          style={{ minWidth: chartMinWidth }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function SimulatorPanel({
-  analysis,
-  p,
-  trials,
-  onChangeP,
-  onChangeTrials,
-}: {
-  analysis: DistributionAnalysis;
-  p: number;
-  trials: number;
-  onChangeP: (value: number) => void;
-  onChangeTrials: (value: number) => void;
-}) {
-  const probabilityLabel =
-    analysis.mode === "categorical"
-      ? "Class A probability p"
-      : "Success probability p";
-  const probabilityValueLabel =
-    analysis.mode === "categorical"
-      ? "Class A probability value"
-      : "Success probability value";
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>3. Move The Mass</LessonTitle>
-      <div className="mt-4 grid gap-6 xl:grid-cols-[minmax(300px,0.78fr)_minmax(0,1.22fr)]">
-        <div className="min-w-0">
-          <div className="grid gap-3">
-            <SliderControl
-              label={probabilityLabel}
-              valueAriaLabel={probabilityValueLabel}
-              value={p}
-              onChange={onChangeP}
-            />
-            <TrialStepper
-              value={trials}
-              isActive={analysis.mode === "binomial"}
-              onChange={onChangeTrials}
-            />
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <FactPill
-              label={
-                analysis.mode === "categorical"
-                  ? "Target probability"
-                  : "Expected value"
-              }
-              value={formatMetric(analysis.expectedValue)}
-            />
-            <FactPill label="Variance" value={formatMetric(analysis.variance)} />
-            <FactPill
-              label="Highlighted mass"
-              value={formatProbability(analysis.targetProbability)}
-            />
-            <FactPill label="Most likely" value={analysis.mostLikelyLabel} />
-          </div>
-
-          <div className="mt-4 rounded-[8px] border border-[#dedcff] bg-[#f8f7ff] px-4 py-3">
-            <p className="text-[13px] font-black text-[#352cff] uppercase">
-              Outcome mass
-            </p>
-            <div className="mt-3">
-              <OutcomeChips points={analysis.massPoints} />
-            </div>
-          </div>
-        </div>
-
-        <MassChart analysis={analysis} />
-      </div>
-    </Panel>
-  );
-}
-
-function TakeawayPanel({ analysis }: { analysis: DistributionAnalysis }) {
-  const fact = modeFacts[analysis.mode];
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <div className="grid gap-4 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
-        <div>
-          <LessonTitle>4. Keep The Question Straight</LessonTitle>
-          <p className="mt-4 text-[16px] leading-[1.45] text-[#16264e]">
-            {fact.takeaway}
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] p-4">
-            <p className="text-[12px] font-black text-[#52628a] uppercase">
-              One trial
-            </p>
-            <p className="mt-2 text-[16px] leading-tight font-black text-[#071024]">
-              Bernoulli asks yes or no.
-            </p>
-          </div>
-          <div className="rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] p-4">
-            <p className="text-[12px] font-black text-[#52628a] uppercase">
-              One choice
-            </p>
-            <p className="mt-2 text-[16px] leading-tight font-black text-[#071024]">
-              Categorical picks one class.
-            </p>
-          </div>
-          <div className="rounded-[10px] border border-[#dfe4f4] bg-[#fbfbff] p-4">
-            <p className="text-[12px] font-black text-[#52628a] uppercase">
-              Many repeats
-            </p>
-            <p className="mt-2 text-[16px] leading-tight font-black text-[#071024]">
-              Binomial counts successes.
-            </p>
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
+const metric = (value: number) => Number(value.toFixed(4)).toString();
+const same = (a: DistributionState, b: DistributionState) => a.mode === b.mode && Math.abs(a.p - b.p) < 1e-9 && (a.mode !== "binomial" || a.n === b.n);
+const shortLabels = { bernoulli: "One yes/no outcome", categorical: "One class label", binomial: "Number of successes" };
 
 export function BernoulliCategoricalBinomialPlayground() {
-  const [mode, setMode] = useState<DistributionMode>("bernoulli");
-  const [p, setP] = useState(0.62);
-  const [trials, setTrials] = useState(8);
-  const analysis = useMemo(
-    () => analyzeDistribution(mode, p, trials),
-    [mode, p, trials],
-  );
-
-  return (
-    <main className="min-h-screen bg-[#f7faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[1500px]">
-        <header className="flex flex-col gap-4 pb-5 md:flex-row md:items-start md:justify-between">
-          <div className="min-w-0">
-            <h1 className="text-[42px] leading-[0.95] font-black tracking-normal text-[#060917] sm:text-[56px]">
-              Bernoulli, Categorical & Binomial Lab
-            </h1>
-            <p className="mt-3 max-w-3xl text-[20px] leading-[1.25] font-semibold text-[#263f73] sm:text-[22px]">
-              One trial, one choice, or many repeated trials: probability mass
-              tells the story.
-            </p>
-          </div>
-        </header>
-
-        <div className="grid gap-4">
-          <ShapePanel mode={mode} onSelectMode={setMode} />
-          <FormulaPanel mode={mode} />
-          <SimulatorPanel
-            analysis={analysis}
-            p={p}
-            trials={trials}
-            onChangeP={setP}
-            onChangeTrials={setTrials}
-          />
-          <TakeawayPanel analysis={analysis} />
-        </div>
-      </div>
-    </main>
-  );
+  const [state, setState] = useState<DistributionState>(distributionDefaults);
+  const [index, setIndex] = useState(0);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const [transferAnswer, setTransferAnswer] = useState<string | null>(null);
+  const analysis = useMemo(() => analyzeDistribution(state.mode, state.p, state.n), [state]);
+  const experiment = distributionExperiments[index];
+  const transfer = index === distributionExperiments.length;
+  const reached = !!prediction && !!experiment && same(state, experiment.target);
+  const complete = reached && explanation === experiment?.correctExplanation;
+  const transferReached = same(state, { mode: "binomial", p: .8, n: 1 });
+  const fact = modeFacts[state.mode];
+  function clearAnswers() { setExplanation(null); setTransferAnswer(null); }
+  function start(next = index) { setIndex(next); setState(distributionExperiments[next]?.baseline ?? distributionDefaults); setPrediction(null); clearAnswers(); }
+  function edit(patch: Partial<DistributionState>) { setState((current) => ({ ...current, ...patch })); clearAnswers(); }
+  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
+    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="distribution-prediction" choices={experiment.predictions} value={prediction} onChange={(id) => { start(); setPrediction(id); }} /><p className={sharedStyles.small}>Choosing a prediction restores this experiment’s starting model and values.</p></>}
+    {prediction && !reached && <div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Reset starts this experiment again.</p></div>}
+    {reached && <><p role="status" className={sharedStyles.observation}>{prediction === experiment.correctPrediction ? "Your prediction matches the model." : "The model challenges your prediction. Compare the bars and their outcome labels."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="distribution-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />{explanation && !complete && <p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
+    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
+  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Reduce the count to one trial" : "Ask a different probability question"}>
+    {transfer ? <><p>Choose Binomial Count. Set Trials to 1 and Success probability (%) to 80. Which distribution does this match?</p><ExperimentChoices legend="Transfer explanation" name="distribution-transfer" choices={[{ id: "bernoulli", label: "Bernoulli with p = 0.8: zero successes has 20% probability and one has 80%." }, { id: "same", label: "A count model always has nine possible outcomes, whatever n is." }, { id: "fraction", label: "One trial has a possible outcome of 0.8 successes." }]} value={transferAnswer} onChange={setTransferAnswer} />{transferAnswer && (!transferReached ? <p role="status" className={sharedStyles.feedback}>First choose Binomial Count, set Trials to 1 and Success probability to 80.</p> : transferAnswer !== "bernoulli" ? <p role="status" className={sharedStyles.feedback}>Try again. One trial has only zero or one success. Compare those probabilities with a Bernoulli trial.</p> : <><ExperimentResult title="Transfer explained">With n = 1, the binomial count is exactly a Bernoulli 0/1 outcome. Its mean is 0.8; a single outcome is 0 or 1.</ExperimentResult><ExperimentButton onClick={() => setIndex(4)}>Explore freely</ExperimentButton></>)}</> : <><p>Switch models, move probability from 5% to 95%, and try 1–16 binomial trials. Look for tied modes and fractional means. Each distribution assigns total mass one; the question determines its possible outcomes.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
+  </ExperimentRail>;
+  const numerical = analysis.expectedValue !== null;
+  const summaries = numerical ? [
+    { label: "Mean", value: metric(analysis.expectedValue!), color: "#5031dc", definition: "Probability-weighted average of numerical outcomes.", formula: state.mode === "binomial" ? `n × p = ${state.n} × ${state.p}` : `0 × (1 − p) + 1 × p = ${state.p}`, comparison: "The mean need not be a possible single outcome." },
+    { label: "Variance", value: metric(analysis.variance!), color: "#1760db", definition: state.mode === "binomial" ? "Spread of success counts, in squared-count units." : "Spread of the coded 0/1 outcome.", formula: `${state.mode === "binomial" ? "n × " : ""}p × (1 − p)` },
+    { label: "Most likely", value: analysis.mostLikelyLabel, color: "#5031dc", definition: "Outcome(s) with the largest probability.", formula: "Mode: a tie outlines every equal maximum." },
+  ] : [
+    { label: "P(A)", value: probability(state.p), color: "#5031dc", definition: "Chance of one draw landing in class A.", formula: `p = ${state.p}` },
+    { label: "Total mass", value: probability(analysis.totalMass), color: "#1760db", definition: "All four mutually exclusive classes exhaust one draw.", formula: "P(A) + P(B) + P(C) + P(D) = 1" },
+    { label: "Most likely class", value: analysis.mostLikelyLabel, color: "#5031dc", definition: "Class label with the largest probability.", formula: "Names have no intrinsic numerical mean or variance." },
+  ];
+  return <LearningPage title="Bernoulli, Categorical & Binomial" subtitle="Match the probability model to the question." rail={rail}>
+    <LessonToolbar label="Probability models" scenarios={modeOrder.map((mode) => ({ id: mode, label: modeFacts[mode].title, shortLabel: shortLabels[mode] }))} selectedId={state.mode} onSelect={(mode) => edit({ mode: mode as DistributionMode })} onReset={() => start(experiment || transfer ? index : 0)} />
+    <section className={styles.question} aria-label="Model question"><h2>{fact.question}</h2><p>{state.mode === "bernoulli" ? "One trial: 0 means failure, 1 means success." : state.mode === "categorical" ? "One draw selects A, B, C or D. These are names without a numerical order. This example assigns A probability p; B/C/D split the remaining 1 − p in a fixed 52:30:18 ratio." : `A run contains ${state.n} independent trials with the same success probability p. Its outcome is the total success count, from 0 to ${state.n}; each bar combines every trial order giving that count.`}</p></section>
+    <div className={styles.parameters}>
+      <LessonRangeControl label={state.mode === "categorical" ? "Class A probability" : "Success probability"} unit="%" min={5} max={95} step={1} value={Number((state.p * 100).toFixed(10))} onChange={(value) => edit({ p: value / 100 })} help={state.mode === "categorical" ? "Other classes share the remaining probability." : "Chance of success on each trial."} />
+      {state.mode === "binomial" && <LessonRangeControl label="Trials" min={1} max={16} step={1} value={state.n} onChange={(n) => edit({ n })} help="Independent repeats with unchanged p." />}
+    </div>
+    <section className={styles.mass} aria-label="Probability mass"><h2>Probability mass</h2><p>Mass means the chance assigned to a possible outcome. The vertical scale stays at 0–100%; outlined bars are most likely, including ties. Tiny probabilities have tiny bars; they are not boosted to a minimum height.</p>
+      <div className={styles.chartScroller} tabIndex={0} role="region" aria-label="Scrollable probability bars"><div className={styles.plot} style={{ minWidth: analysis.massPoints.length * 64 + 48 }}><div className={styles.axis}><span>100%</span><span>50%</span><span>0%</span></div><div className={styles.bars} style={{ gridTemplateColumns: `repeat(${analysis.massPoints.length}, minmax(0, 1fr))` }}>{analysis.massPoints.map((point) => <div key={point.id} className={styles.barCell}><span className={styles.probability}>{probability(point.probability)}</span><div className={styles.barWell}><div className={styles.bar} data-mode={point.isTarget} style={{ height: `${point.probability * 100}%` }} role="img" aria-label={`${point.detail}: ${probability(point.probability)}${point.isTarget ? ", most likely" : ""}`} /></div><span className={styles.outcome}>{point.label}</span></div>)}</div></div></div>
+      <p className={styles.scrollHelp}>Scroll the bars horizontally if needed. The complete probability table below provides the same data.</p>
+    </section>
+    <LessonSummaries label="Distribution summaries" summaries={summaries} />
+    <section className={styles.evidence} aria-label="Supporting probability evidence"><details><summary>Formula</summary><p className={styles.formula}>{fact.formula}</p><p>{state.mode === "binomial" ? "C(n,k) is the number of ways to place k successes among n trials. Each arrangement has probability p^k × (1 − p)^(n − k); adding their probabilities gives the count’s mass. Independent equal-p trials are required." : fact.simplified}</p></details><details><summary>Complete probability table</summary><div className={styles.tableScroller} tabIndex={0} role="region" aria-label="Scrollable outcome probabilities"><table><caption>Probability percentages may be rounded; full-precision masses sum to one. Small positive probabilities below 0.01% are explicitly marked.</caption><thead><tr><th scope="col">Outcome</th><th scope="col">Probability</th><th scope="col">Most likely?</th></tr></thead><tbody>{analysis.massPoints.map((point) => <tr key={point.id}><th scope="row">{point.detail}</th><td>{probability(point.probability)}</td><td>{point.isTarget ? "Yes" : "No"}</td></tr>)}</tbody><tfoot><tr><th scope="row">Total</th><td>{probability(analysis.totalMass)}</td><td /></tr></tfoot></table></div></details><p>Bernoulli asks about one yes/no outcome. Categorical asks which class label occurs. Binomial asks how many successes occur in independent equal-p trials. These are theoretical probabilities, not sampled frequencies.</p></section>
+    <p className={sharedStyles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">{fact.title}, p {probability(state.p)}{state.mode === "binomial" ? `, ${state.n} trials` : ""}. Most likely: {analysis.mostLikelyLabel}. {numerical ? `Mean ${metric(analysis.expectedValue!)}; variance ${metric(analysis.variance!)}.` : "Class labels have no intrinsic numerical mean or variance."} Total mass {probability(analysis.totalMass)}.</p>
+  </LearningPage>;
 }

@@ -1,0 +1,28 @@
+.facts { padding: 18px 0; color: #536487; font-size: 14px; line-height: 1.6; }
+.facts p { margin: 4px 0; }
+.population { padding: 24px 0; border-bottom: 1px solid #dfe4f4; }
+.population h2, .comparison h2 { font-size: 18px; margin: 0 0 10px; }
+.population p, .comparison p { font-size: 14px; line-height: 1.6; color: #536487; }
+.counts { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 6px; margin: 16px 0; }
+.counts caption { text-align: left; font-size: 13px; color: #536487; margin-bottom: 8px; }
+.counts th { text-align: left; font-size: 13px; }
+.counts th:first-child { width: 17%; }
+.counts th:last-child { width: 13%; }
+.counts td { padding: 12px 8px; vertical-align: top; font: 16px var(--font-ibm-plex-mono),monospace; }
+.counts td[data-denominator="true"] { outline: 1px solid #536487; outline-offset: -1px; }
+.counts td[data-numerator="true"] { background: #f0edff; color: #5031dc; outline: 2px solid #5031dc; outline-offset: -2px; }
+.counts td strong { display: block; font-size: 28px; }
+.counts td span { display: block; font: 12px var(--font-space-grotesk),sans-serif; margin-top: 6px; }
+.selected { font: 20px var(--font-ibm-plex-mono),monospace !important; color: #0c1230 !important; overflow-wrap: anywhere; }
+.population details { margin-top: 16px; }
+.population summary { cursor: pointer; color: #5031dc; }
+.population summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.people { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(10,minmax(0,1fr)); gap: 4px; }
+.people li { text-align: center; padding: 4px 1px; font-size: 11px; border: 1px dashed #a3acc0; }
+.people li[data-denominator="true"] { border-style: solid; border-color: #536487; }
+.people li[data-numerator="true"] { background: #f0edff; border-color: #5031dc; }
+.people li small, .people li strong, .people li span { display: block; }
+.comparison { padding: 24px 0; border-top: 1px solid #dfe4f4; }
+.barRow { margin: 16px 0; font-size: 14px; }
+.track { height: 14px; background: #e7eaf3; margin-top: 7px; }
+.track div { height: 100%; background: #5031dc; }

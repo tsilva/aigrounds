@@ -1,3 +1,4 @@
+import { conditionalTutorPlan } from "@/modules/conditional-probability/learning-experiments";
 import { probabilityTutorPlan } from "@/modules/probability-rules/learning-experiments";
 
 export type TutorStep = {
@@ -410,47 +411,7 @@ export const playgroundTutorPlans = {
     ],
   },
   "probability-rules": probabilityTutorPlan,
-  "conditional-probability": {
-    intro:
-      "Work through three filtering experiments. Predict how the denominator changes, switch scenarios, then decide whether the events are independent.",
-    whyItMatters:
-      "Conditional probability exists because new information changes the group you are reasoning about. It is useful for updating rates after a filter, comparing groups fairly, and deciding whether one event actually changes another.",
-    steps: [
-      {
-        title: "Filter the denominator",
-        experiment:
-          "Start on Dependent, then select B given A. Compare P(B), P(B given A), and the highlighted A group in the 100-person grid.",
-        predictionQuestion:
-          "When you select B given A, which people should be in the denominator?",
-        observationPrompt:
-          "What changed when the grid filtered down to A first?",
-        takeaway:
-          "Conditional probability changes the denominator first: P(B given A) counts B only inside the A group.",
-      },
-      {
-        title: "Check independence",
-        experiment:
-          "Choose Independent while B given A is selected. Compare P(B given A) with P(B).",
-        predictionQuestion:
-          "If A and B are independent, should filtering by A change the chance of B?",
-        observationPrompt:
-          "What did the independent scenario show about the two rates?",
-        takeaway:
-          "Events are independent when knowing A does not change the probability of B.",
-      },
-      {
-        title: "Watch base rates",
-        experiment:
-          "Choose Base-rate shift while B given A is selected. Compare the conditional rate with the joint count in the grid.",
-        predictionQuestion:
-          "Can a conditional probability jump even when the total number of true cases is small?",
-        observationPrompt:
-          "What did the base-rate scenario reveal about rate versus count?",
-        takeaway:
-          "A strong signal can raise a conditional rate while the rare event still occupies a small slice of the full population.",
-      },
-    ],
-  },
+  "conditional-probability": conditionalTutorPlan,
   "bayes-rule": {
     intro:
       "Work through three evidence experiments. Predict the posterior, move the rates, then connect the positive-result denominator to true and false positives.",

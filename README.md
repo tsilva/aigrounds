@@ -15,7 +15,7 @@
 
 AI Grounds is a web app for people learning artificial intelligence through hands-on experiments. Move data points, tune parameters, and step through algorithms to see how their behavior changes. Try the [live playgrounds](https://aigrounds.tsilva.eu) to explore statistics, probability, neural networks, and more.
 
-The gallery follows a learning sequence and distinguishes published lessons from planned ones. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide to talk through the result. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds.
+The gallery follows a learning sequence and distinguishes published lessons from planned ones. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide to talk through the result. Probability lessons connect exact outcome counts and reference groups to the formulas through guided experiments. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds.
 
 ## Install
 

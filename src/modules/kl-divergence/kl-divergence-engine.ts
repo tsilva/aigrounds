@@ -1,166 +1,22 @@
-import { type KlCategory } from "./scenario";
-
-export type KlDirection = "p-to-q" | "q-to-p";
-
-export type KlContribution = {
-  category: KlCategory;
-  sourceValue: number;
-  targetValue: number;
-  referenceValue: number;
-  approximationValue: number;
-  ratio: number;
-  contribution: number;
-};
-
-export type KlAnalysis = {
-  direction: KlDirection;
-  sourceLabel: "P" | "Q";
-  targetLabel: "P" | "Q";
-  score: number;
-  reverseScore: number;
-  contributions: KlContribution[];
-  formulaTerms: string[];
-};
-
-const minProbability = 0.01;
-const maxProbability = 0.97;
-
-export function analyzeKlDivergence(
-  categories: KlCategory[],
-  reference: number[],
-  approximation: number[],
-  direction: KlDirection,
-): KlAnalysis {
-  const forwardContributions = buildContributions(
-    categories,
-    reference,
-    approximation,
-    "p-to-q",
-  );
-  const reverseContributions = buildContributions(
-    categories,
-    reference,
-    approximation,
-    "q-to-p",
-  );
-  const contributions =
-    direction === "p-to-q" ? forwardContributions : reverseContributions;
-  const score = sumContributions(contributions);
-  const reverseScore = sumContributions(
-    direction === "p-to-q" ? reverseContributions : forwardContributions,
-  );
-  const sourceLabel = direction === "p-to-q" ? "P" : "Q";
-  const targetLabel = direction === "p-to-q" ? "Q" : "P";
-
-  return {
-    direction,
-    sourceLabel,
-    targetLabel,
-    score,
-    reverseScore,
-    contributions,
-    formulaTerms: contributions.map(
-      (row) =>
-        `${formatProbability(row.sourceValue)} log(${formatProbability(
-          row.sourceValue,
-        )}/${formatProbability(row.targetValue)})`,
-    ),
-  };
-}
-
-export function adjustApproximation(
-  approximation: number[],
-  changedIndex: number,
-  nextValue: number,
-) {
-  const clamped = roundProbability(
-    Math.min(maxProbability, Math.max(minProbability, nextValue)),
-  );
-  const otherIndexes = approximation
-    .map((_, index) => index)
-    .filter((index) => index !== changedIndex);
-  const remaining = 1 - clamped;
-  const previousOtherTotal = otherIndexes.reduce(
-    (total, index) => total + approximation[index],
-    0,
-  );
-  const next = approximation.map((value, index) => {
-    if (index === changedIndex) {
-      return clamped;
-    }
-
-    const share =
-      previousOtherTotal > 0
-        ? (value / previousOtherTotal) * remaining
-        : remaining / otherIndexes.length;
-
-    return roundProbability(Math.max(minProbability, share));
+import {allocatePercentages} from "@/lib/probability-allocation";
+import {type KlCategory} from "./scenario";
+export type KlDirection="p-to-q"|"q-to-p";
+export type KlContribution={category:KlCategory;sourceValue:number;targetValue:number;referenceValue:number;approximationValue:number;ratio:number|null;contribution:number};
+export type KlAnalysis={direction:KlDirection;sourceLabel:"P"|"Q";targetLabel:"P"|"Q";score:number;reverseScore:number;contributions:KlContribution[];formulaTerms:string[]};
+export function analyzeKlDivergence(categories:KlCategory[],reference:number[],approximation:number[],direction:KlDirection):KlAnalysis {
+  for(const values of [reference,approximation]) if(!categories.length||values.length!==categories.length||values.some(v=>!Number.isFinite(v)||v<0||v>1)||Math.abs(distributionTotal(values)-1)>1e-10) throw new Error("KL requires normalized distributions on the same categories.");
+  const build=(d:KlDirection)=>categories.map((category,i)=>{
+    const referenceValue=reference[i],approximationValue=approximation[i],sourceValue=d==="p-to-q"?referenceValue:approximationValue,targetValue=d==="p-to-q"?approximationValue:referenceValue;
+    const ratio=sourceValue===0&&targetValue===0?null:sourceValue/targetValue;
+    return {category,referenceValue,approximationValue,sourceValue,targetValue,ratio,contribution:sourceValue===0?0:targetValue===0?Infinity:sourceValue*Math.log(sourceValue/targetValue)};
   });
-
-  const total = roundProbability(next.reduce((sum, value) => sum + value, 0));
-  const diff = roundProbability(1 - total);
-  const adjustmentIndex =
-    otherIndexes.find((index) => next[index] + diff >= minProbability) ??
-    changedIndex;
-
-  next[adjustmentIndex] = roundProbability(next[adjustmentIndex] + diff);
-
-  return next;
+  const contributions=build(direction),opposite=build(direction==="p-to-q"?"q-to-p":"p-to-q");
+  // Only remove negative roundoff at equality; probabilities and terms are never clipped.
+  const sum=(rows:KlContribution[])=>{const total=rows.reduce((s,r)=>s+r.contribution,0);return total<0&&total>-1e-12?0:total;};
+  return {direction,sourceLabel:direction==="p-to-q"?"P":"Q",targetLabel:direction==="p-to-q"?"Q":"P",score:sum(contributions),reverseScore:sum(opposite),contributions,formulaTerms:contributions.map(r=>`${r.sourceValue} ln(${r.sourceValue}/${r.targetValue})`)};
 }
-
-export function distributionTotal(values: number[]) {
-  return values.reduce((total, value) => total + value, 0);
-}
-
-export function formatProbability(value: number) {
-  return value.toFixed(2);
-}
-
-export function formatRatio(value: number) {
-  return value.toFixed(4);
-}
-
-export function formatKl(value: number) {
-  return value.toFixed(4);
-}
-
-function buildContributions(
-  categories: KlCategory[],
-  reference: number[],
-  approximation: number[],
-  direction: KlDirection,
-) {
-  return categories.map((category, index) => {
-    const referenceValue = clampProbability(reference[index] ?? minProbability);
-    const approximationValue = clampProbability(
-      approximation[index] ?? minProbability,
-    );
-    const sourceValue =
-      direction === "p-to-q" ? referenceValue : approximationValue;
-    const targetValue =
-      direction === "p-to-q" ? approximationValue : referenceValue;
-    const ratio = sourceValue / targetValue;
-
-    return {
-      category,
-      sourceValue,
-      targetValue,
-      referenceValue,
-      approximationValue,
-      ratio,
-      contribution: sourceValue * Math.log(ratio),
-    };
-  });
-}
-
-function sumContributions(contributions: KlContribution[]) {
-  return contributions.reduce((total, row) => total + row.contribution, 0);
-}
-
-function roundProbability(value: number) {
-  return Math.round(value * 100) / 100;
-}
-
-function clampProbability(value: number) {
-  return Math.min(0.99, Math.max(0.001, value));
-}
+export function adjustApproximation(values:number[],index:number,next:number){if(!Number.isFinite(next)) return [...values];return allocatePercentages(values.map(v=>Math.round(v*100)),index,next*100).map(v=>v/100);}
+export function distributionTotal(values:number[]){return values.reduce((s,v)=>s+v,0);}
+export function formatProbability(v:number){return v.toFixed(2);}
+export function formatRatio(v:number|null){return v===null?"undefined":v===Infinity?"∞":v.toFixed(4);}
+export function formatKl(v:number){return v===Infinity?"∞":v===0?"0":Math.abs(v)<.00005?v.toExponential(2):v.toFixed(4);}

@@ -320,6 +320,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "categorical-cross-entropy",
+    layout: "guided-discovery",
     title: "Cross Entropy Loss",
     tag: "loss",
     kicker:

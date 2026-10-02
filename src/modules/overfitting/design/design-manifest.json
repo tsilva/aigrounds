@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": null,
+  "title": "Overfitting",
+  "slug": "overfitting",
+  "modulePath": "src/modules/overfitting",
+  "mockupPath": "src/modules/overfitting/design/accepted-mockup.png",
+  "promptPath": "src/modules/overfitting/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-943218e9-cf37-4cf3-b9a4-fe931b2cba49.png",
+  "approval": "Self-reviewed under explicit user authorization for the legacy redesign batch.",
+  "refinements": [
+    "First draft rejected for two Guide buttons and an incorrect logarithmic loss view; accepted second draft restores one CTA and a linear scale.",
+    "Use exact engine curves, dots, loss values and bounds; raster geometry is illustrative.",
+    "Fit axes include all sampled curves across degrees and observed points; stay fixed for the current scenario/noise.",
+    "Negative gaps are possible in these constructed noise patterns, without an unsupported claim of random chance.",
+    "Use shared immediate explanation feedback and vertically stacked optional details for narrow containers.",
+    "Keep the fixed tiny numerical fitting penalty and QR method in optional evidence; remove preset underfit/overfit degree thresholds.",
+    "Start the first experiment at degree 1 to align the initial plot with its prediction; place axis names away from numeric tick labels."
+  ]
+}

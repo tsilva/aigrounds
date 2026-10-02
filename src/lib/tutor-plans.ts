@@ -1,3 +1,4 @@
+import { bayesTutorPlan } from "@/modules/bayes-rule/learning-experiments";
 import { conditionalTutorPlan } from "@/modules/conditional-probability/learning-experiments";
 import { probabilityTutorPlan } from "@/modules/probability-rules/learning-experiments";
 
@@ -412,47 +413,7 @@ export const playgroundTutorPlans = {
   },
   "probability-rules": probabilityTutorPlan,
   "conditional-probability": conditionalTutorPlan,
-  "bayes-rule": {
-    intro:
-      "Work through three evidence experiments. Predict the posterior, move the rates, then connect the positive-result denominator to true and false positives.",
-    whyItMatters:
-      "Bayes' rule exists because evidence only makes sense relative to the base rate and possible false alarms. It is useful for turning signals into updated beliefs without ignoring rare-event traps.",
-    steps: [
-      {
-        title: "Start from the prior",
-        experiment:
-          "Choose Medical Test. Look at People, Real cases, Prior, and the 1000-person grid before changing any sliders.",
-        predictionQuestion:
-          "When the condition is rare, do you expect many real cases before any test result arrives?",
-        observationPrompt:
-          "What did the prior population show before the positive signal was applied?",
-        takeaway:
-          "The prior is the base pool of real cases available before evidence. Rare priors limit how many true positives a signal can find.",
-      },
-      {
-        title: "Build the positive denominator",
-        experiment:
-          "Lower Sensitivity, then raise it again. Compare True positives with False positives in the Bayes denominator.",
-        predictionQuestion:
-          "What else besides true positives appears in the denominator after a positive result?",
-        observationPrompt:
-          "Which groups made up all positive results?",
-        takeaway:
-          "After a positive result, Bayes compares true positives against every positive result, including false positives.",
-      },
-      {
-        title: "Let false alarms compete",
-        experiment:
-          "Switch to Fraud Alert, then increase the False-positive rate and compare the false alarm share.",
-        predictionQuestion:
-          "What should happen to certainty after a positive signal when false alarms become more common?",
-        observationPrompt:
-          "How did false positives change the posterior probability?",
-        takeaway:
-          "A positive signal is less convincing when the false-positive pool is large, especially for rare events.",
-      },
-    ],
-  },
+  "bayes-rule": bayesTutorPlan,
   "softmax-temperature": {
     intro:
       "Work through three softmax experiments. Predict the ranking and confidence, change logits or temperature, then explain what temperature actually controls.",

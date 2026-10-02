@@ -166,12 +166,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "bayes-rule",
+    layout: "guided-discovery",
     title: "Bayes Rule Playground",
     tag: "probability",
     kicker:
       "Tune base rates and test errors to see why a positive signal can still be uncertain.",
     summary:
-      "Adjust prevalence, sensitivity, and false-positive rate in a rare-event scenario. The lab shows how true positives and false positives combine into the posterior probability after evidence arrives.",
+      "Adjust prevalence, sensitivity, and false-positive rate in medical-test and fraud-alert models. Exact expected counts, three guided experiments, and a transfer check show how both positive-result pools determine the posterior.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Bayes theorem",

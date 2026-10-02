@@ -503,13 +503,14 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "convolution-filter-lab",
+    layout: "guided-discovery",
     title: "Convolution Filter Lab",
     tag: "computer vision",
     kicker:
-      "Drag a 3x3 kernel across a tiny image and see output cells fill.",
+      "Slide a small grid of weights and trace one image patch into one output.",
     summary:
-      "Choose Edge, Blur, or Sharpen kernels, slide the 3x3 window over a padded image, and connect patch products, stride, padding, and feature-map cells.",
-    estimatedDuration: "5 to 7 minutes",
+      "Compare Edge, Blur, and Sharpen on three tiny images. Trace exact patch products into a selectable output map, then predict how stride and zero padding change it.",
+    estimatedDuration: "7 to 10 minutes",
     concepts: [
       "Convolution kernels",
       "Stride",
@@ -520,7 +521,8 @@ const activePlaygroundDefinitions = [
       "Explain one convolution output cell as a weighted sum of a local patch and kernel.",
       "Connect the highlighted image window to the patch, product table, formula, and feature-map cell.",
       "Compare how different 3x3 kernels ask different local questions of the same image.",
-      "See how stride and padding change sampled windows and output size.",
+      "Explain how stride changes sampled windows and output size.",
+      "Explain zero padding and recognize filter responses caused by border zeros.",
     ],
   },
   {

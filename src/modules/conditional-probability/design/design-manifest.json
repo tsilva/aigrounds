@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": null,
+  "title": "Conditional Probability & Independence Lab",
+  "slug": "conditional-probability",
+  "modulePath": "src/modules/conditional-probability",
+  "mockupPath": "src/modules/conditional-probability/design/accepted-mockup.png",
+  "promptPath": "src/modules/conditional-probability/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-60f5ba85-817a-4edf-bdc4-3ee3968c4d0a.png",
+  "approval": "User authorized autonomous mockup review for the legacy redesign batch.",
+  "refinements": [
+    "Use canonical shared typography, solid controls and progress components.",
+    "Outline denominator groups and mark numerator groups with text and checkmarks.",
+    "Retain the exact engine-derived 100-person grid in an optional disclosure.",
+    "Show scenario facts, exact count table, independent rates and transfer feedback.",
+    "Use exactly one shared rail Guide invitation."
+  ]
+}

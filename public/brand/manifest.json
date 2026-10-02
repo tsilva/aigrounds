@@ -16,8 +16,8 @@
     {
       "key": "root-logo",
       "path": "../../logo.png",
-      "width": 1024,
-      "height": 1024
+      "width": 908,
+      "height": 879
     },
     {
       "key": "favicon-16",
@@ -72,24 +72,6 @@
       "path": "web-seo/site.webmanifest",
       "width": 0,
       "height": 0
-    },
-    {
-      "key": "google-play-icon",
-      "path": "google-play/google-play-icon-512.png",
-      "width": 512,
-      "height": 512
-    },
-    {
-      "key": "google-play-feature",
-      "path": "google-play/feature-graphic-1024x500.png",
-      "width": 1024,
-      "height": 500
-    },
-    {
-      "key": "app-store-icon",
-      "path": "apple-store/app-store-icon-1024.png",
-      "width": 1024,
-      "height": 1024
     }
   ]
 }

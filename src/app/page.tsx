@@ -4,6 +4,7 @@ import {
   upcomingPlaygrounds,
 } from "@/lib/playground-metadata";
 import { activePlaygrounds } from "@/lib/playgrounds";
+import playgroundUpdates from "@/lib/playground-updates.json";
 import packageJson from "../../package.json";
 
 function compactOutcome(summary: string) {
@@ -38,6 +39,7 @@ export default function Home() {
           concepts: livePlayground.concepts,
           status: "live",
           href: `/playgrounds/${livePlayground.slug}`,
+          lastUpdated: (playgroundUpdates as Record<string, string>)[livePlayground.slug] ?? null,
         };
       }
 
@@ -57,6 +59,7 @@ export default function Home() {
         level: `lesson ${String(step).padStart(2, "0")}`,
         concepts: upcomingPlayground.concepts,
         status: "coming-soon",
+        lastUpdated: null,
       };
     },
   );

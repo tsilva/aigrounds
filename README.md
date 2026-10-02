@@ -10,6 +10,8 @@ AI Grounds is an interactive educational web app for learning AI concepts throug
 
 AI Grounds supports viewport widths of 768 pixels and above. Smaller screens show a prompt to continue on a desktop or laptop.
 
+The gallery opens in curriculum order. Use the sort buttons to switch to newest updates first; search works in either view, and planned lessons follow published lessons when sorting by update date. Published cards show the date of the latest committed change in their module. `pnpm dev` and `pnpm build` refresh `src/lib/playground-updates.json` from Git history, retaining saved dates when history is missing or shallow. Commit the refreshed dates alongside lesson updates so builds without Git history can display them.
+
 The Mean, Median & Mode lab pairs a live dataset workspace with guided predict → try → explain experiments. Drag individual points, use the keyboard or an exact value field, and compare aligned summary markers, sorted values, and calculations. The built-in experiments work independently of the optional AI Guide.
 
 The Range, Quartiles & IQR lesson uses an exact shared scale for draggable values, range, and a min/max box plot. Compact sorted halves show the median-of-halves calculation. Three predict → try → explain experiments contrast an extreme moving outward, a quartile contributor moving, and a value changing sorted position; incorrect explanations cannot complete an experiment. The exercises work independently of the optional AI Guide.

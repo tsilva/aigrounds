@@ -32,6 +32,8 @@ Waiting & Arrival Distributions separates exact geometric waiting times from Poi
 
 The Overfitting lesson compares polynomial fits on training circles and held-out squares through three controlled experiments and a sparse-data transfer check. Fixed fitting constraints and stable axes across degrees expose error changes without automatic degree-based labels. Optional point predictions and all-degree losses support exact comparisons; the noise-zero counterexample and validation/test distinction challenge misleading generalization rules.
 
+Confusion Matrix & Thresholds uses fixed score lanes, an inclusive cutoff, a complete confusion matrix, and separate precision/recall denominators. Its three guided experiments cover catching more cases, a stricter-cutoff precision counterexample, and undefined precision; the transfer check applies equality to Spam Filter. All twelve example decisions and F1/accuracy formulas remain available as supporting evidence.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

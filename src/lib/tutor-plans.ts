@@ -1,3 +1,4 @@
+import { gradientTutorPlan } from "@/modules/gradient-descent/learning-experiments";
 import { klTutorPlan } from "@/modules/kl-divergence/learning-experiments";
 import { lossTutorPlan } from "@/modules/categorical-cross-entropy/learning-experiments";
 import { softmaxTutorPlan } from "@/modules/softmax-temperature/learning-experiments";
@@ -336,58 +337,7 @@ export const playgroundTutorPlans = {
   "conditional-probability": conditionalTutorPlan,
   "bayes-rule": bayesTutorPlan,
   "softmax-temperature": softmaxTutorPlan,
-  "gradient-descent": {
-    intro:
-      "Work through four tiny experiments. Predict first, change the controls, observe the graph, then explain what you learned.",
-    whyItMatters:
-      "Gradient descent exists because many models have too many parameters to tune by hand. It is useful because it uses local slope information to repeatedly lower loss and learn from data.",
-    steps: [
-      {
-        title: "Make descent crawl",
-        experiment:
-          "Choose Creep, press Reset, then press Step three times. Watch the point and the loss value.",
-        predictionQuestion:
-          "Before stepping, do you expect theta to move a little or a lot each step?",
-        observationPrompt:
-          "What did you notice about the point and the loss after three tiny steps?",
-        takeaway:
-          "A small learning rate follows the downhill direction but makes tiny updates, so progress is stable and slow.",
-      },
-      {
-        title: "Find a useful step",
-        experiment:
-          "Choose Converge, press Reset, then press Step two or three times. Compare the point's path to Creep.",
-        predictionQuestion:
-          "What do you think a useful learning rate should do differently from Creep?",
-        observationPrompt:
-          "What changed faster this time: theta, loss, or both?",
-        takeaway:
-          "A useful learning rate makes visible progress toward the minimum without jumping wildly across the valley.",
-      },
-      {
-        title: "Force an overshoot",
-        experiment:
-          "Choose Overshoot, press Reset, then press Step once or twice. Watch whether the point crosses the minimum.",
-        predictionQuestion:
-          "If the learning rate is too large, where do you expect the next point to land?",
-        observationPrompt:
-          "What did the point do relative to the minimum?",
-        takeaway:
-          "A large learning rate can still point downhill locally, but the step can be so long that it launches past the minimum.",
-      },
-      {
-        title: "Test momentum",
-        experiment:
-          "Choose Converge, press Reset, raise Momentum beta toward heavy, then press Step several times. Compare it with low momentum.",
-        predictionQuestion:
-          "What do you expect momentum to carry from one step into the next?",
-        observationPrompt:
-          "How did the path change when previous movement carried into later steps?",
-        takeaway:
-          "Momentum reuses previous motion. It can speed travel on smooth slopes, but too much carry-over can push past the valley.",
-      },
-    ],
-  },
+  "gradient-descent": gradientTutorPlan,
   "expected-value-risk": payoffTutorPlan,
   "bernoulli-categorical-binomial": distributionTutorPlan,
   "waiting-arrival-distributions": arrivalTutorPlan,

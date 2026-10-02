@@ -364,6 +364,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "gradient-descent",
+    layout: "guided-discovery",
     title: "Gradient Descent Playground",
     tag: "optimization",
     kicker:
@@ -378,7 +379,7 @@ const activePlaygroundDefinitions = [
       "Momentum",
     ],
     learningGoals: [
-      "See that the gradient gives the downhill direction from the current position.",
+      "See that the negative gradient gives the local downhill direction from the current position.",
       "Understand how learning rate changes the distance traveled on each update.",
       "Recognize how momentum carries previous updates and can speed convergence or overshoot.",
     ],

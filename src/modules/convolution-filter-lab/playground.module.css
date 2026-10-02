@@ -1,0 +1,42 @@
+.settings { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; margin-top: 22px; font-size: 14px; }
+.settings label, .position label { display: inline-flex; align-items: center; gap: 9px; }
+.settings select, .position input { border: 1px solid #9faec9; border-radius: 7px; padding: 8px; background: white; min-width: 58px; }
+.filters { display: flex; gap: 0; align-items: center; border: 0; min-width: 0; }
+.filters legend { float: left; margin-right: 12px; font-weight: 600; }
+.filters button { border: 1px solid #dfe4f4; padding: 8px 12px; background: #f8f8ff; min-height: 38px; }
+.filters button:first-of-type { border-radius: 7px 0 0 7px; }
+.filters button:last-of-type { border-radius: 0 7px 7px 0; }
+.filters button[aria-pressed="true"] { background: #5031dc; color: white; border-color: #5031dc; }
+.images { margin-top: 24px; }
+.images h2, .construction h2 { font-size: 18px; font-weight: 700; }
+.imageFlow { display: grid; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); gap: 18px; align-items: center; margin-top: 20px; }
+.imageFlow > div { min-width: 0; text-align: center; }
+.flowArrow { font-size: 28px; color: #536487; text-align: center; }
+.matrixGroup { min-width: 0; }
+.matrixGroup h3 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.matrixWrap { position: relative; display: inline-block; vertical-align: top; }
+.matrix { border-collapse: collapse; table-layout: fixed; background: white; font-family: var(--font-ibm-plex-mono), monospace; font-size: 13px; font-variant-numeric: tabular-nums; }
+.matrix td { padding: 0; border: 1px solid #c9d1e5; width: 36px; height: 36px; text-align: center; }
+.matrix td > span { display: grid; place-items: center; min-width: 36px; min-height: 36px; }
+.matrix td[data-padding="true"] { background: #edf0f5; color: #536487; }
+.matrix td[data-patch="true"] { background: #f4f1ff; }
+.matrix td[data-padding="true"][data-patch="true"] { background: #e6e5f0; }
+.matrix td[data-sign="-1"] { color: #ad4508; }
+.matrix td[data-sign="1"] { color: #422abe; }
+.matrix button { display: block; width: 100%; min-width: 36px; height: 36px; background: transparent; font-size: inherit; }
+.matrix button[aria-pressed="true"] { outline: 2px solid #5031dc; outline-offset: -2px; background: #eeeaff; font-weight: 700; }
+.matrix button:focus-visible { position: relative; z-index: 1; outline: 3px solid #5031dc; outline-offset: 3px; }
+.patchOutline { position: absolute; pointer-events: none; border: 2px solid #5031dc; }
+.position { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 22px; font-size: 13px; }
+.position input { width: 58px; }
+.arrows { display: flex; gap: 7px; }
+.arrows button { width: 36px; height: 36px; border: 1px solid #c9d1e5; border-radius: 7px; color: #5031dc; background: white; font-size: 18px; }
+.arrows button:disabled { color: #8790a5; background: #f5f6f8; cursor: default; }
+.construction { border-top: 1px solid #dfe4f4; border-bottom: 1px solid #dfe4f4; padding: 20px 0 16px; margin-top: 22px; }
+.products { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 18px; text-align: center; }
+.products > span { color: #536487; font-size: 22px; }
+.products .matrix td, .products .matrix td > span { min-width: 42px; width: 42px; }
+.rowSums { margin-top: 12px; color: #536487; font-size: 12px; text-align: center; }
+.formula { margin-top: 10px; font-family: var(--font-ibm-plex-mono), monospace; font-size: 14px; line-height: 1.7; text-align: center; overflow-wrap: anywhere; }
+@container (max-width: 699px) { .imageFlow { gap: 10px; } .products { gap: 10px; } .settings { gap: 14px; } }
+@container (max-width: 639px) { .imageFlow { grid-template-columns: minmax(0, 1fr); gap: 16px; } .flowArrow { transform: rotate(90deg); } .products { flex-wrap: wrap; } }

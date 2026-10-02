@@ -1,698 +1,191 @@
 "use client";
 
-import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
-import {
-  analyzeConvolution,
-  clampIndex,
-  makeFormulaTerms,
-  type ConvolutionState,
-  type KernelOption,
-  type Matrix,
-} from "./convolution-filter-engine";
-import { baseImage, kernelOptions } from "./scenario";
-
-const kernelSize = 3;
+import { useMemo, useRef, useState } from "react";
+import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonSummaries, LessonToolbar } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
+import { analyzeConvolution, clampIndex, type Matrix } from "./convolution-filter-engine";
+import { learningExperiments, matchesState, type LessonState } from "./learning-experiments";
+import { imageScenarios, kernelOptions, type ImageId } from "./scenario";
+import styles from "./playground.module.css";
 
 function formatValue(value: number) {
-  if (Math.abs(value - Math.round(value)) < 0.0001) {
-    return String(Math.round(value));
-  }
-
-  return value.toFixed(2);
+  return Number.isInteger(value) || Math.abs(value - Math.round(value)) < 1e-10
+    ? String(Math.round(value)) : `≈${value.toFixed(2)}`;
 }
 
-function getKernelDisplayValue(value: number) {
-  if (Math.abs(value - 1 / 9) < 0.0001) {
-    return "1/9";
-  }
-
-  return formatValue(value);
+// All fractional products in this lesson come from the fixed 1/9 Blur weights.
+function exactValue(value: number) {
+  const numerator = Math.round(value * 9);
+  if (Math.abs(value * 9 - numerator) > 1e-10) return formatValue(value);
+  let a = Math.abs(numerator), b = 9;
+  while (b) { const remainder = a % b; a = b; b = remainder; }
+  const divisor = a || 9;
+  return 9 / divisor === 1 ? String(numerator / divisor) : `${numerator / divisor}/${9 / divisor}`;
 }
 
-function Panel({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={`min-w-0 overflow-hidden rounded-[12px] border border-[#c7d5fb] bg-white shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
-
-function SectionTitle({
-  children,
-  number,
-}: {
-  children: ReactNode;
-  number: number;
-}) {
-  return (
-    <div className="flex items-center gap-3 text-[#1d25ff]">
-      <span className="grid size-8 place-items-center rounded-[8px] bg-[#1d25ff] text-[17px] font-black text-white">
-        {number}
-      </span>
-      <h2 className="text-[20px] leading-none font-black uppercase">
-        {children}
-      </h2>
-    </div>
-  );
-}
-
-function MatrixGrid({
-  matrix,
-  cellSize = 42,
-  className = "",
-  getCellClassName,
-  getDisplayValue = formatValue,
-  onCellEnter,
-  onCellPointerDown,
-}: {
+function MatrixTable({ matrix, label, exact = false, padding = 0, patch, selected, onSelect }: {
   matrix: Matrix;
-  cellSize?: number;
-  className?: string;
-  getCellClassName?: (row: number, col: number, value: number) => string;
-  getDisplayValue?: (value: number) => string;
-  onCellEnter?: (row: number, col: number) => void;
-  onCellPointerDown?: (row: number, col: number) => void;
-}) {
-  const style = {
-    "--cell-size": `${cellSize}px`,
-    gridTemplateColumns: `repeat(${matrix[0]?.length ?? 0}, var(--cell-size))`,
-  } as CSSProperties;
-
-  return (
-    <div
-      className={`grid w-max overflow-hidden rounded-[8px] border border-[#c8d4ec] bg-white ${className}`}
-      style={style}
-    >
-      {matrix.map((row, rowIndex) =>
-        row.map((value, colIndex) => {
-          const content = (
-            <span className="relative z-10">{getDisplayValue(value)}</span>
-          );
-          const cellClassName = getCellClassName?.(
-            rowIndex,
-            colIndex,
-            value,
-          );
-          const edgeClassName = [
-            colIndex === row.length - 1 ? "border-r-0" : "",
-            rowIndex === matrix.length - 1 ? "border-b-0" : "",
-          ].join(" ");
-          const classNames = `grid place-items-center border-r border-b border-[#c8d4ec] font-mono text-[16px] font-bold tabular-nums ${edgeClassName} ${cellClassName ?? ""}`;
-
-          if (onCellPointerDown || onCellEnter) {
-            return (
-              <button
-                type="button"
-                key={`${rowIndex}-${colIndex}`}
-                className={`${classNames} h-[var(--cell-size)] w-[var(--cell-size)] text-[#071024] focus:outline-none focus:ring-2 focus:ring-[#1d25ff]`}
-                onPointerDown={() => onCellPointerDown?.(rowIndex, colIndex)}
-                onPointerEnter={() => onCellEnter?.(rowIndex, colIndex)}
-              >
-                {content}
-              </button>
-            );
-          }
-
-          return (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              className={`${classNames} h-[var(--cell-size)] w-[var(--cell-size)] text-[#071024]`}
-            >
-              {content}
-            </div>
-          );
-        }),
-      )}
-    </div>
-  );
-}
-
-function KernelGrid({ kernel }: { kernel: Matrix }) {
-  return (
-    <MatrixGrid
-      matrix={kernel}
-      cellSize={58}
-      getDisplayValue={getKernelDisplayValue}
-      getCellClassName={(_, col, value) => {
-        if (value > 0 && col === 2) {
-          return "text-[#f01818]";
-        }
-
-        if (value < 0) {
-          return "text-[#001fe5]";
-        }
-
-        return "";
-      }}
-    />
-  );
-}
-
-function SegmentedButton({
-  active,
-  children,
-  onClick,
-}: {
-  active: boolean;
-  children: ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`min-h-11 rounded-[8px] border px-5 text-[15px] font-black transition focus:outline-none focus:ring-4 focus:ring-blue-100 ${
-        active
-          ? "border-[#1d25ff] bg-[#1d25ff] text-white shadow-[0_10px_22px_rgba(29,37,255,0.18)]"
-          : "border-[#cbd7f4] bg-white text-[#111a44] hover:border-[#8097ff]"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function StepperButton({
-  children,
-  label,
-  onClick,
-  variant = "default",
-}: {
-  children: ReactNode;
   label: string;
-  onClick: () => void;
-  variant?: "default" | "primary";
+  exact?: boolean;
+  padding?: number;
+  patch?: { row: number; col: number; size: number };
+  selected?: { row: number; col: number };
+  onSelect?: (row: number, col: number) => void;
 }) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className={`grid size-10 place-items-center rounded-[8px] border text-[18px] font-black transition focus:outline-none focus:ring-4 focus:ring-blue-100 ${
-        variant === "primary"
-          ? "border-[#1d25ff] bg-[#1d25ff] text-white shadow-[0_10px_22px_rgba(29,37,255,0.18)] hover:bg-[#1018d8]"
-          : "border-[#cbd7f4] bg-white text-[#1d25ff] hover:border-[#1d25ff]"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function isInCurrentPatch(
-  row: number,
-  col: number,
-  topLeftRow: number,
-  topLeftCol: number,
-) {
-  return (
-    row >= topLeftRow &&
-    row < topLeftRow + kernelSize &&
-    col >= topLeftCol &&
-    col < topLeftCol + kernelSize
-  );
-}
-
-function FilterPanel({
-  activeFilter,
-  onSelectFilter,
-}: {
-  activeFilter: KernelOption;
-  onSelectFilter: (filterId: KernelOption["id"]) => void;
-}) {
-  return (
-    <Panel className="p-5">
-      <SectionTitle number={1}>Pick the filter</SectionTitle>
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(220px,0.72fr)] lg:items-center">
-        <div className="min-w-0">
-          <p className="text-[15px] leading-6 text-[#172452]">
-            Choose a 3x3 kernel. Red weights add signal; blue weights subtract
-            it.
-          </p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
-            {kernelOptions.map((filter) => (
-              <SegmentedButton
-                key={filter.id}
-                active={filter.id === activeFilter.id}
-                onClick={() => onSelectFilter(filter.id)}
-              >
-                {filter.shortLabel}
-              </SegmentedButton>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Selected kernel K
-          </p>
-          <KernelGrid kernel={activeFilter.kernel} />
-        </div>
-        <div className="rounded-[10px] border border-[#d8e2f6] bg-[#f9fbff] p-4 text-[15px] leading-7 text-[#101b47]">
-          {activeFilter.description}
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function SlidePanel({
-  analysis,
-  image,
-  isDragging,
-  onCellEnter,
-  onCellPointerDown,
-  onSetDragging,
-  onSetNextPosition,
-  onSetPadding,
-  onSetPosition,
-  onSetStride,
-  padding,
-  stride,
-}: {
-  analysis: ReturnType<typeof analyzeConvolution>;
-  image: Matrix;
-  isDragging: boolean;
-  onCellEnter: (row: number, col: number) => void;
-  onCellPointerDown: (row: number, col: number) => void;
-  onSetDragging: (isDragging: boolean) => void;
-  onSetNextPosition: () => void;
-  onSetPadding: (padding: number) => void;
-  onSetPosition: (row: number, col: number) => void;
-  onSetStride: (stride: number) => void;
-  padding: number;
-  stride: number;
-}) {
-  return (
-    <Panel className="p-5">
-      <SectionTitle number={2}>Slide over the image</SectionTitle>
-      <p className="mt-4 text-[15px] leading-6 text-[#172452]">
-        Drag the padded grid or use the arrows. Stride and padding change which
-        windows get sampled.
-      </p>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-[14px] font-black text-[#111a44]">
-          Stride
-          <div className="grid grid-cols-3 overflow-hidden rounded-[8px] border border-[#cbd7f4]">
-            {[1, 2, 3].map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => onSetStride(value)}
-                className={`h-10 w-11 font-black ${
-                  stride === value ? "bg-[#1d25ff] text-white" : "bg-white"
-                }`}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-[14px] font-black text-[#111a44]">
-          Padding
-          <div className="grid grid-cols-3 overflow-hidden rounded-[8px] border border-[#cbd7f4]">
-            {[0, 1, 2].map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => onSetPadding(value)}
-                className={`h-10 w-11 font-black ${
-                  padding === value ? "bg-[#1d25ff] text-white" : "bg-white"
-                }`}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-[8px] border border-[#cbd7f4] bg-[#f9fbff] px-4 py-2 font-mono text-[16px] font-black text-[#001fe5]">
-          output {analysis.outputSize} x {analysis.outputSize}
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 xl:grid-cols-[auto_auto_minmax(130px,1fr)] xl:items-start">
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Input image (5x5)
-          </p>
-          <MatrixGrid matrix={image} cellSize={44} />
-        </div>
-        <div
-          onPointerLeave={() => onSetDragging(false)}
-          onPointerUp={() => onSetDragging(false)}
-        >
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Padded image ({analysis.paddedImage.length}x
-            {analysis.paddedImage.length})
-          </p>
-          <div className="max-w-full overflow-x-auto pb-2">
-            <MatrixGrid
-              matrix={analysis.paddedImage}
-              cellSize={38}
-              getCellClassName={(row, col, value) => {
-                const classes = [];
-
-                if (value === 0 && padding > 0) {
-                  classes.push("bg-[#fff4ce]");
-                }
-
-                if (
-                  isInCurrentPatch(
-                    row,
-                    col,
-                    analysis.topLeftRow,
-                    analysis.topLeftCol,
-                  )
-                ) {
-                  classes.push("ring-2 ring-inset ring-[#1d25ff]");
-                }
-
-                return classes.join(" ");
-              }}
-              onCellPointerDown={(row, col) => {
-                onSetDragging(true);
-                onCellPointerDown(row, col);
-              }}
-              onCellEnter={(row, col) => {
-                if (isDragging) {
-                  onCellEnter(row, col);
-                }
-              }}
-            />
-          </div>
-        </div>
-        <div className="grid gap-4">
-          <div>
-            <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-              Current cell
-            </p>
-            <div className="w-max rounded-[8px] border border-[#cbd7f4] bg-[#f9fbff] px-4 py-2 font-mono text-[16px] font-black text-[#071024]">
-              y[{analysis.topLeftRow / stride},{analysis.topLeftCol / stride}]
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <StepperButton
-              label="Move window left"
-              onClick={() =>
-                onSetPosition(
-                  analysis.topLeftRow / stride,
-                  analysis.topLeftCol / stride - 1,
-                )
-              }
-            >
-              ←
-            </StepperButton>
-            <StepperButton
-              label="Move window up"
-              onClick={() =>
-                onSetPosition(
-                  analysis.topLeftRow / stride - 1,
-                  analysis.topLeftCol / stride,
-                )
-              }
-            >
-              ↑
-            </StepperButton>
-            <StepperButton
-              label="Move window down"
-              onClick={() =>
-                onSetPosition(
-                  analysis.topLeftRow / stride + 1,
-                  analysis.topLeftCol / stride,
-                )
-              }
-            >
-              ↓
-            </StepperButton>
-            <StepperButton
-              label="Move window right"
-              onClick={() =>
-                onSetPosition(
-                  analysis.topLeftRow / stride,
-                  analysis.topLeftCol / stride + 1,
-                )
-              }
-            >
-              →
-            </StepperButton>
-            <StepperButton
-              label="Move to next output cell"
-              onClick={onSetNextPosition}
-              variant="primary"
-            >
-              ↪
-            </StepperButton>
-          </div>
-          <p className="text-[14px] leading-6 text-[#172452]">
-            The next arrow moves left to right, then down. After the
-            bottom-right output cell, it wraps back to the top-left.
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function ComputePanel({
-  analysis,
-  kernel,
-  outputColIndex,
-  outputRowIndex,
-}: {
-  analysis: ReturnType<typeof analyzeConvolution>;
-  kernel: Matrix;
-  outputColIndex: number;
-  outputRowIndex: number;
-}) {
-  return (
-    <Panel className="p-5">
-      <SectionTitle number={3}>Compute one cell</SectionTitle>
-      <div className="mt-6 grid gap-5 xl:grid-cols-[auto_auto_auto_auto_auto] xl:items-center">
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Current patch
-          </p>
-          <MatrixGrid
-            matrix={analysis.currentPatch}
-            cellSize={50}
-            getCellClassName={(_, __, value) =>
-              value === 0 ? "bg-[#fff4ce]" : ""
-            }
-          />
-        </div>
-        <div className="hidden text-[34px] font-black text-[#6d789b] xl:block">
-          x
-        </div>
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Kernel K
-          </p>
-          <KernelGrid kernel={kernel} />
-        </div>
-        <div className="hidden text-[34px] font-black text-[#6d789b] xl:block">
-          =
-        </div>
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Product
-          </p>
-          <MatrixGrid
-            matrix={analysis.elementProducts}
-            cellSize={50}
-            getCellClassName={(_, col, value) =>
-              value > 0 && col === 2 ? "text-[#f01818]" : ""
-            }
-          />
-        </div>
-      </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-        <div className="overflow-x-auto rounded-[8px] border border-[#d6def5] bg-[#f7f9ff] px-4 py-3 font-mono text-[14px] font-bold whitespace-nowrap text-[#071024]">
-          y[{outputRowIndex},{outputColIndex}] ={" "}
-          {makeFormulaTerms(analysis.flattenedProducts).join(" + ")} ={" "}
-          <span className="text-[#001fe5]">{formatValue(analysis.sum)}</span>
-        </div>
-        <div className="rounded-[9px] border border-[#ffc5c5] bg-[#fff3f3] px-6 py-3 text-center text-[#f01818]">
-          <div className="text-[12px] font-black uppercase">Current sum</div>
-          <div className="font-mono text-[34px] leading-none font-black">
-            {formatValue(analysis.sum)}
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function OutputPanel({
-  analysis,
-  rowIndex,
-  colIndex,
-}: {
-  analysis: ReturnType<typeof analyzeConvolution>;
-  rowIndex: number;
-  colIndex: number;
-}) {
-  return (
-    <Panel className="p-5">
-      <SectionTitle number={4}>Watch the output fill</SectionTitle>
-      <div className="mt-6 grid gap-8 xl:grid-cols-[auto_minmax(180px,0.45fr)_minmax(300px,0.8fr)] xl:items-center xl:justify-center">
-        <div>
-          <p className="mb-2 text-[12px] font-black text-[#00166d] uppercase">
-            Output feature map ({analysis.outputSize}x{analysis.outputSize})
-          </p>
-          <div className="max-w-full overflow-x-auto pb-2">
-            <MatrixGrid
-              matrix={analysis.output}
-              cellSize={54}
-              getCellClassName={(row, col) =>
-                row === rowIndex && col === colIndex
-                  ? "bg-[#e8f7e8] ring-4 ring-inset ring-[#1d25ff] text-[#001fe5]"
-                  : "bg-[#e8f7e8]"
-              }
-            />
-          </div>
-        </div>
-        <div className="grid gap-3 text-[14px] font-semibold text-[#18224a]">
-          <div>
-            <span className="mr-3 inline-block size-5 align-middle ring-4 ring-[#1d25ff]" />
-            Current cell
-          </div>
-          <div>
-            <span className="mr-3 inline-block size-5 border border-[#b9c6df] bg-[#e8f7e8] align-middle" />
-            Completed
-          </div>
-          <div>
-            <span className="mr-3 inline-block size-5 border border-[#b9c6df] bg-white align-middle" />
-            Not visited yet
-          </div>
-          <div>
-            <span className="mr-3 inline-block size-5 border border-[#b9c6df] bg-[#fff4ce] align-middle" />
-            Padded zero
-          </div>
-        </div>
-        <div className="border-t border-[#d9e2f5] pt-5 text-[17px] leading-8 text-[#07133c] xl:border-t-0 xl:border-l xl:pt-0 xl:pl-8">
-          <div className="mb-2 text-[18px] font-black text-[#0f8a34] uppercase">
-            Takeaway
-          </div>
-          <p>Kernel weights decide what each neighborhood becomes.</p>
-          <p>Stride skips windows.</p>
-          <p>Padding lets borders participate.</p>
-        </div>
-      </div>
-    </Panel>
-  );
+  const buttons = useRef(new Map<string, HTMLButtonElement>());
+  return <div className={styles.matrixGroup}>
+    <h3>{label}</h3>
+    <div className={styles.matrixWrap}>
+      <table className={styles.matrix} aria-label={label}>
+        <tbody>{matrix.map((row, r) => <tr key={r}>{row.map((value, c) => {
+          const isPadding = padding > 0 && (r < padding || c < padding || r >= matrix.length - padding || c >= row.length - padding);
+          const inPatch = patch && r >= patch.row && r < patch.row + patch.size && c >= patch.col && c < patch.col + patch.size;
+          const isSelected = selected?.row === r && selected?.col === c;
+          const display = exact ? exactValue(value) : formatValue(value);
+          return <td key={c} data-padding={isPadding} data-patch={Boolean(inPatch)} data-sign={onSelect || exact ? Math.sign(value) : 0}>
+            {onSelect ? <button type="button" ref={(button) => {
+              const key = `${r},${c}`;
+              if (button) buttons.current.set(key, button); else buttons.current.delete(key);
+            }} aria-label={`Output row ${r}, column ${c}: ${display}`} aria-pressed={isSelected}
+              tabIndex={isSelected ? 0 : -1} aria-describedby="window-keyboard-help" onClick={() => onSelect(r, c)}
+              onKeyDown={(event) => {
+                const moves: Record<string, [number, number]> = {
+                  ArrowLeft: [r, c - 1], ArrowRight: [r, c + 1], ArrowUp: [r - 1, c], ArrowDown: [r + 1, c],
+                  Home: [r, 0], End: [r, row.length - 1],
+                };
+                const move = moves[event.key];
+                if (!move) return;
+                event.preventDefault();
+                const nextRow = clampIndex(move[0], matrix.length), nextCol = clampIndex(move[1], row.length);
+                onSelect(nextRow, nextCol);
+                buttons.current.get(`${nextRow},${nextCol}`)?.focus();
+              }}>{display}</button> : <span aria-label={`Row ${r}, column ${c}: ${display}${isPadding ? ", padded zero" : ""}`}>{display}</span>}
+          </td>;
+        })}</tr>)}</tbody>
+      </table>
+      {patch && <div className={styles.patchOutline} aria-hidden="true" style={{
+        left: `${100 * patch.col / matrix[0].length}%`, top: `${100 * patch.row / matrix.length}%`,
+        width: `${100 * patch.size / matrix[0].length}%`, height: `${100 * patch.size / matrix.length}%`,
+      }} />}
+    </div>
+  </div>;
 }
 
 export function ConvolutionFilterLabPlayground() {
-  const [state, setState] = useState<ConvolutionState>({
-    colIndex: 0,
-    filterId: "edge",
-    padding: 1,
-    rowIndex: 0,
-    stride: 1,
-  });
-  const [isDragging, setIsDragging] = useState(false);
+  const [experimentIndex, setExperimentIndex] = useState(0);
+  const [state, setState] = useState<LessonState>(learningExperiments[0].start);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const experiment = learningExperiments[experimentIndex];
+  const scenario = imageScenarios.find((item) => item.id === state.imageId)!;
+  const filter = kernelOptions.find((item) => item.id === state.filterId)!;
+  const analysis = useMemo(() => analyzeConvolution(scenario.image, filter.kernel, state), [scenario.image, filter.kernel, state]);
+  const reachedTarget = prediction !== null && matchesState(state, experiment.target);
+  const complete = reachedTarget && explanation === experiment.correctExplanation;
+  const phase = prediction === null ? 0 : reachedTarget ? 2 : 1;
+  const finalExperiment = experimentIndex === learningExperiments.length - 1;
 
-  const activeFilter =
-    kernelOptions.find((filter) => filter.id === state.filterId) ??
-    kernelOptions[0];
-  const analysis = useMemo(
-    () => analyzeConvolution(baseImage, activeFilter.kernel, state),
-    [activeFilter.kernel, state],
-  );
-  const clampedRow = clampIndex(state.rowIndex, analysis.outputSize);
-  const clampedCol = clampIndex(state.colIndex, analysis.outputSize);
-
-  function updateState(nextState: Partial<ConvolutionState>) {
+  function reset(index = experimentIndex) {
+    setExperimentIndex(index); setState(learningExperiments[index].start);
+    setPrediction(null); setExplanation(null);
+  }
+  function update(next: Partial<LessonState>) {
     setState((current) => {
-      const merged = { ...current, ...nextState };
-      const preview = analyzeConvolution(baseImage, activeFilter.kernel, merged);
-
-      return {
-        ...merged,
-        colIndex: clampIndex(merged.colIndex, preview.outputSize),
-        rowIndex: clampIndex(merged.rowIndex, preview.outputSize),
-      };
+      const merged = { ...current, ...next };
+      const image = imageScenarios.find((item) => item.id === merged.imageId)!.image;
+      const kernel = kernelOptions.find((item) => item.id === merged.filterId)!.kernel;
+      const size = analyzeConvolution(image, kernel, merged).outputSize;
+      return { ...merged, rowIndex: clampIndex(merged.rowIndex, size), colIndex: clampIndex(merged.colIndex, size) };
     });
+    setExplanation(null);
   }
-
-  function setPosition(rowIndex: number, colIndex: number) {
-    updateState({ rowIndex, colIndex });
+  function selectImage(id: string) {
+    update({ imageId: id as ImageId }); setPrediction(null);
   }
+  const startScenario = imageScenarios.find((item) => item.id === experiment.start.imageId)!;
+  const rowSums = analysis.elementProducts.map((row) => row.reduce((sum, value) => sum + value, 0));
+  const formulaTerm = (value: number) => value < 0 ? `(${exactValue(value)})` : exactValue(value);
 
-  function setNextPosition() {
-    const nextColIndex =
-      clampedCol + 1 < analysis.outputSize ? clampedCol + 1 : 0;
-    const nextRowIndex =
-      clampedCol + 1 < analysis.outputSize
-        ? clampedRow
-        : (clampedRow + 1) % analysis.outputSize;
-
-    setPosition(nextRowIndex, nextColIndex);
-  }
-
-  function setPositionFromPaddedCell(row: number, col: number) {
-    const nextRow = Math.round(row / state.stride);
-    const nextCol = Math.round(col / state.stride);
-
-    setPosition(nextRow, nextCol);
-  }
-
-  return (
-    <main className="min-h-screen overflow-x-clip bg-[#f7f9fd] px-4 py-5 text-[#071024] sm:px-6 lg:px-8 2xl:pr-56">
-      <div className="mx-auto w-full max-w-[358px] sm:max-w-[1500px]">
-        <header className="min-w-0">
-          <div className="min-w-0">
-            <h1 className="max-w-full text-[30px] leading-[1.02] font-black break-words text-[#050912] sm:text-[56px] lg:text-[64px]">
-              Convolution Filter Lab
-            </h1>
-            <p className="mt-3 max-w-4xl text-[16px] leading-[1.45] font-semibold text-[#001bc6] sm:text-[20px]">
-              Drag a 3x3 kernel across a tiny image and watch output cells fill.
-            </p>
-          </div>
-        </header>
-
-        <div className="mt-6 grid gap-4">
-          <FilterPanel
-            activeFilter={activeFilter}
-            onSelectFilter={(filterId) => updateState({ filterId })}
-          />
-          <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
-            <SlidePanel
-              analysis={analysis}
-              image={baseImage}
-              isDragging={isDragging}
-              onCellEnter={setPositionFromPaddedCell}
-              onCellPointerDown={setPositionFromPaddedCell}
-              onSetDragging={setIsDragging}
-              onSetNextPosition={setNextPosition}
-              onSetPadding={(padding) => updateState({ padding })}
-              onSetPosition={setPosition}
-              onSetStride={(stride) => updateState({ stride })}
-              padding={state.padding}
-              stride={state.stride}
-            />
-            <ComputePanel
-              analysis={analysis}
-              kernel={activeFilter.kernel}
-              outputColIndex={clampedCol}
-              outputRowIndex={clampedRow}
-            />
-          </div>
-          <OutputPanel
-            analysis={analysis}
-            rowIndex={clampedRow}
-            colIndex={clampedCol}
-          />
-        </div>
+  return <LearningPage title="Convolution Filter Lab" subtitle="Slide a small grid of weights. Trace how one patch becomes one output."
+    rail={<ExperimentRail label={finalExperiment ? "Transfer check" : `Experiment ${experimentIndex + 1} of 5`} title={experiment.title} phase={phase}>
+      <h3>{reachedTarget ? "What did you notice?" : "Make a prediction"}</h3>
+      {!reachedTarget && <>
+        <p>{experiment.question}</p>
+        <p className={sharedStyles.small}>Start: {startScenario.label} · {kernelOptions.find((item) => item.id === experiment.start.filterId)!.shortLabel} · Stride {experiment.start.stride} · Zero padding {experiment.start.padding} · y[{experiment.start.rowIndex},{experiment.start.colIndex}]</p>
+        <ExperimentChoices legend="Your prediction" name="prediction" choices={experiment.predictions} value={prediction} onChange={(id) => {
+          setState(experiment.start); setPrediction(id); setExplanation(null);
+        }} />
+        <p className={sharedStyles.small}>Choosing a prediction restores this experiment’s starting settings.</p>
+      </>}
+      {prediction !== null && !reachedTarget && <div className={sharedStyles.actionPrompt}><strong>Now try it.</strong> {experiment.action}</div>}
+      {reachedTarget && <>
+        <p className={sharedStyles.observation} role="status">{prediction === experiment.correctPrediction ? "Your prediction matches the result. " : "The result differed from your prediction. "}{experiment.observation}</p>
+        <h3>{experiment.explanationQuestion}</h3>
+        <ExperimentChoices legend="Your explanation" name="explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />
+        {explanation && !complete && <p className={sharedStyles.feedback} role="status">Try again. {experiment.retryHint}</p>}
+      </>}
+      {complete && <ExperimentResult title={finalExperiment ? "Lesson explained" : "Experiment explained"}>{experiment.takeaway}</ExperimentResult>}
+      {complete && <ExperimentButton arrow onClick={() => reset(finalExperiment ? 0 : experimentIndex + 1)}>
+        {finalExperiment ? "Restart experiments" : experimentIndex === 4 ? "Try the transfer check" : "Next experiment"}
+      </ExperimentButton>}
+    </ExperimentRail>}>
+    <LessonToolbar scenarios={imageScenarios} selectedId={state.imageId} onSelect={selectImage} onReset={() => reset()} />
+    <div className={styles.settings}>
+      <fieldset className={styles.filters}><legend>Filter</legend>{kernelOptions.map((item) => <button key={item.id} type="button"
+        aria-pressed={state.filterId === item.id} onClick={() => update({ filterId: item.id })}>{item.shortLabel}</button>)}</fieldset>
+      <label>Stride<select value={state.stride} onChange={(event) => update({ stride: Number(event.currentTarget.value) })}>
+        {[1, 2, 3].map((value) => <option key={value} value={value}>{value}</option>)}
+      </select></label>
+      <label>Zero padding<select value={state.padding} onChange={(event) => update({ padding: Number(event.currentTarget.value) })}>
+        {[0, 1, 2].map((value) => <option key={value} value={value}>{value}</option>)}
+      </select></label>
+    </div>
+    <p className={sharedStyles.small}>Stride is the pixel step. Padding adds zero-valued border cells.</p>
+    <section className={styles.images} aria-labelledby="image-output-heading">
+      <h2 id="image-output-heading">Your image → output</h2>
+      <p className={sharedStyles.caption}>Choose an output cell to inspect its 3 × 3 image window. Rows and columns count from 0.</p>
+      <div className={styles.imageFlow}>
+        <div><MatrixTable label={`Image + zero padding · ${analysis.paddedImage.length} × ${analysis.paddedImage.length}`} matrix={analysis.paddedImage}
+          padding={state.padding} patch={{ row: analysis.topLeftRow, col: analysis.topLeftCol, size: 3 }} />
+          <p className={sharedStyles.small}>Gray cells are padding; original zeros stay white.</p></div>
+        <span className={styles.flowArrow} aria-hidden="true">→</span>
+        <div><MatrixTable label={`Output · ${analysis.outputSize} × ${analysis.outputSize}`} matrix={analysis.output}
+          selected={{ row: state.rowIndex, col: state.colIndex }} onSelect={(rowIndex, colIndex) => update({ rowIndex, colIndex })} />
+          <p className={sharedStyles.small}>Full map; selected cell y[{state.rowIndex},{state.colIndex}]. ≈ marks rounded values.</p></div>
       </div>
-    </main>
-  );
+      <div className={styles.position}>
+        <strong>Selected output</strong>
+        <label>Row<input aria-label="Output row" type="number" min={0} max={analysis.outputSize - 1} step={1} value={state.rowIndex}
+          onChange={(event) => { if (Number.isFinite(event.currentTarget.valueAsNumber)) update({ rowIndex: Math.round(event.currentTarget.valueAsNumber) }); }} /></label>
+        <label>Column<input aria-label="Output column" type="number" min={0} max={analysis.outputSize - 1} step={1} value={state.colIndex}
+          onChange={(event) => { if (Number.isFinite(event.currentTarget.valueAsNumber)) update({ colIndex: Math.round(event.currentTarget.valueAsNumber) }); }} /></label>
+        <div className={styles.arrows}>{([
+          ["left", "←", 0, -1], ["up", "↑", -1, 0], ["down", "↓", 1, 0], ["right", "→", 0, 1],
+        ] as const).map(([label, symbol, dr, dc]) => <button key={label} type="button" aria-label={`Move window ${label}`}
+          disabled={state.rowIndex + dr < 0 || state.rowIndex + dr >= analysis.outputSize || state.colIndex + dc < 0 || state.colIndex + dc >= analysis.outputSize}
+          onClick={() => update({ rowIndex: state.rowIndex + dr, colIndex: state.colIndex + dc })}>{symbol}</button>)}</div>
+      </div>
+      <p id="window-keyboard-help" className={sharedStyles.small}>Click an output cell, or focus it and use arrow keys. Home / End moves to the first / last column. Row and Column fields set an exact position.</p>
+    </section>
+    <section className={styles.construction} aria-labelledby="construction-heading">
+      <h2 id="construction-heading">Build one output cell</h2>
+      <p className={sharedStyles.caption}>Multiply matching positions, then add all nine products. {filter.description}</p>
+      <div className={styles.products}>
+        <MatrixTable label="Image patch" matrix={analysis.currentPatch} padding={0} exact />
+        <span aria-hidden="true">×</span>
+        <MatrixTable label="Kernel weights" matrix={filter.kernel} exact />
+        <span aria-hidden="true">=</span>
+        <MatrixTable label="Products" matrix={analysis.elementProducts} exact />
+      </div>
+      <p className={styles.rowSums}>Row sums: {rowSums.map(exactValue).join("; ")}. Fractions are exact.</p>
+      <p className={styles.formula}>y[{state.rowIndex},{state.colIndex}] = {rowSums.map(formulaTerm).join(" + ")} = {exactValue(analysis.sum)}</p>
+    </section>
+    <LessonSummaries label="Live convolution summaries" summaries={[
+      { label: "Selected sum", color: "#5031dc", value: formatValue(analysis.sum), definition: "Nine products added.", formula: "Σ patch value × weight" },
+      { label: "Output size", color: "#0c1230", value: `${analysis.outputSize} × ${analysis.outputSize}`, definition: "One cell per sampled window.", formula: `floor((5 + 2 × ${state.padding} − 3) / ${state.stride}) + 1 = ${analysis.outputSize}` },
+      { label: "Window step", color: "#0c1230", value: `${state.stride} px`, definition: "Weights stay fixed as the patch moves.", formula: "p = padding; s = stride" },
+    ]} />
+    <p className={sharedStyles.small}>CNN convention: weights are used as shown, without flipping (cross-correlation). One input channel, no bias. These are fixed teaching filters, not learned weights.</p>
+    <p className={sharedStyles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">{scenario.label}, {filter.shortLabel}, stride {state.stride}, zero padding {state.padding}; output {analysis.outputSize} by {analysis.outputSize}; selected row {state.rowIndex}, column {state.colIndex}, sum {exactValue(analysis.sum)}.</p>
+  </LearningPage>;
 }

@@ -5,5 +5,11 @@
   "modulePath": "src/modules/convolution-filter-lab",
   "acceptedMockup": "src/modules/convolution-filter-lab/design/accepted-mockup.png",
   "prompt": "src/modules/convolution-filter-lab/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/private/tmp/convolution-filter-lab-mockup.svg.png"
+  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-f188097a-5d09-4f2a-959a-7b43a1019f6f.png",
+  "approvedRefinements": [
+    "Reuse the shared radio-card, progress, and summary styling.",
+    "Use exact fraction arithmetic; mark rounded map values with \u2248.",
+    "Five experiments followed by a border-response transfer check.",
+    "Output cells support direct selection and keyboard navigation; row and column editors replace image dragging."
+  ]
 }

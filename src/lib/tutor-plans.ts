@@ -1372,62 +1372,84 @@ export const playgroundTutorPlans = {
   },
   "convolution-filter-lab": {
     intro:
-      "Work through four convolution experiments. Pick a kernel, move the 3x3 window, change stride and padding, then explain how one output cell is produced.",
+      "Use five prediction → try → explanation experiments, then a border-response transfer check. The image window, exact products, and selected output are linked.",
     whyItMatters:
-      "Convolution is the core operation behind many image models. It turns local pixel neighborhoods into feature maps, so learners need to see both the sliding window and the arithmetic inside one output cell.",
+      "Image models reuse a small grid of weights across local neighborhoods. Tracing one weighted sum reveals what a filter detects and why stride and boundary assumptions matter.",
     openingMessage:
-      "No prior computer vision knowledge needed. We will trace one tiny convolution by hand.\n\n- A kernel is a small grid of weights.\n- The kernel slides over the image and multiplies the current patch element by element.\n- The products add up to one output cell.\n- Stride skips window positions. Padding adds border values so edge neighborhoods can participate.\n\nFirst prediction: when the Edge kernel sees values increasing left to right, should the current weighted sum be positive, negative, or zero? Reply with your prediction first. Then I will tell you exactly what to try.",
+      "You only need addition, signed multiplication, and averages; no computer-vision background. A kernel is a small grid of weights. An output map contains one weighted sum per image window. Rows and columns count from 0.\n\nThe rail has five experiments and a transfer check. Choose a prediction there to restore its starting settings, try the named control, then explain the result. Reset restarts the current experiment. You can explore any image or filter at any time.\n\nStart with Experiment 1, Ramp, Edge, Stride 1, Zero padding 1, y[1,1]. First prediction: switching to Blur, what will y[1,1] become: 2, 6, or 18? Share your prediction before trying it.",
     masteryCriteria: [
-      "Explains that a convolution output cell is a weighted sum of a local patch and kernel.",
-      "Connects the highlighted image window to the patch, product table, formula, and current output cell.",
-      "Compares how Edge, Blur, and Sharpen kernels produce different feature maps from the same image.",
-      "Explains how stride changes sampled positions and output size.",
-      "Explains how padding adds border values so edge cells can be computed.",
+      "Calculates one output by multiplying matching patch and kernel positions and adding all nine products.",
+      "Maps a selected output cell to its image window and explains that moving reuses fixed weights.",
+      "Compares Edge column differences, Blur averaging, and Sharpen local contrast without assuming outputs stay in the image range.",
+      "Explains stride as window step and uses floor((5 + 2p - 3) / s) + 1 to predict output dimensions.",
+      "Explains zero padding as an outside-image assumption and identifies a border-created negative Edge response.",
     ],
     steps: [
       {
-        title: "Read one edge response",
+        title: "One patch, one number",
         experiment:
-          "Keep Edge selected with stride 1 and padding 1. Look at the highlighted top-left patch, the product table, and the current output cell.",
+          "In Experiment 1 choose a prediction, which restores Ramp, Edge, Stride 1, Zero padding 1, Output row 1 and Output column 1. Select Blur. Inspect Image patch, Kernel weights, Products, Row sums, and Selected sum. Answer the rail explanation before Next experiment.",
         predictionQuestion:
-          "When the Edge kernel sees values increasing left to right, should the weighted sum be positive, negative, or zero?",
+          "Switching to Blur on the three rows of 1, 2, 3, what will y[1,1] become: 2, 6, or 18?",
         observationPrompt:
-          "Which surfaces agreed on the current value?",
+          "How do the nine exact Products and Row sums produce the selected output?",
         takeaway:
-          "One convolution output cell is just the sum of patch values multiplied by kernel weights.",
+          "Blur weights each value by 1/9; the patch total is 18 and the output is 2. The center happens to equal this average, but all nine values contribute. Products are elementwise, not matrix multiplication.",
       },
       {
-        title: "Move the window",
+        title: "Same weights, new patch",
         experiment:
-          "Use the arrow buttons or drag the padded image window to a different output cell. Watch the patch, product table, formula, current sum, and highlighted output cell update together.",
+          "Use Next experiment and choose a prediction in Experiment 2. Use Move window right once or set Output column to 2. Keep Ramp, Blur, Stride 1, Zero padding 1 and Output row 1. Compare the patch and weights.",
         predictionQuestion:
-          "When the window moves right, which values should change first: the kernel weights or the image patch?",
+          "Moving one output cell right, does the patch change, do the weights change, or do both change?",
         observationPrompt:
-          "What changed when the window moved?",
+          "What changed in Image patch and Kernel weights as the selected output moved from y[1,1] to y[1,2]?",
         takeaway:
-          "The kernel stays fixed while the patch changes. Each visited patch writes a different output location.",
+          "The patch rows change from 1,2,3 to 2,3,4 and the Blur output becomes 3. The same weights are reused. The complete output map is computed immediately; selection inspects a calculation, not a visit/completion state.",
       },
       {
-        title: "Switch kernels",
+        title: "Choose the local question",
         experiment:
-          "Switch from Edge to Blur, then Sharpen. Compare the kernel table, current sum, and output feature map.",
+          "Use Next experiment and choose a prediction in Experiment 3. This restores Single spot, Blur, Stride 1, Zero padding 1, Output row 2 and Output column 2. Select Sharpen, leaving the position unchanged. Compare the center product and Selected sum.",
         predictionQuestion:
-          "Should changing the kernel alter the output map even when the image stays the same?",
+          "For a center pixel of 9 with zero neighbors, will Sharpen output 45, 9, or 1?",
         observationPrompt:
-          "What changed when the kernel changed?",
+          "What is the center product, and which neighbor products contribute?",
         takeaway:
-          "Different kernels ask different local questions of the same image neighborhood.",
+          "Sharpen gives 9×5=45 while Blur gives 9/9=1 on this patch. Edge compares the right and left columns. Outputs can exceed the input range or be negative. These are fixed demonstration filters; changing filters does not train or replace the image.",
       },
       {
-        title: "Change stride and padding",
+        title: "Skip window positions",
         experiment:
-          "Set padding to 0, then set stride to 2. Watch the padded image, output size pill, available window positions, and output map size.",
+          "Use Next experiment and choose a prediction in Experiment 4. Set Stride to 2; keep Ramp, Edge and Zero padding 1. Read Output size and inspect the highlighted window. Use Output row and Output column or arrow keys on an output cell to inspect other sampled positions.",
         predictionQuestion:
-          "Which setting should preserve border positions: padding 0 or padding 1?",
+          "Keeping zero padding at 1, does Stride 2 produce a 3×3, 5×5, or 2×2 output?",
         observationPrompt:
-          "How did stride and padding change the feature map?",
+          "What start positions can a 3×3 window use on the 7×7 padded image when stepping by two?",
         takeaway:
-          "Padding changes the border neighborhoods available to the kernel. Stride changes how densely the kernel samples those neighborhoods.",
+          "Positions 0,2,4 fit, producing 3×3. Stride samples fewer windows without resizing the image or averaging output cells. The dimension formula assumes this 5×5 image, fixed 3×3 kernel and no dilation.",
+      },
+      {
+        title: "Give borders a neighborhood",
+        experiment:
+          "Use Next experiment and choose a prediction in Experiment 5. This restores Ramp, Blur, Stride 1, Zero padding 0 and y[0,0]. Set Zero padding to 1. Compare padded-image and output sizes and trace the new top-left patch.",
+        predictionQuestion:
+          "With Stride 1, does adding one ring of zero padding make the output 5×5, 3×3, or 7×7?",
+        observationPrompt:
+          "Which zeros are padding, and what do their products contribute to the new y[0,0]?",
+        takeaway:
+          "The input becomes 7×7 and output becomes 5×5. The new top-left patch has six padded zeros and Blur output 2/3. The same output index now covers a different image window. Padding enables border-centered windows, assumes zero outside the image, and can affect responses; it does not recover true missing pixels.",
+      },
+      {
+        title: "A border can look like an edge",
+        experiment:
+          "Use Try the transfer check and choose a prediction. The start is Step edge, Edge, Stride 1, Zero padding 1, Output row 2 and Output column 3. Use Move window right once. Trace Products at y[2,4], then explain in the rail. Restart experiments is available after the explanation succeeds.",
+        predictionQuestion:
+          "Moving right from a flat patch of fives into the padded border, will Edge output a negative value, zero, or a positive value?",
+        observationPrompt:
+          "Why did a flat part of the original image give a negative response?",
+        takeaway:
+          "The patch has rows of 5, 5, 0. The right-column sum of 0 minus the left-column sum of 15 gives −15. Padding created the apparent drop; negative responses are valid. The layer uses displayed weights without flipping, the cross-correlation convention used in CNNs; one input channel, no bias or activation.",
       },
     ],
   },

@@ -28,6 +28,8 @@ The Expected Value & Risk lesson preserves three two-bet presets, six payoff/pro
 
 The Bernoulli, Categorical & Binomial lesson distinguishes a single yes/no outcome, one nominal class label and a count of independent equal-probability trials. Three guided experiments and a one-trial transfer check use fixed-scale probability bars, exact parameter editors, full-precision mass and tied modes. Categorical summaries avoid invented numerical moments; optional formulas and a keyboard-scrollable probability table preserve the supporting evidence.
 
+Waiting & Arrival Distributions separates exact geometric waiting times from Poisson count approximations under independent one-second ticks. Three guided experiments and a new-window transfer check compare event chance, observation length, exact at-least-one tick probability and the small-expected-count linear shortcut. Fixed-scale probability bars include a labeled pooled count tail; an optional seeded tick timeline shows actual events without forcing the expected count.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

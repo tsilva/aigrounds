@@ -1,7 +1,13 @@
 .page { --ink: #0c1230; --muted: #536487; --line: #dfe4f4; --indigo: #5031dc; --orange: #ad4508; min-height: 100vh; background: #fff; color: var(--ink); container-type: inline-size; }
-.page button, .page input { font: inherit; }
+.page button, .page input, .page select { font: inherit; }
 .page button { cursor: pointer; }
-.page button:focus-visible, .page input:focus-visible, .page a:focus-visible { outline: 3px solid var(--indigo); outline-offset: 4px; }
+.page button:focus-visible, .page input:focus-visible, .page select:focus-visible, .page a:focus-visible { outline: 3px solid var(--indigo); outline-offset: 4px; }
+.controlField { display: grid; gap: 7px; font-size: 14px; font-weight: 600; min-width: 0; }
+.controlField select { width: 100%; min-width: 0; padding: 9px 12px; border: 1px solid #9faec9; border-radius: 7px; background: white; color: var(--ink); font-size: 14px; }
+.toggleGroup { display: flex; flex-wrap: wrap; gap: 8px; }
+.toggleGroup button, .lessonAction { padding: 9px 13px; border: 1px solid #9faec9; border-radius: 7px; background: white; color: var(--ink); font-size: 14px !important; }
+.toggleGroup button[aria-pressed="true"] { background: var(--indigo); color: white; border-color: var(--indigo); }
+.lessonAction:disabled { opacity: .6; cursor: default; }
 .nav { height: 64px; display: flex; gap: 24px; align-items: center; border-bottom: 1px solid var(--line); padding: 0 32px; }
 .nav > a:first-child { font-size: 22px; font-weight: 700; letter-spacing: -.04em; }
 .allLessons { border-left: 1px solid var(--line); padding-left: 24px; color: var(--muted); font-size: 14px; }

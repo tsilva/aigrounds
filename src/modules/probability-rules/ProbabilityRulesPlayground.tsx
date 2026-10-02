@@ -1,559 +1,76 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  advanceSimulation,
-  analyzeProbabilityRule,
-  ruleLabels,
-  type EventRuleId,
-  type OutcomeMembership,
-  type RuleView,
-  type SimulationResult,
-  type SimulationState,
-} from "./probability-rules-engine";
-import {
-  eventAOptions,
-  eventBOptions,
-  ruleViews,
-  type EventOption,
-} from "./scenario";
+import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonAction, LessonSelect, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
+import { advanceSimulation, analyzeProbabilityRule, type EventRuleId, type RuleView, type SimulationState } from "./probability-rules-engine";
+import { eventAOptions, eventBOptions } from "./scenario";
+import { ruleExperiments } from "./learning-experiments";
+import styles from "./playground.module.css";
 
-const initialSimulation: SimulationState = {
-  seed: 1309,
-  rolls: 0,
-  hits: 0,
-};
-
-const ruleViewDetails: Record<
-  RuleView,
-  {
-    label: string;
-    helper: string;
-  }
-> = {
-  a: {
-    label: "Event A",
-    helper: "count all A cells",
-  },
-  "not-a": {
-    label: "Not A",
-    helper: "outside A",
-  },
-  intersection: {
-    label: "A and B",
-    helper: "overlap only",
-  },
-  union: {
-    label: "A or B",
-    helper: "either event",
-  },
-  "a-only": {
-    label: "A not B",
-    helper: "A without overlap",
-  },
-  "b-only": {
-    label: "B not A",
-    helper: "B without overlap",
-  },
-};
-
-function Panel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={`rounded-[14px] border border-[#d8e0f3] bg-white/95 shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
-
-function LessonTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[18px] leading-none font-black text-[#352cff] uppercase">
-      {children}
-    </h2>
-  );
-}
-
-function EventButton({
-  option,
-  isSelected,
-  onSelect,
-}: {
-  option: EventOption;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`min-w-0 rounded-[10px] border p-4 text-left transition ${
-        isSelected
-          ? "border-[#5636f5] bg-[linear-gradient(180deg,#694bff,#4a27e8)] text-white shadow-[0_14px_24px_rgba(70,39,232,0.2)]"
-          : "border-[#d8e0f0] bg-white text-[#0d1429] hover:border-[#b9c4de] hover:bg-[#fbfaff]"
-      }`}
-    >
-      <span className="block text-[13px] font-black uppercase">
-        {option.shortLabel}
-      </span>
-      <span className="mt-2 block text-[16px] leading-[1.2] font-black">
-        {option.label}
-      </span>
-      <span
-        className={`mt-2 block text-[13px] leading-[1.35] ${
-          isSelected ? "text-white/85" : "text-[#30446f]"
-        }`}
-      >
-        {option.description}
-      </span>
-    </button>
-  );
-}
-
-function FactPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 rounded-[8px] border border-[#dfe4f4] bg-white px-3 py-2">
-      <p className="text-[11px] font-black tracking-[0.03em] text-[#7180a5] uppercase">
-        {label}
-      </p>
-      <p className="mt-1 truncate font-mono text-[13px] font-bold text-[#071024]">
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function membershipTone(membership: OutcomeMembership) {
-  if (membership.inA && membership.inB) {
-    return {
-      className:
-        "border-[#8053ff] bg-[#f0eaff] text-[#24115f] shadow-[inset_0_0_0_2px_rgba(128,83,255,0.18)]",
-      label: "A ∩ B",
-    };
-  }
-
-  if (membership.inA) {
-    return {
-      className: "border-[#5d7dff] bg-[#eaf0ff] text-[#162a76]",
-      label: "A",
-    };
-  }
-
-  if (membership.inB) {
-    return {
-      className: "border-[#ff6b7a] bg-[#fff0f2] text-[#8b1024]",
-      label: "B",
-    };
-  }
-
-  return {
-    className: "border-[#d9e1f2] bg-white text-[#66779e]",
-    label: "Neither",
-  };
-}
-
-function DiceGrid({ memberships }: { memberships: OutcomeMembership[] }) {
-  const membershipById = new Map(
-    memberships.map((membership) => [membership.outcome.id, membership]),
-  );
-
-  return (
-    <div className="mt-5 min-w-0 overflow-x-auto pb-2">
-      <div className="grid min-w-[520px] grid-cols-[42px_repeat(6,minmax(54px,1fr))] gap-2">
-        <div className="h-9" />
-        {[1, 2, 3, 4, 5, 6].map((second) => (
-          <div
-            key={second}
-            className="grid h-9 place-items-center font-mono text-[12px] font-black text-[#52628a]"
-          >
-            d2={second}
-          </div>
-        ))}
-
-        {[1, 2, 3, 4, 5, 6].map((first) => (
-          <Row
-            key={first}
-            first={first}
-            membershipById={membershipById}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Row({
-  first,
-  membershipById,
-}: {
-  first: number;
-  membershipById: Map<string, OutcomeMembership>;
-}) {
-  return (
-    <>
-      <div className="grid h-14 place-items-center font-mono text-[12px] font-black text-[#52628a]">
-        d1={first}
-      </div>
-      {[1, 2, 3, 4, 5, 6].map((second) => {
-        const membership = membershipById.get(`${first}-${second}`);
-
-        if (!membership) {
-          return null;
-        }
-
-        const tone = membershipTone(membership);
-
-        return (
-          <div
-            key={membership.outcome.id}
-            className={`relative grid h-14 place-items-center rounded-[8px] border font-mono text-[13px] font-black transition ${tone.className} ${
-              membership.inView
-                ? "after:pointer-events-none after:absolute after:inset-[-4px] after:rounded-[11px] after:border-2 after:border-[#111827] after:shadow-[0_0_0_2px_rgba(255,255,255,0.95)] after:content-['']"
-                : ""
-            }`}
-            title={tone.label}
-          >
-            {first},{second}
-          </div>
-        );
-      })}
-    </>
-  );
-}
-
-function RuleViewButton({
-  view,
-  isSelected,
-  onSelect,
-}: {
-  view: RuleView;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-label={`Show ${ruleViewDetails[view].label}: ${ruleViewDetails[view].helper}`}
-      className={`min-h-[52px] rounded-[8px] border px-3 py-2 text-left transition ${
-        isSelected
-          ? "border-[#5636f5] bg-[#352cff] text-white shadow-[0_10px_18px_rgba(53,44,255,0.18)]"
-          : "border-[#d8e0f0] bg-white text-[#263a68] hover:border-[#b9c4de]"
-      }`}
-    >
-      <span className="block font-mono text-[13px] leading-none font-black">
-        {ruleLabels[view]}
-      </span>
-      <span className="mt-1 block text-[12px] leading-tight font-black">
-        {ruleViewDetails[view].label}
-      </span>
-    </button>
-  );
-}
-
-function LegendSwatch({
-  className,
-  label,
-}: {
-  className: string;
-  label: string;
-}) {
-  return (
-    <span className="inline-flex items-center gap-2 font-mono text-[12px] font-bold text-[#32466f]">
-      <span className={`h-3 w-3 rounded-[3px] border ${className}`} />
-      {label}
-    </span>
-  );
-}
-
-function SimulationPanel({
-  simulation,
-  onRun,
-}: {
-  simulation: SimulationResult;
-  onRun: (count: number) => void;
-}) {
-  const expectedWidth = `${Math.round(simulation.expected * 100)}%`;
-  const observedWidth = `${Math.round(simulation.observed * 100)}%`;
-
-  return (
-    <Panel className="p-5 sm:p-6">
-      <LessonTitle>4. Simulate Rolls</LessonTitle>
-      <p className="mt-4 text-[15px] leading-[1.45] text-[#263a68]">
-        Expected comes from the counted grid. Observed appears after you run
-        simulated rolls.
-      </p>
-      <div className="mt-4 flex flex-wrap gap-3">
-        {[100, 1000].map((count) => (
-          <button
-            key={count}
-            type="button"
-            onClick={() => onRun(count)}
-            className="h-10 rounded-[8px] border border-[#d8e0f0] bg-white px-4 font-mono text-[12px] font-black text-[#352cff] transition hover:border-[#352cff] hover:bg-[#f6f4ff]"
-          >
-            Run {count}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-5 space-y-4">
-        <ProbabilityBar
-          label="Expected"
-          value={simulation.expected}
-          width={expectedWidth}
-          color="bg-[#352cff]"
-        />
-        <ProbabilityBar
-          label="Observed"
-          value={simulation.observed}
-          valueLabel={simulation.rolls === 0 ? "Run rolls first" : undefined}
-          width={observedWidth}
-          color="bg-[#17a65a]"
-        />
-      </div>
-
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <FactPill label="Total rolls" value={String(simulation.rolls)} />
-        <FactPill label="Current hits" value={String(simulation.hits)} />
-      </div>
-    </Panel>
-  );
-}
-
-function ProbabilityBar({
-  label,
-  value,
-  valueLabel,
-  width,
-  color,
-}: {
-  label: string;
-  value: number;
-  valueLabel?: string;
-  width: string;
-  color: string;
-}) {
-  return (
-    <div>
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[13px] font-black text-[#071024]">{label}</p>
-        <p className="font-mono text-[13px] font-black text-[#071024]">
-          {valueLabel ?? value.toFixed(3)}
-        </p>
-      </div>
-      <div className="mt-2 h-4 overflow-hidden rounded-full border border-[#dfe4f4] bg-[#f2f5fb]">
-        <div className={`h-full rounded-full ${color}`} style={{ width }} />
-      </div>
-    </div>
-  );
-}
+const initialSimulation: SimulationState = { seed: 1309, rolls: 0, hits: 0 };
+const views: { id: RuleView; label: string }[] = [{ id: "a", label: "A" }, { id: "not-a", label: "Not A" }, { id: "intersection", label: "Both" }, { id: "union", label: "Either" }, { id: "a-only", label: "A only" }, { id: "b-only", label: "B only" }];
+const dice = [1, 2, 3, 4, 5, 6];
+const membershipLabel = (inA: boolean, inB: boolean) => inA && inB ? "A+B" : inA ? "A" : inB ? "B" : "—";
 
 export function ProbabilityRulesPlayground() {
   const [eventA, setEventA] = useState<EventRuleId>("sum-seven");
   const [eventB, setEventB] = useState<EventRuleId>("first-even");
   const [view, setView] = useState<RuleView>("a");
-  const [simulation, setSimulation] =
-    useState<SimulationState>(initialSimulation);
-  const analysis = useMemo(
-    () => analyzeProbabilityRule(eventA, eventB, view),
-    [eventA, eventB, view],
-  );
-  const simulationResult: SimulationResult = {
-    ...simulation,
-    observed: simulation.rolls === 0 ? 0 : simulation.hits / simulation.rolls,
-    expected: analysis.probability,
-  };
-
-  function resetForSelection(
-    nextEventA: EventRuleId,
-    nextEventB: EventRuleId,
-    nextView: RuleView,
-  ) {
-    setEventA(nextEventA);
-    setEventB(nextEventB);
-    setView(nextView);
-    setSimulation(initialSimulation);
+  const [simulation, setSimulation] = useState(initialSimulation);
+  const [index, setIndex] = useState(0);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const [transferAnswer, setTransferAnswer] = useState<string | null>(null);
+  const analysis = useMemo(() => analyzeProbabilityRule(eventA, eventB, view), [eventA, eventB, view]);
+  const experiment = ruleExperiments[index];
+  const transfer = index === ruleExperiments.length;
+  const reached = !!prediction && eventA === "sum-seven" && eventB === "first-even" && view === experiment?.target && simulation.rolls >= (experiment.rolls ?? 0);
+  const complete = reached && explanation === experiment?.correctExplanation;
+  const transferReached = eventA === "doubles" && eventB === "at-least-one-six" && view === "a-only";
+  function clearAnswers() { setExplanation(null); setTransferAnswer(null); }
+  function start(nextIndex = index) {
+    setIndex(nextIndex); setEventA("sum-seven"); setEventB("first-even");
+    setView(ruleExperiments[nextIndex]?.start ?? "union"); setSimulation(initialSimulation);
+    setPrediction(null); clearAnswers();
   }
-
-  function runSimulation(count: number) {
-    setSimulation((current) =>
-      advanceSimulation(current, eventA, eventB, view, count),
-    );
-  }
-
-  return (
-    <main className="min-h-screen bg-[#f7faff] px-4 py-5 text-[#071024] sm:px-6 lg:px-10">
-      <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-5">
-        <header className="pb-1">
-          <div className="min-w-0">
-            <h1 className="text-[42px] leading-none font-black tracking-[-0.04em] text-[#070b1a] sm:text-[52px] lg:text-[60px]">
-              Probability Rules Simulator
-            </h1>
-            <p className="mt-3 max-w-3xl text-[20px] leading-[1.35] font-bold text-[#314571] sm:text-[24px]">
-              Count outcomes first, then watch probability rules become arithmetic.
-            </p>
-          </div>
-        </header>
-
-        <Panel className="p-5 sm:p-6">
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)]">
-            <div className="min-w-0">
-              <LessonTitle>1. Choose Events</LessonTitle>
-              <p className="mt-4 max-w-[760px] text-[16px] leading-[1.45] text-[#16264e]">
-                Every dice rule shades a region inside the same 36 possible
-                outcomes. Choose A and B, then compare their regions.
-              </p>
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div className="min-w-0">
-                  <p className="mb-3 text-[12px] font-black tracking-[0.08em] text-[#52628a] uppercase">
-                    Event A
-                  </p>
-                  <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3">
-                    {eventAOptions.map((option) => (
-                      <EventButton
-                        key={option.id}
-                        option={option}
-                        isSelected={eventA === option.id}
-                        onSelect={() => resetForSelection(option.id, eventB, view)}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="min-w-0">
-                  <p className="mb-3 text-[12px] font-black tracking-[0.08em] text-[#52628a] uppercase">
-                    Event B
-                  </p>
-                  <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3">
-                    {eventBOptions.map((option) => (
-                      <EventButton
-                        key={option.id}
-                        option={option}
-                        isSelected={eventB === option.id}
-                        onSelect={() => resetForSelection(eventA, option.id, view)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="min-w-0 rounded-[12px] border border-[#dbe2f2] bg-[#fbfbff] p-4">
-              <p className="text-[13px] font-black tracking-[0.02em] text-[#352cff] uppercase">
-                Current Count
-              </p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <FactPill
-                  label="Sample space"
-                  value={`${analysis.counts.sampleSpace} outcomes`}
-                />
-                <FactPill label="A" value={`${analysis.counts.a} outcomes`} />
-                <FactPill label="B" value={`${analysis.counts.b} outcomes`} />
-                <FactPill
-                  label="Overlap"
-                  value={`${analysis.counts.intersection} outcomes`}
-                />
-              </div>
-            </div>
-          </div>
-        </Panel>
-
-        <Panel className="p-5 sm:p-6">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-            <div className="min-w-0">
-              <LessonTitle>2. See The Sample Space</LessonTitle>
-              <p className="mt-4 max-w-[820px] text-[16px] leading-[1.45] text-[#16264e]">
-                Color shows whether each outcome belongs to A, B, both, or
-                neither. The ringed cells are counted now for{" "}
-                {ruleViewDetails[view].label}.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {ruleViews.map((entryView) => (
-                <RuleViewButton
-                  key={entryView}
-                  view={entryView}
-                  isSelected={entryView === view}
-                  onSelect={() => resetForSelection(eventA, eventB, entryView)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-            <LegendSwatch
-              className="border-[#5d7dff] bg-[#eaf0ff]"
-              label="A"
-            />
-            <LegendSwatch
-              className="border-[#ff6b7a] bg-[#fff0f2]"
-              label="B"
-            />
-            <LegendSwatch
-              className="border-[#8053ff] bg-[#efeaff]"
-              label="A ∩ B"
-            />
-            <LegendSwatch
-              className="border-white bg-white ring-2 ring-[#111827] ring-offset-1 ring-offset-white"
-              label="counted now"
-            />
-          </div>
-
-          <DiceGrid memberships={analysis.memberships} />
-        </Panel>
-
-        <Panel className="p-5 sm:p-6">
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.45fr)]">
-            <div className="min-w-0">
-              <LessonTitle>3. Count The Rule</LessonTitle>
-              <div className="mt-4 rounded-[8px] border border-[#dbe2f2] bg-[#fbfbff] px-4 py-5 text-center font-mono text-[19px] leading-[1.45] font-black text-[#071024] sm:text-[25px]">
-                {analysis.formula}
-              </div>
-              <div className="mt-3 rounded-[8px] border border-[#dbe2f2] bg-white px-4 py-4 text-center font-mono text-[16px] leading-[1.45] font-black text-[#352cff] sm:text-[21px]">
-                {analysis.expandedFormula}
-              </div>
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-[13px] font-black tracking-[0.02em] text-[#352cff] uppercase">
-                Current Probability
-              </p>
-              <div className="mt-4 grid gap-3">
-                <FactPill label="Counted region" value={analysis.fraction} />
-                <FactPill label="Decimal" value={analysis.decimal} />
-                <div className="rounded-[8px] border border-[#dedcff] bg-[#f8f7ff] px-4 py-3 text-[15px] leading-[1.4] text-[#2924ff]">
-                  {analysis.takeaway}
-                </div>
-              </div>
-            </div>
-          </div>
-        </Panel>
-
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-          <SimulationPanel simulation={simulationResult} onRun={runSimulation} />
-
-          <Panel className="p-5 sm:p-6">
-            <LessonTitle>5. The Takeaway</LessonTitle>
-            <p className="mt-4 text-[22px] leading-[1.35] font-black text-[#071024]">
-              Probability is counted region size divided by total possible
-              outcomes.
-            </p>
-            <div className="mt-5 rounded-[8px] border border-[#dfe4f4] bg-[#fbfbff] px-4 py-4 font-mono text-[15px] leading-[1.6] font-black text-[#263a68]">
-              {analysis.fraction} = {analysis.decimal}
-              <br />
-              {ruleLabels[view]} selects {analysis.counts.view} of{" "}
-              {analysis.counts.sampleSpace} outcomes.
-            </div>
-          </Panel>
-        </div>
-      </div>
-    </main>
-  );
+  function chooseView(id: string) { setView(id as RuleView); setSimulation(initialSimulation); clearAnswers(); }
+  function roll(count: number) { setSimulation((state) => advanceSimulation(state, eventA, eventB, view, count)); clearAnswers(); }
+  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of ${ruleExperiments.length}`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
+    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="rule-prediction" choices={experiment.predictions} value={prediction} onChange={(id) => { start(index); setPrediction(id); }} /><p className={sharedStyles.small}>Choosing a prediction restores this experiment’s events, rule and empty sample.</p></>}
+    {prediction && !reached && <div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Use Event A = Sum is 7 and Event B = First die even. Reset starts again.</p></div>}
+    {reached && <><p role="status" className={sharedStyles.observation}>{prediction === experiment.correctPrediction ? "Your prediction matches the model." : "The evidence challenges your prediction. Compare the grid, formula and sample."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="rule-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />{explanation && !complete && <p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
+    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 3 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
+  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Apply a rule to new events" : "Explore the sample space"}>
+    {transfer ? <><p>Choose Event A = Doubles, Event B = At least one 6, and A only. What fraction is selected, and why?</p><ExperimentChoices legend="Transfer explanation" name="rule-transfer" choices={[{ id: "five", label: "5/36: remove (6,6) from the six doubles." }, { id: "six", label: "6/36: A only keeps every double." }, { id: "one", label: "1/36: A only means both events." }]} value={transferAnswer} onChange={setTransferAnswer} />{transferAnswer && (!transferReached ? <p className={sharedStyles.feedback}>First set the three named controls and inspect the selected region.</p> : transferAnswer !== "five" ? <p className={sharedStyles.feedback}>Try again. A only keeps A outcomes that are outside B. Is (6,6) outside B?</p> : <><ExperimentResult title="Transfer explained">Exactly five doubles remain. The same set rule works for a different pair of events; its count depends on the overlap.</ExperimentResult><ExperimentButton onClick={() => setIndex(5)}>Explore freely</ExperimentButton></>)}</> : <><p>Try all event pairs and rules. Count the selected region before simulating it.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
+  </ExperimentRail>;
+  const selectedLabel = views.find((item) => item.id === view)!.label;
+  return <LearningPage title="Probability Rules" subtitle="Select outcomes. Count what belongs to each event." rail={rail}>
+    <LessonToolbar label="Experiment starting points" scenarios={ruleExperiments} selectedId={experiment?.id ?? ""} onSelect={(id) => start(ruleExperiments.findIndex((item) => item.id === id))} onReset={() => start()} />
+    <div className={styles.controls}>
+      <LessonSelect label="Event A" choices={eventAOptions} value={eventA} onChange={(id) => { setEventA(id as EventRuleId); setSimulation(initialSimulation); clearAnswers(); }} />
+      <LessonSelect label="Event B" choices={eventBOptions} value={eventB} onChange={(id) => { setEventB(id as EventRuleId); setSimulation(initialSimulation); clearAnswers(); }} />
+    </div>
+    <LessonToggleGroup label="Rule" choices={views} value={view} onChange={chooseView} />
+    <section className={styles.evidence} aria-label="Dice sample space">
+      <h2>Your sample space</h2><p>Two fair, independent dice give 36 equally likely ordered outcomes. A+B means both events; — means neither. ✓ marks outcomes counted by {selectedLabel}.</p>
+      <table className={styles.space}><caption>First die = row; second die = column. Each cell is one possible ordered pair.</caption>
+        <thead><tr><th scope="col">1st / 2nd</th>{dice.map((die) => <th scope="col" key={die}>{die}</th>)}</tr></thead>
+        <tbody>{dice.map((first) => <tr key={first}><th scope="row">{first}</th>{analysis.memberships.filter((item) => item.outcome.first === first).map((item) => <td key={item.outcome.id} data-selected={item.inView} aria-label={`First die ${first}, second die ${item.outcome.second}; ${membershipLabel(item.inA, item.inB) === "—" ? "neither event" : membershipLabel(item.inA, item.inB)}; ${item.inView ? "selected" : "not selected"}`}><span>({first},{item.outcome.second})</span><strong>{membershipLabel(item.inA, item.inB)}</strong>{item.inView && <span className={styles.check} aria-hidden="true">✓</span>}</td>)}</tr>)}</tbody>
+      </table>
+    </section>
+    <section className={styles.construction} aria-label="Build the probability"><h2>Count the selected region</h2><p>{analysis.formula}</p><p>{analysis.expandedFormula}</p><p>{analysis.takeaway}</p></section>
+    <LessonSummaries label="Exact event probabilities" summaries={[
+      { label: "A", color: "#1760db", value: `${analysis.counts.a}/36`, definition: "Outcomes in event A.", formula: eventAOptions.find((item) => item.id === eventA)!.label },
+      { label: "B", color: "#22715d", value: `${analysis.counts.b}/36`, definition: "Outcomes in event B.", formula: eventBOptions.find((item) => item.id === eventB)!.label },
+      { label: "Both", color: "#976000", value: `${analysis.counts.intersection}/36`, definition: "The overlapping outcomes.", formula: "A ∩ B" },
+      { label: "Selected", color: "#5031dc", value: `${analysis.counts.view}/36`, definition: "Outcomes counted by this rule.", formula: `${selectedLabel}: ≈ ${analysis.decimal}` },
+    ]} />
+    <section className={styles.simulation} aria-label="Simulated rolls"><h2>Compare exact and observed</h2><p>Each simulated roll samples one ordered pair. Changing events or the rule starts a new sample; Clear rolls also resets the sample.</p>
+      <div className={styles.actions}><LessonAction onClick={() => roll(100)}>Roll 100</LessonAction><LessonAction onClick={() => roll(1000)}>Roll 1000</LessonAction><LessonAction onClick={() => { setSimulation(initialSimulation); clearAnswers(); }}>Clear rolls</LessonAction></div>
+      <p className={styles.observed}>{simulation.rolls ? `Observed: ${simulation.hits} / ${simulation.rolls} ≈ ${(simulation.hits / simulation.rolls).toFixed(3)}` : "No rolls yet"}</p>
+      <p>Exact: {analysis.counts.view} / 36 ≈ {analysis.decimal}. Larger samples reduce sampling noise on average, but need not get closer at every step. Rolls use a repeatable pseudorandom stream, not physical dice.</p>
+    </section>
+    <p className={sharedStyles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">{selectedLabel} selects {analysis.counts.view} of 36 outcomes. {simulation.rolls} simulated rolls; {simulation.hits} hits.</p>
+  </LearningPage>;
 }

@@ -39,14 +39,15 @@ export function ExperimentProgress({ phase }: { phase: number }) {
   </ol>;
 }
 
-export function LessonToolbar({ scenarios, selectedId, onSelect, onReset }: {
+export function LessonToolbar({ scenarios, selectedId, onSelect, onReset, label = "Dataset scenarios" }: {
   scenarios: readonly { id: string; label: string; shortLabel: string }[];
   selectedId: string;
   onSelect: (id: string) => void;
   onReset: () => void;
+  label?: string;
 }) {
   return <div className={styles.toolbar}>
-    <div className={styles.presets} aria-label="Dataset scenarios">
+    <div className={styles.presets} aria-label={label}>
       {scenarios.map((scenario) => <button key={scenario.id} type="button"
         aria-pressed={selectedId === scenario.id} onClick={() => onSelect(scenario.id)}>
         <strong>{scenario.label}</strong><span>{scenario.shortLabel}</span>
@@ -124,6 +125,36 @@ export function ExperimentButton({ children, onClick, disabled, arrow = false }:
   return <button type="button" className={arrow ? styles.nextButton : styles.primary} disabled={disabled} onClick={onClick}>
     {children}{arrow && <ArrowRightIcon aria-hidden="true" />}
   </button>;
+}
+
+export function LessonSelect({ label, choices, value, onChange }: {
+  label: string;
+  choices: readonly { id: string; label: string }[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  return <label className={styles.controlField}>{label}<select value={value}
+    onChange={(event) => onChange(event.currentTarget.value)}>
+    {choices.map((choice) => <option key={choice.id} value={choice.id}>{choice.label}</option>)}
+  </select></label>;
+}
+
+export function LessonToggleGroup({ label, choices, value, onChange }: {
+  label: string;
+  choices: readonly { id: string; label: string }[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  return <div className={styles.toggleGroup} role="group" aria-label={label}>
+    {choices.map((choice) => <button key={choice.id} type="button" aria-pressed={choice.id === value}
+      onClick={() => onChange(choice.id)}>{choice.label}</button>)}
+  </div>;
+}
+
+export function LessonAction({ children, onClick, disabled = false }: {
+  children: ReactNode; onClick: () => void; disabled?: boolean;
+}) {
+  return <button type="button" className={styles.lessonAction} onClick={onClick} disabled={disabled}>{children}</button>;
 }
 
 export function GuideInvitation() {

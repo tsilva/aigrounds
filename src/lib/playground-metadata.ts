@@ -122,6 +122,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "probability-rules",
+    layout: "guided-discovery",
     title: "Probability Rules Simulator",
     tag: "probability",
     kicker:

@@ -1,3 +1,4 @@
+import {allocatePercentages} from "@/lib/probability-allocation";
 import {type CrossEntropyClass,type CrossEntropyMode} from "./scenario";
 
 export type LossTerm={classItem:CrossEntropyClass;target:0|1;probability:number;eventProbability:number;loss:number};
@@ -32,24 +33,6 @@ export function adjustProbability(classes:CrossEntropyClass[],probabilities:Reco
   const changed=Math.min(upper,Math.max(1,Math.round(nextValue*100)));
   if (Math.abs(changed/100-probabilities[changedClassId])<1e-12) return {...probabilities};
   if (mode==="multilabel") return {...probabilities,[changedClassId]:changed/100};
-  const others=classes.filter(c=>c.id!==changedClassId);
-  const allocated:Record<string,number>={[changedClassId]:changed};
-  let active=[...others],remaining=100-changed;
-  let shares:{id:string;share:number;order:number}[]=[];
-  while (active.length){
-    const weight=active.reduce((sum,c)=>sum+Math.max(0,Math.round((probabilities[c.id]??0)*100)),0);
-    shares=active.map((c,order)=>({id:c.id,order,share:weight>0?remaining*Math.max(0,Math.round((probabilities[c.id]??0)*100))/weight:remaining/active.length}));
-    const below=shares.filter(s=>s.share<1-1e-12);
-    if (!below.length) break;
-    for (const s of below){allocated[s.id]=1;remaining--;}
-    active=active.filter(c=>!below.some(s=>s.id===c.id));
-  }
-  for (const s of shares) allocated[s.id]=Math.floor(s.share+1e-12);
-  const left=remaining-shares.reduce((sum,s)=>sum+allocated[s.id],0);
-  const order=[...shares].sort((a,b)=>{
-    const difference=(b.share-Math.floor(b.share+1e-12))-(a.share-Math.floor(a.share+1e-12));
-    return Math.abs(difference)<1e-10?a.order-b.order:difference;
-  });
-  for (let i=0;i<left;i++) allocated[order[i].id]++;
-  return Object.fromEntries(classes.map(c=>[c.id,allocated[c.id]/100]));
+  const values=allocatePercentages(classes.map(c=>Math.round(probabilities[c.id]*100)),classes.findIndex(c=>c.id===changedClassId),changed);
+  return Object.fromEntries(classes.map((c,i)=>[c.id,values[i]/100]));
 }

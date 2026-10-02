@@ -38,6 +38,8 @@ Softmax Temperature Lab separates positive temperature scaling from score edits,
 
 Cross Entropy Loss compares binary complements, one-hot categorical targets, and separate multi-label predictions through three guided experiments and a changed-target transfer check. Fixed-scale probability bars show each target and its loss contribution; false labels remain part of the four-label mean. Exact whole-percent controls keep exclusive distributions normalized without hidden loss clipping, while optional worked calculations and all original reference cases retain supporting evidence.
 
+KL Divergence Intuition Lab compares the original three reference distributions with exact, normalized Q edits. Three prediction → try → explanation experiments expose signed source-weighted terms, a full match and direction, then transfer to a changed reference with Q fixed. Optional worked calculations and a fixed-scale signed chart accompany the paired probability bars. The engine handles zero-source and zero-target limits without clipping.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

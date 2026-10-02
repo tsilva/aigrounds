@@ -16,6 +16,7 @@ The first three lessons share the components in `src/components/learning-page/`;
 | `ExperimentResult`, `ExperimentButton` | Completion feedback and exercise actions |
 | `LessonSummaries` | Labeled values, definitions, formulas and comparisons |
 | `NumberLinePoint`, `useNumberLineLayout` | 0–100 sliders, pointer capture, keyboard editing, responsive collision packing |
+| `LessonSelect`, `LessonToggleGroup`, `LessonAction` | Labeled discrete choices, selected workbench modes, and compact actions |
 
 Page and experiment components are exported from `learning-page.tsx`; number-line controls are in `number-line-controls.tsx`. `ExperimentRail` places `ExperimentProgress` and `GuideInvitation` automatically. Omit its `phase` for free exploration. Keep scenario datasets, experiment state, answer checking, chart geometry and supporting mathematical evidence in the module. In particular, a lesson can check explanations immediately or require an explicit check action without duplicating the rail.
 

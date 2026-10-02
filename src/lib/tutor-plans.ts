@@ -1,3 +1,5 @@
+import { probabilityTutorPlan } from "@/modules/probability-rules/learning-experiments";
+
 export type TutorStep = {
   title: string;
   experiment: string;
@@ -407,52 +409,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "probability-rules": {
-    intro:
-      "Work through three sample-space experiments. Predict which grid cells count, switch the rule view, then connect the colored region to the formula.",
-    whyItMatters:
-      "Probability rules exist because real questions combine events with and, or, and not. They are useful because they keep counts honest, especially when outcomes overlap and naive adding would double-count.",
-    masteryCriteria: [
-      "Explains probability as counted outcomes divided by the 36-outcome sample space.",
-      "Recognizes that an intersection counts only cells that satisfy both A and B.",
-      "Explains that a union subtracts the overlap because A plus B counts those cells twice.",
-    ],
-    steps: [
-      {
-        title: "Count a single event",
-        experiment:
-          "Set A to Sum is 7 and choose the Event A view. Look at the ringed cells in the sample-space grid and the Current Count panel.",
-        predictionQuestion:
-          "Out of 36 dice outcomes, how many cells do you expect Sum is 7 to count?",
-        observationPrompt:
-          "What did the ringed grid cells make visible about probability as counting?",
-        takeaway:
-          "Probability starts as counted outcomes divided by the whole sample space.",
-      },
-      {
-        title: "Find overlap",
-        experiment:
-          "Choose the A and B intersection view. Compare the colored A cells, B cells, and ringed overlap cells on the grid.",
-        predictionQuestion:
-          "What must be true for an outcome to land in the overlap?",
-        observationPrompt:
-          "Which cells counted in the intersection?",
-        takeaway:
-          "An intersection counts only outcomes where both event rules are true.",
-      },
-      {
-        title: "Subtract double-counting",
-        experiment:
-          "Switch to the A or B union view. Watch the formula include A plus B minus the overlap.",
-        predictionQuestion:
-          "Why should the union formula subtract the overlap once?",
-        observationPrompt:
-          "What did the union formula do with cells that belonged to both A and B?",
-        takeaway:
-          "A union counts A or B, so overlapping cells must be subtracted once after adding both regions.",
-      },
-    ],
-  },
+  "probability-rules": probabilityTutorPlan,
   "conditional-probability": {
     intro:
       "Work through three filtering experiments. Predict how the denominator changes, switch scenarios, then decide whether the events are independent.",

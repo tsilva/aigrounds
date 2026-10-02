@@ -228,7 +228,7 @@ function ruleCopy(
   if (view === "a") {
     return {
       formula: "P(A) = |A| / |S|",
-      expandedFormula: `${counts.a} / ${counts.sampleSpace} = ${(counts.a / counts.sampleSpace).toFixed(3)}`,
+      expandedFormula: `${counts.a} / ${counts.sampleSpace} ≈ ${(counts.a / counts.sampleSpace).toFixed(3)}`,
       takeaway: "One event probability is its region size divided by all possible outcomes.",
     };
   }
@@ -244,7 +244,7 @@ function ruleCopy(
   if (view === "intersection") {
     return {
       formula: "P(A ∩ B) = |A ∩ B| / |S|",
-      expandedFormula: `${counts.intersection} / ${counts.sampleSpace} = ${(counts.intersection / counts.sampleSpace).toFixed(3)}`,
+      expandedFormula: `${counts.intersection} / ${counts.sampleSpace} ≈ ${(counts.intersection / counts.sampleSpace).toFixed(3)}`,
       takeaway: "The intersection keeps only outcomes that satisfy both events.",
     };
   }

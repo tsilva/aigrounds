@@ -1,0 +1,18 @@
+{
+  "lessonPlanStep": null,
+  "title": "Confusion Matrix & Thresholds",
+  "slug": "confusion-matrix-thresholds",
+  "modulePath": "src/modules/confusion-matrix-thresholds",
+  "mockupPath": "src/modules/confusion-matrix-thresholds/design/accepted-mockup.png",
+  "promptPath": "src/modules/confusion-matrix-thresholds/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-34dbaafc-db46-4ecc-a35d-7a80151ec8e4.png",
+  "approval": "Self-reviewed under explicit user authorization.",
+  "refinements": [
+    "Reject first draft for invented scores, contradictory counts and four-column dashboard clutter.",
+    "Use canonical shared frame, continuous lavender rail and open summaries; remove raster card containers and move Guided discovery inside the workbench.",
+    "Derive geometry and counts from all original twelve examples; raster spacing is illustrative.",
+    "Keep equality included and explain undefined precision separately from zero F1.",
+    "Use full names and scores in the complete optional table; single-letter plot IDs avoid collisions.",
+    "Normalize visible score percentages and render each SVG title as one text node to preserve correct hydration. State metric rounding explicitly."
+  ]
+}

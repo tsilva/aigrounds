@@ -1,3 +1,4 @@
+import { thresholdTutorPlan } from "@/modules/confusion-matrix-thresholds/learning-experiments";
 import { fitTutorPlan } from "@/modules/overfitting/learning-experiments";
 import { arrivalTutorPlan } from "@/modules/waiting-arrival-distributions/learning-experiments";
 import { distributionTutorPlan } from "@/modules/bernoulli-categorical-binomial/learning-experiments";
@@ -555,47 +556,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "confusion-matrix-thresholds": {
-    intro:
-      "Work through three threshold experiments. Predict which mistakes change, move the cutoff, then connect the confusion matrix to precision and recall.",
-    whyItMatters:
-      "Thresholds and confusion matrices exist because model scores become real decisions with different mistake costs. They are useful for choosing a cutoff that matches the job, such as catching more positives or avoiding false alarms.",
-    steps: [
-      {
-        title: "Lower the cutoff",
-        experiment:
-          "Choose Medical Screen. Lower the threshold and watch the score strip, false positives, and false negatives.",
-        predictionQuestion:
-          "When the threshold drops, do you expect more or fewer examples to be predicted positive?",
-        observationPrompt:
-          "What happened to missed positives and extra positives after lowering the threshold?",
-        takeaway:
-          "Lower thresholds catch more actual positives, but they often create more false positives.",
-      },
-      {
-        title: "Raise the cutoff",
-        experiment:
-          "Raise the threshold and compare precision, recall, and the confusion matrix.",
-        predictionQuestion:
-          "What mistake becomes more likely when the model only accepts very high scores?",
-        observationPrompt:
-          "How did the positive queue and false negatives change?",
-        takeaway:
-          "Higher thresholds are stricter, which can improve precision but can miss positives and reduce recall.",
-      },
-      {
-        title: "Pick the cost that matters",
-        experiment:
-          "Switch between Medical Screen, Spam Filter, and Fraud Review. Compare the default thresholds and mistake stories.",
-        predictionQuestion:
-          "Why might two tasks choose different thresholds for the same kind of score?",
-        observationPrompt:
-          "What changed when the cost of false positives and false negatives changed?",
-        takeaway:
-          "A threshold is a decision policy, so the best cutoff depends on which mistake costs more in the real task.",
-      },
-    ],
-  },
+  "confusion-matrix-thresholds": thresholdTutorPlan,
   overfitting: fitTutorPlan,
   "matrix-multiplication": {
     intro:

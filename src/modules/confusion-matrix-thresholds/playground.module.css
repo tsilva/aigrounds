@@ -1,0 +1,20 @@
+.context { color:#536487; font-size:14px; line-height:1.7; margin:20px 0; }
+.plot,.matrix { border-top:1px solid #dfe4f4; padding:22px 0; }
+.plot h2,.matrix h2 { font-size:21px; font-weight:600; line-height:1.4; }
+.plot p,.optional p { color:#536487; font-size:14px; line-height:1.7; margin-top:8px; }
+.plot svg { width:100%; max-width:700px; height:auto; display:block; margin:14px auto 0; }
+.plot svg text { fill:#536487; font-size:18px; font-family:var(--font-ibm-plex-mono),monospace; }
+.matrix table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:14px; margin-top:12px; }
+.matrix caption,.scroller caption { text-align:left; color:#536487; font-size:13px; line-height:1.7; margin:8px 0 12px; }
+.matrix th,.matrix td { padding:14px 8px; border-bottom:1px solid #dfe4f4; text-align:center; }
+.matrix th { font-weight:500; }
+.matrix td strong { display:block; color:#5031dc; font-size:30px; }
+.matrix td span { display:block; margin-top:5px; font-size:12px; }
+.matrix small { font-size:12px; color:#536487; }
+.optional { border-top:1px solid #dfe4f4; }
+.optional details { padding:16px 0; border-bottom:1px solid #dfe4f4; }
+.optional summary { color:#0c1230; cursor:pointer; font-size:15px; font-weight:500; }
+.scroller { overflow-x:auto; margin-top:12px; }
+.scroller table { width:100%; min-width:580px; border-collapse:collapse; text-align:left; font-size:13px; }
+.scroller th,.scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
+.scroller td { white-space:nowrap; }

@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": null,
+  "title": "Cross Entropy Loss",
+  "slug": "categorical-cross-entropy",
+  "modulePath": "src/modules/categorical-cross-entropy",
+  "mockupPath": "src/modules/categorical-cross-entropy/design/accepted-mockup.png",
+  "promptPath": "src/modules/categorical-cross-entropy/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-83c38851-e9c2-4dbf-99ad-e693ae737402.png",
+  "approval": "Self-reviewed under explicit user authorization.",
+  "refinements": [
+    "Apply canonical shared anatomy, exact editor and horizontal progress; remove raster Restore baseline text because prediction choice restores it automatically.",
+    "Use fixed0\u2013100%row bars consistently across all three target shapes instead of a binary-only stacked bar.",
+    "Retain all original classes and reference cases; start Binary to align the first experiment.",
+    "Binary uses one complementary probability editor; multi-label supports all-false and all-true targets with separate label editors.",
+    "Use whole-percent exact redistribution without hidden clipping or changed requested values; state ranges and sum rules explicitly.",
+    "Expose each true/false label contribution and average over all four labels; retain formulas and reference cases as optional evidence.",
+    "Give exclusive target groups visible headings matching their accessible names; Guide instructions explicitly restore the current baseline instead of assuming the visible mode."
+  ]
+}

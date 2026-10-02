@@ -1,3 +1,4 @@
+import { lossTutorPlan } from "@/modules/categorical-cross-entropy/learning-experiments";
 import { softmaxTutorPlan } from "@/modules/softmax-temperature/learning-experiments";
 import { thresholdTutorPlan } from "@/modules/confusion-matrix-thresholds/learning-experiments";
 import { fitTutorPlan } from "@/modules/overfitting/learning-experiments";
@@ -328,47 +329,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "categorical-cross-entropy": {
-    intro:
-      "Work through three loss experiments. Predict which probability matters, change the target or prediction, then connect surprise to loss.",
-    whyItMatters:
-      "Cross entropy exists because classifiers need a training signal that rewards probability on the true answer and punishes confident mistakes. It is useful because it turns prediction quality into a smooth number that models can optimize.",
-    steps: [
-      {
-        title: "Reward the true outcome",
-        experiment:
-          "Use Binary Cross Entropy. Select the true outcome, then raise its predicted probability.",
-        predictionQuestion:
-          "What should happen to loss when the model assigns more probability to what actually happened?",
-        observationPrompt:
-          "How did the loss respond as the true outcome probability increased?",
-        takeaway:
-          "Cross entropy is low when the prediction puts high probability on the true outcome.",
-      },
-      {
-        title: "Punish confident wrong guesses",
-        experiment:
-          "Switch to Categorical Cross Entropy. Put low probability on the selected true class and watch the loss.",
-        predictionQuestion:
-          "What should happen when the true class gets almost no probability?",
-        observationPrompt:
-          "What did the loss do when the model was confident in the wrong direction?",
-        takeaway:
-          "Categorical cross entropy mostly cares about the probability assigned to the one true class.",
-      },
-      {
-        title: "Treat labels independently",
-        experiment:
-          "Switch to Multi-label Cross Entropy. Select multiple true labels, then raise true labels and lower false labels.",
-        predictionQuestion:
-          "Should multi-label probabilities need to add up to 1?",
-        observationPrompt:
-          "What happened when each label was treated as its own yes/no question?",
-        takeaway:
-          "Multi-label cross entropy applies a binary loss to each label, so several labels can be true at once.",
-      },
-    ],
-  },
+  "categorical-cross-entropy": lossTutorPlan,
   "kl-divergence": {
     intro:
       "Work through three mismatch experiments. Predict which buckets will matter, reshape Q, then flip direction to see why KL is not a symmetric distance.",

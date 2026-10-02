@@ -1,202 +1,55 @@
-import { type CrossEntropyClass, type CrossEntropyMode } from "./scenario";
+import {type CrossEntropyClass,type CrossEntropyMode} from "./scenario";
 
-const MIN_PROBABILITY = 0.01;
+export type LossTerm={classItem:CrossEntropyClass;target:0|1;probability:number;eventProbability:number;loss:number};
+export type LossAnalysis={loss:number;total:number;terms:LossTerm[];trueClasses:CrossEntropyClass[];isValidDistribution:boolean};
 
-type LossAnalysis = {
-  trueClass: CrossEntropyClass;
-  trueClasses: CrossEntropyClass[];
-  trueProbability: number;
-  loss: number;
-  total: number;
-  isValidDistribution: boolean;
-  qualityLabel: string;
-  qualityTone: "good" | "medium" | "bad";
-  calculationTerms: string[];
-};
+export function analyzeLoss(classes:CrossEntropyClass[],probabilities:Record<string,number>,trueClassIds:string[],mode:CrossEntropyMode):LossAnalysis {
+  if (!classes.length) throw new Error("At least one class is required.");
+  const targets=new Set(trueClassIds);
+  if ([...targets].some(id=>!classes.some(c=>c.id===id))) throw new Error("Targets must name existing classes.");
+  if (mode!=="multilabel"&&targets.size!==1) throw new Error("An exclusive outcome needs exactly one true class.");
+  if (classes.some(c=>!Number.isFinite(probabilities[c.id])||probabilities[c.id]<0||probabilities[c.id]>1)) throw new Error("Probabilities must be finite and between zero and one.");
+  const total=classes.reduce((sum,c)=>sum+probabilities[c.id],0);
+  if (mode!=="multilabel"&&Math.abs(total-1)>1e-10) throw new Error("Exclusive probabilities must sum to one.");
+  const terms:LossTerm[]=classes.map(classItem=>{
+    const probability=probabilities[classItem.id],target:0|1=targets.has(classItem.id)?1:0;
+    const eventProbability=mode==="multilabel"&&target===0?1-probability:probability;
+    const loss=mode!=="multilabel"&&target===0?0:eventProbability===0?Infinity:-Math.log(eventProbability);
+    return {classItem,probability,target,eventProbability,loss:loss===0?0:loss};
+  });
+  const sum=terms.reduce((s,t)=>s+t.loss,0);
+  return {loss:mode==="multilabel"?sum/classes.length:sum,total,terms,trueClasses:classes.filter(c=>targets.has(c.id)),isValidDistribution:true};
+}
 
-export function categoricalCrossEntropyLoss(
-  classes: CrossEntropyClass[],
-  probabilities: Record<string, number>,
-  trueClassIds: string[],
-  mode: CrossEntropyMode = "categorical",
-) {
-  if (mode === "multilabel") {
-    const trueClassSet = new Set(trueClassIds);
-    const totalLoss = classes.reduce((sum, classItem) => {
-      const target = trueClassSet.has(classItem.id) ? 1 : 0;
-      const probability = clampProbability(probabilities[classItem.id] ?? 0);
-      const term =
-        target === 1
-          ? -Math.log(probability)
-          : -Math.log(1 - probability);
+export function categoricalCrossEntropyLoss(classes:CrossEntropyClass[],probabilities:Record<string,number>,trueClassIds:string[],mode:CrossEntropyMode="categorical") {
+  return analyzeLoss(classes,probabilities,trueClassIds,mode).loss;
+}
 
-      return sum + term;
-    }, 0);
-
-    return totalLoss / classes.length;
+// Whole-percent allocation keeps every displayed control on its step grid and the edited value exact.
+export function adjustProbability(classes:CrossEntropyClass[],probabilities:Record<string,number>,changedClassId:string,nextValue:number,mode:CrossEntropyMode="categorical"):Record<string,number> {
+  if (!Number.isFinite(nextValue)||!classes.some(c=>c.id===changedClassId)) return {...probabilities};
+  const upper=mode==="categorical"?97:99;
+  const changed=Math.min(upper,Math.max(1,Math.round(nextValue*100)));
+  if (Math.abs(changed/100-probabilities[changedClassId])<1e-12) return {...probabilities};
+  if (mode==="multilabel") return {...probabilities,[changedClassId]:changed/100};
+  const others=classes.filter(c=>c.id!==changedClassId);
+  const allocated:Record<string,number>={[changedClassId]:changed};
+  let active=[...others],remaining=100-changed;
+  let shares:{id:string;share:number;order:number}[]=[];
+  while (active.length){
+    const weight=active.reduce((sum,c)=>sum+Math.max(0,Math.round((probabilities[c.id]??0)*100)),0);
+    shares=active.map((c,order)=>({id:c.id,order,share:weight>0?remaining*Math.max(0,Math.round((probabilities[c.id]??0)*100))/weight:remaining/active.length}));
+    const below=shares.filter(s=>s.share<1-1e-12);
+    if (!below.length) break;
+    for (const s of below){allocated[s.id]=1;remaining--;}
+    active=active.filter(c=>!below.some(s=>s.id===c.id));
   }
-
-  const trueClassId = trueClassIds[0] ?? classes[0]?.id ?? "";
-  const trueProbability = clampProbability(probabilities[trueClassId] ?? 0);
-
-  return -Math.log(trueProbability);
-}
-
-function probabilityTotal(
-  classes: CrossEntropyClass[],
-  probabilities: Record<string, number>,
-) {
-  return classes.reduce(
-    (total, classItem) => total + (probabilities[classItem.id] ?? 0),
-    0,
-  );
-}
-
-export function analyzeLoss(
-  classes: CrossEntropyClass[],
-  probabilities: Record<string, number>,
-  trueClassIds: string[],
-  mode: CrossEntropyMode,
-): LossAnalysis {
-  const trueClassSet = new Set(trueClassIds);
-  const trueClasses = classes.filter((classItem) =>
-    trueClassSet.has(classItem.id),
-  );
-  const trueClass = trueClasses[0] ?? classes[0];
-
-  if (!trueClass) {
-    throw new Error("At least one class is required.");
-  }
-
-  const trueProbability =
-    mode === "multilabel"
-      ? trueClasses.reduce(
-          (sum, classItem) =>
-            sum + clampProbability(probabilities[classItem.id] ?? 0),
-          0,
-        ) / Math.max(1, trueClasses.length)
-      : clampProbability(probabilities[trueClass.id] ?? 0);
-  const loss = categoricalCrossEntropyLoss(
-    classes,
-    probabilities,
-    trueClassIds,
-    mode,
-  );
-  const total = probabilityTotal(classes, probabilities);
-
-  return {
-    trueClass,
-    trueClasses,
-    trueProbability,
-    loss,
-    total,
-    isValidDistribution:
-      mode === "multilabel" || Math.abs(total - 1) < 0.005,
-    qualityLabel: qualityLabel(loss),
-    qualityTone: qualityTone(loss),
-    calculationTerms: classes.map((classItem) => {
-      const target = trueClassSet.has(classItem.id) ? 1 : 0;
-      const probability = probabilities[classItem.id] ?? 0;
-
-      if (mode === "multilabel" && target === 0) {
-        return `(1 − ${target}) × log(1 − ${probability.toFixed(2)})`;
-      }
-
-      return `${target} × log(${probability.toFixed(2)})`;
-    }),
-  };
-}
-
-export function adjustProbability(
-  classes: CrossEntropyClass[],
-  probabilities: Record<string, number>,
-  changedClassId: string,
-  nextValue: number,
-  mode: CrossEntropyMode = "categorical",
-) {
-  const clampedValue = clamp(nextValue, MIN_PROBABILITY, 0.97);
-
-  if (mode === "multilabel") {
-    return {
-      ...probabilities,
-      [changedClassId]: roundProbability(clampedValue),
-    };
-  }
-
-  const otherClasses = classes.filter(
-    (classItem) => classItem.id !== changedClassId,
-  );
-  const remainingMass = 1 - clampedValue;
-  const previousOtherTotal = otherClasses.reduce(
-    (total, classItem) => total + (probabilities[classItem.id] ?? 0),
-    0,
-  );
-  const equalShare = remainingMass / otherClasses.length;
-  const nextProbabilities: Record<string, number> = {
-    [changedClassId]: roundProbability(clampedValue),
-  };
-
-  for (const classItem of otherClasses) {
-    const previous = probabilities[classItem.id] ?? equalShare;
-    const scaled =
-      previousOtherTotal > 0
-        ? (previous / previousOtherTotal) * remainingMass
-        : equalShare;
-    nextProbabilities[classItem.id] = roundProbability(scaled);
-  }
-
-  return rebalance(classes, nextProbabilities, changedClassId);
-}
-
-function qualityLabel(loss: number) {
-  if (loss < 0.5) {
-    return "Lower is better! The model is more confident in the correct class.";
-  }
-
-  if (loss < 1.4) {
-    return "The correct class has some probability, but the model is uncertain.";
-  }
-
-  return "The loss is high because the true class received too little probability.";
-}
-
-function qualityTone(loss: number): LossAnalysis["qualityTone"] {
-  if (loss < 0.5) {
-    return "good";
-  }
-
-  if (loss < 1.4) {
-    return "medium";
-  }
-
-  return "bad";
-}
-
-function rebalance(
-  classes: CrossEntropyClass[],
-  probabilities: Record<string, number>,
-  preferredClassId: string,
-) {
-  const total = probabilityTotal(classes, probabilities);
-  const difference = roundProbability(1 - total);
-  const preferred = probabilities[preferredClassId] ?? MIN_PROBABILITY;
-
-  return {
-    ...probabilities,
-    [preferredClassId]: roundProbability(
-      clamp(preferred + difference, MIN_PROBABILITY, 0.97),
-    ),
-  };
-}
-
-function roundProbability(value: number) {
-  return Math.round(value * 100) / 100;
-}
-
-function clampProbability(value: number) {
-  return clamp(value, MIN_PROBABILITY, 0.99);
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
+  for (const s of shares) allocated[s.id]=Math.floor(s.share+1e-12);
+  const left=remaining-shares.reduce((sum,s)=>sum+allocated[s.id],0);
+  const order=[...shares].sort((a,b)=>{
+    const difference=(b.share-Math.floor(b.share+1e-12))-(a.share-Math.floor(a.share+1e-12));
+    return Math.abs(difference)<1e-10?a.order-b.order:difference;
+  });
+  for (let i=0;i<left;i++) allocated[order[i].id]++;
+  return Object.fromEntries(classes.map(c=>[c.id,allocated[c.id]/100]));
 }

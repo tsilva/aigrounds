@@ -36,6 +36,8 @@ Confusion Matrix & Thresholds uses fixed score lanes, an inclusive cutoff, a com
 
 Softmax Temperature Lab separates positive temperature scaling from score edits, using four exact logit controls and probability bars on a fixed scale. Three guided experiments cover preserved ranking, competition through normalization, and uniform probabilities for equal logits; a close-call transfer check distinguishes concentration from certainty or correctness. Supporting normalization and entropy evidence defines shifted weights, natural-log units, and relative spread.
 
+Cross Entropy Loss compares binary complements, one-hot categorical targets, and separate multi-label predictions through three guided experiments and a changed-target transfer check. Fixed-scale probability bars show each target and its loss contribution; false labels remain part of the four-label mean. Exact whole-percent controls keep exclusive distributions normalized without hidden loss clipping, while optional worked calculations and all original reference cases retain supporting evidence.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": null,
+  "title": "Softmax Temperature Lab",
+  "slug": "softmax-temperature",
+  "modulePath": "src/modules/softmax-temperature",
+  "mockupPath": "src/modules/softmax-temperature/design/accepted-mockup.png",
+  "promptPath": "src/modules/softmax-temperature/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-11c459b5-f1ca-40b0-b117-40b65143e2c3.png",
+  "approval": "Self-reviewed under explicit user authorization.",
+  "refinements": [
+    "Reject first draft for invented animal/object meanings assigned to abstract class names.",
+    "Restore canonical shared navigation, control positions, sizes, progress and Guide invitation.",
+    "Remove unnecessary Try it button; exact editors apply changes directly.",
+    "Derive bar lengths from probabilities on a fixed scale; raster proportions and slider positions are illustrative.",
+    "Keep all original preset scores exactly, with 0.05 score steps supporting their fractional values.",
+    "Presets load Temperature0.70; prediction selection restores the experiment baseline.",
+    "List every tied largest class; retain normalization and entropy as optional defined evidence."
+  ]
+}

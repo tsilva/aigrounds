@@ -1,0 +1,22 @@
+.context { color:#536487; font-size:14px; line-height:1.7; margin:18px 0; }
+.logits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; padding:14px 0; }
+.probabilities,.optional { border-top:1px solid #dfe4f4; }
+.probabilities { padding:22px 0; }
+.probabilities h2 { font-size:21px; font-weight:600; }
+.probabilities p,.optional p { color:#536487; font-size:14px; line-height:1.7; margin:8px 0; }
+.axis,.barRow { display:grid; grid-template-columns:74px minmax(0,1fr) 78px; gap:10px; align-items:center; }
+.axis { margin:18px 0 10px; color:#536487; font-size:12px; }
+.axis div { display:flex; justify-content:space-between; }
+.barRow { margin:14px 0; font-size:14px; }
+.barRow strong { font-weight:500; }
+.barRow output { text-align:right; font-family:var(--font-ibm-plex-mono),monospace; font-size:13px; }
+.track { height:16px; background:#edf0f7; }
+.track span { display:block; height:100%; background:#5031dc; }
+.optional details { padding:16px 0; border-bottom:1px solid #dfe4f4; }
+.optional summary { color:#0c1230; font-size:15px; font-weight:500; cursor:pointer; }
+.scroller { overflow-x:auto; margin-top:14px; }
+.scroller table { width:100%; min-width:580px; border-collapse:collapse; font-size:13px; text-align:left; }
+.scroller caption { text-align:left; font-size:13px; color:#536487; line-height:1.7; margin:8px 0 12px; }
+.scroller th,.scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
+.scroller td { white-space:nowrap; font-family:var(--font-ibm-plex-mono),monospace; }
+@container (max-width:699px) { .logits { grid-template-columns:minmax(0,1fr); } }

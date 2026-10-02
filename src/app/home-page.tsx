@@ -14,6 +14,7 @@ export type HomePlaygroundCard = {
   concepts: string[];
   status: "live" | "coming-soon";
   href?: string;
+  lastUpdated: string | null;
 };
 
 type HomePageProps = {
@@ -23,15 +24,12 @@ type HomePageProps = {
 
 export function HomePage({ playgrounds, version }: HomePageProps) {
   const [query, setQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
 
   const visiblePlaygrounds = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    if (!normalizedQuery) {
-      return playgrounds;
-    }
-
-    return playgrounds.filter((playground) => {
+    const filteredPlaygrounds = playgrounds.filter((playground) => {
       const searchableText = [
         playground.title,
         playground.slug,
@@ -47,7 +45,21 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
 
       return searchableText.includes(normalizedQuery);
     });
-  }, [playgrounds, query]);
+
+    return filteredPlaygrounds.sort((a, b) => {
+      if (sortOrder === "updated") {
+        if (a.status !== b.status) return a.status === "live" ? -1 : 1;
+
+        const dateDifference =
+          (b.lastUpdated ? Date.parse(b.lastUpdated) : 0) -
+          (a.lastUpdated ? Date.parse(a.lastUpdated) : 0);
+
+        if (dateDifference !== 0) return dateDifference;
+      }
+
+      return a.step - b.step;
+    });
+  }, [playgrounds, query, sortOrder]);
 
   return (
     <main className="min-h-screen bg-[#f7faff] px-4 py-5 text-slate-950 sm:px-6 lg:px-10">
@@ -94,6 +106,32 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
             />
           </label>
         </header>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-500">
+            {visiblePlaygrounds.length} playgrounds
+          </p>
+          <div role="group" aria-label="Sort playgrounds" className="flex items-center gap-1 rounded-xl border border-blue-200 bg-white p-1">
+            {([
+              ["curriculum", "Curriculum order"],
+              ["updated", "Last updated"],
+            ] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={sortOrder === value}
+                onClick={() => setSortOrder(value)}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-4 focus:ring-indigo-100 ${
+                  sortOrder === value
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => (
@@ -166,6 +204,23 @@ function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
       <p className={outcomeClassName}>
         {playground.outcome}.
       </p>
+      {!isComingSoon ? (
+        <p className="mt-auto pt-4 font-mono text-xs text-slate-500">
+          {playground.lastUpdated ? (
+            <>
+              Updated{" "}
+              <time dateTime={playground.lastUpdated}>
+                {new Intl.DateTimeFormat("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  timeZone: "UTC",
+                }).format(new Date(playground.lastUpdated))}
+              </time>
+            </>
+          ) : "Update date unavailable"}
+        </p>
+      ) : null}
     </>
   );
 

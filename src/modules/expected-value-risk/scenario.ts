@@ -15,8 +15,8 @@ export const expectedValuePresets: BetPreset[] = [
     bets: [
       {
         id: "safe",
-        label: "Safe Bet",
-        shortLabel: "Safe",
+        label: "Bet A",
+        shortLabel: "A",
         probability: 0.72,
         winAmount: 35,
         lossAmount: -18,
@@ -25,8 +25,8 @@ export const expectedValuePresets: BetPreset[] = [
       },
       {
         id: "risky",
-        label: "Risky Bet",
-        shortLabel: "Risky",
+        label: "Bet B",
+        shortLabel: "B",
         probability: 0.34,
         winAmount: 125,
         lossAmount: -38,
@@ -42,8 +42,8 @@ export const expectedValuePresets: BetPreset[] = [
     bets: [
       {
         id: "safe",
-        label: "Safe Bet",
-        shortLabel: "Safe",
+        label: "Bet A",
+        shortLabel: "A",
         probability: 0.76,
         winAmount: 30,
         lossAmount: -20,
@@ -52,8 +52,8 @@ export const expectedValuePresets: BetPreset[] = [
       },
       {
         id: "risky",
-        label: "Risky Bet",
-        shortLabel: "Risky",
+        label: "Bet B",
+        shortLabel: "B",
         probability: 0.28,
         winAmount: 190,
         lossAmount: -42,
@@ -69,8 +69,8 @@ export const expectedValuePresets: BetPreset[] = [
     bets: [
       {
         id: "safe",
-        label: "Safe Bet",
-        shortLabel: "Safe",
+        label: "Bet A",
+        shortLabel: "A",
         probability: 0.68,
         winAmount: 28,
         lossAmount: -14,
@@ -79,8 +79,8 @@ export const expectedValuePresets: BetPreset[] = [
       },
       {
         id: "risky",
-        label: "Risky Bet",
-        shortLabel: "Risky",
+        label: "Bet B",
+        shortLabel: "B",
         probability: 0.12,
         winAmount: 210,
         lossAmount: -36,

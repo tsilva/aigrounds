@@ -1,0 +1,44 @@
+.intro { margin: 18px 0; color: #536487; font-size: 14px; line-height: 1.6; }
+.bets, .samples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+.bets > section, .sample { min-width: 0; }
+.bets > section + section, .sample + .sample { padding-left: 24px; border-left: 1px solid #dfe4f4; }
+.bets h2, .comparison h2, .simulation h2 { font-size: 20px; margin: 0 0 16px; }
+.bets h3 { font-size: 14px; margin: 20px 0 10px; }
+.probabilityBar { display: flex; height: 24px; overflow: hidden; border: 1px solid #dfe4f4; }
+.probabilityBar [data-outcome='win'] { background: #279565; }
+.probabilityBar [data-outcome='loss'] { background: #ec94ae; }
+.outcomeLabels { font-size: 13px; line-height: 1.7; color: #536487; }
+.arithmetic { font-family: var(--font-ibm-plex-mono), monospace; font-size: 13px; line-height: 1.9; overflow-wrap: anywhere; }
+.comparison, .simulation { border-top: 1px solid #dfe4f4; margin-top: 24px; padding-top: 22px; }
+.comparison p, .simulation > p { color: #536487; font-size: 14px; line-height: 1.6; }
+.comparison table, .roundTable table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.comparison th, .comparison td, .roundTable th, .roundTable td { text-align: left; border-bottom: 1px solid #dfe4f4; padding: 12px 8px; overflow-wrap: anywhere; }
+.comparison caption, .roundTable caption { text-align: left; padding-bottom: 12px; font-size: 12px; color: #536487; }
+.comparison thead th, .roundTable thead th { color: #536487; font-weight: 500; }
+.comparison td, .roundTable td { font-family: var(--font-ibm-plex-mono), monospace; }
+.samples { margin-top: 22px; }
+.sample { margin: 0; }
+.sample figcaption { font-size: 13px; line-height: 1.7; }
+.sample svg { width: 100%; display: block; margin-top: 10px; }
+.sample svg text { font-size: 18px; fill: #536487; font-family: var(--font-ibm-plex-mono), monospace; }
+.sample p { font-size: 12px; line-height: 1.6; color: #536487; }
+.axis { stroke: #a4afca; stroke-width: 1; }
+.expectedLine { stroke: #5031dc; stroke-dasharray: 4 4; stroke-width: 1.5; }
+.sampleLine { fill: none; stroke: #1760db; stroke-width: 2; }
+.roundTable { max-height: 300px; overflow: auto; }
+.comparison details, .sample details { font-size: 13px; line-height: 1.6; margin-top: 16px; }
+.comparison summary, .sample summary { cursor: pointer; color: #5031dc; }
+@media (max-width: 900px) {
+  .comparison th, .comparison td { padding: 10px 5px; }
+}
+
+.comparisonTable { overflow-x: auto; }
+.comparisonTable:focus-visible, .roundTable:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
+.comparison table { min-width: 480px; }
+.comparison td { white-space: nowrap; }
+.scrollHelp { display: none; }
+@container (max-width: 699px) {
+  .bets, .samples { grid-template-columns: minmax(0, 1fr); }
+  .bets > section + section, .sample + .sample { padding: 24px 0 0; border-left: 0; border-top: 1px solid #dfe4f4; }
+}
+@container (max-width: 549px) { .scrollHelp { display: block; } }

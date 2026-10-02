@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": null,
+  "title": "Expected Value & Risk Lab",
+  "slug": "expected-value-risk",
+  "modulePath": "src/modules/expected-value-risk",
+  "mockupPath": "src/modules/expected-value-risk/design/accepted-mockup.png",
+  "promptPath": "src/modules/expected-value-risk/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-641c3cea-ec71-4d7d-89c0-0212fa13558f.png",
+  "approval": "User authorized autonomous mockup review for the legacy redesign batch.",
+  "refinements": [
+    "Use shared shell, horizontal progress, rail Guide invitation and bounded exact editors, including their help text.",
+    "Use all original scenario values and parameter ranges; slider geometry is derived from bounds, not image pixels.",
+    "Use neutral Bet A/Bet B names and define SD as per-round spread, distinct from loss probability.",
+    "Place probability labels outside bars so extreme shares remain legible.",
+    "Use a shared payoff scale for the two running-average charts and preserve the sample prefix.",
+    "Provide optional complete round tables and four experiments with transfer/recovery gates.",
+    "At narrow available containers stack bets and charts; keep comparison values intact in a keyboard-scrollable table."
+  ]
+}

@@ -16,7 +16,7 @@ export type BetAnalysis = BetInput & {
   variance: number;
   standardDeviation: number;
   swing: number;
-  breakEvenProbability: number;
+  breakEvenProbability: number | null;
   outcomes: OutcomeTick[];
   simulatedAverage: number;
   simulatedTotal: number;
@@ -34,9 +34,6 @@ export type OutcomeTick = {
 
 export type ComparisonAnalysis = {
   bets: BetAnalysis[];
-  bestExpectedValue: BetId;
-  lowestRisk: BetId;
-  widestSwing: BetId;
   domain: {
     min: number;
     max: number;
@@ -48,23 +45,11 @@ export function analyzeBets(
   rounds: number,
 ): ComparisonAnalysis {
   const analyzedBets = bets.map((bet) => analyzeBet(bet, rounds));
-  const bestExpectedValue = analyzedBets.reduce((best, bet) =>
-    bet.expectedValue > best.expectedValue ? bet : best,
-  ).id;
-  const lowestRisk = analyzedBets.reduce((lowest, bet) =>
-    bet.standardDeviation < lowest.standardDeviation ? bet : lowest,
-  ).id;
-  const widestSwing = analyzedBets.reduce((widest, bet) =>
-    bet.swing > widest.swing ? bet : widest,
-  ).id;
   const min = Math.min(...analyzedBets.map((bet) => bet.lossAmount), -100);
   const max = Math.max(...analyzedBets.map((bet) => bet.winAmount), 100);
 
   return {
     bets: analyzedBets,
-    bestExpectedValue,
-    lowestRisk,
-    widestSwing,
     domain: {
       min,
       max,
@@ -88,6 +73,13 @@ export function updateBet(
 }
 
 export function analyzeBet(bet: BetInput, rounds: number): BetAnalysis {
+  bet = {
+    ...bet,
+    probability: Number.isFinite(bet.probability) ? Math.min(1, Math.max(0, bet.probability)) : 0.5,
+    winAmount: Number.isFinite(bet.winAmount) ? bet.winAmount : 1,
+    lossAmount: Number.isFinite(bet.lossAmount) ? bet.lossAmount : -1,
+  };
+  rounds = Number.isFinite(rounds) ? Math.min(10000, Math.max(1, Math.floor(rounds))) : 60;
   const expectedValue =
     bet.probability * bet.winAmount + (1 - bet.probability) * bet.lossAmount;
   const variance =
@@ -104,7 +96,7 @@ export function analyzeBet(bet: BetInput, rounds: number): BetAnalysis {
     variance,
     standardDeviation,
     swing: bet.winAmount - bet.lossAmount,
-    breakEvenProbability: Math.abs(bet.lossAmount) / (bet.winAmount - bet.lossAmount),
+    breakEvenProbability: bet.winAmount === bet.lossAmount ? null : -bet.lossAmount / (bet.winAmount - bet.lossAmount),
     outcomes,
     simulatedAverage: simulatedTotal / rounds,
     simulatedTotal,
@@ -115,9 +107,13 @@ export function analyzeBet(bet: BetInput, rounds: number): BetAnalysis {
 
 function simulateOutcomes(bet: BetInput, rounds: number): OutcomeTick[] {
   let runningTotal = 0;
+  // One fixed stream per bet: payoff edits preserve outcomes; longer runs
+  // extend the same prefix. These seeded samples illustrate the model.
+  let seed = bet.id === "safe" ? 1309 : 1907;
 
   return Array.from({ length: rounds }, (_, index) => {
-    const roll = deterministicUnitValue(bet, index + 1);
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const roll = seed / 2 ** 32;
     const isWin = roll < bet.probability;
     const value = isWin ? bet.winAmount : bet.lossAmount;
 
@@ -131,16 +127,4 @@ function simulateOutcomes(bet: BetInput, rounds: number): OutcomeTick[] {
       runningAverage: runningTotal / (index + 1),
     };
   });
-}
-
-function deterministicUnitValue(bet: BetInput, round: number) {
-  const seed =
-    round * 1103515245 +
-    bet.probability * 1009 +
-    bet.winAmount * 917 +
-    Math.abs(bet.lossAmount) * 619 +
-    (bet.id === "safe" ? 17 : 71);
-  const mixed = Math.sin(seed) * 10000;
-
-  return mixed - Math.floor(mixed);
 }

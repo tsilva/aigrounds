@@ -20,6 +20,8 @@ The Shape, Skew & Outliers lesson uses the shared workbench and rail for four ex
 
 The Probability Rules lesson retains every dice event pair and six set-operation views in an accessible sample-space table. Four guided experiments and a new-event transfer check connect exact counts to complements, intersections, inclusive unions, set differences, and simulated frequencies. Shared workbench controls keep selects, mode buttons, and compact actions consistent across lessons.
 
+The Conditional Probability & Independence lesson uses an exact four-cell count table, an optional 100-person grid, and three guided experiments plus a transfer check. Learners change the eligible reference group while retaining the overlap, compare independence as equal rates rather than equal counts, and distinguish a higher conditional rate from a changed population. Incorrect explanations and stale answers cannot complete the exercises.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

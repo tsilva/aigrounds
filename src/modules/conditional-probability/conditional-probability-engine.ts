@@ -118,7 +118,7 @@ export function analyzeConditionalProbability(
         ? 0
         : selection.numerator / selection.denominator,
     independenceDelta: probabilities.pBGivenA - probabilities.pB,
-    isIndependent: Math.abs(probabilities.pBGivenA - probabilities.pB) < 0.015,
+    isIndependent: intersection * total === a * b,
   };
 }
 

@@ -144,12 +144,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "conditional-probability",
+    layout: "guided-discovery",
     title: "Conditional Probability & Independence Lab",
     tag: "probability",
     kicker:
       "Filter a population and see why conditional probability changes the denominator first.",
     summary:
-      "Toggle between independent, dependent, and base-rate scenarios. The lab updates a 100-person grid, marginal and conditional fractions, joint probability, and the independence verdict together.",
+      "Compare independent, dependent, and base-rate populations with an exact count table and optional 100-person grid. Three guided experiments and a transfer check connect marginal, joint, and conditional fractions to their reference groups.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Conditional probability",

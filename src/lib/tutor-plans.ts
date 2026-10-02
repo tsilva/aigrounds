@@ -1,3 +1,4 @@
+import { distributionTutorPlan } from "@/modules/bernoulli-categorical-binomial/learning-experiments";
 import { payoffTutorPlan } from "@/modules/expected-value-risk/learning-experiments";
 import { bayesTutorPlan } from "@/modules/bayes-rule/learning-experiments";
 import { conditionalTutorPlan } from "@/modules/conditional-probability/learning-experiments";
@@ -509,47 +510,7 @@ export const playgroundTutorPlans = {
     ],
   },
   "expected-value-risk": payoffTutorPlan,
-  "bernoulli-categorical-binomial": {
-    intro:
-      "Work through three probability-mass experiments. Predict which outcome gets mass, change p or n, then connect the visible shape to the question being asked.",
-    whyItMatters:
-      "These distributions exist because different random processes ask different questions: one yes/no outcome, one class choice, or a count of repeated successes. They are useful because matching the distribution to the question keeps probability calculations meaningful.",
-    steps: [
-      {
-        title: "Start with one yes/no trial",
-        experiment:
-          "Choose Bernoulli Trial. Move Success probability p and compare the 0 and 1 bars.",
-        predictionQuestion:
-          "When p rises, where should probability mass move in a one-trial yes/no model?",
-        observationPrompt:
-          "What happened to the failure and success bars as p changed?",
-        takeaway:
-          "A Bernoulli trial has only two outcomes, so adding mass to success removes the same amount from failure.",
-      },
-      {
-        title: "Spread one choice across classes",
-        experiment:
-          "Choose Categorical Choice. Move p and watch class A trade mass with the other class buckets.",
-        predictionQuestion:
-          "If class A receives more probability, what must happen to the other classes?",
-        observationPrompt:
-          "How did the class probabilities keep the total mass at 1?",
-        takeaway:
-          "Categorical probabilities describe one draw from many buckets, and all buckets must still sum to 1.",
-      },
-      {
-        title: "Repeat and count successes",
-        experiment:
-          "Choose Binomial Count. Change Trials n, then move p and compare where the tallest count bars land.",
-        predictionQuestion:
-          "When p rises across repeated trials, should the likely success count move left or right?",
-        observationPrompt:
-          "What happened to the count shape and expected value?",
-        takeaway:
-          "A binomial model repeats the same Bernoulli trial and summarizes the run by how many successes occurred.",
-      },
-    ],
-  },
+  "bernoulli-categorical-binomial": distributionTutorPlan,
   "waiting-arrival-distributions": {
     intro:
       "Work through three arrival experiments. Predict how one event chance changes waits and counts, then connect the tick model to the Poisson rate view.",

@@ -210,6 +210,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "bernoulli-categorical-binomial",
+    layout: "guided-discovery",
     title: "Bernoulli, Categorical & Binomial Lab",
     tag: "probability",
     kicker:

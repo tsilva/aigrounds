@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": null,
+  "title": "Bernoulli, Categorical & Binomial Lab",
+  "slug": "bernoulli-categorical-binomial",
+  "modulePath": "src/modules/bernoulli-categorical-binomial",
+  "mockupPath": "src/modules/bernoulli-categorical-binomial/design/accepted-mockup.png",
+  "promptPath": "src/modules/bernoulli-categorical-binomial/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-c1549dae-3d89-400e-b83c-a8f13f976f6e.png",
+  "approval": "User authorized autonomous mockup review for the legacy redesign batch.",
+  "refinements": [
+    "Use canonical shared controls, horizontal progress and single rail Guide CTA.",
+    "Preserve p5\u201395% and n1\u201316; chart probabilities use fixed0\u2013100% fullprecision scale.",
+    "All equal modal outcomes get outlines; keep percentages outside bars.",
+    "Numeric moments for Bernoulli/binomial only; categorical probability summaries.",
+    "Scrollable chart/data table remain keyboard-operable at narrow available widths."
+  ]
+}

@@ -30,6 +30,8 @@ The Bernoulli, Categorical & Binomial lesson distinguishes a single yes/no outco
 
 Waiting & Arrival Distributions separates exact geometric waiting times from Poisson count approximations under independent one-second ticks. Three guided experiments and a new-window transfer check compare event chance, observation length, exact at-least-one tick probability and the small-expected-count linear shortcut. Fixed-scale probability bars include a labeled pooled count tail; an optional seeded tick timeline shows actual events without forcing the expected count.
 
+The Overfitting lesson compares polynomial fits on training circles and held-out squares through three controlled experiments and a sparse-data transfer check. Fixed fitting constraints and stable axes across degrees expose error changes without automatic degree-based labels. Optional point predictions and all-degree losses support exact comparisons; the noise-zero counterexample and validation/test distinction challenge misleading generalization rules.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

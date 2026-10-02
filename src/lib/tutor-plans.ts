@@ -1,3 +1,4 @@
+import { fitTutorPlan } from "@/modules/overfitting/learning-experiments";
 import { arrivalTutorPlan } from "@/modules/waiting-arrival-distributions/learning-experiments";
 import { distributionTutorPlan } from "@/modules/bernoulli-categorical-binomial/learning-experiments";
 import { payoffTutorPlan } from "@/modules/expected-value-risk/learning-experiments";
@@ -595,47 +596,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  overfitting: {
-    intro:
-      "Work through three generalization experiments. Predict how complexity affects train and test loss, then find the useful middle.",
-    whyItMatters:
-      "Overfitting exists as a warning because a model can memorize training data while failing on new examples. It is useful to study because real models only matter if they generalize beyond what they already saw.",
-    steps: [
-      {
-        title: "Underfit with too little shape",
-        experiment:
-          "Choose Balanced Split and set Model complexity to a low degree. Compare the curve with the training and test dots.",
-        predictionQuestion:
-          "What should happen when a model is too simple to follow the real pattern?",
-        observationPrompt:
-          "How did the curve miss both training and test structure?",
-        takeaway:
-          "Underfitting happens when the model is too simple to capture the signal, so it performs poorly on both training and test data.",
-      },
-      {
-        title: "Find the useful middle",
-        experiment:
-          "Raise complexity to a moderate degree. Watch training loss and test loss together.",
-        predictionQuestion:
-          "What should happen when complexity is enough to learn the pattern but not enough to chase every wiggle?",
-        observationPrompt:
-          "What changed for training and test loss in the middle range?",
-        takeaway:
-          "A moderate model often generalizes best because it captures signal without memorizing noise.",
-      },
-      {
-        title: "Overfit the noise",
-        experiment:
-          "Push Model complexity high. Compare the wiggly curve, training loss, and test loss.",
-        predictionQuestion:
-          "Can training loss keep improving while test loss gets worse?",
-        observationPrompt:
-          "What did the high-complexity curve do around individual training dots?",
-        takeaway:
-          "Overfitting lowers training error by memorizing noise, but that extra wiggle can hurt future examples.",
-      },
-    ],
-  },
+  overfitting: fitTutorPlan,
   "matrix-multiplication": {
     intro:
       "Work through three matrix multiplication experiments. Predict which shapes work, pick one output cell, then connect every product cell to a row-column dot product.",

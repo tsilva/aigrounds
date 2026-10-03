@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "power-effect-size-sample-size",
+    layout: "guided-discovery",
+    title: "Power, Effect Size & Sample Size Lab",
+    tag: "inference",
+    kicker: "Change a true effect or study size; compare detection probability.",
+    summary: "Adjust effect size and sample size to see when real effects become detectable.",
+    estimatedDuration: "8 to 11 minutes",
+    concepts: ["Power", "Effect size", "Sample size"],
+    learningGoals: [
+      "Separate assumed true effect, standardized effect, expected Z and difference standard error.",
+      "Explain size and effect-magnitude changes in conditional detection probability.",
+      "Keep two-sided sign symmetry and null false alarms distinct from real-effect detection.",
+      "Transfer to a new plan without posterior, causal or certainty claims.",
+    ],
+  },
+  {
     slug: "type-i-type-ii-errors",
     layout: "guided-discovery",
     title: "Type I & Type II Errors Lab",
@@ -902,14 +918,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "power-effect-size-sample-size",
-    title: "Power, Effect Size & Sample Size Lab",
-    tag: "inference",
-    summary:
-      "Adjust effect size and sample size to see when real effects become detectable.",
-    concepts: ["Power", "Effect size", "Sample size"],
-  },
+
   {
     slug: "covariance-correlation",
     title: "Covariance & Correlation Map",

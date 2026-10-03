@@ -1,0 +1,17 @@
+{
+  "step": 24,
+  "title": "Correlation Shape & Outliers Lab",
+  "slug": "correlation-shape-outliers",
+  "modulePath": "src/modules/correlation-shape-outliers",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5c1e334c-74d3-4541-a728-5e3cf1c8b9d0.png",
+  "approval": "Autonomous self-review authorized by user",
+  "refinements": [
+    "Canonical shared toolbar, phases, native exact controls and Guide invitation used.",
+    "Live metrics immediately above chart; numeric geometry/paired ranks engine derived.",
+    "Six fixed circles and one movable numbered diamond distinguish roles without color alone.",
+    "V1 inventednavigation rejected; V2 restorescanonicalnav.",
+    "Rank table and six-circle reference optional; no removalrecommendation/inference."
+  ]
+}

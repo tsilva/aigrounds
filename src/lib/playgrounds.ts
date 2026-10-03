@@ -1,3 +1,4 @@
+import { ShapePlayground } from "@/modules/correlation-shape-outliers/ShapePlayground";
 import { CovariancePlayground } from "@/modules/covariance-correlation/CovariancePlayground";
 import { PowerPlayground } from "@/modules/power-effect-size-sample-size/PowerPlayground";
 import { ErrorsPlayground } from "@/modules/type-i-type-ii-errors/ErrorsPlayground";
@@ -58,6 +59,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "correlation-shape-outliers": ShapePlayground,
   "covariance-correlation": CovariancePlayground,
   "mean-median-mode": MeanMedianModePlayground,
   "range-quartiles-iqr": RangeQuartilesIqrPlayground,

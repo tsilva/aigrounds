@@ -669,22 +669,18 @@ const activePlaygroundDefinitions = [
   {
     slug: "zero-knowledge-proofs",
     title: "Zero Knowledge Proofs Lab",
+    layout: "guided-discovery",
     tag: "cryptography",
-    kicker:
-      "Open one random edge and watch confidence grow while the secret coloring stays hidden.",
-    summary:
-      "Run a graph-coloring proof where a prover commits hidden colors, the verifier challenges one edge, and repeated fresh shuffles prove local checks without revealing the full coloring.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Provers",
-      "Verifiers",
-      "Commitments",
-      "Zero knowledge",
-    ],
+    kicker: "Commit before opening one edge; separate local checks from repeated random evidence.",
+    summary: "Illustrate graph-coloring commitments, honest and invalid colorings, one edge per fresh round, and the fixed cheater’s theoretical escape probability under independent uniform challenges. This is a visual simulation, not cryptographic secrecy.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Provers", "Verifiers", "Hiding and binding", "Independent repetition", "Zero knowledge"],
     learningGoals: [
-      "Understand a proof round as commit, challenge, open, and verify.",
-      "See how repeated random edge checks reduce a cheating prover's chance of escaping.",
-      "Recognize why fresh hidden shuffles keep local openings from revealing the secret coloring.",
+      "Explain why commitments hide and bind before the challenge.",
+      "Separate two opened shuffled endpoint colors and a local pass from a full-coloring check.",
+      "Show that color permutations preserve equality and expose the fixed invalid coloring’s two bad edges.",
+      "Explain why each opening needs fresh commitments and independently sampled color names may repeat.",
+      "Use (7/9)^k only for the specified independent uniform challenges, without confusing theory, actual history or certainty.",
     ],
   },
   {

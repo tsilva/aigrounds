@@ -42,6 +42,8 @@ KL Divergence Intuition Lab compares the original three reference distributions 
 
 Gradient Descent Playground preserves the scalar quadratic, three original presets and rate/momentum ranges while following the full-precision update without clamps. Four controlled experiments distinguish slow descent, a rate-only comparison, crossing with lower loss and momentum raising one loss; a new-rate transfer follows. The actual curve, proposed point, signed arithmetic and optional history replace heuristic convergence badges. Run checks both position and stored velocity before stopping.
 
+Tensor Shape & Broadcasting Lab checks right-aligned axes, requires every pair to pass, and traces actual source indices for elementwise addition. Three guided experiments repair a mismatch, follow singleton reuse and reject arbitrary smaller-axis stretching; a transfer moves the singleton to another axis. All original shape presets and sizes 1 through 5 remain available, with optional all-size comparisons and an explanation of missing leading axes. Zero indices and repeated toy values are explicitly distinguished from singleton reuse.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

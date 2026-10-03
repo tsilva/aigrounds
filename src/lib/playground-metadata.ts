@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "margin-of-error-sample-size",
+    layout: "guided-discovery",
+    title: "Margin of Error & Sample Size Lab",
+    tag: "inference",
+    kicker: "Trade sample size against confidence and interval width.",
+    summary: "Change sample size and confidence level to see interval width expand or shrink.",
+    estimatedDuration: "6 to 9 minutes",
+    concepts: ["Margin of error", "Sample size", "Confidence level"],
+    learningGoals: [
+      "Use the square-root size rule without changing selected confidence.",
+      "Explain higher confidence through critical distance and interval width.",
+      "Separate known spread, SE, half-width, full width and unobserved actual error.",
+      "Transfer precision tradeoffs to different size, spread and confidence settings.",
+    ],
+  },
+  {
     slug: "central-limit-theorem",
     layout: "guided-discovery",
     title: "Central Limit Theorem Lab",
@@ -834,14 +850,7 @@ export const activePlaygroundMetadata: Array<
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
-  {
-    slug: "margin-of-error-sample-size",
-    title: "Margin of Error & Sample Size Lab",
-    tag: "inference",
-    summary:
-      "Change sample size and confidence level to see interval width expand or shrink.",
-    concepts: ["Margin of error", "Sample size", "Confidence level"],
-  },
+
   {
     slug: "confidence-intervals",
     title: "Confidence Intervals Explorer",

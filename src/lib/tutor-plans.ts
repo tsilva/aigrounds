@@ -1,3 +1,4 @@
+import { marginTutorPlan } from "@/modules/margin-of-error-sample-size/learning-experiments";
 import { cltTutorPlan } from "@/modules/central-limit-theorem/learning-experiments";
 import { seTutorPlan } from "@/modules/sampling-distributions-standard-error/learning-experiments";
 import { biasTutorPlan } from "@/modules/sampling-bias/learning-experiments";
@@ -270,6 +271,7 @@ export const playgroundTutorPlans = {
   "law-large-numbers-simulation": llnTutorPlan,
   "pdf-cdf-probability-area": areaTutorPlan,
   "normal-distribution-z-scores": normalTutorPlan,
+  "margin-of-error-sample-size": marginTutorPlan,
   "central-limit-theorem": cltTutorPlan,
   "sampling-distributions-standard-error": seTutorPlan,
   "sampling-bias": biasTutorPlan,

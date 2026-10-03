@@ -1,0 +1,16 @@
+{
+  "step": 18,
+  "title": "Margin of Error & Sample Size Lab",
+  "slug": "margin-of-error-sample-size",
+  "modulePath": "src/modules/margin-of-error-sample-size",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-82b84a43-5854-42a0-8209-bd996789e072.png",
+  "approval": "Autonomous self-review explicitly authorized by user",
+  "refinements": [
+    "Use shared compact Guide invitation and range controls exactly",
+    "Derive all paired interval geometry from engine on fixed -5..45 scale",
+    "Reference row shares currently selected SD; exact endpoints remain text evidence",
+    "Generated raster is illustrative, not a numeric oracle"
+  ]
+}

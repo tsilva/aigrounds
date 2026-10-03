@@ -45,6 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 ## Notes
 
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
+- The [Margin of Error & Sample Size Lab](https://aigrounds.tsilva.eu/playgrounds/margin-of-error-sample-size) isolates size, confidence and known spread in a normal-model planning calculator, separating half-width from actual estimation error.
 - The [Central Limit Theorem Lab](https://aigrounds.tsilva.eu/playgrounds/central-limit-theorem) compares standardized averages from skewed and discrete sources with a normal bin reference, including a rare-event counterexample to universal size thresholds.
 - [Sampling Distributions & Standard Error](https://aigrounds.tsilva.eu/playgrounds/sampling-distributions-standard-error) separates individual-value spread, theoretical mean SE and a finite batch of repeated estimates; its transfer shows SE is not a guaranteed error bound.
 - The [Sampling Bias Lab](https://aigrounds.tsilva.eu/playgrounds/sampling-bias) contrasts incomplete frames, outcome-related nonresponse and survivor-only observation while separating expected bias from finite sample error.

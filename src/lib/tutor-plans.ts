@@ -1,3 +1,4 @@
+import { covarianceTutorPlan } from "@/modules/covariance-correlation/learning-experiments";
 import { powerTutorPlan } from "@/modules/power-effect-size-sample-size/learning-experiments";
 import { errorsTutorPlan } from "@/modules/type-i-type-ii-errors/learning-experiments";
 import { testingTutorPlan } from "@/modules/hypothesis-testing-basics/learning-experiments";
@@ -68,6 +69,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "covariance-correlation": covarianceTutorPlan,
   "mean-median-mode": {
     intro:
       "Work through three small experiments. Predict first, change the data, observe the summaries, then explain which measure of typical stayed useful.",

@@ -545,24 +545,18 @@ const activePlaygroundDefinitions = [
   {
     slug: "pytorch-image-augmentations",
     title: "PyTorch Image Transforms",
+    layout: "guided-discovery",
     tag: "computer vision",
-    kicker:
-      "Stack torchvision transforms on one image and watch the composed result update.",
-    summary:
-      "Choose an image, tune a stack of single-image transforms, inspect the original versus composed result, and copy the matching torchvision Compose code.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Image augmentation",
-      "torchvision transforms",
-      "Transform composition",
-      "RandomResizedCrop",
-      "One-hot labels",
-    ],
+    kicker: "Sample a transform, trace the order, and check the target assumption.",
+    summary: "Compose ten single-image transforms in a reproducible browser simulation, inspect sampled stages and type requirements, and copy a runnable torchvision v1 configuration with explicitly separate Python draws.",
+    estimatedDuration: "8 to 12 minutes",
+    concepts: ["Image augmentation", "Transform composition", "Random sampling", "Tensor representation", "One-hot targets"],
     learningGoals: [
-      "Compose multiple single-image torchvision transforms in a visible top-to-bottom stack.",
-      "Connect each visible slider to the exact parameter in generated v2.Compose code.",
-      "Observe how crop, rotation, color, blur, and erasing compound on the selected image.",
-      "Recognize that these transforms change pixels while the class label stays one-hot.",
+      "Distinguish a transform's configured probability or range from its actual sampled outcome.",
+      "Demonstrate how sequential crop and flip order can change a composed result.",
+      "Explain RGB byte-to-CHW float conversion and why RandomErasing requires ToTensor first.",
+      "Distinguish predefined RandAugment fixed magnitudes from TrivialAugmentWide sampled magnitudes.",
+      "Separate a mechanically retained one-hot target from task-dependent augmentation validity.",
     ],
   },
   {

@@ -611,23 +611,19 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "mnist-mlp-inference-debugger",
+    layout: "guided-discovery",
     title: "MNIST MLP Inference Debugger",
     tag: "neural networks",
-    kicker:
-      "Drop an ONNX MNIST classifier, draw one digit, and inspect the WebGPU forward pass.",
-    summary:
-      "Upload a dense MNIST MLP, run inference in the browser with WebGPU, then debug softmax probabilities, hidden activations, contribution signs, and input saliency for the drawn digit.",
+    kicker: "Draw an input, trace fixed weights, and question the prediction.",
+    summary: "Inspect real WebGPU inference from input preprocessing to hidden neuron sums, softmax probabilities and local score saliency. Sampled views never change the model.",
     estimatedDuration: "6 to 9 minutes",
-    concepts: [
-      "MLP inference",
-      "WebGPU",
-      "Softmax",
-      "Saliency",
-    ],
+    concepts: ["MLP inference", "Input preprocessing", "WebGPU", "Softmax", "Local score saliency"],
     learningGoals: [
-      "See how a 28x28 digit becomes a 784-value MLP input.",
-      "Run dense neural network layers on WebGPU inside the browser.",
-      "Connect hidden activations, contribution signs, softmax confidence, and input saliency to one prediction.",
+      "Trace 28×28 brightness values through the default model’s input contract and fixed weights.",
+      "Distinguish relative class probabilities from correctness or digit presence.",
+      "Reconcile signed contributions, remaining terms, bias and activation from the actual GPU trace.",
+      "Distinguish sampled graph filtering from model pruning or training.",
+      "Interpret local score sensitivity and rerun a finite pixel intervention.",
     ],
   },
   {

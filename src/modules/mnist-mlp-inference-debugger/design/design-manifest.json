@@ -1,9 +1,21 @@
 {
   "lessonPlanStep": null,
-  "lessonPlanTitle": "MNIST MLP Inference Debugger",
+  "title": "MNIST MLP Inference Debugger",
   "slug": "mnist-mlp-inference-debugger",
   "modulePath": "src/modules/mnist-mlp-inference-debugger",
-  "acceptedMockup": null,
-  "prompt": "src/modules/mnist-mlp-inference-debugger/design/imagegen-prompt.md",
-  "sourceGeneratedImage": null
+  "acceptedMockupPath": "src/modules/mnist-mlp-inference-debugger/design/accepted-mockup.png",
+  "promptPath": "src/modules/mnist-mlp-inference-debugger/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-82091df8-e588-4725-a1aa-ff7427bc841e.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without asking for approval.",
+  "approvedRefinements": [
+    "Canonical shared frame, two-line Reference seven/Hand-drawn and Blank/Zero brightness buttons (remove invented third button), range controls, summaries/progress/Guide invitation.",
+    "Immediate prediction selection; mutually exclusive answers distinguish possible biased/nonuniform scores from mandatory uniformity or inability to compute, removing overlapping raster alternatives.",
+    "Real loaded model/runtime metadata only; no fake fallback architecture or probabilities before current inference.",
+    "Actual model input/trace/bar lengths and score gradients supersede raster arithmetic.",
+    "Primary compact input/probability comparison; selected neuron reconciliation and optional network/matrix/saliency retain original debugging scope.",
+    "All pixels/layers/neurons keyboard editable; signed evidence and exact data supply color-independent equivalents.",
+    "One Guide invitation with canonical behavior; remove invented promises about hints/answers and Start discussion button.",
+    "Four-decimal brightness editor preserves the supersampled fixture on blur; native pointer focus prevents scrolling. Controlled matrix disclosure survives input reruns."
+  ]
 }

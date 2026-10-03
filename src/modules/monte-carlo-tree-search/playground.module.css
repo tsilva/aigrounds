@@ -1,0 +1,38 @@
+.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
+.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.evidence p, .evidence li { font-size: 15px; line-height: 1.6; margin: 9px 0; }
+.evidence details { margin-top: 14px; }
+.evidence summary { cursor: pointer; font-weight: 600; }
+.evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 15px; }
+.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+.table caption { text-align: left; color: #536487; margin: 10px 0; font-size: 13px; }
+.table th, .table td { padding: 10px 6px; text-align: left; border-bottom: 1px solid #dfe4f4; overflow-wrap: anywhere; vertical-align: top; }
+.table th { font-weight: 600; }
+.table td { font-family: var(--font-ibm-plex-mono), monospace; }
+.table tr[data-next="true"] { background: #eeebff; }
+.table td:last-child { font-family: inherit; }
+.tree { width: 100%; display: block; height: auto; min-width: 0; }
+.tree text { fill: #0c1230; font: 15px var(--font-space-grotesk), sans-serif; text-anchor: middle; }
+.tree text[data-count] { font: 14px var(--font-ibm-plex-mono), monospace; }
+.tree line { stroke: #70809b; stroke-width: 2; }
+.tree line[data-last="true"] { stroke: #ad4508; stroke-width: 4; }
+.tree rect { fill: white; stroke: #70809b; stroke-width: 1.5; }
+.tree rect[data-last="true"] { fill: #fff1e5; stroke: #ad4508; stroke-width: 3; }
+.tree rect[data-next="true"] { stroke: #5031dc; stroke-width: 3; stroke-dasharray: 5 4; }
+.board { font-family: var(--font-ibm-plex-mono), monospace; white-space: pre; }
+.compactTree { display: none; text-align: center; }
+.compactTree > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.compactTree > div p { border: 1px solid #70809b; border-radius: 7px; padding: 10px; }
+.compactTree span { display: block; }
+.compactTree [data-last="true"] { background: #fff1e5; border: 3px solid #ad4508; }
+.compactTree [data-next="true"] { border: 3px dashed #5031dc; }
+@container (max-width: 599px) {
+  .tree { display: none; }
+  .compactTree { display: block; }
+  .controls { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .table { font-size: 12px; }
+  .table th, .table td { padding: 8px 3px; }
+}

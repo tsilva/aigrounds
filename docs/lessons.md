@@ -54,6 +54,8 @@ The PyTorch Image Transforms lesson preserves four photos and ten single-image t
 
 The Label-Mixing Image Transforms lesson connects whole-image RGB MixUp with exact-coordinate CutMix through five experiments and a same-class transfer check. Labels use the measured integer CutMix area after border clipping, while MixUp uses its per-channel coefficient. All four source classes can be paired, including a duplicated same-class example that stays one-hot. Exact class bars, optional pixel arithmetic and numeric cross-entropy use separate fixed illustrative model predictions. Copyable controlled-pair Python is distinguished from random torchvision v2 batch augmentation.
 
+Batch Normalization Lab now follows a single feature across fixed mini-batches through linked input, normalized and output rows. Five prediction/action/explanation experiments and an inference transfer check distinguish population variance, epsilon-sensitive spread, manual Scale/Shift, outlier-induced batch dependence and explicit frozen references. The module retains all four datasets and original control bounds, calculates true centered standard deviation in inference, and documents that no optimizer or running-statistics updates are simulated.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

@@ -21,7 +21,7 @@ export const batchNormalizationScenarios: BatchScenario[] = [
   {
     id: "shifted",
     label: "Shifted",
-    helper: "Same shape, moved right",
+    helper: "Positive activations",
     values: [2.0, 2.7, 3.4, 4.0, 4.8, 5.1, 6.2, 7.0],
     runningMean: 4.15,
     runningStd: 1.62,
@@ -37,7 +37,7 @@ export const batchNormalizationScenarios: BatchScenario[] = [
   {
     id: "outlier",
     label: "Outlier",
-    helper: "One activation dominates",
+    helper: "Last value is 6.2",
     values: [0.1, 0.3, 0.4, 0.6, 0.8, 1.0, 1.1, 6.2],
     runningMean: 1.05,
     runningStd: 1.85,

@@ -1,9 +1,20 @@
 {
-  "lessonPlanStep": 62,
-  "lessonPlanTitle": "Batch Normalization Lab",
+  "lessonPlanStep": null,
+  "title": "Batch Normalization Lab",
   "slug": "batch-normalization",
   "modulePath": "src/modules/batch-normalization",
-  "acceptedMockup": "src/modules/batch-normalization/design/accepted-mockup.png",
-  "prompt": "src/modules/batch-normalization/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/private/tmp/batch-normalization-lab-mockup.png"
+  "acceptedMockupPath": "src/modules/batch-normalization/design/accepted-mockup.png",
+  "promptPath": "src/modules/batch-normalization/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-eba569b3-a236-4a5f-9eb9-e07b9e53c949.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without asking for approval.",
+  "approvedRefinements": [
+    "Canonical shared navbar, horizontal 3-step progress, exact native range controls, open summaries and single Guide invitation.",
+    "Actual fixed fixtures and engine geometry; generated values are illustrative.",
+    "Batch size retains 4\u20138, Scale .5\u20132, Shift \u22122\u20132; no invented controls or Try it button.",
+    "Equal numeric axes explicitly label z dimensionless and x/y activation values; one lane per example removes dot collisions.",
+    "Responsive columns stack with narrow Guide-reduced space; optional exact data table.",
+    "Frozen illustrative references, no running update/optimizer claim; epsilon-sensitive spread and true centered inference standard deviation.",
+    "Use shared-page container queries to stack controls and plot stages when Guide reduces available width, regardless of viewport size."
+  ]
 }

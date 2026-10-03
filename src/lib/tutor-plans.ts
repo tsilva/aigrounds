@@ -1,3 +1,4 @@
+import { llnTutorPlan } from "@/modules/law-large-numbers-simulation/learning-experiments";
 import { mctsTutorPlan } from "@/modules/monte-carlo-tree-search/learning-experiments";
 import { atlasTutorPlan } from "@/modules/ai-concept-atlas/learning-experiments";
 import { proofTutorPlan } from "@/modules/zero-knowledge-proofs/learning-experiments";
@@ -260,6 +261,7 @@ export const playgroundTutorPlans = {
   "softmax-temperature": softmaxTutorPlan,
   "gradient-descent": gradientTutorPlan,
   "expected-value-risk": payoffTutorPlan,
+  "law-large-numbers-simulation": llnTutorPlan,
   "bernoulli-categorical-binomial": distributionTutorPlan,
   "waiting-arrival-distributions": arrivalTutorPlan,
   "monte-carlo-tree-search": mctsTutorPlan,

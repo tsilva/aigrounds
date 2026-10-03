@@ -304,6 +304,23 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "sampling-sample-size",
+    layout: "guided-discovery",
+    title: "Sampling & Sample Size Lab",
+    tag: "inference",
+    kicker: "Compare sample estimates with a revealed toy population.",
+    summary: "Repeatedly inspect reproducible samples from initially hidden populations and compare how sample size changes estimate variability without finite guarantees.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Sampling", "Sample size", "Sampling variability"],
+    learningGoals: [
+      "Separate a sample mean statistic from a fixed population mean parameter.",
+      "Compare sample-to-sample variability at smaller and larger sizes.",
+      "Inspect another sample while keeping the source and size fixed.",
+      "Reject guaranteed improvement of a particular larger sample prefix.",
+      "Distinguish estimate stability from individual source-value variability and transfer to another source.",
+    ],
+  },
+  {
     slug: "overfitting",
     layout: "guided-discovery",
     title: "Overfitting Lab",
@@ -767,14 +784,6 @@ export const activePlaygroundMetadata: Array<
 }));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-  {
-    slug: "sampling-sample-size",
-    title: "Sampling & Sample Size Lab",
-    tag: "inference",
-    summary:
-      "Repeatedly sample from a hidden population and see why bigger samples stabilize estimates.",
-    concepts: ["Sampling", "Sample size", "Sampling variability"],
-  },
   {
     slug: "central-limit-theorem",
     title: "Central Limit Theorem Lab",

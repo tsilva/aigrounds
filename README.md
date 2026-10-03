@@ -45,6 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 ## Notes
 
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
+- The [Sampling & Sample Size Lab](https://aigrounds.tsilva.eu/playgrounds/sampling-sample-size) compares reproducible sample estimates with revealed population means and separates larger-sample stability from finite guarantees.
 - The [Normal Distribution & Z-Scores Lab](https://aigrounds.tsilva.eu/playgrounds/normal-distribution-z-scores) connects signed distance to normal tail probability and tests shifts, spread changes and transfers between model units.
 - The [PDF, CDF & Probability Area Lab](https://aigrounds.tsilva.eu/playgrounds/pdf-cdf-probability-area) connects exact density areas to cumulative endpoint differences and distinguishes density height from probability.
 - The [Law of Large Numbers Simulator](https://aigrounds.tsilva.eu/playgrounds/law-large-numbers-simulation) compares reproducible short and long runs, temporary movement away from a model expectation, and averages of coin and die outcomes.

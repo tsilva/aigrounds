@@ -42,13 +42,14 @@ function getAlignedSize(shape: Shape, alignedIndex: number, alignedRank: number)
 }
 
 export function analyzeBroadcast(aShape: Shape, bShape: Shape): BroadcastAnalysis {
+  for (const shape of [aShape,bShape]) if (shape.some(size=>!Number.isSafeInteger(size)||size<0)) throw new Error("Axis sizes must be nonnegative integers.");
   const rank = Math.max(aShape.length, bShape.length);
   const axes = Array.from({ length: rank }, (_, axisIndex) => {
     const aSize = getAlignedSize(aShape, axisIndex, rank);
     const bSize = getAlignedSize(bShape, axisIndex, rank);
     const outputSize =
       aSize === bSize || aSize === 1 || bSize === 1
-        ? Math.max(aSize, bSize)
+        ? aSize === 1 ? bSize : bSize === 1 ? aSize : aSize
         : null;
     const status: AxisStatus =
       outputSize === null
@@ -87,7 +88,7 @@ export function analyzeBroadcast(aShape: Shape, bShape: Shape): BroadcastAnalysi
 }
 
 export function clampShapeAxis(value: number) {
-  return Math.min(5, Math.max(1, value));
+  return Number.isFinite(value) ? Math.min(5, Math.max(1, Math.round(value))) : 1;
 }
 
 export function clampOutputIndex(index: number[], outputShape: Shape | null) {
@@ -96,7 +97,7 @@ export function clampOutputIndex(index: number[], outputShape: Shape | null) {
   }
 
   return outputShape.map((size, axisIndex) =>
-    Math.min(size - 1, Math.max(0, index[axisIndex] ?? 0)),
+    Math.min(size - 1, Math.max(0, Number.isFinite(index[axisIndex]) ? Math.round(index[axisIndex]) : 0)),
   );
 }
 
@@ -129,6 +130,8 @@ export function getValueTrace({
   bShape: Shape;
   outputIndex: Shape;
 }): ValueTrace {
+  const analysis=analyzeBroadcast(aShape,bShape);
+  if(!analysis.outputShape||outputIndex.length!==analysis.outputShape.length||outputIndex.some((v,i)=>!Number.isInteger(v)||v<0||v>=analysis.outputShape![i])) throw new Error("A trace requires compatible shapes and a valid output index.");
   const aIndex = mapOutputIndexToInput(outputIndex, aShape);
   const bIndex = mapOutputIndexToInput(outputIndex, bShape);
   const aValue = getAValue(aIndex);

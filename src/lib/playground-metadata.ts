@@ -429,6 +429,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "tensor-shape-broadcasting",
+    layout: "guided-discovery",
     title: "Tensor Shape & Broadcasting Lab",
     tag: "tensors",
     kicker:

@@ -1,3 +1,4 @@
+import { BiasPlayground } from "@/modules/sampling-bias/BiasPlayground";
 import { SamplingPlayground } from "@/modules/sampling-sample-size/SamplingPlayground";
 import { NormalDistributionPlayground } from "@/modules/normal-distribution-z-scores/NormalDistributionPlayground";
 import { ProbabilityAreaPlayground } from "@/modules/pdf-cdf-probability-area/ProbabilityAreaPlayground";
@@ -60,6 +61,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "law-large-numbers-simulation": LawLargeNumbersPlayground,
   "pdf-cdf-probability-area": ProbabilityAreaPlayground,
   "normal-distribution-z-scores": NormalDistributionPlayground,
+  "sampling-bias": BiasPlayground,
   "sampling-sample-size": SamplingPlayground,
   "bernoulli-categorical-binomial": BernoulliCategoricalBinomialPlayground,
   "waiting-arrival-distributions": WaitingArrivalDistributionsPlayground,

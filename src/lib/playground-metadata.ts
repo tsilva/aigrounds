@@ -304,6 +304,23 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "sampling-bias",
+    layout: "guided-discovery",
+    title: "Sampling Bias Lab",
+    tag: "inference",
+    kicker: "Change who gets observed, then change sample size.",
+    summary: "Compare random samples with biased collection rules and see why size cannot fix bad sampling.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Selection bias", "Nonresponse bias", "Survivorship bias"],
+    learningGoals: [
+      "Keep the original population target fixed while selection-frame coverage changes.",
+      "Separate larger-sample concentration from expected bias.",
+      "Distinguish random invitation from outcome-related response.",
+      "Identify survivor-only observation and the original-target mismatch.",
+      "Separate collection expectation, theoretical bias and finite sample error.",
+    ],
+  },
+  {
     slug: "sampling-sample-size",
     layout: "guided-discovery",
     title: "Sampling & Sample Size Lab",
@@ -792,14 +809,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
       "Sample from strange populations and watch sample means form a predictable bell shape.",
     concepts: ["Sample means", "Sampling distributions", "Normal approximation"],
   },
-  {
-    slug: "sampling-bias",
-    title: "Sampling Bias Lab",
-    tag: "inference",
-    summary:
-      "Compare random samples with biased collection rules and see why size cannot fix bad sampling.",
-    concepts: ["Selection bias", "Nonresponse bias", "Survivorship bias"],
-  },
+
   {
     slug: "sampling-distributions-standard-error",
     title: "Sampling Distributions & Standard Error",

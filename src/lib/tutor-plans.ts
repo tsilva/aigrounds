@@ -1,3 +1,4 @@
+import { biasTutorPlan } from "@/modules/sampling-bias/learning-experiments";
 import { samplingTutorPlan } from "@/modules/sampling-sample-size/learning-experiments";
 import { normalTutorPlan } from "@/modules/normal-distribution-z-scores/learning-experiments";
 import { areaTutorPlan } from "@/modules/pdf-cdf-probability-area/learning-experiments";
@@ -267,6 +268,7 @@ export const playgroundTutorPlans = {
   "law-large-numbers-simulation": llnTutorPlan,
   "pdf-cdf-probability-area": areaTutorPlan,
   "normal-distribution-z-scores": normalTutorPlan,
+  "sampling-bias": biasTutorPlan,
   "sampling-sample-size": samplingTutorPlan,
   "bernoulli-categorical-binomial": distributionTutorPlan,
   "waiting-arrival-distributions": arrivalTutorPlan,

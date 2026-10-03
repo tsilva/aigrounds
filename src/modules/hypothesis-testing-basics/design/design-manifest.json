@@ -1,0 +1,16 @@
+{
+  "step": 20,
+  "title": "Hypothesis Testing Basics",
+  "slug": "hypothesis-testing-basics",
+  "modulePath": "src/modules/hypothesis-testing-basics",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-e7aa2ed6-6db5-46e2-876e-75ccce7a3afd.png",
+  "approval": "Autonomous self-review explicitly authorized by user",
+  "refinements": [
+    "Actual shared components govern controls, compact Guide CTA and desktop reflow",
+    "Mockup illustrates the gap2.5 target; default/reset remain gap0",
+    "Null curve, observed/extreme/critical positions and both tail polygons come from engine; raster is illustrative not a numeric oracle",
+    "Normal density peak is exactly engine-derived 1/sqrt(2pi); numerical probabilities include tails beyond finite plot"
+  ]
+}

@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "hypothesis-testing-basics",
+    layout: "guided-discovery",
+    title: "Hypothesis Testing Basics",
+    tag: "inference",
+    kicker: "Compare an A/B gap with what the null model predicts.",
+    summary: "Use one clean A/B test to connect null hypotheses, p-values, and decision rules.",
+    estimatedDuration: "8 to 11 minutes",
+    concepts: ["Null hypothesis", "P-values", "Significance"],
+    learningGoals: [
+      "Interpret a two-sided p-value as null-model tail evidence rather than posterior truth probability.",
+      "Separate a predeclared significance rule from the observed evidence.",
+      "Distinguish failure to reject, raw magnitude, precision, significance and causal validity.",
+      "Treat opposite directions symmetrically and transfer to a new size and threshold.",
+    ],
+  },
+  {
     slug: "confidence-intervals",
     layout: "guided-discovery",
     title: "Confidence Intervals Explorer",
@@ -868,14 +884,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "hypothesis-testing-basics",
-    title: "Hypothesis Testing Basics",
-    tag: "inference",
-    summary:
-      "Use one clean A/B test to connect null hypotheses, p-values, and decision rules.",
-    concepts: ["Null hypothesis", "P-values", "Significance"],
-  },
+
   {
     slug: "type-i-type-ii-errors",
     title: "Type I & Type II Errors Lab",

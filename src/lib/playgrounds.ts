@@ -1,3 +1,4 @@
+import { TestingPlayground } from "@/modules/hypothesis-testing-basics/TestingPlayground";
 import { IntervalsPlayground } from "@/modules/confidence-intervals/IntervalsPlayground";
 import { MarginPlayground } from "@/modules/margin-of-error-sample-size/MarginPlayground";
 import { CentralLimitPlayground } from "@/modules/central-limit-theorem/CentralLimitPlayground";
@@ -65,6 +66,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "law-large-numbers-simulation": LawLargeNumbersPlayground,
   "pdf-cdf-probability-area": ProbabilityAreaPlayground,
   "normal-distribution-z-scores": NormalDistributionPlayground,
+  "hypothesis-testing-basics": TestingPlayground,
   "confidence-intervals": IntervalsPlayground,
   "margin-of-error-sample-size": MarginPlayground,
   "central-limit-theorem": CentralLimitPlayground,

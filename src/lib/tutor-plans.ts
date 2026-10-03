@@ -1,3 +1,4 @@
+import { testingTutorPlan } from "@/modules/hypothesis-testing-basics/learning-experiments";
 import { intervalTutorPlan } from "@/modules/confidence-intervals/learning-experiments";
 import { marginTutorPlan } from "@/modules/margin-of-error-sample-size/learning-experiments";
 import { cltTutorPlan } from "@/modules/central-limit-theorem/learning-experiments";
@@ -272,6 +273,7 @@ export const playgroundTutorPlans = {
   "law-large-numbers-simulation": llnTutorPlan,
   "pdf-cdf-probability-area": areaTutorPlan,
   "normal-distribution-z-scores": normalTutorPlan,
+  "hypothesis-testing-basics": testingTutorPlan,
   "confidence-intervals": intervalTutorPlan,
   "margin-of-error-sample-size": marginTutorPlan,
   "central-limit-theorem": cltTutorPlan,

@@ -48,6 +48,8 @@ Byte Pair Encoding Lab links training pair counts to the last actual replacement
 
 Transformer Attention now separates fixed-fixture query routing, sharpness, weighted value mixing and comparisons that change multiple inputs. Four predict → try → explain experiments and a cash-query transfer use truthful 0–100% weight lanes, raw entropy in nats, and exact Q/K/V and contribution tables. The preserved hand-authored fixtures are explicitly a six-token, unmasked, single-head toy rather than learned word meanings or a full Transformer.
 
+Linear Quantization (INT4) Lab now traces an unsigned 4-bit affine code through exact decimal rounding, raw-code clamping and reconstruction. Five predict → try → explain experiments and a sensor-block transfer compare plateaus, tail errors, integer zero-point shifts and packing overhead. Three original synthetic blocks and all range presets remain, with a separate exact probe, true level geometry and complete sample, code-count and overflow tables. Payload-only 8× savings are distinguished from an explicit block storage model and from unmeasured model performance.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

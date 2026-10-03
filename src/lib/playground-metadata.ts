@@ -496,25 +496,26 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "linear-quantization-int4",
+    layout: "guided-discovery",
     title: "Linear Quantization (INT4) Lab",
     tag: "compression",
     kicker:
       "Turn real weights into 16 reusable integer codes and see what memory savings cost.",
     summary:
-      "Choose a block of values, tune the quantization range, inspect one value as it snaps to an INT4 code, and compare rounding, clipping, and 8x storage savings.",
+      "Choose a synthetic block, tune its range and trace one real value through rounding, an unsigned 4-bit code and reconstruction. Compare block errors, zero-point shifts and payload savings with explicit storage overhead.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Linear quantization",
-      "INT4 codes",
+      "4-bit affine codes",
       "Scale and zero point",
       "Rounding and clipping error",
     ],
     learningGoals: [
-      "Derive scale and zero point from a block's min/max range.",
-      "Understand how scale and zero point map a real value onto one of 16 INT4 codes.",
+      "Derive scale and zero point from a block’s calibration range.",
+      "Understand how scale and zero point map a real value onto one of 16 unsigned 4-bit codes.",
       "See why dequantized values are approximate shelf centers rather than the original decimals.",
-      "Compare why different blocks use different ranges while the 16-code INT4 budget stays fixed.",
-      "Recognize the range tradeoff between smaller steps, more clipping, and memory savings.",
+      "Compare why different blocks use different ranges while the 16-code budget stays fixed.",
+      "Compare smaller steps with tail clamping, and distinguish fixed payload bits from storage overhead.",
     ],
   },
   {

@@ -1,9 +1,18 @@
 {
-  "lessonPlanStep": 53,
-  "lessonPlanTitle": "Zero Knowledge Proofs Lab",
+  "lessonPlanStep": null,
+  "title": "Zero-Knowledge Proofs",
   "slug": "zero-knowledge-proofs",
   "modulePath": "src/modules/zero-knowledge-proofs",
-  "acceptedMockup": "src/modules/zero-knowledge-proofs/design/accepted-mockup.png",
-  "prompt": "src/modules/zero-knowledge-proofs/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e11ea-c0e0-7f10-b72c-af152b4ff21c/ig_031f2911cbf3b98e016a009c98adc48190b0f42d58b86dc955.png"
+  "acceptedMockupPath": "src/modules/zero-knowledge-proofs/design/accepted-mockup.png",
+  "promptPath": "src/modules/zero-knowledge-proofs/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-1750f3a5-f518-4232-bc1b-bc29d2d41d62.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without approval questions.",
+  "approvedRefinements": [
+    "V1 rejected incorrect7/9 detection wording and p20 rounding; V2 accepted correct2/9 detection and .006563124 escape.",
+    "Canonical shared components supply full navigation, horizontal rail progress, Guide invitation, exact editors and flat controls.",
+    "Actual graph and21integer-round plot points derive from the engine; raster tick labels/geometry are illustrative.",
+    "Initial stage has no committed round number; commit enables choosing/opening one edge. Open random edge and exact labeled node/history tables preserve real interaction and accessibility.",
+    "Prepared experiment starting openings are explicitly labeled; actual completed openings only. Graph/transcript use original graph and two fixed colorings, with no cryptographic secrecy claim."
+  ]
 }

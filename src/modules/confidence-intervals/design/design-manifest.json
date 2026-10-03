@@ -1,0 +1,16 @@
+{
+  "step": 19,
+  "title": "Confidence Intervals Explorer",
+  "slug": "confidence-intervals",
+  "modulePath": "src/modules/confidence-intervals",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-cf36e7c6-028e-4e15-be8a-0b85401a1dd4.png",
+  "approval": "Autonomous self-review explicitly authorized by user",
+  "refinements": [
+    "Use shared controls, spacing and compact Guide invitation exactly",
+    "Mockup is an alternate size-1 illustrative state; default/reset remain declared size25",
+    "Draw all100rows at identical engine-derived interval width with exact capture positions; raster is not a numerical oracle",
+    "Native scrollable plot and exact endpoint table expose every interval; axis remains fixed outside row scrolling"
+  ]
+}

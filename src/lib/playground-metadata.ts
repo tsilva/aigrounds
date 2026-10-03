@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "confidence-intervals",
+    layout: "guided-discovery",
+    title: "Confidence Intervals Explorer",
+    tag: "inference",
+    kicker: "See which repeated intervals capture the fixed true mean.",
+    summary: "Run many simulated samples and show which intervals capture the true population value.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Confidence intervals", "Coverage", "Interval width"],
+    learningGoals: [
+      "Distinguish fixed population truth from moving sample means and intervals.",
+      "Separate finite coverage from a selected repeated-procedure confidence level.",
+      "Explain confidence-width and size-precision tradeoffs under a stated model.",
+      "Reject posterior, individual-value and guaranteed-coverage claims while transferring to another batch.",
+    ],
+  },
+  {
     slug: "margin-of-error-sample-size",
     layout: "guided-discovery",
     title: "Margin of Error & Sample Size Lab",
@@ -851,14 +867,7 @@ export const activePlaygroundMetadata: Array<
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
-  {
-    slug: "confidence-intervals",
-    title: "Confidence Intervals Explorer",
-    tag: "inference",
-    summary:
-      "Run many simulated samples and show which intervals capture the true population value.",
-    concepts: ["Confidence intervals", "Coverage", "Interval width"],
-  },
+
   {
     slug: "hypothesis-testing-basics",
     title: "Hypothesis Testing Basics",

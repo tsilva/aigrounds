@@ -1,3 +1,4 @@
+import { attentionTutorPlan } from "@/modules/transformer-attention/learning-experiments";
 import { bpeTutorPlan } from "@/modules/byte-pair-encoding/learning-experiments";
 import { tensorTutorPlan } from "@/modules/tensor-shape-broadcasting/learning-experiments";
 import { gradientTutorPlan } from "@/modules/gradient-descent/learning-experiments";
@@ -200,47 +201,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "transformer-attention": {
-    intro:
-      "Work through three attention experiments. Pick the ambiguous token, predict which context word should matter, then change sharpness and inspect the value mix.",
-    whyItMatters:
-      "Attention exists because a token often needs surrounding context before its meaning is clear. It is useful because the model can choose which earlier tokens to read from, making words, facts, and relationships available where they are needed.",
-    steps: [
-      {
-        title: "Disambiguate bank",
-        experiment:
-          "Choose River Bank, select bank as the query token, and compare the attention weights for river and bank.",
-        predictionQuestion:
-          "Which token should bank attend to if the sentence is about a river?",
-        observationPrompt:
-          "What happened to the strongest key and output meaning?",
-        takeaway:
-          "The same token can lean toward different meanings when its query finds different context keys.",
-      },
-      {
-        title: "Switch context",
-        experiment:
-          "Choose Money Bank and keep bank selected. Watch cash compete against the other keys.",
-        predictionQuestion:
-          "Which token should pull bank toward a finance meaning?",
-        observationPrompt:
-          "What changed when the sentence switched from river to cash?",
-        takeaway:
-          "Attention uses the sentence around a token, so context can steer an ambiguous word before the next layer.",
-      },
-      {
-        title: "Sharpen the lookup",
-        experiment:
-          "Click Low, then click High in Focus Sharpness. Compare entropy, top weight, and the connection diagram.",
-        predictionQuestion:
-          "What should happen when softmax focus changes from low to high?",
-        observationPrompt:
-          "How did the weights change as sharpness increased?",
-        takeaway:
-          "Sharper attention concentrates the weighted lookup, while softer attention blends more tokens together.",
-      },
-    ],
-  },
+  "transformer-attention": attentionTutorPlan,
   "byte-pair-encoding": bpeTutorPlan,
   "shape-skew-outliers": {
     intro: "Four experiments and a transfer check compare shape and summaries while moving only point M.",

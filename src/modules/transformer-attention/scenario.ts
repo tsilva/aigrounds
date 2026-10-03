@@ -31,19 +31,19 @@ export const attentionDimensions: Array<{
 }> = [
   {
     id: "water",
-    label: "shore meaning",
+    label: "Shore feature",
     color: "#0ea5e9",
     mutedColor: "#d8f1ff",
   },
   {
     id: "money",
-    label: "finance meaning",
+    label: "Finance feature",
     color: "#16a34a",
     mutedColor: "#dcfce7",
   },
   {
     id: "syntax",
-    label: "sentence glue",
+    label: "Glue feature",
     color: "#f59e0b",
     mutedColor: "#fef3c7",
   },
@@ -56,7 +56,7 @@ export const attentionScenarios: AttentionScenario[] = [
     shortLabel: "river context",
     sentence: "The duck sat by the river bank",
     description:
-      "The ambiguous word bank should borrow meaning from river and shore-like context.",
+      "Hand-authored shore-oriented vectors, with six simplified modeled tokens.",
     defaultQueryId: "bank",
     tokens: [
       {
@@ -115,7 +115,7 @@ export const attentionScenarios: AttentionScenario[] = [
     shortLabel: "cash context",
     sentence: "She put cash in the bank",
     description:
-      "The same word bank should borrow meaning from cash and finance-like context.",
+      "A separate hand-authored finance-oriented fixture; Q, K and V change.",
     defaultQueryId: "bank",
     tokens: [
       {

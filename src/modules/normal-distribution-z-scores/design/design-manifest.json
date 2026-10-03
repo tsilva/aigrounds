@@ -1,0 +1,12 @@
+{
+  "lessonPlanStep": 13,
+  "title": "Normal Distribution & Z-Scores Lab",
+  "slug": "normal-distribution-z-scores",
+  "modulePath": "src/modules/normal-distribution-z-scores",
+  "mockupPath": "src/modules/normal-distribution-z-scores/design/accepted-mockup.png",
+  "promptPath": "src/modules/normal-distribution-z-scores/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-529d2fd8-5d1d-46bf-9e59-c6f07fd58cec.png",
+  "approval": "User authorized autonomous mockup review for all planned lessons.",
+  "rejectedDraft": "V1 invented Reflect and Next phases and a bordered summary container.",
+  "refinements": ["Use canonical shared controls, header and three-stage progress.", "Engine supplies exact density geometry and explicit adaptive raw-axis/window and off-window evidence.", "Label numeric tail approximation and retain both tails plus exact zero point probability."]
+}

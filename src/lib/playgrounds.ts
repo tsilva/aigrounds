@@ -1,3 +1,4 @@
+import { NormalDistributionPlayground } from "@/modules/normal-distribution-z-scores/NormalDistributionPlayground";
 import { ProbabilityAreaPlayground } from "@/modules/pdf-cdf-probability-area/ProbabilityAreaPlayground";
 import { LawLargeNumbersPlayground } from "@/modules/law-large-numbers-simulation/LawLargeNumbersPlayground";
 import { type ComponentType } from "react";
@@ -57,6 +58,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "expected-value-risk": ExpectedValueRiskPlayground,
   "law-large-numbers-simulation": LawLargeNumbersPlayground,
   "pdf-cdf-probability-area": ProbabilityAreaPlayground,
+  "normal-distribution-z-scores": NormalDistributionPlayground,
   "bernoulli-categorical-binomial": BernoulliCategoricalBinomialPlayground,
   "waiting-arrival-distributions": WaitingArrivalDistributionsPlayground,
   overfitting: OverfittingPlayground,

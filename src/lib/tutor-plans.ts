@@ -1,3 +1,4 @@
+import { layerTutorPlan } from "@/modules/layer-normalization/learning-experiments";
 import { quantizationTutorPlan } from "@/modules/linear-quantization-int4/learning-experiments";
 import { attentionTutorPlan } from "@/modules/transformer-attention/learning-experiments";
 import { bpeTutorPlan } from "@/modules/byte-pair-encoding/learning-experiments";
@@ -412,78 +413,7 @@ export const playgroundTutorPlans = {
       { title: "Use a frozen reference", experiment: "Next experiment starts Outlier, Batch size 8, Training. Predict first, then choose Inference. Read Used mean/variance, z mean and optional Per-example exact values and both references.", predictionQuestion: "Must the arriving batch have normalized mean zero in Inference?", observationPrompt: "Compare current mean1.3125 with frozen1.05 and reference variance3.4225; why is mean(z) about .142?", takeaway: "With tracked running statistics, evaluation uses a frozen reference and still applies Scale/Shift. Current batch mean need not match it. Presets are illustrative frozen estimates, not simulated training history. Transfer check: in Outlier Inference, increase Batch size7→8 while holding Scale1.5, Shift−.5 and Example1: existing z/y stay fixed although aggregate statistics can change." },
     ],
   },
-  "layer-normalization": {
-    intro:
-      "Work through four LayerNorm experiments. Predict which values contribute to one token's statistics, change hidden features, inspect the z-score calculation, then tune gamma and beta.",
-    whyItMatters:
-      "LayerNorm exists because sequence models need stable hidden activations without depending on other examples in the batch. It is useful because each token can normalize its own features, which works well for transformers and variable batch sizes.",
-    openingMessage:
-      "No prior normalization knowledge needed. We will build LayerNorm with one token row at a time.\n\n- A token has several hidden feature activations.\n- LayerNorm computes the mean and variance across the features inside that one token.\n- It turns those features into z-scores with x_hat = (x - mean) / sqrt(variance + epsilon).\n- Learned gamma and beta then scale and shift each feature so the layer stays expressive.\n- Unlike BatchNorm, the current token's stats do not depend on other examples or tokens in the batch.\n\nFirst prediction: for the selected cat token, which values should decide the mean and variance: cat's four features, the same feature across all tokens, or the whole table? Reply with your prediction first. Then I will tell you exactly what to try.",
-    masteryCriteria: [
-      "Explains that LayerNorm computes mean and variance across features within one token.",
-      "Connects the displayed mean, variance, and standard deviation to the selected token's hidden vector.",
-      "Uses the formula to explain how a raw feature becomes a normalized z-score.",
-      "Explains that gamma scales and beta shifts each normalized feature after stabilization.",
-      "Distinguishes LayerNorm's row-wise statistics from BatchNorm's column-wise batch statistics.",
-    ],
-    steps: [
-      {
-        title: "Find the contributing row",
-        experiment:
-          "Keep cat selected. Compare the highlighted cat row with the Current selection panel and the formula values.",
-        predictionQuestion:
-          "For the selected cat token, which values should decide the mean and variance: cat's four features, the same feature across all tokens, or the whole table?",
-        observationPrompt:
-          "Which values did the formula use to compute cat's mean and variance?",
-        takeaway:
-          "LayerNorm normalizes one token at a time, so the selected row's hidden features provide that token's statistics.",
-      },
-      {
-        title: "Move one hidden feature",
-        experiment:
-          "Drag x1 for the selected token toward -2, then toward +2. Watch the feature grid, mean, variance, raw bars, and normalized bars.",
-        predictionQuestion:
-          "If one feature moves far from the other three, what should happen to the variance?",
-        observationPrompt:
-          "What changed in the formula and charts when x1 moved?",
-        takeaway:
-          "Changing one hidden feature changes the selected token's row statistics, and the z-score chart recenters the row around zero.",
-      },
-      {
-        title: "Read one z-score",
-        experiment:
-          "Use the formula panel to explain x_hat_i = (x_i - mean) / sqrt(variance + epsilon) for one displayed feature.",
-        predictionQuestion:
-          "If a feature is below the selected token's mean, should its normalized value be negative, near zero, or positive?",
-        observationPrompt:
-          "How did subtracting the mean and dividing by the standard deviation create the z-score?",
-        takeaway:
-          "A LayerNorm z-score is the feature's signed distance from that token's mean in that token's own standard-deviation units.",
-      },
-      {
-        title: "Restore useful feature sizes",
-        experiment:
-          "Move one gamma slider and one beta slider. Watch the output y bars and the y vector while the normalized checks stay focused on x_hat.",
-        predictionQuestion:
-          "Which learned parameter should stretch a normalized feature, and which should shift it?",
-        observationPrompt:
-          "What did gamma change, and what did beta change?",
-        takeaway:
-          "LayerNorm stabilizes hidden activations first; gamma and beta then let the model recover useful scale and offset feature by feature.",
-      },
-      {
-        title: "Compare the axis",
-        experiment:
-          "Look at the Compare the Axis panel. Compare the LayerNorm highlighted row with the BatchNorm highlighted column.",
-        predictionQuestion:
-          "Which normalization depends on the other examples or tokens in a batch?",
-        observationPrompt:
-          "How did the highlighted row and column explain the difference?",
-        takeaway:
-          "LayerNorm's statistics come from features inside the current token, while BatchNorm's statistics come from matching features across the batch.",
-      },
-    ],
-  },
+  "layer-normalization": layerTutorPlan,
   "mnist-mlp-inference-debugger": {
     intro:
       "Work through one uploaded MNIST classifier. Predict what the drawn digit should produce, run the forward pass on WebGPU, then inspect the strongest probabilities, neuron contributions, and saliency pixels.",

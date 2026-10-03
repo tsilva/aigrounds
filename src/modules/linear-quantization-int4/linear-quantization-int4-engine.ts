@@ -1,233 +1,91 @@
 import { type QuantizationScenario } from "./scenario";
-
 export type QuantizationRangePreset = "auto" | "tighter" | "wider";
-
-export type QuantizedValue = {
-  source: number;
-  rawCode: number;
-  code: number;
-  dequantized: number;
-  error: number;
-  clipped: boolean;
-};
-
-export type HistogramBin = {
-  label: string;
-  start: number;
-  end: number;
-  count: number;
-  ratio: number;
-  clipped: boolean;
-};
-
-export type CodeBin = {
-  code: number;
-  center: number;
-  count: number;
-  ratio: number;
-  selected: boolean;
-};
-
+export type QuantizedValue = { source: number; rounded: number; rawCode: number; code: number; dequantized: number; error: number; clipped: boolean };
+export type HistogramBin = { label: string; start: number; end: number; count: number; ratio: number; kind: "underflow" | "interior" | "overflow" };
+export type CodeBin = { code: number; center: number; count: number; clippedCount: number; ratio: number; selected: boolean };
+export const int4Bits = 4, int4CodeCount = 16, int4QMin = 0, int4QMax = 15, float32Bits = 32;
 export type QuantizationAnalysis = {
-  min: number;
-  max: number;
-  scale: number;
-  zeroPoint: number;
-  selectedValue: number;
-  selected: QuantizedValue;
-  roundingInterval: {
-    start: number;
-    end: number;
-  };
-  averageAbsoluteError: number;
-  maxRoundingError: number;
-  clippedRatio: number;
-  compressionRatio: number;
-  realHistogram: HistogramBin[];
-  codeBins: CodeBin[];
-  quantizedValues: QuantizedValue[];
+  min: number; max: number; scale: number; zeroPoint: number; selectedValue: number; selected: QuantizedValue;
+  roundingInterval: { start: number; end: number }; inputInterval: { start: number; end: number };
+  averageAbsoluteError: number; maxRoundingError: number; clippedCount: number; clippedRatio: number; compressionRatio: number;
+  realHistogram: HistogramBin[]; codeBins: CodeBin[]; quantizedValues: QuantizedValue[];
+  storage: { fp32Bytes: number; packedBytes: number; metadataBytes: number; totalBytes: number; ratio: number };
 };
-
-export const int4Bits = 4;
-export const int4CodeCount = 16;
-export const int4QMin = 0;
-export const int4QMax = int4CodeCount - 1;
-export const float32Bits = 32;
-
-export function rangeForPreset(
-  scenario: QuantizationScenario,
-  preset: QuantizationRangePreset,
-) {
+export function rangeForPreset(scenario: QuantizationScenario, preset: QuantizationRangePreset) {
   const midpoint = (scenario.defaultMin + scenario.defaultMax) / 2;
   const span = scenario.defaultMax - scenario.defaultMin;
-
-  if (preset === "tighter") {
-    const tightSpan = span * 0.68;
-
-    return {
-      min: midpoint - tightSpan / 2,
-      max: midpoint + tightSpan / 2,
-    };
-  }
-
-  if (preset === "wider") {
-    const wideSpan = span * 1.22;
-
-    return {
-      min: midpoint - wideSpan / 2,
-      max: midpoint + wideSpan / 2,
-    };
-  }
-
-  return {
-    min: scenario.defaultMin,
-    max: scenario.defaultMax,
-  };
+  const factor = preset === "tighter" ? 0.68 : preset === "wider" ? 1.22 : 1;
+  return { min: midpoint - span * factor / 2, max: midpoint + span * factor / 2 };
 }
-
-export function analyzeQuantization(
-  scenario: QuantizationScenario,
-  preset: QuantizationRangePreset,
-  selectedValue: number,
-): QuantizationAnalysis {
-  const range = rangeForPreset(scenario, preset);
-  const min = round(range.min, 3);
-  const max = round(range.max, 3);
-  const scale = (max - min) / int4QMax;
-  const zeroPoint = clampInteger(Math.round(-min / scale), int4QMin, int4QMax);
-  const selected = quantizeValue(selectedValue, scale, zeroPoint);
-  const quantizedValues = scenario.samples.map((value) =>
-    quantizeValue(value, scale, zeroPoint),
-  );
-  const absoluteErrors = quantizedValues.map((value) => Math.abs(value.error));
-  const averageAbsoluteError =
-    absoluteErrors.reduce((sum, value) => sum + value, 0) /
-    Math.max(1, absoluteErrors.length);
-  const clippedCount = quantizedValues.filter((value) => value.clipped).length;
-
-  return {
-    min,
-    max,
-    scale,
-    zeroPoint,
-    selectedValue,
-    selected,
-    roundingInterval: getRoundingInterval(selected.code, scale, zeroPoint),
-    averageAbsoluteError,
-    maxRoundingError: scale / 2,
-    clippedRatio: clippedCount / Math.max(1, quantizedValues.length),
-    compressionRatio: float32Bits / int4Bits,
-    realHistogram: buildRealHistogram(scenario.samples, min, max),
-    codeBins: buildCodeBins(quantizedValues, selected.code, scale, zeroPoint),
-    quantizedValues,
-  };
+export function inspectorBounds(scenario: QuantizationScenario) {
+  const wider = rangeForPreset(scenario, "wider");
+  return { min: round(wider.min - 0.03, 3), max: round(wider.max + 0.03, 3) };
 }
-
-function quantizeValue(value: number, scale: number, zeroPoint: number) {
-  const rawCode = Math.round(value / scale) + zeroPoint;
-  const code = clampInteger(rawCode, int4QMin, int4QMax);
+// Treat authored decimal inputs exactly when deciding a half-step tie. This avoids
+// a binary division moving e.g. 0.050 / 0.020 just below the half boundary.
+function decimalFraction(value: number): [bigint, bigint] {
+  const [coefficient, exponent = "0"] = value.toString().toLowerCase().split("e");
+  const [whole, fraction = ""] = coefficient.split(".");
+  const places = fraction.length - Number(exponent);
+  const numerator = BigInt(whole + fraction);
+  return places >= 0 ? [numerator, BigInt(10) ** BigInt(places)] : [numerator * BigInt(10) ** BigInt(-places), BigInt(1)];
+}
+function roundFraction(numerator: bigint, denominator: bigint) {
+  let lower = numerator / denominator;
+  if (numerator < BigInt(0) && numerator % denominator !== BigInt(0)) lower -= BigInt(1);
+  const remainder = numerator - lower * denominator;
+  return Number(lower + (remainder * BigInt(2) >= denominator ? BigInt(1) : BigInt(0)));
+}
+function quantizeValue(value: number, scale: number, zeroPoint: number, spanUnits: number): QuantizedValue {
+  const [n, d] = decimalFraction(value);
+  const rounded = roundFraction(n * BigInt(15000), d * BigInt(spanUnits));
+  const rawCode = rounded + zeroPoint;
+  const code = Math.min(15, Math.max(0, rawCode));
   const dequantized = scale * (code - zeroPoint);
-
-  return {
-    source: value,
-    rawCode,
-    code,
-    dequantized,
-    error: dequantized - value,
-    clipped: rawCode !== code,
-  };
+  return { source: value, rounded, rawCode, code, dequantized, error: dequantized - value, clipped: rawCode !== code };
 }
-
-function getRoundingInterval(code: number, scale: number, zeroPoint: number) {
-  const center = scale * (code - zeroPoint);
-
-  return {
-    start: center - scale / 2,
-    end: center + scale / 2,
-  };
-}
-
-function buildRealHistogram(values: number[], min: number, max: number) {
-  const binCount = 24;
-  const span = max - min;
-  const step = span / binCount;
-  const bins = Array.from({ length: binCount }, (_, index) => {
-    const start = min + index * step;
-    const end = start + step;
-
-    return {
-      label: formatSigned((start + end) / 2, 2),
-      start,
-      end,
-      count: 0,
-      ratio: 0,
-      clipped: false,
-    };
+export function analyzeQuantization(scenario: QuantizationScenario, preset: QuantizationRangePreset, selectedValue: number): QuantizationAnalysis {
+  const range = rangeForPreset(scenario, preset);
+  const min = round(range.min, 3), max = round(range.max, 3);
+  if (![min, max, selectedValue, ...scenario.samples].every(Number.isFinite) || max <= min || scenario.samples.length === 0) throw new Error("Quantization requires finite values, a positive range and a nonempty sample block.");
+  const spanUnits = Math.round((max - min) * 1000);
+  const scale = spanUnits / 15000;
+  const zeroPoint = Math.min(15, Math.max(0, roundFraction(BigInt(Math.round(-min * 1000)) * BigInt(15), BigInt(spanUnits))));
+  const selected = quantizeValue(selectedValue, scale, zeroPoint, spanUnits);
+  const quantizedValues = scenario.samples.map(value => quantizeValue(value, scale, zeroPoint, spanUnits));
+  const averageAbsoluteError = quantizedValues.reduce((sum, v) => sum + Math.abs(v.error), 0) / quantizedValues.length;
+  const clippedCount = quantizedValues.filter(v => v.clipped).length;
+  const codeBins = Array.from({ length: 16 }, (_, code) => {
+    const assigned = quantizedValues.filter(v => v.code === code);
+    return { code, center: scale * (code - zeroPoint), count: assigned.length, clippedCount: assigned.filter(v => v.clipped).length, ratio: assigned.length / quantizedValues.length, selected: code === selected.code };
   });
-
+  const roundingInterval = { start: selected.dequantized - scale / 2, end: selected.dequantized + scale / 2 };
+  const fp32Bytes = scenario.samples.length * 4, packedBytes = Math.ceil(scenario.samples.length / 2), metadataBytes = 5;
+  return { min, max, scale, zeroPoint, selectedValue, selected, roundingInterval,
+    inputInterval: { start: selected.code === 0 ? -Infinity : roundingInterval.start, end: selected.code === 15 ? Infinity : roundingInterval.end },
+    averageAbsoluteError, maxRoundingError: scale / 2, clippedCount, clippedRatio: clippedCount / quantizedValues.length, compressionRatio: 8,
+    realHistogram: buildRealHistogram(scenario.samples, min, max), codeBins, quantizedValues,
+    storage: { fp32Bytes, packedBytes, metadataBytes, totalBytes: packedBytes + metadataBytes, ratio: fp32Bytes / (packedBytes + metadataBytes) },
+  };
+}
+function buildRealHistogram(values: number[], min: number, max: number): HistogramBin[] {
+  const boundaries = Array.from({ length: 25 }, (_, i) => min + (max - min) * i / 24);
+  const interior: HistogramBin[] = Array.from({ length: 24 }, (_, i) => ({ label: `[${formatSigned(boundaries[i], 5)}, ${formatSigned(boundaries[i + 1], 5)}${i === 23 ? "]" : ")"}`, start: boundaries[i], end: boundaries[i + 1], count: 0, ratio: 0, kind: "interior" }));
+  const bins: HistogramBin[] = [{ label: `Below ${formatSigned(min, 5)}`, start: -Infinity, end: min, count: 0, ratio: 0, kind: "underflow" }, ...interior, { label: `Above ${formatSigned(max, 5)}`, start: max, end: Infinity, count: 0, ratio: 0, kind: "overflow" }];
+  const minUnits = BigInt(Math.round(min * 1000));
+  const spanUnits = BigInt(Math.round((max - min) * 1000));
   for (const value of values) {
-    const index = clampInteger(
-      Math.floor((value - min) / step),
-      0,
-      binCount - 1,
-    );
+    const [n, d] = decimalFraction(value);
+    const offset = n * BigInt(1000) - minUnits * d;
+    const span = spanUnits * d;
+    const index = offset < BigInt(0) ? 0 : offset > span ? 25 : Math.min(24, Number(offset * BigInt(24) / span) + 1);
     bins[index].count += 1;
-    bins[index].clipped = bins[index].clipped || value < min || value > max;
   }
-
-  const maxCount = Math.max(1, ...bins.map((bin) => bin.count));
-
-  return bins.map((bin) => ({
-    ...bin,
-    ratio: bin.count / maxCount,
-    clipped: bin.clipped || bin.start < min + step || bin.end > max - step,
-  }));
+  return bins.map(bin => ({ ...bin, ratio: bin.count / values.length }));
 }
-
-function buildCodeBins(
-  quantizedValues: QuantizedValue[],
-  selectedCode: number,
-  scale: number,
-  zeroPoint: number,
-) {
-  const counts = Array.from({ length: int4CodeCount }, () => 0);
-
-  for (const value of quantizedValues) {
-    counts[value.code] += 1;
-  }
-
-  const maxCount = Math.max(1, ...counts);
-
-  return counts.map((count, code) => ({
-    code,
-    center: scale * (code - zeroPoint),
-    count,
-    ratio: count / maxCount,
-    selected: code === selectedCode,
-  }));
+export function formatSigned(value: number, digits = 5) {
+  const normalized = Math.abs(value) < 0.5 * 10 ** -digits ? 0 : value;
+  return `${normalized > 0 ? "+" : ""}${normalized.toFixed(digits)}`;
 }
-
-export function formatSigned(value: number, digits = 3) {
-  const normalized = Math.abs(value) < 0.0005 ? 0 : value;
-  const prefix = normalized > 0 ? "+" : "";
-
-  return `${prefix}${normalized.toFixed(digits)}`;
-}
-
-export function formatPercent(value: number, digits = 1) {
-  return `${(value * 100).toFixed(digits)}%`;
-}
-
-function round(value: number, digits: number) {
-  const factor = 10 ** digits;
-
-  return Math.round(value * factor) / factor;
-}
-
-function clampInteger(value: number, min: number, max: number) {
-  if (!Number.isFinite(value)) {
-    return min;
-  }
-
-  return Math.min(max, Math.max(min, Math.round(value)));
-}
+export function formatPercent(value: number, digits = 2) { return `${(value * 100).toFixed(digits)}%`; }
+function round(value: number, digits: number) { const factor = 10 ** digits; return Math.round(value * factor) / factor; }

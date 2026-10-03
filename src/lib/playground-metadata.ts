@@ -243,6 +243,23 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "normal-distribution-z-scores",
+    layout: "guided-discovery",
+    title: "Normal Distribution & Z-Scores Lab",
+    tag: "probability",
+    kicker: "Read signed distance in standard-deviation units and compare normal tails.",
+    summary: "Move a value across an assumed normal model and connect raw distance, z-score and tail probability while changing the mean and spread.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Normal distribution", "Z-scores", "Tail probabilities"],
+    learningGoals: [
+      "Calculate signed z-distance relative to the model mean and positive standard deviation.",
+      "Choose the correct normal tail and distinguish probability from density height or z.",
+      "Preserve relative position when moving mean and value together.",
+      "Explain how spread changes normal tail probability at a fixed raw distance.",
+      "Transfer across model locations and scales while retaining the normality assumption.",
+    ],
+  },
+  {
     slug: "bernoulli-categorical-binomial",
     layout: "guided-discovery",
     title: "Bernoulli, Categorical & Binomial Lab",
@@ -750,14 +767,6 @@ export const activePlaygroundMetadata: Array<
 }));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-  {
-    slug: "normal-distribution-z-scores",
-    title: "Normal Distribution & Z-Scores Lab",
-    tag: "probability",
-    summary:
-      "Move a value across a bell curve and connect raw units to standardized distance.",
-    concepts: ["Normal distribution", "Z-scores", "Tail probabilities"],
-  },
   {
     slug: "sampling-sample-size",
     title: "Sampling & Sample Size Lab",

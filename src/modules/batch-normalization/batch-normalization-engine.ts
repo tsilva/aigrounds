@@ -18,6 +18,10 @@ export type BatchNormalizationAnalysis = {
   std: number;
   normalizationMean: number;
   normalizationStd: number;
+  normalizationVariance: number;
+  denominator: number;
+  normalizedMean: number;
+  normalizedStd: number;
   normalizedValues: number[];
   outputValues: number[];
   outputMean: number;
@@ -49,15 +53,19 @@ export function analyzeBatchNormalization({
   runningMean,
   runningStd,
 }: BatchNormalizationInput): BatchNormalizationAnalysis {
+  if (!values.length || values.some(value => !Number.isFinite(value)) || !Number.isInteger(batchSize) || batchSize < 1 || batchSize > values.length || ![gamma, beta, epsilon, runningMean, runningStd].every(Number.isFinite) || epsilon <= 0 || runningStd < 0 || !["training", "inference"].includes(mode)) {
+    throw new RangeError("BatchNorm requires finite values, a valid batch size, positive epsilon and nonnegative reference spread.");
+  }
   const rawValues = values.slice(0, batchSize);
   const batchMean = mean(rawValues);
   const batchVariance = variance(rawValues, batchMean);
   const batchStd = Math.sqrt(batchVariance);
   const normalizationMean = mode === "training" ? batchMean : runningMean;
   const normalizationStd = mode === "training" ? batchStd : runningStd;
-  const normalizedValues = rawValues.map(
-    (value) => (value - normalizationMean) / Math.sqrt(normalizationStd ** 2 + epsilon),
-  );
+  const normalizationVariance = mode === "training" ? batchVariance : runningStd ** 2;
+  const denominator = Math.sqrt(normalizationVariance + epsilon);
+  const normalizedValues = rawValues.map(value => (value - normalizationMean) / denominator);
+  const normalizedMean = mean(normalizedValues);
   const outputValues = normalizedValues.map((value) => gamma * value + beta);
   const outputMean = mean(outputValues);
 
@@ -68,6 +76,10 @@ export function analyzeBatchNormalization({
     std: batchStd,
     normalizationMean,
     normalizationStd,
+    normalizationVariance,
+    denominator,
+    normalizedMean,
+    normalizedStd: standardDeviation(normalizedValues, normalizedMean),
     normalizedValues,
     outputValues,
     outputMean,
@@ -86,5 +98,5 @@ export function formatValue(value: number, digits = 2) {
 }
 
 export function valueToPercent(value: number, min: number, max: number) {
-  return Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+  return ((value - min) / (max - min)) * 100;
 }

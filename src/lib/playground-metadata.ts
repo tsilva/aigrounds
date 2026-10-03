@@ -579,23 +579,18 @@ const activePlaygroundDefinitions = [
   {
     slug: "batch-normalization",
     title: "Batch Normalization Lab",
+    layout: "guided-discovery",
     tag: "neural networks",
-    kicker:
-      "Change mini-batch statistics and watch activations recentered, rescaled, and reshaped.",
-    summary:
-      "Choose shifted, wide, centered, or outlier mini-batches, inspect how BatchNorm computes normalized values, then tune scale and shift before comparing training with inference statistics.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Mini-batches",
-      "Activation statistics",
-      "Batch normalization",
-      "Scale and shift",
-    ],
+    kicker: "Compare activations with batchmates or a frozen reference.",
+    summary: "Follow one feature through batch normalization and manual scale/shift, test an outlier’s effect on its batchmates, and compare current with frozen inference statistics.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Mini-batches", "Population variance", "Batch normalization", "Scale and shift", "Frozen inference statistics"],
     learningGoals: [
-      "See how BatchNorm uses mini-batch mean and standard deviation during training.",
-      "Connect the normalization formula to the displayed normalized value for one activation.",
-      "Understand how learned scale and shift restore output size and center.",
-      "Distinguish training-time batch statistics from inference-time running statistics.",
+      "Explain training-time centering and epsilon-sensitive normalized spread.",
+      "Follow one activation through normalization and scale/shift.",
+      "Distinguish scale’s effect on spread from shift’s effect on center.",
+      "Show how an outlier changes its batchmates during training.",
+      "Explain why frozen inference statistics remove dependence on batchmates without forcing an arriving batch to zero mean.",
     ],
   },
   {

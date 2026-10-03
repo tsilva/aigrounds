@@ -1,9 +1,21 @@
 {
   "lessonPlanStep": null,
-  "lessonPlanTitle": "PyTorch Image Transforms",
+  "title": "PyTorch Image Transforms",
   "slug": "pytorch-image-augmentations",
   "modulePath": "src/modules/pytorch-image-augmentations",
-  "acceptedMockup": "src/modules/pytorch-image-augmentations/design/accepted-mockup.png",
-  "prompt": "src/modules/pytorch-image-augmentations/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e6e3f-3137-7512-8eb3-e8d446452ffc/ig_06a0d9813666ba6c016a18431809f0819183370d2cec5bb55f.png"
+  "acceptedMockupPath": "src/modules/pytorch-image-augmentations/design/accepted-mockup.png",
+  "promptPath": "src/modules/pytorch-image-augmentations/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-393c923a-6a81-41a7-b83b-1cb69a4cbece.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User explicitly authorized self-review without requesting approval.",
+  "approvedRefinements": [
+    "Use original local photos, not generated cat imagery; mathematical/sample evidence comes from the engine.",
+    "Canonical shared toolbar, controls, summaries and separate Talk it through invitation replace custom mockup treatments.",
+    "Put tensor/erasing at fixed final positions; keyboard reorder only the eight pixel transforms.",
+    "Stack controls below the two-image comparison for supported narrow widths.",
+    "Add starting-result comparison for causal ordering and exact sampled-stage evidence.",
+    "Show settings invalidation and type errors, explicit square preparation, separate browser/Python RNG and rendering limits.",
+    "No preselected predictions, no automatic label-validity assertion.",
+    "Final self-review moves Selected transform and Run pipeline above the image comparison, so the primary action precedes the long composition inventory."
+  ]
 }

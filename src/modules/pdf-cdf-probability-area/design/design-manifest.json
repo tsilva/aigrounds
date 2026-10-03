@@ -1,0 +1,11 @@
+{
+  "lessonPlanStep": 12,
+  "title": "PDF, CDF & Probability Area Lab",
+  "slug": "pdf-cdf-probability-area",
+  "modulePath": "src/modules/pdf-cdf-probability-area",
+  "mockupPath": "src/modules/pdf-cdf-probability-area/design/accepted-mockup.png",
+  "promptPath": "src/modules/pdf-cdf-probability-area/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-d5fa6aab-9c6b-4d43-a002-5885c35bee2f.png",
+  "approval": "User authorized autonomous mockup review for all planned lessons.",
+  "refinements": ["Use the canonical header inside the workbench, horizontal progress, toolbar buttons and exact native range controls.", "Shade only the selected density interval, without a full-support background fill.", "Generate mathematical geometry from the engine; keep axes fixed and exact evidence available in both representations."]
+}

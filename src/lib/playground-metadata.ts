@@ -226,6 +226,23 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "pdf-cdf-probability-area",
+    layout: "guided-discovery",
+    title: "PDF, CDF & Probability Area Lab",
+    tag: "probability",
+    kicker: "Connect density area to cumulative endpoint differences.",
+    summary: "Move interval bounds across exact density models and compare shaded area with cumulative probability, including zero-width intervals and density above one.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["PDFs", "CDFs", "Continuous variables"],
+    learningGoals: [
+      "Calculate flat density interval probability as width times height.",
+      "Distinguish positive density from zero point probability in continuous density models.",
+      "Explain why density can exceed one while probability cannot.",
+      "Equate density area with a cumulative endpoint difference.",
+      "Compare equal-width intervals under a nonuniform density and transfer to a new interval.",
+    ],
+  },
+  {
     slug: "bernoulli-categorical-binomial",
     layout: "guided-discovery",
     title: "Bernoulli, Categorical & Binomial Lab",
@@ -733,14 +750,6 @@ export const activePlaygroundMetadata: Array<
 }));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-  {
-    slug: "pdf-cdf-probability-area",
-    title: "PDF, CDF & Probability Area Lab",
-    tag: "probability",
-    summary:
-      "Move interval bounds and watch probability update as shaded area under a curve.",
-    concepts: ["PDFs", "CDFs", "Continuous variables"],
-  },
   {
     slug: "normal-distribution-z-scores",
     title: "Normal Distribution & Z-Scores Lab",

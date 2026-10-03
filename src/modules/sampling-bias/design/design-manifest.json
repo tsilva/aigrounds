@@ -1,0 +1,16 @@
+{
+  "lessonPlanStep": 15,
+  "title": "Sampling Bias Lab",
+  "slug": "sampling-bias",
+  "modulePath": "src/modules/sampling-bias",
+  "mockupPath": "src/modules/sampling-bias/design/accepted-mockup.png",
+  "promptPath": "src/modules/sampling-bias/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-2e014c57-1f35-4bdd-bbf1-e7c774f7c473.png",
+  "approval": "User authorized autonomous mockup review for all planned lessons.",
+  "refinements": [
+    "Canonical shared three-phase progress; no repeated phase sections.",
+    "Observed probability table and exact means are optional disclosures.",
+    "All20 means, reference lines and selected values derive from independent-checked engine, not raster.",
+    "Mechanism linked to outcome explicitly declared; expected bias separate from finite observed gap."
+  ]
+}

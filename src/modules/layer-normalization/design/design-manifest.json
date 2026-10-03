@@ -1,9 +1,20 @@
 {
-  "lessonPlanStep": 63,
-  "lessonPlanTitle": "Layer Normalization Lab",
+  "lessonPlanStep": null,
+  "title": "Layer Normalization Lab",
   "slug": "layer-normalization",
   "modulePath": "src/modules/layer-normalization",
-  "acceptedMockup": "src/modules/layer-normalization/design/accepted-mockup.png",
-  "prompt": "src/modules/layer-normalization/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e1c60-f68e-7a02-a864-9228f36a34c6/ig_0d293b2a9bb22f76016a032d9ba1808191a4b5621ca2e198b4.png"
+  "acceptedMockupPath": "src/modules/layer-normalization/design/accepted-mockup.png",
+  "promptPath": "src/modules/layer-normalization/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-86844057-d24a-45cf-8c59-c252f158c851.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without asking for approval.",
+  "approvedRefinements": [
+    "Canonical shared navbar, two-line token buttons, three-step progress, range controls, open summaries and one Guide invitation.",
+    "Generated features have no assigned linguistic meanings; remove invented article/animal/action/context labels.",
+    "Preserve original initial raw rows and affine vectors; each experiment declares its starting state.",
+    "Four horizontal individual feature lanes per stage replace raster vertical axes; fixed numeric axes -5 to 5 cover all supported outputs.",
+    "Engine values and exact geometry supersede raster arithmetic; distinguish raw std from regularized denominator.",
+    "Optional exact values and declared-shape BatchNorm comparison stay in workbench; no duplicate selectors, Submit or extra Guide launcher.",
+    "Container-responsive stacking supports Guide-reduced width."
+  ]
 }

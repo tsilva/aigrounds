@@ -56,6 +56,8 @@ The Label-Mixing Image Transforms lesson connects whole-image RGB MixUp with exa
 
 Batch Normalization Lab now follows a single feature across fixed mini-batches through linked input, normalized and output rows. Five prediction/action/explanation experiments and an inference transfer check distinguish population variance, epsilon-sensitive spread, manual Scale/Shift, outlier-induced batch dependence and explicit frozen references. The module retains all four datasets and original control bounds, calculates true centered standard deviation in inference, and documents that no optimizer or running-statistics updates are simulated.
 
+Layer Normalization links a selected-feature editor to four-feature input/normalized/output lanes. Five gated experiments distinguish token-local statistics from within-row coupling, test epsilon with a constant row, expose feature-wise parameters shared across tokens, and compare explicitly declared LayerNorm and BatchNorm1d axes. Raw standard deviation and the regularized denominator are separate; fixed numeric plots cover the complete supported range. A constant-row Scale transfer check, exact values and optional model notes support independent explanations.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

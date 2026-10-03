@@ -595,24 +595,18 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "layer-normalization",
+    layout: "guided-discovery",
     title: "Layer Normalization Lab",
     tag: "neural networks",
-    kicker:
-      "Select one token row and watch its hidden features normalize from their own statistics.",
-    summary:
-      "Adjust a token's hidden activations, inspect the per-token mean and variance, then tune learned gamma and beta while comparing LayerNorm's row-wise statistics with BatchNorm's batch-wise axis.",
+    kicker: "Change one feature and follow its token’s own normalization reference.",
+    summary: "Edit illustrative token features, compare row-local statistics, test a constant row and shared per-feature Scale/Shift, then declare the axes in a BatchNorm comparison.",
     estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Hidden features",
-      "Per-token statistics",
-      "Layer normalization",
-      "Scale and shift",
-    ],
+    concepts: ["Row-local statistics", "Epsilon", "Layer normalization", "Per-feature scale and shift"],
     learningGoals: [
-      "See how LayerNorm computes mean and variance across the features inside one token.",
-      "Connect the normalization formula to displayed z-score values.",
-      "Understand how gamma and beta restore useful feature scale after normalization.",
-      "Distinguish LayerNorm's per-token statistics from BatchNorm's batch statistics.",
+      "Explain independence from other rows and coupling within one edited row.",
+      "Calculate normalized values with population variance and epsilon, including a constant row.",
+      "Explain per-feature Scale/Shift shared across tokens and output mean/spread.",
+      "Declare normalization axes for a LayerNorm/BatchNorm comparison.",
     ],
   },
   {

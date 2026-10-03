@@ -1,9 +1,19 @@
 {
   "lessonPlanStep": null,
-  "lessonPlanTitle": "Linear Quantization (INT4) Lab",
+  "title": "Linear Quantization (INT4) Lab",
   "slug": "linear-quantization-int4",
   "modulePath": "src/modules/linear-quantization-int4",
-  "acceptedMockup": "src/modules/linear-quantization-int4/design/accepted-mockup.png",
-  "prompt": "src/modules/linear-quantization-int4/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e16a3-5990-74e1-8b29-968ea64df991/ig_0ea0ce8e197a248b016a01c0311b3881918d66c62942694afb.png"
+  "acceptedMockupPath": "src/modules/linear-quantization-int4/design/accepted-mockup.png",
+  "promptPath": "src/modules/linear-quantization-int4/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-adb61428-40fd-4738-ae2a-fe0c15ade14f.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without requesting approval.",
+  "approvedRefinements": [
+    "Canonical indigo two-line scenario selection, toolbar Reset, shared exact controls, open summaries and one Guide CTA replace generated card/pill treatments.",
+    "Use separate source/reconstructed rows on one true domain, with all sixteen level ticks and exact numeric data; do not copy generated coordinates/counts.",
+    "Retain histogram evidence as honest optional count tables with separate underflow/overflow and no minimum bar width.",
+    "Expose exact rounded offset separately from raw/clamped codes, full endpoint cells and half-step boundary convention.",
+    "Treat decimal half ties exactly; preserve original rounding toward positive infinity rather than silently adopting ONNX ties-to-even.",
+    "Explicit illustrative storage overhead complements payload-only 8x ratio."
+  ]
 }

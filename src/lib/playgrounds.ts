@@ -1,3 +1,4 @@
+import { ProbabilityAreaPlayground } from "@/modules/pdf-cdf-probability-area/ProbabilityAreaPlayground";
 import { LawLargeNumbersPlayground } from "@/modules/law-large-numbers-simulation/LawLargeNumbersPlayground";
 import { type ComponentType } from "react";
 import { AiConceptAtlasPlayground } from "@/modules/ai-concept-atlas/AiConceptAtlasPlayground";
@@ -55,6 +56,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "bayes-rule": BayesRulePlayground,
   "expected-value-risk": ExpectedValueRiskPlayground,
   "law-large-numbers-simulation": LawLargeNumbersPlayground,
+  "pdf-cdf-probability-area": ProbabilityAreaPlayground,
   "bernoulli-categorical-binomial": BernoulliCategoricalBinomialPlayground,
   "waiting-arrival-distributions": WaitingArrivalDistributionsPlayground,
   overfitting: OverfittingPlayground,

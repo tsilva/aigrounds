@@ -37,8 +37,6 @@ export type AtlasConcept = {
   difficulty: AtlasDifficulty;
   description: string;
   whyItMatters: string;
-  prerequisiteIds: string[];
-  relatedIds: string[];
   playgroundSlug?: string;
 };
 
@@ -1533,7 +1531,7 @@ const coreDetails: Record<
   },
   "Transformer": {
     description:
-      "A neural architecture that uses attention to mix information across a sequence in parallel.",
+      "A neural architecture that uses attention to mix information across sequence positions.",
     whyItMatters:
       "Transformers power many modern language, vision, audio, and multimodal systems.",
     playgroundSlug: "transformer-attention",
@@ -1551,7 +1549,7 @@ const coreDetails: Record<
     description:
       "Generative models that learn to reverse a gradual noising process.",
     whyItMatters:
-      "They are a leading approach for high-quality image, audio, video, and multimodal generation.",
+      "They are used for image, audio, video, and other generation tasks.",
   },
   "Retrieval-augmented generation": {
     description:
@@ -1604,97 +1602,6 @@ const coreDetails: Record<
   },
 };
 
-const relationshipLabels: Record<
-  string,
-  { prerequisites?: string[]; related?: string[] }
-> = {
-  "Matrix multiplication": { prerequisites: ["Vectors", "Matrices", "Dot product"] },
-  "Gradient descent": { prerequisites: ["Gradients", "Optimization"] },
-  "Maximum likelihood estimation": {
-    prerequisites: ["Probability distributions", "Likelihood"],
-  },
-  "Cross entropy": { prerequisites: ["Probability distributions", "Entropy"] },
-  "KL divergence": { prerequisites: ["Entropy", "Probability distributions"] },
-  "Linear regression": { prerequisites: ["Linear algebra", "Least squares"] },
-  "Logistic regression": {
-    prerequisites: ["Linear regression", "Sigmoid activation"],
-  },
-  "K-means clustering": {
-    prerequisites: ["Vectors", "Vector norms"],
-    related: ["Gaussian mixture models", "Hierarchical clustering"],
-  },
-  "Principal component analysis": {
-    prerequisites: ["Linear algebra", "Eigenvectors"],
-    related: ["Singular value decomposition", "Low-rank approximation"],
-  },
-  "Neural networks": { prerequisites: ["Linear algebra"] },
-  "Backpropagation": { prerequisites: ["Chain rule", "Computational graphs"] },
-  "Automatic differentiation": { prerequisites: ["Chain rule", "Computational graphs"] },
-  "Convolutional neural networks": {
-    prerequisites: ["Neural networks", "Convolution"],
-  },
-  "Attention": {
-    prerequisites: ["Neural networks"],
-    related: ["Dot product", "Softmax"],
-  },
-  "Self-attention": { prerequisites: ["Attention"] },
-  "Multi-head attention": { prerequisites: ["Self-attention"] },
-  "Transformer": { prerequisites: ["Attention"] },
-  "Vision transformers": {
-    prerequisites: ["Transformer", "Computer vision"],
-    related: ["Convolutional neural networks"],
-  },
-  "Large language models": {
-    prerequisites: ["Transformer", "Language modeling", "Tokenization"],
-  },
-  "Byte-pair encoding": { prerequisites: ["Tokenization", "Data compression"] },
-  "Retrieval-augmented generation": {
-    prerequisites: ["Large language models", "Dense retrieval"],
-    related: ["Grounding", "Vector databases"],
-  },
-  "AI agents": {
-    prerequisites: ["Large language models", "Tool use", "Agent planning"],
-  },
-  "Diffusion models": {
-    prerequisites: ["Probability distributions", "Neural networks"],
-  },
-  "Markov decision processes": {
-    prerequisites: ["Markov chains", "Conditional probability"],
-  },
-  "State-value functions": { prerequisites: ["Markov decision processes", "Return"] },
-  "Action-value functions": { prerequisites: ["State-value functions", "Action"] },
-  "Q-learning": {
-    prerequisites: ["Action-value functions", "Temporal-difference learning"],
-    related: ["SARSA", "Deep Q-networks"],
-  },
-  "Double Q-learning": { prerequisites: ["Q-learning"] },
-  "Deep Q-networks": {
-    prerequisites: ["Q-learning", "Neural networks"],
-  },
-  "Policy gradients": {
-    prerequisites: ["Policy", "Gradients", "Return"],
-  },
-  "Actor-critic methods": {
-    prerequisites: ["Policy gradients", "State-value functions"],
-  },
-  "Proximal policy optimization": {
-    prerequisites: ["Actor-critic methods", "Advantage functions"],
-  },
-  "Monte Carlo tree search": {
-    prerequisites: ["Trees", "Monte Carlo estimation", "RL planning"],
-  },
-  "Calibration": {
-    prerequisites: ["Probability", "Decision thresholds"],
-    related: ["Brier score", "Uncertainty estimation"],
-  },
-  "SHAP values": {
-    prerequisites: ["Feature importance", "Cooperative game theory"],
-  },
-  "Quantization": {
-    prerequisites: ["Floating-point arithmetic", "Model inference"],
-  },
-};
-
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -1711,8 +1618,6 @@ const baseConcepts: AtlasConcept[] = [
     difficulty: "beginner",
     description: coreDetails["Artificial Intelligence"].description ?? "",
     whyItMatters: coreDetails["Artificial Intelligence"].whyItMatters ?? "",
-    prerequisiteIds: [],
-    relatedIds: [],
   },
 ];
 
@@ -1726,8 +1631,6 @@ for (const domain of atlasDomains) {
     difficulty: "beginner",
     description: domain.summary,
     whyItMatters: `This domain organizes ${domain.groups.length} connected areas of study so learners can move from broad ideas to specific methods.`,
-    prerequisiteIds: [],
-    relatedIds: [],
   });
 
   for (const group of domain.groups) {
@@ -1743,8 +1646,6 @@ for (const domain of atlasDomains) {
       description: `${group.label} groups ${group.concepts.length} closely related ideas inside ${domain.label}.`,
       whyItMatters:
         "This branch provides a manageable entry point into a larger part of the atlas.",
-      prerequisiteIds: [],
-      relatedIds: [],
     });
 
     for (const label of group.concepts) {
@@ -1763,36 +1664,13 @@ for (const domain of atlasDomains) {
         whyItMatters:
           detail.whyItMatters ??
           `Understanding ${label} helps connect neighboring ideas in ${group.label}.`,
-        prerequisiteIds: [],
-        relatedIds: [],
         playgroundSlug: detail.playgroundSlug,
       });
     }
   }
 }
 
-const idByLabel = new Map<string, string>();
-for (const concept of baseConcepts) {
-  if (!idByLabel.has(concept.label)) {
-    idByLabel.set(concept.label, concept.id);
-  }
-}
-
-function idsForLabels(labels: string[] | undefined) {
-  return (labels ?? []).flatMap((label) => {
-    const id = idByLabel.get(label);
-    return id ? [id] : [];
-  });
-}
-
-export const atlasConcepts: AtlasConcept[] = baseConcepts.map((concept) => {
-  const relationships = relationshipLabels[concept.label];
-  return {
-    ...concept,
-    prerequisiteIds: idsForLabels(relationships?.prerequisites),
-    relatedIds: idsForLabels(relationships?.related),
-  };
-});
+export const atlasConcepts: AtlasConcept[] = baseConcepts;
 
 export const atlasConceptById = new Map(
   atlasConcepts.map((concept) => [concept.id, concept]),
@@ -1802,8 +1680,7 @@ export const atlasDomainById = new Map(
   atlasDomains.map((domain) => [domain.id, domain]),
 );
 
-export const defaultAtlasConceptId =
-  idByLabel.get("Transformer") ?? "artificial-intelligence";
+export const defaultAtlasConceptId = "artificial-intelligence";
 
 export const atlasSources = [
   {

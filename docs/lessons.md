@@ -58,6 +58,8 @@ Batch Normalization Lab now follows a single feature across fixed mini-batches t
 
 Layer Normalization links a selected-feature editor to four-feature input/normalized/output lanes. Five gated experiments distinguish token-local statistics from within-row coupling, test epsilon with a constant row, expose feature-wise parameters shared across tokens, and compare explicitly declared LayerNorm and BatchNorm1d axes. Raw standard deviation and the regularized denominator are separate; fixed numeric plots cover the complete supported range. A constant-row Scale transfer check, exact values and optional model notes support independent explanations.
 
+MNIST MLP Inference Debugger links a compact 28×28 input to probabilities and hidden traces from one current WebGPU run. Five gated experiments distinguish blank-image scores from recognition, test the default model’s preprocessing contract, reconcile all signed neuron terms, separate sampled views from inference, and interpret local score saliency. Pixel, layer, neuron and matrix editors provide keyboard access; uploads enter free exploration and rejected graphs preserve the current model. A pixel-intervention transfer check keeps fixed inference separate from training.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

@@ -12,6 +12,9 @@ interface GPUAdapter {
 
 interface GPUDevice {
   queue: GPUQueue;
+  readonly limits: { readonly maxStorageBufferBindingSize: number };
+  pushErrorScope(filter: "validation" | "out-of-memory" | "internal"): void;
+  popErrorScope(): Promise<{ readonly message: string } | null>;
   createShaderModule(descriptor: { code: string }): GPUShaderModule;
   createComputePipeline(descriptor: {
     layout: "auto";
@@ -47,6 +50,7 @@ interface GPUQueue {
 
 interface GPUShaderModule {
   readonly label?: string;
+  getCompilationInfo(): Promise<{ readonly messages: ReadonlyArray<{ readonly type: "error" | "warning" | "info"; readonly message: string }> }>;
 }
 
 interface GPUComputePipeline {

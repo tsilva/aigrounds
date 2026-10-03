@@ -1,8 +1,7 @@
-User supplied the accepted visual target directly in the task message.
+# Accepted MNIST debugger mockup
 
-Implementation target:
-- Full-screen AI Grounds immersive lab.
-- Header: "MNIST MLP Inference Debugger", upload model button, file, architecture, and activation pills.
-- Primary row: input drawing panel, MLP network contribution visualization, softmax output panel.
-- Secondary row: selected neuron details, effective contributions matrix, input saliency map.
-- Required interaction: drag-and-drop or upload an ONNX MNIST MLP classifier, draw/edit a 28x28 digit, run inference with WebGPU, inspect probabilities, hidden activations, contribution signs, and saliency.
+Exact generation prompt:
+
+Create a refined 1440x1100 desktop AI Grounds MNIST MLP Inference Debugger webpage mockup following canonical shared DESIGN_SYSTEM: white workbench69%, pale lavender #f6f5ff experimentrail31%, navy #0c1230, muted #536487, indigo #5031dc, thin #dfe4f4 rules, Space Grotesk title40, IBM Plex Mono numbers. Navigation only AI Grounds and ← All lessons. Guided discovery, title 'MNIST MLP Inference Debugger', subtitle 'Change the pixels. Follow the fixed model’s computation.' Compact open model line: default model.onnx, architecture784→1024→1024→1024→10, WebGPU current; labeled Upload ONNX button. Separate two-line scenario buttons Reference seven / Hand-drawn, Blank / Zero brightness, small Reset. Preprocessing labeled MNIST norm active vs Raw 0..1; caption modelcard expects (brightness−0.1307)/0.3081. Primary compact side-by-side black224x224 pixelcanvas with white handwritten7 and Output probabilities ten horizontal bars true0..100% scale, class7~98.8%, otherbars honest tiny widths notinflated. Under canvas Draw/Erase, Pixel index numeric/range406, Brightness numeric/range0.8, row14column14 caption. Output says Largest model probability, not verified accuracy; exact selected input raw and preprocessed math visible. Below thin divider selectedLayer1 and Neuron1 native controls; weighted sum+bias→z→ReLU(a), signed top-contributor table with rest-of-sum clearly not just topfive. Optional disclosure sections Network preview (display-only threshold/Top-K), Effective contribution matrix, Local score saliency. Rail Experiment1of5 'A score is not recognition', canonical horizontal3steps Predict→Try→Explain; question 'Must a blank image give ten equal digit probabilities?', three immediate-selection radiochoices, action 'Select Blank. Read the probabilities after WebGPU finishes.' Single Talk it through AI Guide invitation. No fake Submit button, no photography, no giantcanvas, no shadowedcards, no extra nav. Numeric values and geometry illustrative; actual model execution supplies exact evidence.
+
+Self-reviewed refinements recorded in design-manifest.json. User waived mockup approval; generated numbers and geometry are illustrative, actual model execution is authoritative.

@@ -1,3 +1,4 @@
+import { shapeTutorPlan } from "@/modules/correlation-shape-outliers/learning-experiments";
 import { covarianceTutorPlan } from "@/modules/covariance-correlation/learning-experiments";
 import { powerTutorPlan } from "@/modules/power-effect-size-sample-size/learning-experiments";
 import { errorsTutorPlan } from "@/modules/type-i-type-ii-errors/learning-experiments";
@@ -69,6 +70,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "correlation-shape-outliers": shapeTutorPlan,
   "covariance-correlation": covarianceTutorPlan,
   "mean-median-mode": {
     intro:

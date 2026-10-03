@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "correlation-shape-outliers",
+    layout: "guided-discovery",
+    title: "Correlation Shape & Outliers Lab",
+    tag: "relationships",
+    kicker: "Move one pair; compare straight-line and rank alignment.",
+    summary: "Switch among datasets and drag outliers to compare correlation metrics.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Spearman correlation", "Nonlinear relationships", "Outliers"],
+    learningGoals: [
+      "Compare numeric straight-line alignment with strict monotonic rank agreement.",
+      "Recognize nonlinear dependence despite zero correlation and influence on both metrics.",
+      "Handle average ties and preserve paired observations when computing Spearman.",
+      "Transfer to new spacings without causal or automatic data-removal claims.",
+    ],
+  },
+  {
     slug: "covariance-correlation",
     layout: "guided-discovery",
     title: "Covariance & Correlation Map",
@@ -935,14 +951,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "correlation-shape-outliers",
-    title: "Correlation Shape & Outliers Lab",
-    tag: "relationships",
-    summary:
-      "Switch among datasets and drag outliers to compare correlation metrics.",
-    concepts: ["Spearman correlation", "Nonlinear relationships", "Outliers"],
-  },
   {
     slug: "simpsons-paradox-confounding",
     title: "Simpson's Paradox & Confounding Lab",

@@ -474,12 +474,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "transformer-attention",
+    layout: "guided-discovery",
     title: "Transformer Attention",
     tag: "transformers",
     kicker:
       "Select a token and watch query-key scores become a weighted context mix.",
     summary:
-      "Switch between two meanings of bank, choose a query token, and adjust attention sharpness. The lab shows how queries compare with keys, softmax creates weights, and values blend into the next token representation.",
+      "Compare two hand-authored fixtures, choose a query and adjust attention sharpness. Inspect scaled query-key scores, normalized weights and every weighted value contribution to one unmasked attention-head output.",
     estimatedDuration: "5 to 7 minutes",
     concepts: [
       "Self-attention",
@@ -490,7 +491,7 @@ const activePlaygroundDefinitions = [
     learningGoals: [
       "Understand attention as a weighted lookup over context tokens.",
       "See how query-key scores decide which tokens receive larger weights.",
-      "Recognize that values, not keys, are blended into the next representation.",
+      "Recognize that all values, not a winning key, are blended into the attention-head output.",
     ],
   },
   {

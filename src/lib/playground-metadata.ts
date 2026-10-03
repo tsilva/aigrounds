@@ -685,12 +685,13 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "ai-concept-atlas",
+    layout: "guided-discovery",
     title: "The AI Concept Atlas",
     tag: "concept map",
     kicker:
-      "Open a branch from the AI core and move from broad categories to specific concepts.",
+      "Open a local branch, search the full catalog and read a chosen browse path.",
     summary:
-      "Navigate a center-out mind map of AI, machine learning, deep learning, generative AI, reinforcement learning, evaluation, safety, and production systems. Expand categories into subcategories and concepts, search the atlas, and highlight any concept's path from the AI core.",
+      "Navigate 903 curated nodes through a center-out map or the same hierarchy in a readable branch list. Expand and collapse local branches, search hidden concepts and compare chosen browse homes without mistaking overlapping categories for prerequisites.",
     estimatedDuration: "8 to 12 minutes",
     concepts: [
       "AI taxonomy",
@@ -699,10 +700,11 @@ const activePlaygroundDefinitions = [
       "Concept search",
     ],
     learningGoals: [
-      "Read an AI concept from the central root through its category and subcategory.",
-      "Control a large taxonomy with local branch expansion, collapse, and search.",
-      "Trace a selected concept through its parent categories to the AI core.",
-      "Explain that a branch shows category membership rather than prerequisite order.",
+      "Expand one category locally while keeping the full catalog available.",
+      "Read a concept’s chosen root/category/subcategory/label path.",
+      "Collapse a selected child’s branch and explain the move to its parent without catalog deletion.",
+      "Search a hidden concept and reveal its ancestors without changing its browse home.",
+      "Compare actual category and subcategory labels without inferring prerequisites or exclusive scientific membership.",
     ],
   },
 ] satisfies ActivePlaygroundDefinition[];

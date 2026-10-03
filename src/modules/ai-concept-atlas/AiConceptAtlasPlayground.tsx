@@ -1,276 +1,52 @@
 "use client";
-
-import {
-  ArrowsPointingOutIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
-import {
-  useCallback,
-  useDeferredValue,
-  useMemo,
-  useState,
-} from "react";
-import {
-  atlasConceptById,
-  atlasConcepts,
-  atlasDomainById,
-  atlasDomains,
-  defaultAtlasConceptId,
-  type AtlasConcept,
-} from "./ai-concept-atlas-data";
-import {
-  buildAtlasView,
-  getAncestorIds,
-  getConceptTrail,
-  searchAtlas,
-} from "./ai-concept-atlas-engine";
-
-const ConceptAtlasMap = dynamic(
-  () =>
-    import("./ConceptAtlasMap").then((module) => module.ConceptAtlasMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        role="status"
-        className="grid h-[680px] min-h-[560px] place-items-center bg-white text-[13px] font-bold text-[#53617e] lg:h-[760px]"
-      >
-        Preparing the branching mind map…
-      </div>
-    ),
-  },
-);
-
-function SearchBox({
-  query,
-  results,
-  onQueryChange,
-  onSelect,
-}: {
-  query: string;
-  results: AtlasConcept[];
-  onQueryChange: (query: string) => void;
-  onSelect: (concept: AtlasConcept) => void;
-}) {
-  const [focused, setFocused] = useState(false);
-  const showResults = focused && query.trim().length > 0;
-
-  return (
-    <div
-      className="relative z-30 w-full min-w-[240px] sm:w-[320px]"
-      onFocus={() => setFocused(true)}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
-      }}
-    >
-      <label htmlFor="atlas-search" className="sr-only">
-        Search the AI concept atlas
-      </label>
-      <div className="flex h-11 items-center gap-2 rounded-[8px] border border-[#cfd9ed] bg-white px-3 text-[#54617e] focus-within:border-[#2447ff] focus-within:ring-4 focus-within:ring-indigo-100">
-        <MagnifyingGlassIcon aria-hidden="true" className="size-5" />
-        <input
-          id="atlas-search"
-          type="search"
-          role="combobox"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
-          placeholder={`Search ${atlasConcepts.length} atlas nodes...`}
-          autoComplete="off"
-          aria-autocomplete="list"
-          aria-expanded={showResults}
-          aria-controls="atlas-search-results"
-          className="min-w-0 flex-1 bg-transparent text-[13px] font-semibold text-[#071024] outline-none placeholder:text-[#7b88a6]"
-        />
-      </div>
-
-      {showResults ? (
-        <ul
-          id="atlas-search-results"
-          role="listbox"
-          aria-label="Concept search results"
-          className="absolute top-[calc(100%+8px)] left-0 max-h-[360px] w-full overflow-y-auto rounded-[10px] border border-[#cfd9ed] bg-white p-2 shadow-[0_22px_45px_rgba(26,38,80,0.16)]"
-        >
-          {results.length ? (
-            results.map((concept) => {
-              const domain =
-                concept.domainId === "root"
-                  ? undefined
-                  : atlasDomainById.get(concept.domainId);
-              return (
-                <li key={concept.id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={false}
-                    onClick={() => {
-                      onSelect(concept);
-                      setFocused(false);
-                    }}
-                    className="flex w-full items-center justify-between gap-3 rounded-[7px] px-3 py-2.5 text-left hover:bg-[#f5f7ff] focus:bg-[#f5f7ff] focus:outline-none"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate text-[13px] font-black text-[#071024]">
-                        {concept.label}
-                      </span>
-                      <span className="mt-0.5 block truncate text-[11px] font-semibold text-[#6c7894]">
-                        {domain?.label ?? "Atlas root"}
-                      </span>
-                    </span>
-                    <span className="rounded-full border border-[#d9e1f0] px-2 py-1 font-mono text-[9px] font-bold tracking-wide text-[#65728e] uppercase">
-                      {concept.kind}
-                    </span>
-                  </button>
-                </li>
-              );
-            })
-          ) : (
-            <li className="px-3 py-5 text-center text-[13px] font-semibold text-[#65728e]">
-              No matching concept. Try a shorter term.
-            </li>
-          )}
-        </ul>
-      ) : null}
-    </div>
-  );
-}
-
-const initialExpandedIds = new Set<string>([
-  ...atlasDomains.map(({ id }) => id),
-]);
-
+import { useCallback, useMemo, useState } from "react";
+import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonAction, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import shared from "@/components/learning-page/learning-page.module.css";
+import { atlasConcepts, atlasDomains, atlasSources } from "./ai-concept-atlas-data";
+import { buildAtlasView, getConceptTrail, searchAtlas } from "./ai-concept-atlas-engine";
+import { atlasBaseline, idForLabel, initialAtlasState, reachedAtlas, selectAtlasConcept, toggleAtlasBranch, type AtlasState } from "./atlas-state";
+import { atlasExperiments } from "./learning-experiments";
+import { AtlasBranchList } from "./AtlasBranchList";
+import styles from "./playground.module.css";
+const ConceptAtlasMap = dynamic(() => import("./ConceptAtlasMap").then(m => m.ConceptAtlasMap), { ssr: false, loading: () => <p role="status">Preparing the spatial map… Branch list is available immediately.</p> });
 export function AiConceptAtlasPlayground() {
-  const [selectedId, setSelectedId] = useState(defaultAtlasConceptId);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(
-    () => new Set(initialExpandedIds),
-  );
-  const [query, setQuery] = useState("");
-  const [focusRequest, setFocusRequest] = useState(0);
-  const [fitRequest, setFitRequest] = useState(0);
-  const [branchFitRequest, setBranchFitRequest] = useState({
-    conceptId: "",
-    request: 0,
-  });
-  const deferredQuery = useDeferredValue(query);
-  const searchResults = useMemo(
-    () => searchAtlas(deferredQuery),
-    [deferredQuery],
-  );
-  const view = useMemo(
-    () => buildAtlasView({ selectedId, domainFilter: "all", expandedIds }),
-    [expandedIds, selectedId],
-  );
-
-  const selectConcept = useCallback(
-    (conceptId: string, focus = true) => {
-      const concept = atlasConceptById.get(conceptId);
-      if (!concept) return;
-      setSelectedId(conceptId);
-      setExpandedIds((current) => {
-        const next = new Set(current);
-        for (const ancestorId of getAncestorIds(conceptId)) next.add(ancestorId);
-        return next;
-      });
-      if (focus) setFocusRequest((current) => current + 1);
-    },
-    [],
-  );
-
-  const toggleBranch = useCallback(
-    (conceptId: string) => {
-      const collapsing = expandedIds.has(conceptId);
-      setExpandedIds((current) => {
-        const next = new Set(current);
-        if (next.has(conceptId)) next.delete(conceptId);
-        else next.add(conceptId);
-        return next;
-      });
-
-      if (!collapsing) {
-        setBranchFitRequest((current) => ({
-          conceptId,
-          request: current.request + 1,
-        }));
-      }
-
-      if (
-        collapsing &&
-        selectedId !== conceptId &&
-        getAncestorIds(selectedId).includes(conceptId)
-      ) {
-        selectConcept(conceptId, false);
-      }
-    },
-    [expandedIds, selectConcept, selectedId],
-  );
-
-  function selectSearchResult(concept: AtlasConcept) {
-    setQuery(concept.label);
-    selectConcept(concept.id);
-  }
-
-  return (
-    <main className="min-h-screen overflow-x-clip bg-[#f8faff] px-4 py-6 text-[#071024] sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-[1580px] flex-col gap-4">
-        <header>
-          <div className="min-w-0">
-            <h1 className="text-[42px] leading-[0.98] font-black text-black sm:text-[46px]">
-              The AI Concept Atlas
-            </h1>
-            <p className="mt-3 max-w-3xl text-[16px] leading-[1.45] font-bold text-[#14275d]">
-              Start at the center, open a branch, and move from broad categories
-              to specific AI concepts.
-            </p>
-          </div>
-        </header>
-
-        <div className="min-w-0">
-          <section
-            aria-label="AI concept mind map"
-            className="min-w-0 overflow-hidden rounded-[12px] border border-[#d8e0f3] bg-white shadow-[0_16px_38px_rgba(26,38,80,0.05)]"
-          >
-            <div className="relative">
-              <div
-                role="region"
-                aria-label="Atlas navigation controls"
-                className="absolute top-3 left-3 z-30 flex flex-wrap items-center gap-2"
-              >
-                <SearchBox
-                  query={query}
-                  results={searchResults}
-                  onQueryChange={setQuery}
-                  onSelect={selectSearchResult}
-                />
-                <button
-                  type="button"
-                  onClick={() => setFitRequest((current) => current + 1)}
-                  className="inline-flex min-h-11 w-fit shrink-0 items-center gap-1.5 rounded-[7px] border border-[#d5deee] bg-white px-3 text-[11px] font-black text-[#43516f] hover:border-[#9cadff] hover:text-[#173ee8] focus:outline-none focus:ring-4 focus:ring-indigo-100"
-                >
-                  <ArrowsPointingOutIcon aria-hidden="true" className="size-4" />
-                  Fit map
-                </button>
-              </div>
-              <ConceptAtlasMap
-                view={view}
-                onSelectConcept={selectConcept}
-                onToggleBranch={toggleBranch}
-                focusRequest={focusRequest}
-                fitRequest={fitRequest}
-                branchFitRequest={branchFitRequest}
-              />
-            </div>
-            <div className="border-t border-[#dce4f4] bg-[#fbfcff] px-4 py-3 text-[12px] font-bold text-[#43516f]">
-              Select a node to highlight its path. Use the branch control on a
-              category or subcategory to reveal more specific children.
-            </div>
-          </section>
-        </div>
-
-        <p className="sr-only" aria-live="polite">
-          Selected {view.selected.label}. Its taxonomy path has {getConceptTrail(view.selected.id).length - 1}{" "}
-          levels.
-        </p>
-      </div>
-    </main>
-  );
+    const [state, setState] = useState<AtlasState>(initialAtlasState), [index, setIndex] = useState(0), [prediction, setPrediction] = useState<string | null>(null), [explanation, setExplanation] = useState<string | null>(null), [transferAnswer, setTransferAnswer] = useState<string | null>(null);
+    const [camera, setCamera] = useState<{
+        request: number;
+        kind: "fit" | "branch" | "selected";
+        id: string;
+    }>({ request: 0, kind: "fit", id: "" });
+    const view = useMemo(() => buildAtlasView({ selectedId: state.selectedId, expandedIds: new Set(state.expandedIds) }), [state.selectedId, state.expandedIds]);
+    const results = useMemo(() => searchAtlas(state.query, atlasConcepts.length), [state.query]), trail = getConceptTrail(state.selectedId), compare = state.compareId ? getConceptTrail(state.compareId) : null;
+    const experiment = atlasExperiments[index], transfer = index === 5, reached = !!prediction && !!experiment && reachedAtlas(index, state), complete = reached && explanation === "0";
+    const clear = useCallback(() => { setExplanation(null); setTransferAnswer(null); }, []);
+    function start(next = index) { setIndex(next); setState({ ...atlasBaseline(next), mode: state.mode }); setPrediction(null); clear(); setCamera(c => ({ request: c.request + 1, kind: "fit", id: "" })); }
+    const select = useCallback((id: string, viaSearch = false) => { setState(s => selectAtlasConcept(s, id, viaSearch)); clear(); setCamera(c => ({ request: c.request + 1, kind: "selected", id })); }, [clear]);
+    const toggle = useCallback((id: string) => { const collapsing = state.expandedIds.includes(id); setState(s => toggleAtlasBranch(s, id)); clear(); setCamera(c => ({ request: c.request + 1, kind: collapsing ? "fit" : "branch", id })); }, [state.expandedIds, clear]);
+    function preset(id: string) { const initial = initialAtlasState(); setState({ ...(id === "all" ? initial : id === "transformer" ? selectAtlasConcept(initial, idForLabel("Transformer")) : selectAtlasConcept(initial, idForLabel("Value Learning"))), mode: state.mode }); clear(); setCamera(c => ({ request: c.request + 1, kind: "fit", id: "" })); }
+    const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 5`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
+    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="atlas-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }}/><p className={shared.small}>A different prediction restores starting settings. Reset restarts this experiment. Both views can perform the same branch actions.</p></>}
+    {prediction && !reached && <p className={shared.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
+    {reached && <><p role="status" className={shared.observation}>{prediction === "0" ? "Your prediction matches the hierarchy." : "The visible hierarchy challenges your prediction."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="atlas-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation}/>{explanation && !complete && <p role="status" className={shared.feedback}>Try again. {experiment.retry}</p>}</>}
+    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 4 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
+  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Locate a systems concept" : "Explore the catalog"}>
+    {transfer ? <><p>Without Guide help, find and select Quantization. Read its full path, then decide whether the path prescribes what must be learned first.</p><ExperimentChoices legend="Transfer explanation" name="atlas-transfer" choices={[{ id: "home", label: "Artificial Intelligence → AI Systems & MLOps → Model Optimization → Quantization. This is its chosen browse home, not a prerequisite order or its only possible use." }, { id: "learn", label: "Every ancestor must be mastered first because these edges are prerequisites." }, { id: "place", label: "Quantization is under Evaluation & Safety → Model Interpretability." }]} value={transferAnswer} onChange={setTransferAnswer}/>{transferAnswer && (!reachedAtlas(5, state) ? <p role="status" className={shared.feedback}>First find and select the exact Quantization node, not 4-bit quantization or Quantization-aware training.</p> : transferAnswer !== "home" ? <p role="status" className={shared.feedback}>Try again. Read each label in Selected path; a curated category edge is not a prerequisite or exclusive scientific classification.</p> : <><ExperimentResult title="Transfer explained">Quantization’s path gives its selected home in this atlas. Other topics can use it; browsing ancestors do not define a required learning sequence.</ExperimentResult><ExperimentButton onClick={() => { setIndex(6); clear(); }}>Explore freely</ExperimentButton></>)}</> : <><p>Explore all eight areas, switch views, search any of the 903 labels, and use path buttons to return to an ancestor. The two views share state. All categories restores a collapsed overview; Reset restarts experiments.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
+  </ExperimentRail>;
+    return <LearningPage title="The AI Concept Atlas" subtitle="Open a branch, read its path, and find a concept without mistaking categories for prerequisites." rail={rail}>
+    <LessonToolbar label="Atlas starting views" scenarios={[{ id: "all", label: "All categories", shortLabel: "Eight browse areas" }, { id: "transformer", label: "Transformers", shortLabel: "One selected path" }, { id: "value", label: "Value learning", shortLabel: "One selected path" }]} selectedId={state.selectedId === "artificial-intelligence" ? "all" : state.selectedId === idForLabel("Transformer") ? "transformer" : state.selectedId === idForLabel("Value Learning") ? "value" : ""} onSelect={preset} onReset={() => start(experiment || transfer ? index : 0)}/>
+    <section className={styles.evidence} aria-label="Concept navigation"><h2>Your concept map</h2><p>Categories group subcategories; subcategories group concept labels. Start at Artificial Intelligence and follow a branch outward. Spatial map gives an overview; Branch list provides the same hierarchy in readable text. Selected path stays readable at any zoom.</p>
+      <label className={styles.search}>Search concepts<input type="search" value={state.query} autoComplete="off" placeholder="Search all 903 labels" onChange={e => { setState({ ...state, query: e.currentTarget.value }); clear(); }}/></label>
+      {state.query.trim() && <><p role="status">{results.length ? `${results.length} matching node${results.length === 1 ? "" : "s"}; showing ${Math.min(10, results.length)}. Narrow the term for more specific results.` : "No matching concept. Try a shorter term."}</p><ul className={styles.results} aria-label="Concept search results">{results.slice(0, 10).map(c => <li key={c.id}><button type="button" aria-label={`Select search result ${c.label}`} onClick={() => select(c.id, true)}>{c.label}<span>{getConceptTrail(c.id).slice(0, -1).map(c => c.label).join(" → ")}</span></button></li>)}</ul><LessonAction onClick={() => setState({ ...state, query: "" })}>Clear search</LessonAction></>}
+      <LessonToggleGroup label="Atlas view" choices={[{ id: "map", label: "Spatial map" }, { id: "list", label: "Branch list" }]} value={state.mode} onChange={id => setState({ ...state, mode: id as AtlasState["mode"] })}/>
+      <p className={shared.small}>Map: drag the background to pan; use Zoom in, Zoom out, Fit map or Focus selected. Labeled node buttons select; Expand/Collapse buttons change branches. Fullscreen uses Escape to exit. Branch list uses the same native buttons and hierarchy without zoom.</p>
+      {state.mode === "map" ? <ConceptAtlasMap view={view} onSelectConcept={select} onToggleBranch={toggle} cameraRequest={camera}/> : <AtlasBranchList view={view} onSelect={select} onToggle={toggle}/>}
+      <p role="status" data-atlas-count>{view.nodes.length} visible nodes of {atlasConcepts.length}. Collapsed descendants stay in the catalog and search.</p>
+    </section>
+    <section className={styles.evidence} aria-label="Selected concept"><h2>Selected path</h2><ol className={styles.path} aria-label="Selected category path" data-selected-path>{trail.map((c, i) => <li key={c.id}>{i > 0 && <span aria-hidden="true">→</span>}<button type="button" aria-label={`Go to ${c.label}`} aria-current={i === trail.length - 1 ? "location" : undefined} onClick={() => select(c.id)}>{c.label}</button></li>)}</ol><p data-selected-description>{view.selected.description}</p>
+      {compare && <><h2>Pinned comparison · {compare.at(-1)!.label}</h2><p className={styles.comparison} data-comparison-path>{compare.map(c => c.label).join(" → ")}</p><p>Compare category and subcategory labels with Selected path. This reference stays pinned while the selected node changes; starting another view clears it.</p></>}
+      <p>These are curated browse areas, and their scientific topics can overlap. Deep learning is part of machine learning even though both have direct browse branches here. Branches show a chosen grouping, not prerequisites, difficulty, causal influence or exclusive membership. This is a navigation atlas; many descriptions identify a topic’s location rather than define its algorithm.</p>
+      <details><summary>Catalog scope and sources</summary><p>{atlasDomains.length} categories, {atlasConcepts.filter(c => c.kind === "group").length} subcategories and {atlasConcepts.filter(c => c.kind === "concept").length} concept labels, plus the root. One chosen parent per node keeps the map legible; it is not an exhaustive ontology or an official copy of any one source’s classification. Concept names and curated placements remain available in both views and search.</p><ul>{atlasSources.map(s => <li key={s.href}><a href={s.href} target="_blank" rel="noreferrer">{s.label}</a></li>)}</ul></details>
+    </section>
+  </LearningPage>;
 }

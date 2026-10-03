@@ -19,6 +19,7 @@ export type AttentionAnalysis = {
   queryToken: AttentionToken;
   weights: AttentionWeight[];
   topToken: AttentionToken;
+  topTokens: AttentionToken[];
   topWeight: number;
   entropy: number;
   normalizedEntropy: number;
@@ -42,7 +43,12 @@ export function analyzeTransformerAttention(
     throw new Error("At least one attention token is required.");
   }
 
-  const vectorSize = Math.max(1, queryToken.query.length);
+  const vectorSize = queryToken.query.length;
+  if (!Number.isFinite(sharpness) || vectorSize === 0 || scenario.tokens.some(token =>
+    token.query.length !== vectorSize || token.key.length !== vectorSize ||
+    [...token.query, ...token.key, ...Object.values(token.value)].some(value => !Number.isFinite(value)))) {
+    throw new Error("Attention requires finite, equally sized nonempty queries/keys and finite values/sharpness.");
+  }
   const rawScores = scenario.tokens.map((token) =>
     dot(queryToken.query, token.key) / Math.sqrt(vectorSize),
   );
@@ -90,34 +96,35 @@ export function analyzeTransformerAttention(
     queryToken,
     weights: attentionWeights,
     topToken: topEntry.token,
+    topTokens: attentionWeights.filter(entry => entry.weight === topEntry.weight).map(entry => entry.token),
     topWeight: topEntry.weight,
     entropy,
     normalizedEntropy,
     outputVector,
     dominantDimension,
     dominantLabel,
-    summary: makeSummary(queryToken, topEntry.token, dominantLabel),
+    summary: `${queryToken.label} compares with every key. All ${attentionWeights.length} values contribute to the weighted output.`,
   };
 }
 
 export function formatWeight(value: number) {
-  return `${Math.round(value * 100)}%`;
+  return `${(value * 100).toFixed(2)}%`;
 }
 
 export function formatScore(value: number) {
-  return value.toFixed(2);
+  return value.toFixed(5);
 }
 
 export function formatVectorValue(value: number) {
-  return value.toFixed(2);
+  return value.toFixed(5);
 }
 
 function dot(left: number[], right: number[]) {
-  const length = Math.max(left.length, right.length);
+  const length = left.length;
   let total = 0;
 
   for (let index = 0; index < length; index += 1) {
-    total += (left[index] ?? 0) * (right[index] ?? 0);
+    total += left[index] * right[index];
   }
 
   return total;
@@ -148,33 +155,6 @@ function sumContributions(contributions: AttentionVector[]): AttentionVector {
     }),
     { water: 0, money: 0, syntax: 0 },
   );
-}
-
-function makeSummary(
-  queryToken: AttentionToken,
-  topToken: AttentionToken,
-  dominantLabel: string,
-) {
-  if (queryToken.id === topToken.id) {
-    return `${queryToken.label} mostly keeps its own value, so the output stays close to its current meaning.`;
-  }
-
-  const topTokenDominantLabel =
-    attentionDimensions.find(
-      (dimension) => dimension.id === dominantDimensionFor(topToken.value),
-    )?.label ?? dominantLabel;
-
-  if (topTokenDominantLabel !== dominantLabel) {
-    return `${queryToken.label} blends several tokens, so the output leans toward ${dominantLabel} even though ${topToken.label} has the strongest single weight.`;
-  }
-
-  return `${topToken.label} pulls ${queryToken.label} toward ${dominantLabel}.`;
-}
-
-function dominantDimensionFor(vector: AttentionVector) {
-  return attentionDimensions.reduce((best, dimension) =>
-    vector[dimension.id] > vector[best.id] ? dimension : best,
-  ).id;
 }
 
 function clamp(value: number, min: number, max: number) {

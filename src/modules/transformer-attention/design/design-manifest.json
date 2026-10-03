@@ -1,0 +1,18 @@
+{
+  "lessonPlanStep": null,
+  "title": "Transformer Attention",
+  "slug": "transformer-attention",
+  "modulePath": "src/modules/transformer-attention",
+  "acceptedMockupPath": "src/modules/transformer-attention/design/accepted-mockup.png",
+  "promptPath": "src/modules/transformer-attention/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-7b01718e-e7d8-4eee-a48a-300b9d147fe3.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review of each redesign mockup without requesting approval.",
+  "approvedRefinements": [
+    "Use canonical two-line toolbar, named experiment title and numbered three-phase progress with outlined rail Guide CTA.",
+    "Reset restores current experiment baseline, not a global original state.",
+    "Expose weighted V contributions as primary evidence; retain Q/K/V arithmetic and fixture comparison as optional keyboard-scrollable tables.",
+    "Generated marks are illustrative; scores, bars and values come from independently verified engine.",
+    "Rejected first mockup: misleading same-tokens context claim, preselected explanation and invented navigation. Regenerated without these."
+  ]
+}

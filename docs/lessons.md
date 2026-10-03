@@ -46,6 +46,8 @@ Tensor Shape & Broadcasting Lab checks right-aligned axes, requires every pair t
 
 Byte Pair Encoding Lab links training pair counts to the last actual replacement and separate inspection tokens. Three guided experiments test a first merge, an unchanged inspection and tied maximum frequencies, followed by an unseen-word transfer in Names. The fixed 28-symbol base alphabet covers every original example; all three corpora and merge prefixes 0–8 remain available. Exact controls and optional candidate, learned-rule, example and count tables replace schematic strength bars and misleading compression charts. The AI Guide can address an explicitly requested experiment without resetting a separate workbench setup.
 
+Transformer Attention now separates fixed-fixture query routing, sharpness, weighted value mixing and comparisons that change multiple inputs. Four predict → try → explain experiments and a cash-query transfer use truthful 0–100% weight lanes, raw entropy in nats, and exact Q/K/V and contribution tables. The preserved hand-authored fixtures are explicitly a six-token, unmasked, single-head toy rather than learned word meanings or a full Transformer.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

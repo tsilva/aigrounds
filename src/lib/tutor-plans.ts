@@ -1,3 +1,4 @@
+import { normalTutorPlan } from "@/modules/normal-distribution-z-scores/learning-experiments";
 import { areaTutorPlan } from "@/modules/pdf-cdf-probability-area/learning-experiments";
 import { llnTutorPlan } from "@/modules/law-large-numbers-simulation/learning-experiments";
 import { mctsTutorPlan } from "@/modules/monte-carlo-tree-search/learning-experiments";
@@ -264,6 +265,7 @@ export const playgroundTutorPlans = {
   "expected-value-risk": payoffTutorPlan,
   "law-large-numbers-simulation": llnTutorPlan,
   "pdf-cdf-probability-area": areaTutorPlan,
+  "normal-distribution-z-scores": normalTutorPlan,
   "bernoulli-categorical-binomial": distributionTutorPlan,
   "waiting-arrival-distributions": arrivalTutorPlan,
   "monte-carlo-tree-search": mctsTutorPlan,

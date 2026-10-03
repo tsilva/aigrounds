@@ -138,19 +138,33 @@ export function getDefaultValues(definition: FormulaDefinition) {
   ) as Record<ParameterKey, number>;
 }
 
-export function analyzeAutograd(
-  formulaId: FormulaId,
-  values: Record<ParameterKey, number>,
-): AutogradAnalysis {
-  if (formulaId === "sigmoid") {
-    return analyzeSigmoid(values);
-  }
-
-  if (formulaId === "squared-error") {
-    return analyzeSquaredError(values);
-  }
-
-  return analyzePolynomial(values);
+export type BackwardMessage = { from:string; to:string; incoming:number; local:number; message:number };
+export type AutogradTrace = AutogradAnalysis & { messages:BackwardMessage[]; nodeGradients:Record<string,number> };
+export function analyzeAutograd(formulaId:FormulaId,values:Record<ParameterKey,number>):AutogradTrace {
+  if (!autogradFormulas.some(f=>f.id===formulaId)) throw new Error("Unknown autograd formula.");
+  const definition=getFormulaDefinition(formulaId);
+  const current=Object.fromEntries(definition.parameters.map(p=>[p.key,values[p.key]??p.defaultValue])) as Record<ParameterKey,number>;
+  if (definition.parameters.some(p=>!Number.isFinite(current[p.key]))) throw new Error("Formula parameters must be finite.");
+  const analysis=formulaId==="sigmoid"?analyzeSigmoid(current):formulaId==="squared-error"?analyzeSquaredError(current):analyzePolynomial(current);
+  if (!Number.isFinite(analysis.output)||analysis.graph.nodes.some(n=>!Number.isFinite(n.value))) throw new Error("Formula values exceed the finite numeric range.");
+  const nodeGradients=Object.fromEntries(analysis.graph.nodes.filter(n=>n.tone!=="constant").map(n=>[n.id,0]));
+  nodeGradients[analysis.graph.nodes.at(-1)!.id]=1;
+  const messages=analysis.graph.backwardEdges.map(edge=>{
+    const incoming=nodeGradients[edge.from];let local=1;
+    if (formulaId==="polynomial") {
+      if (edge.from==="mul") local=edge.to==="a"?current.b:current.a;
+      if (edge.from==="square") local=2*current.b;
+    } else if (formulaId==="sigmoid") {
+      if (edge.from==="sigmoid") local=analysis.output*(1-analysis.output);
+      if (edge.from==="mul") local=edge.to==="x"?current.w:current.x;
+    } else {
+      if (edge.from==="square") local=2*(current.m*2+current.c-5);
+      if (edge.from==="mul") local=2;
+    }
+    const message=incoming*local;nodeGradients[edge.to]+=message;
+    return {from:edge.from,to:edge.to,incoming,local,message};
+  });
+  return {...analysis,messages,nodeGradients};
 }
 
 function analyzePolynomial(values: Record<ParameterKey, number>): AutogradAnalysis {
@@ -471,12 +485,32 @@ export function sigmoid(value: number) {
   return 1 / (1 + Math.exp(-value));
 }
 
-export function formatFixed(value: number, digits = 3) {
-  if (Math.abs(value) < 0.0005) {
-    return (0).toFixed(digits);
-  }
-
+export function formatFixed(value:number,digits=3) {
+  if (value!==0&&Math.abs(value)<10**(-digits)) return value.toExponential(Math.max(2,digits-1));
   return value.toFixed(digits);
+}
+export function formatNumber(value:number) {
+  if(value===0)return "0";
+  if(Math.abs(value)<.00001)return value.toExponential(6);
+  return String(Number(value.toPrecision(9)));
+}
+export function functionValue(formulaId:FormulaId,values:Record<ParameterKey,number>) {
+  if(formulaId==="polynomial")return values.a*values.b+values.b**2;
+  if(formulaId==="sigmoid")return sigmoid(values.w*values.x);
+  return (2*values.m+values.c-5)**2;
+}
+export function sliceCharts(analysis:AutogradAnalysis,key:ParameterKey):ChartLine[] {
+  const parameter=analysis.definition.parameters.find(p=>p.key===key);
+  if(!parameter)throw new Error("Select a parameter in this formula.");
+  const values=analysis.values, formula=analysis.definition.id;
+  const output=(value:number)=>functionValue(formula,{...values,[key]:value});
+  const gradient=(value:number)=>{
+    const v={...values,[key]:value};
+    if(formula==="polynomial")return key==="a"?v.b:v.a+2*v.b;
+    if(formula==="sigmoid"){const f=sigmoid(v.w*v.x);return f*(1-f)*(key==="x"?v.w:v.x);}
+    return 2*(2*v.m+v.c-5)*(key==="m"?2:1);
+  };
+  return [buildChart("Function slice",key,formula==="squared-error"?"L":"f",parameter.min,parameter.max,values[key],output),buildChart("Derivative slice",key,"gradient",parameter.min,parameter.max,values[key],gradient)];
 }
 
 export function formatCompact(value: number) {

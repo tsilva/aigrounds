@@ -628,24 +628,19 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "autograd-graphs",
+    layout: "guided-discovery",
     title: "Autograd Graphs",
     tag: "neural networks",
-    kicker:
-      "Pick a formula and watch values flow forward while gradients return through the graph.",
-    summary:
-      "Choose a small formula, adjust its parameters, inspect forward activations and backward gradient badges, then compare function and derivative charts for each parameter.",
+    kicker: "Cache values, multiply backward, and add shared paths.",
+    summary: "Trace three fixed formulas through forward caches and backward messages. Test cancellation and sigmoid saturation, compare conditional function/derivative slices, then inspect a separate optimizer proposal.",
     estimatedDuration: "6 to 8 minutes",
-    concepts: [
-      "Computation graphs",
-      "Autograd",
-      "Chain rule",
-      "Partial derivatives",
-    ],
+    concepts: ["Computation graphs", "Chain rule", "Shared-path gradients", "Local derivatives", "Optimizer separation"],
     learningGoals: [
-      "See how a formula becomes a directed computation graph during the forward pass.",
-      "Connect backward gradient messages to local derivatives and cached activations.",
-      "Recognize why gradients from multiple paths into the same parameter add together.",
-      "Compare function and derivative charts for each adjustable parameter.",
+      "Trace cached values and signed backward messages through actual formula operations.",
+      "Explain shared-path addition and cancellation without claiming zero dependency.",
+      "Explain small nonzero sigmoid gradients using local derivatives.",
+      "Read conditional function and derivative slices with the other argument fixed.",
+      "Separate gradient computation from a simultaneous optimizer preview and transfer a finite edit at zero slope.",
     ],
   },
   {

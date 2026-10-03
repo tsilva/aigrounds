@@ -1,9 +1,18 @@
 {
-  "lessonPlanStep": 62,
-  "lessonPlanTitle": "Autograd Graphs",
+  "lessonPlanStep": null,
+  "title": "Autograd Graphs",
   "slug": "autograd-graphs",
   "modulePath": "src/modules/autograd-graphs",
-  "acceptedMockup": "src/modules/autograd-graphs/design/accepted-mockup.png",
-  "prompt": "src/modules/autograd-graphs/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e3aec-4243-79e2-bd63-4d6c051ad62d/ig_03c963bddd5c97f1016a0b055c95208191a183865b989d2c9b.png"
+  "acceptedMockupPath": "src/modules/autograd-graphs/design/accepted-mockup.png",
+  "promptPath": "src/modules/autograd-graphs/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-9720c119-f471-49a5-868b-82c136480a9d.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without approval questions.",
+  "approvedRefinements": [
+    "V1 rejected misplaced eyebrow, vertical progress and oversized boxed Guide CTA; V2 adopted clearer polynomial topology and canonical rail direction.",
+    "Shared components supply exact full-width navigation, control/radio/summary typography and one canonical Guide invitation.",
+    "Engine derives all chart geometry and numeric values; raster plots are illustrative and some points differ from their captions. Paired slices are optional and closed by default.",
+    "One copy of parameter controls; simple forward/backward graph with exact numeric tables and messages replaces overlapping badges.",
+    "Scientific small-gradient labels, cancellation probe and separate simultaneous optimizer preview preserve original three-formula scope."
+  ]
 }

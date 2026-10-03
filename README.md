@@ -45,6 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 ## Notes
 
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
+- The Monte Carlo Tree Search lesson demonstrates UCB selection and count backup with explicitly scripted outcomes; it does not implement a game solver.
 - Playgrounds run in the browser. The MNIST inference debugger needs WebGPU support.
 - The optional AI Guide uses a server API route backed by OpenRouter. API keys stay on the server.
 - Analytics and Sentry monitoring depend on environment configuration; see [configuration](docs/configuration.md) for settings and local credential handling.

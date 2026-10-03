@@ -1,3 +1,4 @@
+import { mctsTutorPlan } from "@/modules/monte-carlo-tree-search/learning-experiments";
 import { atlasTutorPlan } from "@/modules/ai-concept-atlas/learning-experiments";
 import { proofTutorPlan } from "@/modules/zero-knowledge-proofs/learning-experiments";
 import { autogradTutorPlan } from "@/modules/autograd-graphs/learning-experiments";
@@ -261,47 +262,7 @@ export const playgroundTutorPlans = {
   "expected-value-risk": payoffTutorPlan,
   "bernoulli-categorical-binomial": distributionTutorPlan,
   "waiting-arrival-distributions": arrivalTutorPlan,
-  "monte-carlo-tree-search": {
-    intro:
-      "Work through three search experiments. Predict which move gets the next rollout, change the exploration pressure, then connect the result to the counters that flow back up the tree.",
-    whyItMatters:
-      "MCTS exists because some decision spaces are too large to search completely. It is useful because it spends simulations where they matter, balancing promising moves with uncertain moves that still need evidence.",
-    steps: [
-      {
-        title: "Choose by UCB",
-        experiment:
-          "Keep c near 1.4 and compare the UCB table with the highlighted tree branch.",
-        predictionQuestion:
-          "Should the next rollout always choose the move with the highest win rate?",
-        observationPrompt:
-          "Why did the selected move win the UCB comparison?",
-        takeaway:
-          "MCTS selects by confidence plus curiosity, so a less-proven move can earn the next rollout.",
-      },
-      {
-        title: "Turn exploration down",
-        experiment:
-          "Move c toward exploit. Watch the UCB table and selected branch update.",
-        predictionQuestion:
-          "What should happen when the exploration bonus becomes small?",
-        observationPrompt:
-          "Which part of the UCB score mattered more after lowering c?",
-        takeaway:
-          "Low exploration pressure makes MCTS behave more like it is exploiting the strongest current evidence.",
-      },
-      {
-        title: "Backpropagate one rollout",
-        experiment:
-          "Press Step once. Compare the tree, rollout result, and Backpropagate table.",
-        predictionQuestion:
-          "After one simulated win, which counters should change?",
-        observationPrompt:
-          "Where did the rollout result travel after the simulation ended?",
-        takeaway:
-          "Backpropagation pushes the rollout result through every node on the selected path, changing later UCB choices.",
-      },
-    ],
-  },
+  "monte-carlo-tree-search": mctsTutorPlan,
   "confusion-matrix-thresholds": thresholdTutorPlan,
   overfitting: fitTutorPlan,
   "matrix-multiplication": {

@@ -1,0 +1,16 @@
+{
+  "lessonPlanStep": 59,
+  "title": "Monte Carlo Tree Search",
+  "slug": "monte-carlo-tree-search",
+  "modulePath": "src/modules/monte-carlo-tree-search",
+  "acceptedMockupPath": "src/modules/monte-carlo-tree-search/design/accepted-mockup.png",
+  "promptPath": "src/modules/monte-carlo-tree-search/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-27c7169f-fedf-405c-a286-280d3154fffe.png",
+  "approval": "User authorized self-review; explicitly approved small honest scripted demo.",
+  "approvedRefinements": [
+    "Canonical shared navigation/scenario controls and rail components replace raster detail.",
+    "Keep c 0.1\u20132.5 and total budget 65\u2013160.",
+    "Use full-width five-node diagram and responsive score table; no icons or fake rollout nodes.",
+    "Show exact before/after counts and last completed path separately from next selection."
+  ]
+}

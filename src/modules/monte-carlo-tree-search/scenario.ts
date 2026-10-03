@@ -12,8 +12,8 @@ export const searchProblems: SearchProblem[] = [
   {
     id: "tic-tac-toe",
     label: "Tic Tac Toe",
-    shortLabel: "Corner trap",
-    goal: "Choose a move that can still force three in a row.",
+    shortLabel: "Illustration only",
+    goal: "A board sketch only: A–D are generic branches, not legal Tic Tac Toe moves.",
     board: [
       ["X", "O", "X"],
       ["O", "X", ""],
@@ -23,8 +23,8 @@ export const searchProblems: SearchProblem[] = [
   {
     id: "nim",
     label: "Nim Heap",
-    shortLabel: "Take stones",
-    goal: "Probe take moves until the winning heap pattern appears.",
+    shortLabel: "Illustration only",
+    goal: "A heap sketch only: no take-stone rules, opponent, or winning tactic are simulated.",
     board: [
       ["", "●", ""],
       ["●", "●", "●"],
@@ -34,8 +34,8 @@ export const searchProblems: SearchProblem[] = [
   {
     id: "grid-route",
     label: "Grid Route",
-    shortLabel: "Find reward",
-    goal: "Sample paths until the high-value route is backed by evidence.",
+    shortLabel: "Illustration only",
+    goal: "A route sketch only: no grid actions, legal paths, or terminal rewards are simulated.",
     board: [
       ["S", "", ""],
       ["", "■", ""],

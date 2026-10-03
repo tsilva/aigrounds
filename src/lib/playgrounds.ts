@@ -1,3 +1,4 @@
+import { PowerPlayground } from "@/modules/power-effect-size-sample-size/PowerPlayground";
 import { ErrorsPlayground } from "@/modules/type-i-type-ii-errors/ErrorsPlayground";
 import { TestingPlayground } from "@/modules/hypothesis-testing-basics/TestingPlayground";
 import { IntervalsPlayground } from "@/modules/confidence-intervals/IntervalsPlayground";
@@ -67,6 +68,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "law-large-numbers-simulation": LawLargeNumbersPlayground,
   "pdf-cdf-probability-area": ProbabilityAreaPlayground,
   "normal-distribution-z-scores": NormalDistributionPlayground,
+  "power-effect-size-sample-size": PowerPlayground,
   "type-i-type-ii-errors": ErrorsPlayground,
   "hypothesis-testing-basics": TestingPlayground,
   "confidence-intervals": IntervalsPlayground,

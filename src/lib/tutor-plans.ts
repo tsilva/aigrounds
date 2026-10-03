@@ -1,3 +1,4 @@
+import { tensorTutorPlan } from "@/modules/tensor-shape-broadcasting/learning-experiments";
 import { gradientTutorPlan } from "@/modules/gradient-descent/learning-experiments";
 import { klTutorPlan } from "@/modules/kl-divergence/learning-experiments";
 import { lossTutorPlan } from "@/modules/categorical-cross-entropy/learning-experiments";
@@ -1078,67 +1079,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "tensor-shape-broadcasting": {
-    intro:
-      "Work through four broadcasting experiments. Predict the output shape, edit one axis, compare a failure, then inspect how one output value maps back to reused input indices.",
-    whyItMatters:
-      "Broadcasting is why tensor libraries can combine batches, vectors, masks, and scalars without writing loops. It is powerful, but shape mistakes are common unless you can read the right-aligned axis rule.",
-    openingMessage:
-      "No tensor-library experience needed. We will treat shapes as rows of axis sizes.\n\n- Broadcasting aligns shapes from the right.\n- Each aligned axis is compatible if the sizes match or one side is 1.\n- A size-1 axis reuses the same value across the larger output axis.\n- Different non-1 sizes block the operation.\n\nFirst prediction: for A shape [2,3,1] and B shape [1,3,4], do you expect the operation to broadcast or fail? Reply with your prediction first. Then I will tell you exactly what to try.",
-    masteryCriteria: [
-      "Explains that broadcasting aligns shapes from the trailing axes.",
-      "Uses same-size and size-1 rules to decide whether each axis is compatible.",
-      "Derives the output shape from the maximum compatible size on each axis.",
-      "Identifies that different non-1 sizes cause failure.",
-      "Explains why a reused index becomes 0 along a size-1 axis.",
-    ],
-    steps: [
-      {
-        title: "Read the broadcast result",
-        experiment:
-          "Use the Stretches preset. Compare the A shape, B shape, verdict card, and output shape.",
-        predictionQuestion:
-          "For A=[2,3,1] and B=[1,3,4], should the operation broadcast or fail?",
-        observationPrompt:
-          "What output shape did the verdict show?",
-        takeaway:
-          "The output shape is built one aligned axis at a time after every axis passes the compatibility rule.",
-      },
-      {
-        title: "Zip the axes",
-        experiment:
-          "Look at Zip Axes From The Right. Compare axis -3, axis -2, and axis -1 with the rule badges.",
-        predictionQuestion:
-          "Which axes should stretch, and which axis should stay the same?",
-        observationPrompt:
-          "How did the zipper explain [2,3,1] with [1,3,4]?",
-        takeaway:
-          "Broadcasting is a right-aligned axis check: same sizes pass, and size-1 axes stretch to the larger size.",
-      },
-      {
-        title: "Find the failing axis",
-        experiment:
-          "Choose the Fails preset, then compare the verdict with Axis -3 Outcomes.",
-        predictionQuestion:
-          "When A axis -3 is 2, what should happen if B axis -3 becomes 3 or 4?",
-        observationPrompt:
-          "Which axis blocked the operation?",
-        takeaway:
-          "A mismatch only fails when both sizes are different and neither size is 1.",
-      },
-      {
-        title: "Inspect one reused index",
-        experiment:
-          "Return to Stretches. In Inspect One Value, compare C[1,2,3] with A[1,2,0] and B[0,2,3].",
-        predictionQuestion:
-          "Why should one of the input indices become 0 when an axis has size 1?",
-        observationPrompt:
-          "Where did the blue 0 indices appear?",
-        takeaway:
-          "Broadcasting reuses values along size-1 axes, so the input index on that axis stays 0 while the output index changes.",
-      },
-    ],
-  },
+  "tensor-shape-broadcasting": tensorTutorPlan,
   "ai-concept-atlas": {
     intro:
       "Use the atlas for three short navigation experiments. Read one center-out branch, control how much detail is visible, and jump directly between distant concepts.",

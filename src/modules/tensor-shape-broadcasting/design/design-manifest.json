@@ -1,9 +1,20 @@
 {
   "lessonPlanStep": null,
-  "lessonPlanTitle": "Tensor Shape & Broadcasting Lab",
+  "title": "Tensor Shape & Broadcasting Lab",
   "slug": "tensor-shape-broadcasting",
   "modulePath": "src/modules/tensor-shape-broadcasting",
-  "acceptedMockup": "src/modules/tensor-shape-broadcasting/design/accepted-mockup.png",
-  "prompt": "src/modules/tensor-shape-broadcasting/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e746d-c045-7463-97ce-e27ef6657768/ig_0bdbe7e10b7cdd6b016a19bb954b1c81919eb8962b11830d94.png"
+  "mockupPath": "src/modules/tensor-shape-broadcasting/design/accepted-mockup.png",
+  "promptPath": "src/modules/tensor-shape-broadcasting/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-d94a2a03-25fc-4c51-9fa4-094f6b970428.png",
+  "approval": "Self-reviewed under explicit user authorization.",
+  "refinements": [
+    "Use canonical shared toolbar, open summary columns and single Guide CTA.",
+    "Label per-axis result as candidate size while final output is unavailable if any pair fails.",
+    "Replace unscoped repeated plus/minus controls with six discrete axis selectors and three valid output-index selectors.",
+    "Explicitly identify reuse by actual input size1 rather than coloring every zero index.",
+    "Keep all original shapes, 1..5 axis domain and sample data; expose fixture formulas.",
+    "Repair symmetric singleton rule in optional probe, include all five B sizes and preserve selected state.",
+    "Make memory claim about logical input reuse while acknowledging output allocation; missing-leading-axis example stays optional.",
+    "Begin with failed shapes to make the first prediction lead to a concrete repair."
+  ]
 }

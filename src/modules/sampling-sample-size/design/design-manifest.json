@@ -1,0 +1,11 @@
+{
+  "lessonPlanStep": 14,
+  "title": "Sampling & Sample Size Lab",
+  "slug": "sampling-sample-size",
+  "modulePath": "src/modules/sampling-sample-size",
+  "mockupPath": "src/modules/sampling-sample-size/design/accepted-mockup.png",
+  "promptPath": "src/modules/sampling-sample-size/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-594973a0-40be-4ea7-a26a-d9bb09d29da0.png",
+  "approval": "User authorized autonomous mockup review for all planned lessons.",
+  "refinements": ["Canonical shared controls and Guide CTA.", "All20 dot positions and exact means derive from the independently checked engine, not the illustrative raster.", "Keep true mean, records, error and reference line hidden until revealed, with separate source/estimate evidence."]
+}

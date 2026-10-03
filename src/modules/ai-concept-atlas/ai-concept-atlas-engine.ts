@@ -33,15 +33,11 @@ export type AtlasView = {
   nodes: AtlasLayoutNode[];
   edges: AtlasLayoutEdge[];
   selected: AtlasConcept;
-  prerequisiteIds: string[];
-  unlockIds: string[];
-  relatedIds: string[];
   visibleConceptIds: string[];
 };
 
 export type AtlasViewOptions = {
   selectedId?: string;
-  domainFilter: AtlasDomainId | "all";
   expandedIds: ReadonlySet<string>;
 };
 
@@ -52,11 +48,11 @@ const LEFT_DOMAIN_IDS = new Set<AtlasDomainId>([
   "ai-systems",
 ]);
 
-const DOMAIN_GAP = 44;
-const LEAF_GAP = 40;
-const DEPTH_X = [0, 330, 600, 850] as const;
-const NODE_WIDTH = [190, 168, 156, 150] as const;
-const NODE_HEIGHT = [64, 52, 34, 30] as const;
+const DOMAIN_GAP = 32;
+const LEAF_GAP = 82;
+const DEPTH_X = [0, 290, 580, 870] as const;
+export const NODE_WIDTH = [220, 240, 260, 240] as const;
+export const NODE_HEIGHT = [72, 72, 72, 72] as const;
 
 const childrenByParent = new Map<string, AtlasConcept[]>();
 
@@ -80,33 +76,7 @@ function conceptOrDefault(id?: string) {
 }
 
 export function getAtlasChildren(conceptId: string) {
-  return childrenByParent.get(conceptId) ?? [];
-}
-
-export function getPrerequisiteIds(conceptId: string) {
-  const visited = new Set<string>();
-  const ordered: string[] = [];
-
-  function visit(id: string) {
-    const concept = atlasConceptById.get(id);
-    if (!concept) return;
-
-    for (const prerequisiteId of concept.prerequisiteIds) {
-      if (visited.has(prerequisiteId)) continue;
-      visited.add(prerequisiteId);
-      visit(prerequisiteId);
-      ordered.push(prerequisiteId);
-    }
-  }
-
-  visit(conceptId);
-  return ordered;
-}
-
-export function getUnlockIds(conceptId: string) {
-  return atlasConcepts
-    .filter((concept) => concept.prerequisiteIds.includes(conceptId))
-    .map((concept) => concept.id);
+  return [...(childrenByParent.get(conceptId) ?? [])];
 }
 
 export function getConceptTrail(conceptId: string) {
@@ -133,64 +103,14 @@ function getDomainSide(domainId: AtlasDomainId) {
   return LEFT_DOMAIN_IDS.has(domainId) ? "left" : "right";
 }
 
-function buildVisibleConcepts(
-  selected: AtlasConcept,
-  domainFilter: AtlasDomainId | "all",
-  expandedIds: ReadonlySet<string>,
-) {
+function buildVisibleConcepts(expandedIds: ReadonlySet<string>) {
   const visibleIds = new Set<string>(["artificial-intelligence"]);
-  const selectedTrail = getConceptTrail(selected.id);
-  const selectedTrailIds = new Set(selectedTrail.map(({ id }) => id));
-  const isExpanded = (id: string) =>
-    id === "artificial-intelligence" || expandedIds.has(id);
-
-  function reveal(concept: AtlasConcept) {
-    visibleIds.add(concept.id);
-    const children = getAtlasChildren(concept.id);
-    if (isExpanded(concept.id)) {
-      for (const child of children) reveal(child);
-      return;
-    }
-
-    if (
-      selected.kind === "concept" &&
-      selected.parentId === concept.id
-    ) {
-      const previewIds = new Set<string>([selected.id]);
-      for (const prerequisiteId of selected.prerequisiteIds) {
-        if (atlasConceptById.get(prerequisiteId)?.parentId === concept.id) {
-          previewIds.add(prerequisiteId);
-        }
-      }
-      for (const unlockId of getUnlockIds(selected.id)) {
-        if (atlasConceptById.get(unlockId)?.parentId === concept.id) {
-          previewIds.add(unlockId);
-        }
-      }
-      for (const child of children) {
-        if (previewIds.size >= 4) break;
-        previewIds.add(child.id);
-      }
-      for (const child of children) {
-        if (previewIds.has(child.id)) reveal(child);
-      }
-      return;
-    }
-
-    if (selectedTrailIds.has(concept.id)) {
-      const selectedChild = children.find((child) =>
-        selectedTrailIds.has(child.id),
-      );
-      if (selectedChild) reveal(selectedChild);
-    }
+  const isExpanded = (id: string) => id === "artificial-intelligence" || expandedIds.has(id);
+  function reveal(id: string) {
+    visibleIds.add(id);
+    if (isExpanded(id)) for (const child of getAtlasChildren(id)) reveal(child.id);
   }
-
-  for (const domain of atlasDomains) {
-    if (domainFilter !== "all" && domain.id !== domainFilter) continue;
-    const concept = atlasConceptById.get(domain.id);
-    if (concept) reveal(concept);
-  }
-
+  for (const domain of atlasDomains) reveal(domain.id);
   return { visibleIds, isExpanded };
 }
 
@@ -281,14 +201,7 @@ function buildPositions(visibleIds: ReadonlySet<string>) {
 
 export function buildAtlasView(options: AtlasViewOptions): AtlasView {
   const selected = conceptOrDefault(options.selectedId);
-  const prerequisiteIds = getPrerequisiteIds(selected.id);
-  const unlockIds = getUnlockIds(selected.id);
-  const relatedIds = selected.relatedIds;
-  const { visibleIds, isExpanded } = buildVisibleConcepts(
-    selected,
-    options.domainFilter,
-    options.expandedIds,
-  );
+  const { visibleIds, isExpanded } = buildVisibleConcepts(options.expandedIds);
   const positions = buildPositions(visibleIds);
   const trailIds = new Set(getConceptTrail(selected.id).map(({ id }) => id));
   const nodes: AtlasLayoutNode[] = [];
@@ -340,9 +253,6 @@ export function buildAtlasView(options: AtlasViewOptions): AtlasView {
     nodes,
     edges,
     selected,
-    prerequisiteIds,
-    unlockIds,
-    relatedIds,
     visibleConceptIds: nodes.map(({ id }) => id),
   };
 }

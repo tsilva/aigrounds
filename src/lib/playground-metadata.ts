@@ -386,23 +386,19 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "monte-carlo-tree-search",
+    layout: "guided-discovery",
     title: "Monte Carlo Tree Search",
     tag: "search",
-    kicker:
-      "Spend rollouts where confidence and curiosity say the tree can learn most.",
-    summary:
-      "Tune the UCB exploration constant, step through selection, expansion, simulation, and backpropagation, and see why MCTS sometimes samples an uncertain move before returning to the best-proven branch.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "Tree search",
-      "Rollouts",
-      "UCB selection",
-      "Backpropagation",
-    ],
+    kicker: "Choose a branch by evidence plus exploration, then back up its result.",
+    summary: "Explore UCB selection, scripted successes and failures, path-count updates and finite budgets in an explicitly labeled mechanics demo. Illustrations share generic branches; this lesson does not solve a game.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Tree search", "Rollouts", "UCB selection", "Backpropagation"],
     learningGoals: [
-      "Understand MCTS as a loop of select, expand, simulate, and backpropagate.",
-      "See how UCB combines win rate with an exploration bonus for less-visited moves.",
-      "Recognize why more rollouts turn uncertain branches into evidence-backed decisions.",
+      "Distinguish the largest observed success rate from the next UCB selection priority.",
+      "Change exploration pressure while keeping historical counts fixed.",
+      "Back up success and failure through the visited path with aggregate root counts.",
+      "Stop at a total visit budget without claiming proof of the best action.",
+      "Locate selection, expansion, simulation and backup in full MCTS, and identify this scripted demo’s limits.",
     ],
   },
   {

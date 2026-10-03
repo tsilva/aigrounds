@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "sampling-distributions-standard-error",
+    layout: "guided-discovery",
+    title: "Sampling Distributions & Standard Error",
+    tag: "inference",
+    kicker: "Repeat samples. Measure how their means vary.",
+    summary: "Repeat samples and watch estimate-to-estimate spread become standard error.",
+    estimatedDuration: "6 to 9 minutes",
+    concepts: ["Sampling distributions", "Standard error", "Estimate spread"],
+    learningGoals: [
+      "Distinguish individual values from sample means and their sampling distribution.",
+      "Use the square-root size rule under independent replacement sampling.",
+      "Separate source mean and spread, repetition count and within-sample size.",
+      "Distinguish theoretical SE, finite batch SD and one selected error without guaranteed bounds.",
+    ],
+  },
+  {
     slug: "sampling-bias",
     layout: "guided-discovery",
     title: "Sampling Bias Lab",
@@ -810,14 +826,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Sample means", "Sampling distributions", "Normal approximation"],
   },
 
-  {
-    slug: "sampling-distributions-standard-error",
-    title: "Sampling Distributions & Standard Error",
-    tag: "inference",
-    summary:
-      "Repeat samples and watch estimate-to-estimate spread become standard error.",
-    concepts: ["Sampling distributions", "Standard error", "Estimate spread"],
-  },
+
   {
     slug: "margin-of-error-sample-size",
     title: "Margin of Error & Sample Size Lab",

@@ -45,6 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 ## Notes
 
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
+- [Type I & Type II Errors Lab](https://aigrounds.tsilva.eu/playgrounds/type-i-type-ii-errors) isolates the cutoff tradeoff between conditional false-alarm and missed-effect rates, separating prepared known-truth examples from repeated behavior.
 - [Hypothesis Testing Basics](https://aigrounds.tsilva.eu/playgrounds/hypothesis-testing-basics) connects an explicit two-sided A/B null model, observed gap, p-value and predeclared decision threshold without posterior or practical-importance claims.
 - The [Confidence Intervals Explorer](https://aigrounds.tsilva.eu/playgrounds/confidence-intervals) shows repeated normal-model intervals around moving sample means, distinguishing finite capture counts from confidence and interval width.
 - The [Margin of Error & Sample Size Lab](https://aigrounds.tsilva.eu/playgrounds/margin-of-error-sample-size) isolates size, confidence and known spread in a normal-model planning calculator, separating half-width from actual estimation error.

@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "type-i-type-ii-errors",
+    layout: "guided-discovery",
+    title: "Type I & Type II Errors Lab",
+    tag: "inference",
+    kicker: "Move a cutoff; compare false alarms and missed effects.",
+    summary: "Move a decision cutoff and compare false alarms with missed real effects.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Type I error", "Type II error", "Decision thresholds"],
+    learningGoals: [
+      "Define Type I and Type II errors from both population truth and a decision.",
+      "Explain the cutoff tradeoff for fixed null and alternative probability laws.",
+      "Separate one known-truth outcome from conditional repeated-test rates and posterior claims.",
+      "Transfer the distinction to a missed real-effect example.",
+    ],
+  },
+  {
     slug: "hypothesis-testing-basics",
     layout: "guided-discovery",
     title: "Hypothesis Testing Basics",
@@ -885,14 +901,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "type-i-type-ii-errors",
-    title: "Type I & Type II Errors Lab",
-    tag: "inference",
-    summary:
-      "Move a decision cutoff and compare false alarms with missed real effects.",
-    concepts: ["Type I error", "Type II error", "Decision thresholds"],
-  },
+
   {
     slug: "power-effect-size-sample-size",
     title: "Power, Effect Size & Sample Size Lab",

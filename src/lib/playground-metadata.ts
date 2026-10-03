@@ -562,24 +562,18 @@ const activePlaygroundDefinitions = [
   {
     slug: "label-mixing-image-transforms",
     title: "Label-Mixing Image Transforms",
+    layout: "guided-discovery",
     tag: "computer vision",
-    kicker:
-      "Mix two training examples and watch CutMix and MixUp turn one-hot targets into soft labels.",
-    summary:
-      "Choose source images, switch between CutMix and MixUp, tune lambda, and see the mixed image, soft target vector, generated torchvision code, and weighted loss update together.",
-    estimatedDuration: "5 to 7 minutes",
-    concepts: [
-      "CutMix",
-      "MixUp",
-      "Soft labels",
-      "Lambda mixing",
-      "Cross entropy",
-    ],
+    kicker: "Mix the pixels, measure the patch, and weight the target.",
+    summary: "Compare whole-image MixUp with coordinate-matched CutMix, correct target weights for actual clipped area, inspect fixed-model cross-entropy, and test same-class mixing.",
+    estimatedDuration: "8 to 12 minutes",
+    concepts: ["CutMix", "MixUp", "Soft targets", "Actual patch area", "Weighted cross-entropy"],
     learningGoals: [
-      "Explain why CutMix and MixUp change the target label as well as the image.",
-      "Connect lambda to both the visible image mixture and the soft-label vector.",
-      "Compare CutMix patch replacement with MixUp full-image blending.",
-      "Interpret the weighted cross-entropy terms created by a soft target.",
+      "Construct targets with the same effective coefficient used by the pixel rule.",
+      "Distinguish same-coordinate patch replacement from whole-image blending.",
+      "Recompute CutMix target weights from integer patch area after border clipping.",
+      "Connect weighted target entries to numeric cross-entropy for a fixed illustrative prediction.",
+      "Recognize that same-class contributions can add to a one-hot target.",
     ],
   },
   {

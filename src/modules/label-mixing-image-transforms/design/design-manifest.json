@@ -1,9 +1,20 @@
 {
   "lessonPlanStep": null,
-  "lessonPlanTitle": "Label-Mixing Image Transforms",
+  "title": "Label-Mixing Image Transforms",
   "slug": "label-mixing-image-transforms",
   "modulePath": "src/modules/label-mixing-image-transforms",
-  "acceptedMockup": "src/modules/label-mixing-image-transforms/design/accepted-mockup.png",
-  "prompt": "src/modules/label-mixing-image-transforms/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/019e6e3f-3137-7512-8eb3-e8d446452ffc/ig_0533d6cfd63be70b016a197b837eb48191b1ce18feba0c5c9a.png"
+  "acceptedMockupPath": "src/modules/label-mixing-image-transforms/design/accepted-mockup.png",
+  "promptPath": "src/modules/label-mixing-image-transforms/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-aea5ae92-ecc3-4e5f-9011-c7203b896a70.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User authorized self-review without asking for approval.",
+  "approvedRefinements": [
+    "Canonical horizontal Predict/Try/Explain, shared selectors/exact range, open summaries and one Guide invitation.",
+    "Retain requested .05.. .95 range, use exact engine area/weights and real normalized local photos rather than generated numeric/photo marks.",
+    "Target heading accommodates one-hot same-class mixing; no universal soft-target claim.",
+    "CutMix region copies original prepared donor coordinates, with actual-area correction; centered/border/sampled placements clarify geometry.",
+    "Controlled Python pair is separate from random v2 batch workflow; explicitly describe preparation, byte rounding and float differences.",
+    "Primary mixing controls precede images and supporting evidence; sources wrap at narrow widths.",
+    "Optional center-pixel RGB arithmetic distinguishes actual copied channel values, unrounded MixUp calculation and rounded display bytes."
+  ]
 }

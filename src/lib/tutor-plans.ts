@@ -784,65 +784,61 @@ export const playgroundTutorPlans = {
     ],
   },
   "label-mixing-image-transforms": {
-    intro:
-      "Work through three label-mixing experiments. Choose two examples, compare CutMix with MixUp, move lambda, and connect the mixed image to the soft target vector.",
-    whyItMatters:
-      "CutMix and MixUp are different from ordinary image transforms because the class target is no longer one-hot. Training with them only makes sense when the label vector changes in the same proportion as the mixed pixels.",
-    openingMessage:
-      "No prior CutMix or MixUp details needed. We will build the label contract visually.\n\n- Ordinary single-image transforms keep the original one-hot target.\n- CutMix pastes a region from one image into another.\n- MixUp blends two full images.\n- Both require a soft target vector such as 0.62 cat and 0.38 stop sign.\n\nFirst prediction: if 38% of a stop sign is pasted into a cat image, should the target stay 100% cat or become a mixture? Reply with your prediction first. Then I will tell you exactly what to try.",
-    masteryCriteria: [
-      "Explains why CutMix and MixUp change both pixels and labels.",
-      "Connects lambda to the visible image mixture and soft-label vector.",
-      "Compares CutMix patch mixing with MixUp full-image blending.",
-      "Explains why the loss has weighted terms for both selected classes.",
+    "intro": "Five prediction \u2192 try \u2192 explanation experiments and transfer connect paired pixel construction, actual CutMix area, class targets and numeric fixed-model loss.",
+    "whyItMatters": "Mixing inputs requires a matching target rule. Measuring real patch area and tracing weighted loss prevents confusion between requested coefficients, semantic content and model probabilities.",
+    "openingMessage": "You need RGB pixels, class labels and weighted averages; no PyTorch knowledge. A one-hot target has one selected class. A soft target can distribute training weight across classes. Natural-log cross-entropy measures how much fixed predictions disagree with that target.\n\nFour full photos are each resized to224\u00d7224, which can change aspect ratio. MixUp blends every corresponding channel. CutMix copies a donor rectangle at the same coordinates, then weights labels by actual area after integer rounding and clipping. The browser rounds display bytes; controlled Python uses float32. Random torchvision v2 augmentation uses batches and a sampled coefficient, separate from this fixed pair. No model is run or trained.\n\nChoose a rail prediction to restore starting settings, perform its named action, then explain; Reset restarts the current experiment. The Source A/B selects can choose the same photo to test same-class addition. Sample patch appears only in CutMix and advances a browser center seed.\n\nFirst experiment: cat A, stop sign B, MixUp, Requested A fraction 0.20. Prediction: raising it to 0.80, which class gains target weight: cat, stop sign, or neither? Share a prediction before moving the control.",
+    "masteryCriteria": [
+        "Uses the same effective coefficient for pixel construction and weighted targets.",
+        "Distinguishes copied donor coordinates from resizing a donor or full-image blending.",
+        "Recomputes actual CutMix label weights after integer rounding and clipping.",
+        "Explains numeric weighted negative-log loss for fixed predictions and separates predictions from targets.",
+        "Explains same-class contributions adding to one entry and transfers to a new class."
     ],
-    steps: [
-      {
-        title: "Choose the two source labels",
-        experiment:
-          "Keep cat as source A and stop sign as source B. Read the one-hot target rows for y_A and y_B before changing the mixed image.",
-        predictionQuestion:
-          "If the training example contains evidence from both images, should the label stay one-hot?",
-        observationPrompt:
-          "What did the two source target rows show before mixing?",
-        takeaway:
-          "CutMix and MixUp start from ordinary one-hot labels, then combine those labels in the same proportions as the image mixture.",
-      },
-      {
-        title: "Move lambda",
-        experiment:
-          "Use CutMix. Move lambda from about 0.20 to about 0.80. Watch the mixed image, the A/B percentage pill, and the soft-label bars.",
-        predictionQuestion:
-          "When lambda gets larger, should the source A label weight go up or down?",
-        observationPrompt:
-          "Which surfaces changed when lambda moved?",
-        takeaway:
-          "Lambda is the target weight for source A. The complement, 1 - lambda, is the target weight for source B.",
-      },
-      {
-        title: "Compare CutMix and MixUp",
-        experiment:
-          "Switch between CutMix and MixUp while keeping the same lambda. Compare the image preview with the soft-label vector.",
-        predictionQuestion:
-          "Should switching between CutMix and MixUp change the label formula if lambda stays the same?",
-        observationPrompt:
-          "What changed and what stayed the same after switching modes?",
-        takeaway:
-          "CutMix and MixUp mix pixels differently, but both produce soft labels from the same weighted-label idea.",
-      },
-      {
-        title: "Read the loss",
-        experiment:
-          "Look at the weighted cross-entropy panel. Compare the two weights with the soft-label bars above it.",
-        predictionQuestion:
-          "Why should the loss include terms for both selected classes?",
-        observationPrompt:
-          "How did the loss terms match the mixed target vector?",
-        takeaway:
-          "A soft label asks the model to put probability mass on both classes, weighted by how much each source contributed.",
-      },
-    ],
-  },
+    "steps": [
+        {
+            "title": "Weight both source labels",
+            "experiment": "Choose a prediction in Experiment 1: Source A cat, Source B stop sign, MixUp, Requested A fraction 0.20. Set Requested A fraction to 0.80. Read class weights, Mixed target vector and mixed image.",
+            "predictionQuestion": "Which target class gets more weight when A\u2019s coefficient rises?",
+            "observationPrompt": "What changes in both corresponding RGB pixels and the target entries?",
+            "takeaway": "MixUp blends every corresponding RGB channel and labels with w and 1\u2212w. Cat\u2019s target grows 0.20\u21920.80, stop sign shrinks 0.80\u21920.20. These are training target weights, not fixed model probabilities or semantic-object fractions."
+        },
+        {
+            "title": "A patch is not an opacity",
+            "experiment": "Next experiment and choose a prediction. Source A cat, Source B stop sign, MixUp, Requested A fraction 0.36. Select CutMix with Patch placement Centered. Compare prepared source outlines, exact rectangle and Effective A weight.",
+            "predictionQuestion": "Does CutMix blend everywhere, shrink the whole donor photo, or copy a same-coordinate region?",
+            "observationPrompt": "What is the actual copied area and why is the label coefficient different from 0.36?",
+            "takeaway": "Half-size floor(0.5\u00b7sqrt(1\u22120.36)\u00b7224)=89. Centered box [23,201)\u00d7[23,201) has178\u00d7178=31684 pixels, so effectiveA=1\u221231684/50176=0.368543. CutMix copies exactly that region from B at the same coordinates. Both modes use the same weighted-target formula, but effective coefficients can differ for the same requested slider value."
+        },
+        {
+            "title": "Measure what survives the border",
+            "experiment": "Next experiment and choose a prediction. Keep CutMix, requested 0.36 and centered patch. Set Patch placement to At top-left border. Read copied pixel area and Effective A weight.",
+            "predictionQuestion": "When the patch center moves to the top-left border, should A\u2019s weight increase, decrease or remain0.36?",
+            "observationPrompt": "Which proposed pixels are outside the image, and what remains?",
+            "takeaway": "Clipping keeps x/y[0,89), only7921 pixels. Bweight=7921/50176=.157864; Aweight=.842136, versus centered.368543. Labels use actual area after integer rounding/clipping. Geometry does not infer how much recognizable class evidence survives."
+        },
+        {
+            "title": "The loss sees class probabilities",
+            "experiment": "Next experiment and choose a prediction. MixUp requested 0.75, catA and stop signB. Set Source A to sneaker. Read Weighted A loss, Weighted B loss and Mixed loss under the fixed p=[.60,.10,.20,.10].",
+            "predictionQuestion": "Does moving A\u2019s target weight from cat probability.60 to sneaker probability.10 raise or lower this fixed-model loss?",
+            "observationPrompt": "Which negative-log term changed, and did the model update?",
+            "takeaway": "Loss rises.785479\u21922.129298 nats because .75 multiplies\u2212ln(.10) rather than\u2212ln(.60); .25\u00d7\u2212ln(.20) stays unchanged. Both terms use the same prediction on the mixed example, not separately inferred unmixed predictions. No model is run/trained. Target weights differ from prediction probabilities."
+        },
+        {
+            "title": "Two sources can share one class",
+            "experiment": "Next experiment and choose a prediction. MixUp requested 0.62, catA and stop signB. Set Source B to cat. This duplicates the same selected photo. Read source targets, Mixed target vector and fixed loss.",
+            "predictionQuestion": "Must every two-source mixture create two positive target classes?",
+            "observationPrompt": "Where do the two contributions go when the class index matches?",
+            "takeaway": "Both weights add at class0: .62+.38=1, giving[1,0,0,0] and loss\u2212ln(.60)=.510826. Same-class mixing can remain one-hot. Duplicate photo pixels are unchanged too. Soft targets are not model uncertainty or a semantic-validity guarantee."
+        },
+        {
+            "title": "A new class, the same addition",
+            "experiment": "Try the transfer check starts duplicate leaf A/B, MixUp, Requested A fraction0.25. Predict without Guide help, change to0.75 and explain in the rail.",
+            "predictionQuestion": "Must the target or fixed loss change when both contributions belong to leaf?",
+            "observationPrompt": "Which entry stays1, and which model probability remains fixed?",
+            "takeaway": "Target remains[0,0,0,1], duplicate pixels unchanged, loss\u2212ln(.10)=2.302585 at either coefficient. Leaf is one class regardless of having two source slots; weights are not model confidence."
+        }
+    ]
+},
   "autograd-graphs": {
     intro:
       "Work through three autograd experiments. Predict the forward value, inspect how local derivatives send gradients backward, then change the formula and explain why shared paths add.",

@@ -1,0 +1,16 @@
+{
+  "lessonPlanStep": 16,
+  "title": "Sampling Distributions & Standard Error",
+  "slug": "sampling-distributions-standard-error",
+  "modulePath": "src/modules/sampling-distributions-standard-error",
+  "mockupPath": "src/modules/sampling-distributions-standard-error/design/accepted-mockup.png",
+  "promptPath": "src/modules/sampling-distributions-standard-error/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-8ac4fa8d-ebf5-48f3-ae56-ce79a69ea777.png",
+  "approval": "User authorized autonomous mockup review for all planned lessons.",
+  "refinements": [
+    "Canonical shared shell, controls, three-phase progress and Guide CTA.",
+    "Exact histogram counts sum200 with fixed0..200 height scale, from independent oracle; raster illustrative.",
+    "Separate optional200-sample and40-bin scrollable exact tables.",
+    "Four outcomes and a changed-size/sample transfer reject a guaranteed error bound."
+  ]
+}

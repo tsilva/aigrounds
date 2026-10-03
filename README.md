@@ -45,6 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 ## Notes
 
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
+- [Sampling Distributions & Standard Error](https://aigrounds.tsilva.eu/playgrounds/sampling-distributions-standard-error) separates individual-value spread, theoretical mean SE and a finite batch of repeated estimates; its transfer shows SE is not a guaranteed error bound.
 - The [Sampling Bias Lab](https://aigrounds.tsilva.eu/playgrounds/sampling-bias) contrasts incomplete frames, outcome-related nonresponse and survivor-only observation while separating expected bias from finite sample error.
 - The [Sampling & Sample Size Lab](https://aigrounds.tsilva.eu/playgrounds/sampling-sample-size) compares reproducible sample estimates with revealed population means and separates larger-sample stability from finite guarantees.
 - The [Normal Distribution & Z-Scores Lab](https://aigrounds.tsilva.eu/playgrounds/normal-distribution-z-scores) connects signed distance to normal tail probability and tests shifts, spread changes and transfers between model units.

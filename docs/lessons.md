@@ -52,6 +52,8 @@ Linear Quantization (INT4) Lab now traces an unsigned 4-bit affine code through 
 
 The PyTorch Image Transforms lesson preserves four photos and ten single-image transform constructors through five experiments and a transfer check. Its sequential browser pixel model shows actual sampled stages, reproducible operation-keyed draws, crop/flip order and tensor-before-erasing requirements. All fourteen predefined policy operations are represented, with repeated RandAugment names and operation-specific magnitude bins. A retained one-hot target is explicitly a task assumption, not a validity guarantee. Copyable torchvision v1 Python uses its own RNG and kernels; browser geometry, byte arithmetic and replay seeds are clearly identified as simulation limits.
 
+The Label-Mixing Image Transforms lesson connects whole-image RGB MixUp with exact-coordinate CutMix through five experiments and a same-class transfer check. Labels use the measured integer CutMix area after border clipping, while MixUp uses its per-channel coefficient. All four source classes can be paired, including a duplicated same-class example that stays one-hot. Exact class bars, optional pixel arithmetic and numeric cross-entropy use separate fixed illustrative model predictions. Copyable controlled-pair Python is distinguished from random torchvision v2 batch augmentation.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

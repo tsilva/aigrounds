@@ -1,569 +1,78 @@
 "use client";
-
-import Image from "next/image";
-import { type CSSProperties, useMemo, useState } from "react";
-import {
-  clampMixLambda,
-  formatMixValue,
-  getCutMixPatch,
-  mixedLabelVector,
-  type LabelMixExample,
-  type LabelMixExampleId,
-  type MixMode,
-  oneHotVector,
-} from "./label-mixing-image-transforms-engine";
-import {
-  defaultExampleAId,
-  defaultExampleBId,
-  defaultMixLambda,
-  labelMixExamples,
-} from "./scenario";
-
-const classCount = labelMixExamples.length;
-
-function Panel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={`rounded-[14px] border border-[#d8e0f3] bg-white/90 shadow-[0_18px_42px_rgba(26,38,80,0.05)] ${className}`}
-    >
-      {children}
-    </section>
-  );
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonAction, LessonRangeControl, LessonSelect, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import sharedStyles from "@/components/learning-page/learning-page.module.css";
+import { analyzeMix, controlledPython, fixedProbabilities, formatMixValue as f, mixPixels, oneHotVector, size, type CutMixPatch, type MixState, type Placement } from "./label-mixing-image-transforms-engine";
+import { mixExperiments, mixToolbarScenarios, mixTransferStart, mixTransferTarget } from "./learning-experiments";
+import { labelMixExamples } from "./scenario";
+import styles from "./playground.module.css";
+const same = (a: MixState, b: MixState) => a.a === b.a && a.b === b.b && a.mode === b.mode && a.lambda === b.lambda && a.placement === b.placement && a.seed === b.seed;
+const vectorText = (v: number[]) => `[${v.map(f).join(", ")}]`;
+function Photo({ pixels, label, patch }: { pixels: Uint8ClampedArray | undefined; label: string; patch?: CutMixPatch }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const ctx = ref.current?.getContext("2d"); if (!ctx || !pixels) return;
+    const frame = ctx.createImageData(size, size);
+    for (let i = 0; i < size ** 2; i++) { for (let c = 0; c < 3; c++) frame.data[i * 4 + c] = pixels[i * 3 + c]; frame.data[i * 4 + 3] = 255; }
+    ctx.putImageData(frame, 0, 0);
+  }, [pixels]);
+  return <div className={styles.photo}>{pixels ? <canvas ref={ref} width={size} height={size} role="img" aria-label={label} /> : <p>Loading prepared photo…</p>}{pixels && patch && <svg viewBox="0 0 224 224" aria-hidden="true"><rect data-patch-outline x={patch.x1} y={patch.y1} width={patch.x2-patch.x1} height={patch.y2-patch.y1} fill="none" stroke="#5031dc" strokeWidth="2" strokeDasharray="4 3" /></svg>}</div>;
 }
-
-function LessonTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[19px] leading-tight font-black text-[#052cff] uppercase">
-      {children}
-    </h2>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className="size-4"
-      fill="currentColor"
-    >
-      <path d="M8 5.6v12.8L18.4 12 8 5.6Z" />
-    </svg>
-  );
-}
-
-function vectorText(vector: number[]) {
-  return `[${vector.map((value) => formatMixValue(value)).join(", ")}]`;
-}
-
-function probabilityToken(example: LabelMixExample) {
-  return `p_${example.label.replaceAll(" ", "_")}`;
-}
-
-function getExample(id: LabelMixExampleId) {
-  return (
-    labelMixExamples.find((example) => example.id === id) ?? labelMixExamples[0]
-  );
-}
-
-function SourceCard({
-  example,
-  isA,
-  isB,
-  onSetA,
-  onSetB,
-}: {
-  example: LabelMixExample;
-  isA: boolean;
-  isB: boolean;
-  onSetA: () => void;
-  onSetB: () => void;
-}) {
-  return (
-    <div
-      className={`rounded-[10px] border p-2 transition ${
-        isA || isB
-          ? "border-[#052cff] bg-[#f5f7ff] shadow-[0_12px_24px_rgba(38,63,255,0.08)]"
-          : "border-[#d9e1f5] bg-white"
-      }`}
-    >
-      <div className="relative aspect-[1.32] overflow-hidden rounded-[7px] bg-[#edf2ff]">
-        <Image
-          src={example.imageSrc}
-          alt={example.imageAlt}
-          fill
-          sizes="(max-width: 768px) 42vw, 260px"
-          className="object-cover"
-          style={{ objectPosition: example.objectPosition }}
-        />
-        <div className="absolute top-2 left-2 flex gap-1">
-          {isA ? (
-            <span className="rounded-[5px] bg-[#052cff] px-2 py-1 font-mono text-[11px] font-black text-white">
-              A
-            </span>
-          ) : null}
-          {isB ? (
-            <span className="rounded-[5px] bg-[#052cff] px-2 py-1 font-mono text-[11px] font-black text-white">
-              B
-            </span>
-          ) : null}
-        </div>
-      </div>
-      <p className="mt-2 text-center text-[14px] font-black text-[#071024]">
-        {example.label}
-      </p>
-      <p className="text-center font-mono text-[11px] font-bold text-[#34466f]">
-        class {example.classIndex}
-      </p>
-      <div className="mt-2 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={onSetA}
-          className={`rounded-[6px] border px-2 py-1 font-mono text-[11px] font-black ${
-            isA
-              ? "border-[#052cff] bg-[#052cff] text-white"
-              : "border-[#d6def3] bg-white text-[#052cff]"
-          }`}
-        >
-          A
-        </button>
-        <button
-          type="button"
-          onClick={onSetB}
-          className={`rounded-[6px] border px-2 py-1 font-mono text-[11px] font-black ${
-            isB
-              ? "border-[#052cff] bg-[#052cff] text-white"
-              : "border-[#d6def3] bg-white text-[#052cff]"
-          }`}
-        >
-          B
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function TargetRow({
-  example,
-  prefix,
-}: {
-  example: LabelMixExample;
-  prefix: "A" | "B";
-}) {
-  return (
-    <div className="rounded-[8px] border border-[#d9e1f5] bg-[#fbfcff] px-4 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="rounded-[6px] bg-[#052cff] px-2 py-1 font-mono text-[12px] font-black text-white">
-            {prefix}
-          </span>
-          <p className="font-mono text-[13px] font-black text-[#071024]">
-            y_{prefix} = {vectorText(oneHotVector(example.classIndex, classCount))}
-          </p>
-        </div>
-        <p className="text-[12px] font-black text-[#052cff]">
-          {example.label}{" "}
-          <span className="font-mono text-[#30446f]">
-            class {example.classIndex}
-          </span>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ModeButton({
-  isSelected,
-  label,
-  onClick,
-}: {
-  isSelected: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-[7px] border px-4 py-3 text-[13px] font-black transition ${
-        isSelected
-          ? "border-[#052cff] bg-[#052cff] text-white shadow-[0_12px_22px_rgba(23,53,255,0.16)]"
-          : "border-[#d9e1f5] bg-white text-[#071024] hover:border-[#b8c5ed]"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function MixedImage({
-  exampleA,
-  exampleB,
-  lambda,
-  mode,
-  sampleSeed,
-}: {
-  exampleA: LabelMixExample;
-  exampleB: LabelMixExample;
-  lambda: number;
-  mode: MixMode;
-  sampleSeed: number;
-}) {
-  const patch = getCutMixPatch(lambda, sampleSeed);
-  const patchStyle: CSSProperties = {
-    height: `${patch.height * 100}%`,
-    left: `${patch.left * 100}%`,
-    top: `${patch.top * 100}%`,
-    width: `${patch.width * 100}%`,
-  };
-
-  return (
-    <div>
-      <p className="mb-2 text-center text-[12px] font-black text-[#30446f] uppercase">
-        Mixed image
-      </p>
-      <div className="relative aspect-[1.22] overflow-hidden rounded-[9px] border border-[#b9c6eb] bg-[#f8fbff]">
-        <Image
-          src={exampleA.imageSrc}
-          alt={exampleA.imageAlt}
-          fill
-          sizes="(max-width: 768px) 92vw, 520px"
-          className="object-cover"
-          style={{ objectPosition: exampleA.objectPosition }}
-        />
-        {mode === "cutmix" ? (
-          <div
-            className="absolute overflow-hidden border-2 border-dashed border-[#052cff] shadow-[0_12px_28px_rgba(7,16,36,0.18)]"
-            style={patchStyle}
-          >
-            <Image
-              src={exampleB.imageSrc}
-              alt={exampleB.imageAlt}
-              fill
-              sizes="260px"
-              className="object-cover"
-              style={{ objectPosition: exampleB.objectPosition }}
-            />
-          </div>
-        ) : (
-          <Image
-            src={exampleB.imageSrc}
-            alt={exampleB.imageAlt}
-            fill
-            sizes="(max-width: 768px) 92vw, 520px"
-            className="object-cover"
-            style={{
-              objectPosition: exampleB.objectPosition,
-              opacity: 1 - lambda,
-            }}
-          />
-        )}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 rounded-[7px] border border-[#8ea0f8] bg-white/90 px-3 py-1 font-mono text-[12px] font-black text-[#052cff]">
-          A {Math.round(lambda * 100)}% / B {Math.round((1 - lambda) * 100)}%
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SoftLabelChart({
-  vector,
-}: {
-  vector: number[];
-}) {
-  return (
-    <div className="rounded-[10px] border border-[#d9e1f5] bg-[#fbfcff] p-4">
-      <p className="text-[12px] font-black text-[#052cff] uppercase">
-        Soft label vector
-      </p>
-      <div className="mt-4 space-y-3">
-        {labelMixExamples.map((example) => {
-          const value = vector[example.classIndex] ?? 0;
-
-          return (
-            <div
-              key={example.id}
-              className="grid grid-cols-[104px_minmax(0,1fr)_42px] items-center gap-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-[12px] font-black text-[#071024]">
-                  {example.label}
-                </p>
-                <p className="font-mono text-[10px] font-bold text-[#52628a]">
-                  class {example.classIndex}
-                </p>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-[#dfe5f1]">
-                <div
-                  className="h-full rounded-full bg-[#052cff]"
-                  style={{ width: `${value * 100}%` }}
-                />
-              </div>
-              <p className="text-right font-mono text-[12px] font-black text-[#071024]">
-                {formatMixValue(value)}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function CodePreview({ mode }: { mode: MixMode }) {
-  const transformName = mode === "cutmix" ? "CutMix" : "MixUp";
-  const codeLines = [
-    "from torchvision.transforms import v2",
-    "",
-    `transform = v2.${transformName}(num_classes=4, alpha=1.0)`,
-    "images, labels = transform(images, labels)",
-  ];
-
-  return (
-    <div className="rounded-[9px] border border-[#d4def5] bg-[#fbfcff]">
-      <div className="border-b border-[#d4def5] px-4 py-3">
-        <p className="text-[13px] font-black text-[#052cff] uppercase">
-          PyTorch code preview
-        </p>
-      </div>
-      <pre className="overflow-x-auto p-4 font-mono text-[12px] leading-6 font-semibold text-[#071024]">
-        {codeLines.map((line, index) => (
-          <code key={`${line}-${index}`} className="block">
-            {line || " "}
-          </code>
-        ))}
-      </pre>
-    </div>
-  );
-}
-
-function WeightedLossPanel({
-  exampleA,
-  exampleB,
-  lambda,
-}: {
-  exampleA: LabelMixExample;
-  exampleB: LabelMixExample;
-  lambda: number;
-}) {
-  return (
-    <Panel className="p-5">
-      <LessonTitle>3. What The Loss Sees</LessonTitle>
-      <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)]">
-        <div className="rounded-[10px] border border-[#d9e1f5] bg-[#fbfcff] p-4">
-          <p className="text-[12px] font-black text-[#052cff] uppercase">
-            Weighted cross-entropy
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3 font-mono text-[13px] font-black text-[#071024]">
-            <span className="rounded-[7px] border border-[#d9e1f5] bg-white px-3 py-2">
-              {formatMixValue(lambda)} x -log({probabilityToken(exampleA)})
-            </span>
-            <span>+</span>
-            <span className="rounded-[7px] border border-[#d9e1f5] bg-white px-3 py-2">
-              {formatMixValue(1 - lambda)} x -log({probabilityToken(exampleB)})
-            </span>
-          </div>
-          <p className="mt-4 text-[14px] font-semibold text-[#30446f]">
-            The model is rewarded for putting probability on both visible
-            classes in the same proportions as the mixed target.
-          </p>
-        </div>
-
-        <div className="rounded-[10px] border border-[#bfe8cd] bg-[#f6fff8] p-4">
-          <p className="text-[13px] font-black text-[#086d27]">
-            Labels are no longer one-hot.
-          </p>
-          <div className="mt-4 space-y-2 text-[12px] font-bold text-[#30446f]">
-            <div className="flex items-center justify-between rounded-[7px] border border-[#d9e1f5] bg-white px-3 py-2">
-              <span>RandomCrop</span>
-              <span className="rounded-full bg-[#ddfbe7] px-2 py-1 text-[#08722a]">
-                one-hot
-              </span>
-            </div>
-            <div className="flex items-center justify-between rounded-[7px] border border-[#d9e1f5] bg-white px-3 py-2">
-              <span>CutMix / MixUp</span>
-              <span className="rounded-full bg-[#e9edff] px-2 py-1 text-[#052cff]">
-                soft
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
 export function LabelMixingImageTransformsPlayground() {
-  const [exampleAId, setExampleAId] =
-    useState<LabelMixExampleId>(defaultExampleAId);
-  const [exampleBId, setExampleBId] =
-    useState<LabelMixExampleId>(defaultExampleBId);
-  const [mode, setMode] = useState<MixMode>("cutmix");
-  const [lambda, setLambda] = useState(defaultMixLambda);
-  const [sampleSeed, setSampleSeed] = useState(7);
-
-  const exampleA = getExample(exampleAId);
-  const exampleB = getExample(exampleBId);
-  const mixedVector = useMemo(
-    () =>
-      mixedLabelVector({
-        classCount,
-        exampleA,
-        exampleB,
-        lambda,
-      }),
-    [exampleA, exampleB, lambda],
-  );
-
-  function setSourceA(nextId: LabelMixExampleId) {
-    setExampleAId(nextId);
-
-    if (nextId === exampleBId) {
-      setExampleBId(exampleAId);
+  const [state, setState] = useState<MixState>(mixExperiments[0].baseline), [index, setIndex] = useState(0);
+  const [prediction, setPrediction] = useState<string | null>(null), [explanation, setExplanation] = useState<string | null>(null), [transferAnswer, setTransferAnswer] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<Record<string, Uint8ClampedArray>>({}), [photoErrors, setPhotoErrors] = useState<string[]>([]), [copyStatus, setCopyStatus] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    for (const example of labelMixExamples) {
+      const image = new window.Image(); image.onload = () => {
+        if (cancelled) return;
+        const canvas = document.createElement("canvas"); canvas.width = canvas.height = size; const ctx = canvas.getContext("2d");
+        if (!ctx) { setPhotoErrors(previous => [...previous, example.id]); return; }
+        ctx.drawImage(image, 0, 0, size, size); const rgba = ctx.getImageData(0, 0, size, size).data, pixels = new Uint8ClampedArray(size ** 2 * 3);
+        for (let i = 0; i < size ** 2; i++) for (let c = 0; c < 3; c++) pixels[i * 3 + c] = rgba[i * 4 + c];
+        setPhotos(previous => ({ ...previous, [example.id]: pixels }));
+      }; image.onerror = () => { if (!cancelled) setPhotoErrors(previous => [...previous, example.id]); }; image.src = example.imageSrc;
     }
-  }
-
-  function setSourceB(nextId: LabelMixExampleId) {
-    setExampleBId(nextId);
-
-    if (nextId === exampleAId) {
-      setExampleAId(exampleBId);
-    }
-  }
-
-  return (
-    <main className="min-h-screen overflow-x-clip bg-[#fbfcff] px-3 py-4 text-[#071024] sm:px-5">
-      <div className="mx-auto max-w-[1536px]">
-        <header className="mb-4 pl-0 sm:pl-2">
-          <h1 className="min-w-0 break-words text-[38px] leading-[1] font-black text-[#030713] sm:text-[58px]">
-            Label-Mixing Image Transforms
-          </h1>
-          <p className="mt-2 max-w-[68rem] text-[18px] leading-tight font-medium text-[#10245a] sm:text-[22px]">
-            CutMix and MixUp change the image and the target vector together.
-          </p>
-        </header>
-
-        <div className="space-y-4">
-          <Panel className="p-5">
-            <LessonTitle>1. Pick Two Training Examples</LessonTitle>
-            <div className="mt-4 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.55fr)]">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {labelMixExamples.map((example) => (
-                  <SourceCard
-                    key={example.id}
-                    example={example}
-                    isA={example.id === exampleA.id}
-                    isB={example.id === exampleB.id}
-                    onSetA={() => setSourceA(example.id)}
-                    onSetB={() => setSourceB(example.id)}
-                  />
-                ))}
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-[12px] font-black text-[#052cff] uppercase">
-                  Target vectors before mixing
-                </p>
-                <TargetRow example={exampleA} prefix="A" />
-                <TargetRow example={exampleB} prefix="B" />
-              </div>
-            </div>
-          </Panel>
-
-          <Panel className="p-5">
-            <LessonTitle>2. Mix Pixels, Then Mix Labels</LessonTitle>
-            <div className="mt-4 grid gap-5 xl:grid-cols-[minmax(330px,0.48fr)_minmax(0,1fr)]">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-2">
-                  <ModeButton
-                    isSelected={mode === "cutmix"}
-                    label="CutMix"
-                    onClick={() => setMode("cutmix")}
-                  />
-                  <ModeButton
-                    isSelected={mode === "mixup"}
-                    label="MixUp"
-                    onClick={() => setMode("mixup")}
-                  />
-                </div>
-
-                <div className="rounded-[9px] border border-[#d9e1f5] bg-white px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <label
-                      htmlFor="lambda-slider"
-                      className="text-[13px] font-black text-[#10245a]"
-                    >
-                      lambda / area from A
-                    </label>
-                    <span className="rounded-[7px] border border-[#d4def5] bg-[#fbfcff] px-3 py-2 font-mono text-[13px] font-black text-[#071024]">
-                      {formatMixValue(lambda)}
-                    </span>
-                  </div>
-                  <input
-                    id="lambda-slider"
-                    type="range"
-                    min={0.05}
-                    max={0.95}
-                    step={0.01}
-                    value={lambda}
-                    onChange={(event) =>
-                      setLambda(clampMixLambda(Number(event.target.value)))
-                    }
-                    className="mt-3 w-full accent-[#052cff]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSampleSeed((seed) => seed + 1)}
-                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[7px] border border-[#d9e1f5] bg-white px-4 py-3 text-[13px] font-black text-[#052cff] transition hover:border-[#052cff] hover:bg-[#eef3ff]"
-                  >
-                    <PlayIcon />
-                    Sample
-                  </button>
-                </div>
-
-                <CodePreview mode={mode} />
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-                <MixedImage
-                  exampleA={exampleA}
-                  exampleB={exampleB}
-                  lambda={lambda}
-                  mode={mode}
-                  sampleSeed={sampleSeed}
-                />
-                <div className="space-y-4">
-                  <SoftLabelChart vector={mixedVector} />
-                  <div className="rounded-[9px] border border-[#d9e1f5] bg-[#fbfcff] p-4">
-                    <p className="text-[12px] font-black text-[#052cff] uppercase">
-                      Formula
-                    </p>
-                    <p className="mt-3 rounded-[7px] border border-[#d9e1f5] bg-white px-3 py-3 font-mono text-[13px] font-black text-[#071024]">
-                      y_mix = lambda * y_A + (1 - lambda) * y_B
-                    </p>
-                    <p className="mt-3 font-mono text-[12px] font-bold text-[#30446f]">
-                      lambda = {formatMixValue(lambda)} ; 1 - lambda ={" "}
-                      {formatMixValue(1 - lambda)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Panel>
-
-          <WeightedLossPanel
-            exampleA={exampleA}
-            exampleB={exampleB}
-            lambda={lambda}
-          />
-        </div>
-      </div>
-    </main>
-  );
+    return () => { cancelled = true; };
+  }, []);
+  const a = labelMixExamples.find(e => e.id === state.a)!, b = labelMixExamples.find(e => e.id === state.b)!;
+  const analysis = analyzeMix(state, a, b), p = analysis.patch;
+  const mixed = useMemo(() => photos[state.a] && photos[state.b] ? mixPixels(photos[state.a], photos[state.b], state) : undefined, [photos, state]);
+  const experiment = mixExperiments[index], transfer = index === 5;
+  const reached = !!prediction && !!mixed && !!experiment && same(state, experiment.target), complete = reached && explanation === "0";
+  const transferReached = !!mixed && same(state, mixTransferTarget);
+  function clear() { setExplanation(null); setTransferAnswer(null); setCopyStatus(""); }
+  function edit(next: MixState) { setState(next); clear(); }
+  function start(next = index) { setIndex(next); setState(mixExperiments[next]?.baseline ?? mixTransferStart); setPrediction(null); clear(); }
+  const rail = experiment ? <ExperimentRail label={`Experiment ${index+1} of 5`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
+    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="mix-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }} /><p className={sharedStyles.small}>A different prediction restores starting settings. Reset restarts this experiment.</p></>}
+    {prediction && !reached && <p className={sharedStyles.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
+    {reached && <><p role="status" className={sharedStyles.observation}>{prediction === experiment.correctPrediction ? "Your prediction matches the evidence." : "The pixels, target and numeric evidence challenge your prediction."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="mix-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />{explanation && !complete && <p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
+    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index+1)}>{index === 4 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
+  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "A new class, the same addition" : "Compare constructions"}>
+    {transfer ? <><p>Leaf is selected for both sources, duplicating one photo. In MixUp, predict what changes when Requested A fraction moves from 0.25 to 0.75. Try it, then explain without Guide help.</p><ExperimentChoices legend="Transfer explanation" name="mix-transfer" choices={[{ id: "same", label: "The target stays [0,0,0,1] and the fixed loss stays −ln(0.10)=2.302585. Both weighted contributions belong to the same class; the duplicated photo also stays unchanged." }, { id: "two", label: "The target splits into two separate leaf entries, one for each source." }, { id: "confidence", label: "The fixed model’s leaf probability rises to 0.75." }]} value={transferAnswer} onChange={setTransferAnswer} />{transferAnswer && (!transferReached ? <p role="status" className={sharedStyles.feedback}>First keep leaf in both sources and MixUp, then set Requested A fraction to 0.75. Reset restores 0.25.</p> : transferAnswer !== "same" ? <p role="status" className={sharedStyles.feedback}>Try again. Class contributions add in one vector entry. Target weights and model probabilities are separate.</p> : <><ExperimentResult title="Transfer explained">Same-class contributions sum to 1 at class 3. The fixed prediction and class loss stay unchanged.</ExperimentResult><ExperimentButton onClick={() => { setIndex(6); clear(); }}>Explore freely</ExperimentButton></>)}</> : <><p>Choose any pair of the four examples, including a duplicate. Compare modes, requested coefficients and actual CutMix areas. Sample patch uses a reproducible browser center; its seed is not a torch seed. Python code separates this controlled pair from random batched augmentation.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
+  </ExperimentRail>;
+  const sourceChoices = labelMixExamples.map(e => ({ id: e.id, label: `${e.label} · class ${e.classIndex}` }));
+  const selectedPair = state.a === "cat" && state.b === "stop-sign" ? "cat-sign" : state.a === "sneaker" && state.b === "leaf" ? "sneaker-leaf" : state.a === "leaf" && state.b === "leaf" ? "same-class" : "custom";
+  const code = controlledPython(state, a, b);
+  return <LearningPage title="Label-Mixing Image Transforms" subtitle="Mix the pixels. Measure the patch. Weight the target." rail={rail}>
+    <LessonToolbar label="Source pair presets" scenarios={mixToolbarScenarios} selectedId={selectedPair} onSelect={id => edit({ ...state, a: id === "cat-sign" ? "cat" : id === "sneaker-leaf" ? "sneaker" : "leaf", b: id === "cat-sign" ? "stop-sign" : "leaf" })} onReset={() => start(experiment || transfer ? index : 0)} />
+    <section className={styles.evidence} aria-label="Mixing controls"><h2>Your mixing rule</h2><div className={styles.selectors}><LessonSelect label="Source A" choices={sourceChoices} value={state.a} onChange={id => edit({ ...state, a: id as MixState["a"] })} /><LessonSelect label="Source B" choices={sourceChoices} value={state.b} onChange={id => edit({ ...state, b: id as MixState["b"] })} /></div><LessonToggleGroup label="Pixel construction" choices={[{ id: "cutmix", label: "CutMix" }, { id: "mixup", label: "MixUp" }]} value={state.mode} onChange={id => edit({ ...state, mode: id as MixState["mode"] })} />
+      <LessonRangeControl label="Requested A fraction" value={state.lambda} min={.05} max={.95} step={.01} help={state.mode === "mixup" ? "MixUp uses this as A’s coefficient in every RGB channel and in the target. It is not an area or a model probability." : "CutMix uses this to propose a square patch size. Target weights use the actual copied pixel area after integer rounding and border clipping, so effective A weight can differ."} onChange={lambda => edit({ ...state, lambda })} />
+      {state.mode === "cutmix" && <><LessonSelect label="Patch placement" choices={[{ id: "center", label: "Centered" }, { id: "border", label: "At top-left border" }, { id: "sampled", label: "Sampled center" }]} value={state.placement} onChange={id => edit({ ...state, placement: id as Placement })} /><LessonAction onClick={() => edit({ ...state, placement: "sampled", seed: state.seed === 9999 ? 1 : state.seed+1 })}>Sample patch</LessonAction>{state.placement === "sampled" && <LessonRangeControl label="Patch seed" value={state.seed} min={1} max={9999} step={1} help="Reproduce a browser center. Sample patch advances this seed, wrapping after 9999. It does not reproduce Python’s random draw." onChange={seed => edit({ ...state, seed })} />}</>}
+    </section>
+    <section className={styles.evidence} aria-label="Mixed image evidence"><h2>Your mixed example</h2><p>Each full photo is resized to RGB 224×224, including its aspect ratio. The diagram displays rounded RGB bytes. {state.mode === "cutmix" ? "Outlines mark the same coordinates on A, B and the mixed image. Copy those B pixels directly; keep A outside." : "Each corresponding channel is mixed as w·A+(1−w)·B. This arithmetic is on encoded RGB values, not a physical-light simulation."}</p>{state.a === state.b && <p>Both sources duplicate the same selected photo and class.</p>}{photoErrors.some(id => id === state.a || id === state.b) && <p role="alert">A selected photo could not load. Choose another source or reload this page.</p>}<div className={styles.images}>{[{ name: `Source A: ${a.label}`, pixels: photos[state.a] }, { name: `Source B: ${b.label}`, pixels: photos[state.b] }, { name: `${state.mode === "cutmix" ? "CutMix" : "MixUp"} result`, pixels: mixed }].map(photo => <figure key={photo.name}><figcaption>{photo.name}</figcaption><Photo pixels={photo.pixels} label={photo.name + (photo.pixels === mixed ? (state.mode === "cutmix" ? ", copied donor rectangle described below" : ", full-image RGB blend") : ", prepared full RGB photo")} patch={state.mode === "cutmix" ? p : undefined} /></figure>)}</div>
+      {state.mode === "cutmix" ? <div className={styles.geometry}><p className={styles.mono}>Center ({p.centerX},{p.centerY}) · half-size {p.half} pixels · {p.clipped ? "box clipped at border" : "box fully inside"}</p><p className={styles.mono}>Copy x ∈ [{p.x1},{p.x2}), y ∈ [{p.y1},{p.y2}) · {(p.x2-p.x1)}×{(p.y2-p.y1)} = <output aria-label="Copied pixel area">{p.area}</output> pixels of {size**2}</p><p className={styles.mono}>w_A = 1 − {p.area}/{size**2} = <output aria-label="Effective A weight">{f(analysis.weight)}</output> · w_B = {f(1-analysis.weight)}</p><p>The right/bottom endpoints are excluded. Half-size = floor(0.5·sqrt(1−requested)·224), using torchvision 0.25 v2’s integer/clip convention. Area measures the copied rectangle, not object evidence. Effective weights can exceed the requested slider’s upper bound.</p></div> : <p className={styles.mono}>w_A = <output aria-label="Effective A weight">{f(analysis.weight)}</output> · w_B = {f(1-analysis.weight)} · every channel: w_A·A + w_B·B</p>}
+      {mixed && photos[state.a] && photos[state.b] && <details><summary>One pixel’s RGB arithmetic</summary><p>The center pixel is y=112, x=112. In each prepared source, RGB channels are byte values 0–255. These are pixel values, separate from class labels and model probabilities.</p><p className={styles.mono}>A RGB: <output aria-label="Pixel A RGB">{Array.from(photos[state.a].slice((112*size+112)*3,(112*size+112)*3+3)).join(", ")}</output><br />B RGB: <output aria-label="Pixel B RGB">{Array.from(photos[state.b].slice((112*size+112)*3,(112*size+112)*3+3)).join(", ")}</output><br />Output RGB: <output aria-label="Mixed pixel RGB">{Array.from(mixed.slice((112*size+112)*3,(112*size+112)*3+3)).join(", ")}</output></p>{state.mode === "mixup" ? <p className={styles.mono}>Before byte rounding, w·A+(1−w)·B = <output aria-label="Unrounded MixUp RGB">{[0,1,2].map(c => f(analysis.weight*photos[state.a][(112*size+112)*3+c]+(1-analysis.weight)*photos[state.b][(112*size+112)*3+c])).join(", ")}</output>. The diagram rounds each channel to the nearest byte, with positive half ties up.</p> : <p>At this center pixel, {112 >= p.x1 && 112 < p.x2 && 112 >= p.y1 && 112 < p.y2 ? "the patch includes it, so copy B’s three channel values" : "the patch excludes it, so retain A’s three channel values"}. No per-pixel blending happens in CutMix.</p>}</details>}
+    </section>
+    <section className={styles.evidence} aria-label="Mixed target evidence"><h2>Target class weights</h2><p className={styles.mono}>y_A = {vectorText(oneHotVector(a.classIndex,4))}<br />y_B = {vectorText(oneHotVector(b.classIndex,4))}<br />y_mix = w_A·y_A + (1−w_A)·y_B</p><p>Each bar has a common 0–1 scale. Zero weight has zero width. This is a training target, not a prediction about objects in the mixed pixels.</p><div className={styles.bars}>{labelMixExamples.map(e => <div key={e.id} data-class={e.classIndex} className={styles.barRow}><strong>{e.label}<small>class {e.classIndex}</small></strong><div className={styles.track} aria-hidden="true"><span style={{ width: `${(analysis.target[e.classIndex]*100).toPrecision(6)}%` }} /></div><output aria-label={`${e.label} target weight`}>{f(analysis.target[e.classIndex])}</output></div>)}</div><p className={styles.mono}>Target vector <output aria-label="Mixed target vector">{vectorText(analysis.target)}</output></p><p role="status">{analysis.soft ? "Two distinct classes: target is soft, with two positive entries." : "Same class: contributions add to one one-hot entry."} Target sums to 1. Label construction does not guarantee semantic suitability or better training.</p></section>
+    <LessonSummaries label="Weight and loss summaries" summaries={[{ label: "Effective A weight", value: f(analysis.weight), color: "#5031dc", definition: state.mode === "cutmix" ? "Fraction of the prepared image left from A." : "Coefficient of A in each RGB channel.", formula: state.mode === "cutmix" ? `1 − ${p.area}/50176` : `Requested coefficient ${state.lambda.toFixed(2)}`, comparison: "Use this same weight to construct the target." }, { label: "Fixed-model cross-entropy", value: f(analysis.loss), color: "#0c1230", definition: "Loss for the mixed target against fixed illustrative probabilities.", formula: "nats · natural logarithm", comparison: "No model inference or training occurs here." }]} />
+    <section className={styles.evidence} aria-label="Weighted cross-entropy"><h2>What the loss sees</h2><p>A fixed example prediction is p = [0.60,0.10,0.20,0.10] for cat, sneaker, stop sign, leaf. These probabilities stay unchanged as controls move. Cross-entropy is −Σ y_c ln(p_c); a nat is the unit when using natural logarithms.</p><p className={styles.mono} data-loss-term="A">A ({a.label}): {f(analysis.weight)} × −ln({fixedProbabilities[a.classIndex].toFixed(2)}) = <output aria-label="Weighted A loss">{f(analysis.termA)}</output></p><p className={styles.mono} data-loss-term="B">B ({b.label}): {f(1-analysis.weight)} × −ln({fixedProbabilities[b.classIndex].toFixed(2)}) = <output aria-label="Weighted B loss">{f(analysis.termB)}</output></p><p className={styles.mono}>L = term A + term B = <output aria-label="Mixed loss">{f(analysis.loss)}</output></p><p>Values are rounded to six decimals; totals use unrounded terms. Both class losses use this same fixed prediction for the mixed example. They are not predictions measured separately on the two unmixed photos. If A and B have the same class, the weights add and the loss reduces to that class’s negative log probability.</p></section>
+    <section className={styles.evidence} aria-label="Python mixing code"><details><summary>Controlled Python pair and random torchvision workflow</summary><p>This manual two-image batch uses the exact displayed coefficient/box. Replace A.jpg and B.jpg with your source files. Python/PIL preparation and float32 arithmetic can differ from browser display bytes. Inspect item 0; the second batch item pairs in the other direction.</p><pre className={styles.code}><code>{code}</code></pre><LessonAction onClick={async () => { try { await navigator.clipboard.writeText(code); setCopyStatus("Controlled Python pair copied."); } catch { setCopyStatus("Copy unavailable. Select and copy the visible code."); } }}>Copy Python code</LessonAction><p role="status">{copyStatus}</p><h3>Random training workflow</h3><pre className={styles.code}><code>{`from torchvision.transforms import v2
+# images: float batch [N,3,H,W]; class_ids: integers [N]
+transform = v2.${state.mode === "cutmix" ? "CutMix" : "MixUp"}(num_classes=4, alpha=1.0)
+mixed_images, mixed_targets = transform(images, class_ids)`}</code></pre><p>The actual v2 transform operates on a batch and samples a coefficient from Beta(alpha,alpha); alpha=1 gives a uniform coefficient. Alpha is not the displayed fixed weight. CutMix samples a center and corrects targets using actual area. This random workflow does not reproduce this browser sample. Pairing is implementation-specific; shuffle the training batch. This lesson demonstrates construction rules, not training accuracy.</p></details></section>
+    <p role="status" aria-live="polite" aria-atomic="true" className={sharedStyles.liveUpdate}>{state.mode}, A {a.label}, B {b.label}, requested {f(state.lambda)}, effective A {f(analysis.weight)}, target {vectorText(analysis.target)}, fixed loss {f(analysis.loss)} nats. {state.mode === "cutmix" ? `Copied area ${p.area} pixels; ${p.clipped ? "clipped" : "not clipped"}.` : "Whole-image blend."}</p>
+  </LearningPage>;
 }

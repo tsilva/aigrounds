@@ -1,0 +1,16 @@
+{
+  "lessonPlanStep": 17,
+  "title": "Central Limit Theorem Lab",
+  "slug": "central-limit-theorem",
+  "modulePath": "src/modules/central-limit-theorem",
+  "mockupPath": "src/modules/central-limit-theorem/design/accepted-mockup.png",
+  "promptPath": "src/modules/central-limit-theorem/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-0379abbe-2efa-4c79-a493-176630f7da46.png",
+  "approval": "User authorized autonomous mockup review for all planned lessons.",
+  "refinements": [
+    "Canonical shared controls and dynamically gated Predict/Try/Explain rail.",
+    "Exact24-bin histogram, normal expected counts and tails come from checked engine; raster illustrative.",
+    "Half-open probe interval matching histogram convention is explicitly disclosed.",
+    "Optional source and first-sample evidence distinguishes original observations from standardized means."
+  ]
+}

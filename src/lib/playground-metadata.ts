@@ -304,6 +304,22 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "central-limit-theorem",
+    layout: "guided-discovery",
+    title: "Central Limit Theorem Lab",
+    tag: "inference",
+    kicker: "Compare sample means with a normal reference.",
+    summary: "Sample from strange populations and watch sample means form a predictable bell shape.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Sample means", "Sampling distributions", "Normal approximation"],
+    learningGoals: [
+      "Keep the original source fixed while standardized mean shape changes.",
+      "Compare approximate mean distributions from discrete non-normal observations.",
+      "Reject standardization-as-normality and universal finite-size thresholds.",
+      "Interpret source-dependent approximation without exact finite or monotone guarantees and transfer to another interval.",
+    ],
+  },
+  {
     slug: "sampling-distributions-standard-error",
     layout: "guided-discovery",
     title: "Sampling Distributions & Standard Error",
@@ -817,15 +833,6 @@ export const activePlaygroundMetadata: Array<
 }));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-  {
-    slug: "central-limit-theorem",
-    title: "Central Limit Theorem Lab",
-    tag: "inference",
-    summary:
-      "Sample from strange populations and watch sample means form a predictable bell shape.",
-    concepts: ["Sample means", "Sampling distributions", "Normal approximation"],
-  },
-
 
   {
     slug: "margin-of-error-sample-size",

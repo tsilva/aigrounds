@@ -1,3 +1,4 @@
+import { CentralLimitPlayground } from "@/modules/central-limit-theorem/CentralLimitPlayground";
 import { StandardErrorPlayground } from "@/modules/sampling-distributions-standard-error/StandardErrorPlayground";
 import { BiasPlayground } from "@/modules/sampling-bias/BiasPlayground";
 import { SamplingPlayground } from "@/modules/sampling-sample-size/SamplingPlayground";
@@ -62,6 +63,7 @@ const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
   "law-large-numbers-simulation": LawLargeNumbersPlayground,
   "pdf-cdf-probability-area": ProbabilityAreaPlayground,
   "normal-distribution-z-scores": NormalDistributionPlayground,
+  "central-limit-theorem": CentralLimitPlayground,
   "sampling-distributions-standard-error": StandardErrorPlayground,
   "sampling-bias": BiasPlayground,
   "sampling-sample-size": SamplingPlayground,

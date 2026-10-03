@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": 9,
+  "title": "Law of Large Numbers Simulator",
+  "slug": "law-large-numbers-simulation",
+  "modulePath": "src/modules/law-large-numbers-simulation",
+  "acceptedMockupPath": "src/modules/law-large-numbers-simulation/design/accepted-mockup.png",
+  "promptPath": "src/modules/law-large-numbers-simulation/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-9093116b-139a-48d2-a156-b0cdf2f4ea51.png",
+  "approval": "User authorized creation of missing planned lessons with autonomous mockup review.",
+  "approvedRefinements": [
+    "Shared components provide canonical navigation, numbered progress and single rail Guide invitation.",
+    "Action instructions appear only after a prediction; the raster\u2019s bottom action reminder is omitted.",
+    "Actual curves, checkpoint rows and formulas are generated from the seeded engine, not raster geometry.",
+    "Chart viewBox uses measured container width to preserve label size with the Guide open.",
+    "Exact checkpoint table includes short nonmonotonic examples; bounds remain draws1\u201310000 and seed1\u20139999."
+  ]
+}

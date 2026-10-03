@@ -209,6 +209,23 @@ const activePlaygroundDefinitions = [
     ],
   },
   {
+    slug: "law-large-numbers-simulation",
+    layout: "guided-discovery",
+    title: "Law of Large Numbers Simulator",
+    tag: "probability",
+    kicker: "Extend one reproducible run and separate its average from its individual outcomes.",
+    summary: "Run short and long seeded simulations to compare observed averages with their model expectations, inspect temporary reversals and reject exact finite guarantees.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Expected value", "Long-run averages", "Simulation"],
+    learningGoals: [
+      "Compare average gaps with absolute count gaps while extending the same run.",
+      "Recognize that a running average can move away after another draw.",
+      "Change a reproducible sequence without changing its fixed distribution or demanding a compensating outcome.",
+      "Use the correct model expectation as the long-run target, even when it is not a possible individual outcome.",
+      "State the independent fixed-distribution assumptions and reject finite guarantees.",
+    ],
+  },
+  {
     slug: "bernoulli-categorical-binomial",
     layout: "guided-discovery",
     title: "Bernoulli, Categorical & Binomial Lab",
@@ -716,14 +733,6 @@ export const activePlaygroundMetadata: Array<
 }));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-  {
-    slug: "law-large-numbers-simulation",
-    title: "Law of Large Numbers Simulator",
-    tag: "probability",
-    summary:
-      "Run short and long simulations to see noisy outcomes settle toward expected value.",
-    concepts: ["Expected value", "Long-run averages", "Simulation"],
-  },
   {
     slug: "pdf-cdf-probability-area",
     title: "PDF, CDF & Probability Area Lab",

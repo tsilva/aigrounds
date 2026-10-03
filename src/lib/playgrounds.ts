@@ -1,3 +1,4 @@
+import { CovariancePlayground } from "@/modules/covariance-correlation/CovariancePlayground";
 import { PowerPlayground } from "@/modules/power-effect-size-sample-size/PowerPlayground";
 import { ErrorsPlayground } from "@/modules/type-i-type-ii-errors/ErrorsPlayground";
 import { TestingPlayground } from "@/modules/hypothesis-testing-basics/TestingPlayground";
@@ -57,6 +58,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "covariance-correlation": CovariancePlayground,
   "mean-median-mode": MeanMedianModePlayground,
   "range-quartiles-iqr": RangeQuartilesIqrPlayground,
   "variance-standard-deviation": VarianceStandardDeviationPlayground,

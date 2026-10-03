@@ -1,0 +1,18 @@
+{
+  "step": 23,
+  "title": "Covariance & Correlation Map",
+  "slug": "covariance-correlation",
+  "modulePath": "src/modules/covariance-correlation",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-fd994425-8392-4f7b-92b7-dccf18d38230.png",
+  "approval": "Autonomous self-review authorized by user",
+  "refinements": [
+    "Canonical shared toolbar, coordinate controls, horizontal phases and Guide invitation used.",
+    "All point/mean/label geometry and numerical formulas engine derived; raster is visual reference.",
+    "Collision-packed point numbers use leader lines; selection and keyboard-equivalent coordinates remain outside chart.",
+    "Detailed product table optional; unit-axis behavior and undefined spread explicit.",
+    "Rejected V1 wrong scale tick/redundant controls; V2 swapped mean names/wrong raster formula; V3 repairs those details.",
+    "Live selected coordinates/covariance/r placed immediately above plot so drag feedback stays visible without scrolling to lower summaries."
+  ]
+}

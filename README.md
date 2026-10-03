@@ -45,6 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 ## Notes
 
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
+- [Covariance & Correlation Map](https://aigrounds.tsilva.eu/playgrounds/covariance-correlation) connects editable paired departures with sample covariance and unitless Pearson correlation, including unit changes and zero-spread cases.
 - [Power, Effect Size & Sample Size Lab](https://aigrounds.tsilva.eu/playgrounds/power-effect-size-sample-size) compares conditional detection probabilities for hypothetical true effects and study sizes under a fixed test rule, including null false alarms and tiny positive miss rates.
 - [Type I & Type II Errors Lab](https://aigrounds.tsilva.eu/playgrounds/type-i-type-ii-errors) isolates the cutoff tradeoff between conditional false-alarm and missed-effect rates, separating prepared known-truth examples from repeated behavior.
 - [Hypothesis Testing Basics](https://aigrounds.tsilva.eu/playgrounds/hypothesis-testing-basics) connects an explicit two-sided A/B null model, observed gap, p-value and predeclared decision threshold without posterior or practical-importance claims.

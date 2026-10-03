@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "covariance-correlation",
+    layout: "guided-discovery",
+    title: "Covariance & Correlation Map",
+    tag: "relationships",
+    kicker: "Move paired values; separate direction, strength and units.",
+    summary: "Drag points on a scatterplot and watch direction, strength, and scale sensitivity update.",
+    estimatedDuration: "7 to 10 minutes",
+    concepts: ["Covariance", "Pearson correlation", "Scale sensitivity"],
+    learningGoals: [
+      "Connect signed paired departures with covariance and correlation direction.",
+      "Explain why positive unit scaling changes covariance but preserves Pearson r.",
+      "Recompute centers after point edits and distinguish zero correlation from zero-spread undefined correlation.",
+      "Transfer to a new edited pair and unit scale without causal or probability claims.",
+    ],
+  },
+  {
     slug: "mean-median-mode",
     layout: "guided-discovery",
     title: "Mean, Median & Mode Lab",
@@ -919,14 +935,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "covariance-correlation",
-    title: "Covariance & Correlation Map",
-    tag: "relationships",
-    summary:
-      "Drag points on a scatterplot and watch direction, strength, and scale sensitivity update.",
-    concepts: ["Covariance", "Pearson correlation", "Scale sensitivity"],
-  },
   {
     slug: "correlation-shape-outliers",
     title: "Correlation Shape & Outliers Lab",

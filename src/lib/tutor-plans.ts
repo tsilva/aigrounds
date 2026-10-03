@@ -1,3 +1,4 @@
+import { powerTutorPlan } from "@/modules/power-effect-size-sample-size/learning-experiments";
 import { errorsTutorPlan } from "@/modules/type-i-type-ii-errors/learning-experiments";
 import { testingTutorPlan } from "@/modules/hypothesis-testing-basics/learning-experiments";
 import { intervalTutorPlan } from "@/modules/confidence-intervals/learning-experiments";
@@ -274,6 +275,7 @@ export const playgroundTutorPlans = {
   "law-large-numbers-simulation": llnTutorPlan,
   "pdf-cdf-probability-area": areaTutorPlan,
   "normal-distribution-z-scores": normalTutorPlan,
+  "power-effect-size-sample-size": powerTutorPlan,
   "type-i-type-ii-errors": errorsTutorPlan,
   "hypothesis-testing-basics": testingTutorPlan,
   "confidence-intervals": intervalTutorPlan,

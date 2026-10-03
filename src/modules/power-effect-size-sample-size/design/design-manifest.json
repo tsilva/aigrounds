@@ -1,0 +1,17 @@
+{
+  "step": 22,
+  "title": "Power, Effect Size & Sample Size Lab",
+  "slug": "power-effect-size-sample-size",
+  "modulePath": "src/modules/power-effect-size-sample-size",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-914440d5-07ba-47c2-b7e4-1d011ebee7a5.png",
+  "approval": "Autonomous self-review authorized by user",
+  "refinements": [
+    "Schematic raster intentionally omits precise axes; production chart uses full engine-derived fixed\u221214..14 and0..0.45 numeric axes, curves and correcttail polygons.",
+    "Canonical shared horizontal phase row, exacteditor/slider arrangement and Guide invitation override raster.",
+    "Raster illustratesgap2n100; actualdefaultgap1n25 startsfirstoutcome.",
+    "No engine-implementation text in product. Null label/finiteplot/tiny-miss evidence and optional size table provided.",
+    "V1incorrecttailshading/faketinyarea rejected; V2tailshadingrepaired but scaleapprox; V3qualitative diagram retains truthfulregionrelationship withoutnumericcoordinateclaims."
+  ]
+}

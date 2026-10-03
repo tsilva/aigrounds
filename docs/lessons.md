@@ -44,6 +44,8 @@ Gradient Descent Playground preserves the scalar quadratic, three original prese
 
 Tensor Shape & Broadcasting Lab checks right-aligned axes, requires every pair to pass, and traces actual source indices for elementwise addition. Three guided experiments repair a mismatch, follow singleton reuse and reject arbitrary smaller-axis stretching; a transfer moves the singleton to another axis. All original shape presets and sizes 1 through 5 remain available, with optional all-size comparisons and an explanation of missing leading axes. Zero indices and repeated toy values are explicitly distinguished from singleton reuse.
 
+Byte Pair Encoding Lab links training pair counts to the last actual replacement and separate inspection tokens. Three guided experiments test a first merge, an unchanged inspection and tied maximum frequencies, followed by an unseen-word transfer in Names. The fixed 28-symbol base alphabet covers every original example; all three corpora and merge prefixes 0–8 remain available. Exact controls and optional candidate, learned-rule, example and count tables replace schematic strength bars and misleading compression charts. The AI Guide can address an explicitly requested experiment without resetting a separate workbench setup.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

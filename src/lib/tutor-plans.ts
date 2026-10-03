@@ -645,76 +645,61 @@ export const playgroundTutorPlans = {
     ],
   },
   "pytorch-image-augmentations": {
-    intro:
-      "Work through one image-transform stack. Choose an image, tune the transforms, compare the original with the composed result, and connect the controls to torchvision code.",
-    whyItMatters:
-      "Image augmentation makes training data more varied, but each transform is an assumption about what should not matter. Seeing the composed image next to the exact code makes those assumptions concrete.",
-    openingMessage:
-      "No prior PyTorch transform details needed. We will build one torchvision transform stack.\n\n- Each block receives the image from the block above it.\n- Each slider maps to a parameter in the generated v2.Compose code.\n- Single-image transforms change pixels while the class label stays one-hot.\n\nFirst prediction: if we crop, rotate, and color-jitter a cat image but it is still clearly a cat, should the target label stay one-hot or change? Reply with your prediction first. Then I will tell you exactly what to try.",
-    masteryCriteria: [
-      "Explains that transforms compound top to bottom.",
-      "Connects at least two sliders to their matching torchvision parameters.",
-      "Uses the original/result panes to describe the visible pixel changes.",
-      "Explains why the selected image keeps a one-hot class label.",
+    "intro": "Five prediction \u2192 try \u2192 explanation experiments and a near-transfer check connect probability, sequential image transforms, tensor types, predefined policies and target assumptions.",
+    "whyItMatters": "Augmentation encodes what a training task should ignore. Tracing sampled pixels and valid input types helps distinguish configuration from a draw and retained targets from semantic guarantees.",
+    "openingMessage": "No PyTorch background is needed. Pixels have three RGB channel bytes; a one-hot target has a 1 for one selected class. The entire photo is first resized to RGB 224\u00d7224, which can change its aspect ratio. This is a browser simulation, not Python execution: its seed, geometry/interpolation and byte rounding differ from torchvision/PIL. Python configuration uses the torchvision v1 API and its own random draws.\n\nThe rail has five experiments. Choose a prediction to restore starting settings, perform the named action, press Run pipeline, then explain. Reset restarts the current experiment. New draw advances the browser seed; Run pipeline repeats it. Only enabled stages run. ToTensor and RandomErasing have fixed final positions to preserve their types.\n\nStart with cat, HorizontalFlip and ToTensor, probability 0, seed 1. First prediction: changing Flip probability to 1, will the whole image mirror, only half the pixels mirror, or the target change? Share your prediction before trying it.",
+    "masteryCriteria": [
+        "Explains a configured probability/range versus a sampled outcome.",
+        "Uses ordered crop/flip evidence without confusing a changed random sample with order.",
+        "Explains ToTensor HWC bytes to CHW float byte/255 and RandomErasing input type.",
+        "Distinguishes fixed RandAugment magnitude from sampled TrivialAugmentWide strength and avoids learned-policy claims.",
+        "Separates a retained one-hot target from task-dependent semantic validity."
     ],
-    steps: [
-      {
-        title: "Read the stack top to bottom",
-        experiment:
-          "Start with the cat image selected. Read the enabled blocks from top to bottom: RandomResizedCrop, Rotation, and ColorJitter. Compare that order with the generated v2.Compose code beneath the stack.",
-        predictionQuestion:
-          "Which transform should touch the image first: the top block or the bottom block?",
-        observationPrompt:
-          "How did the transform stack match the code order?",
-        takeaway:
-          "A v2.Compose pipeline applies transforms in order: each block receives the image produced by the block above it.",
-      },
-      {
-        title: "Resample the crop",
-        experiment:
-          "Use the Resample crop button in the RandomResizedCrop block. Watch the crop rectangle on the original image and the composed result on the right.",
-        predictionQuestion:
-          "When the crop sample changes but the object is still recognizable, should the class label change?",
-        observationPrompt:
-          "What changed when the crop was resampled?",
-        takeaway:
-          "RandomResizedCrop samples a crop box, then resizes that crop back to the model input size.",
-      },
-      {
-        title: "Tune rotation and color",
-        experiment:
-          "Move the Rotation max degrees slider and the ColorJitter brightness or contrast sliders. Watch both the composed result and the generated code update.",
-        predictionQuestion:
-          "Which code values should change when you move those sliders?",
-        observationPrompt:
-          "Which visible changes came from rotation and which came from color jitter?",
-        takeaway:
-          "The sliders are not generic strength controls; they map directly to torchvision transform parameters.",
-      },
-      {
-        title: "Toggle extra transforms",
-        experiment:
-          "Enable GaussianBlur or RandomErasing. Compare the active transform count, the composed result, and the generated code.",
-        predictionQuestion:
-          "What should happen to the generated code when a transform is disabled?",
-        observationPrompt:
-          "What changed when the extra transform was enabled or disabled?",
-        takeaway:
-          "Only enabled blocks are part of the composed transform pipeline.",
-      },
-      {
-        title: "Switch the image",
-        experiment:
-          "Choose another image such as the stop sign or sneaker. Keep the same transform stack and compare how the same parameters affect a different image.",
-        predictionQuestion:
-          "Should switching from cat to stop sign change the code, or only the image being transformed?",
-        observationPrompt:
-          "What stayed the same after selecting a different image?",
-        takeaway:
-          "The transform stack describes image operations. The selected image determines which one-hot class label is preserved.",
-      },
-    ],
-  },
+    "steps": [
+        {
+            "title": "A chance is not a strength",
+            "experiment": "Choose a prediction in Experiment 1: cat, only HorizontalFlip and ToTensor, Flip probability 0, Replay seed 1. Set Flip probability to 1, then Run pipeline. Read the sampled HorizontalFlip row.",
+            "predictionQuestion": "Does the whole image mirror, only half its pixels, or its target change?",
+            "observationPrompt": "What does the draw-versus-p comparison decide?",
+            "takeaway": "A probability determines whether a whole transform applies. At 1 it always applies and at 0 it never applies. At 0.5 a run is all-or-none, not half of its pixels; a small set need not contain exactly half flips."
+        },
+        {
+            "title": "The next block receives the result",
+            "experiment": "Next experiment restores cat with crop minimum area 0.5, HorizontalFlip probability 1, ToTensor and seed 1. Choose a prediction; use Move HorizontalFlip up once, then Run pipeline. Compare Starting result with Current composed result and the sampled-stage order.",
+            "predictionQuestion": "Must reversing this off-center crop and mirror give the same pixels?",
+            "observationPrompt": "Which source region is selected when mirroring happens before rather than after cropping?",
+            "takeaway": "Compose passes each output onward. Here order changes selected source pixels; some symmetric cases can coincide. Browser operation-keyed draws preserve the crop sample for causal comparison, unlike the separate Python RNG stream."
+        },
+        {
+            "title": "An image is not yet a tensor",
+            "experiment": "Next experiment restores sneaker, RandomErasing only, Replay seed 2. Choose a prediction and read the type error. Enable ToTensor then Run pipeline. Read ToTensor and RandomErasing rows; optionally expand One pixel and tensor indexing.",
+            "predictionQuestion": "Is a torchvision v1 RandomErasing pipeline without ToTensor valid on a PIL input?",
+            "observationPrompt": "What representation did conversion produce, and did this specific erasing draw apply?",
+            "takeaway": "RandomErasing requires a tensor. ToTensor converts RGB uint8 HWC to float32 CHW [3,224,224], dividing bytes by 255, without recoloring the display or changing targets. Seed 2 erasing applies, but p=0.35 does not guarantee future application. Black value 0 is used after tensor conversion."
+        },
+        {
+            "title": "A policy can be predefined",
+            "experiment": "Next experiment restores leaf, RandAugment and ToTensor, Number of operations 2, Magnitude index 0, Replay seed 14. Choose a prediction, set Magnitude index to 30, then Run pipeline. Read the Rotate and Posterize samples.",
+            "predictionQuestion": "Must the operation names change when this fixed magnitude index rises?",
+            "observationPrompt": "Which units differ between the two operations, and is a policy trained here?",
+            "takeaway": "Same browser draw names remain Rotate and Posterize; magnitudes change from 0 degrees/8 retained bits to 30 degrees/4 bits. RandAugment samples with replacement from 14 predefined operations and uses a fixed magnitude bin; names may repeat. TrivialAugmentWide samples one name and one wider random bin. Neither learns here. Index 0 is not always identity because AutoContrast and Equalize do not vary with magnitude."
+        },
+        {
+            "title": "Retained is not guaranteed valid",
+            "experiment": "Next experiment restores stop sign, VerticalFlip and ToTensor, probability 0, seed 1. Choose a prediction, set Flip probability to 1, then Run pipeline. Compare the upside-down result with Retained target.",
+            "predictionQuestion": "Will the demo keep [0,0,1,0] and does that guarantee augmentation validity?",
+            "observationPrompt": "Who retains the target, and what determines whether an upside-down sign is a suitable example?",
+            "takeaway": "The caller mechanically retains class 2. Single-image transforms do not infer a new class or guarantee semantic validity. Suitability depends on the task; one-hot means one selected class, not model confidence or certainty the transformation is valid."
+        },
+        {
+            "title": "Same assumption, a different photo",
+            "experiment": "Try the transfer check restores leaf with VerticalFlip probability 0 and ToTensor. Without Guide help, predict, set Flip probability to 1, Run pipeline, then explain in the rail.",
+            "predictionQuestion": "Must an upside-down leaf change the target?",
+            "observationPrompt": "What remains in the target vector and what would a leaf-recognition task have to assume?",
+            "takeaway": "The target stays [0,0,0,1]. Whether the transformed example preserves relevant species features depends on the task, not on the unchanged vector. No label mixing or training occurs here."
+        }
+    ]
+},
   "convolution-filter-lab": {
     intro:
       "Use five prediction → try → explanation experiments, then a border-response transfer check. The image window, exact products, and selected output are linked.",

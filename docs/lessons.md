@@ -50,6 +50,8 @@ Transformer Attention now separates fixed-fixture query routing, sharpness, weig
 
 Linear Quantization (INT4) Lab now traces an unsigned 4-bit affine code through exact decimal rounding, raw-code clamping and reconstruction. Five predict → try → explain experiments and a sensor-block transfer compare plateaus, tail errors, integer zero-point shifts and packing overhead. Three original synthetic blocks and all range presets remain, with a separate exact probe, true level geometry and complete sample, code-count and overflow tables. Payload-only 8× savings are distinguished from an explicit block storage model and from unmeasured model performance.
 
+The PyTorch Image Transforms lesson preserves four photos and ten single-image transform constructors through five experiments and a transfer check. Its sequential browser pixel model shows actual sampled stages, reproducible operation-keyed draws, crop/flip order and tensor-before-erasing requirements. All fourteen predefined policy operations are represented, with repeated RandAugment names and operation-specific magnitude bins. A retained one-hot target is explicitly a task assumption, not a validity guarantee. Copyable torchvision v1 Python uses its own RNG and kernels; browser geometry, byte arithmetic and replay seeds are clearly identified as simulation limits.
+
 Convolution Filter Lab links three image scenarios to selectable output cells and exact weighted-sum arithmetic. Its five prediction → try → explanation experiments finish with a zero-padding transfer check, with AI Guide access in the experiment rail.
 
 ## Coverage

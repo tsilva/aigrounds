@@ -400,64 +400,16 @@ export const playgroundTutorPlans = {
     ],
   },
   "batch-normalization": {
-    intro:
-      "Work through four BatchNorm experiments. Predict how batch statistics reshape activations, switch from a centered batch to a shifted batch, inspect one value, tune scale and shift, then compare training with inference.",
-    whyItMatters:
-      "BatchNorm exists because neural-network activations can drift and change scale during training, making optimization harder. It is useful because it stabilizes layer inputs while still letting the model learn the scale and shift it needs.",
-    openingMessage:
-      "No prior neural-network normalization knowledge needed. We will build BatchNorm by predicting, trying one small batch, and explaining what changed.\n\n- A mini-batch is a small set of activations processed together during training.\n- BatchNorm computes the mini-batch mean and standard deviation.\n- It normalizes each activation with normalized = (x - mean) / sqrt(variance + epsilon), so the batch is centered and scaled.\n- The playground shows variance used = std used squared so the formula number is not a mystery.\n- Learned scale and shift then stretch and move the normalized values, keeping the layer expressive.\n- Vocabulary: papers often write mean as mu, std as sigma, scale as gamma, and shift as beta. This lab uses the plain names first.\n- During inference, BatchNorm uses saved running statistics instead of the current mini-batch.\n\nFirst prediction: the page starts on a Centered batch. When you switch to the Shifted scenario, what should happen to the activations after normalization: stay shifted right, center near zero, or all become equal? Reply with your prediction first. Then I will tell you exactly what to try.",
-    masteryCriteria: [
-      "Explains that BatchNorm computes mean and standard deviation from a mini-batch during training.",
-      "Connects normalized = (x - mean) / sqrt(variance + epsilon) to recentering and rescaling activations.",
-      "Uses one displayed x value to explain how a normalized value is produced.",
-      "Explains how scale changes output spread and shift changes output center.",
-      "Distinguishes training-time batch statistics from inference-time running statistics.",
-    ],
+    intro: "Five Predict → Try → Explain experiments follow one scalar feature across examples, normalization, manual Scale/Shift, outlier dependence and frozen inference; then a near-transfer check.",
+    whyItMatters: "BatchNorm gives a network a normalized feature plus learnable scale/shift. This lab isolates the forward mechanics and batch dependence; it does not prove optimization speed or accuracy gains.",
+    openingMessage: "A mini-batch is a group of examples processed together; an activation is a numeric signal. This lab follows one feature across 4–8 examples. Training uses that batch’s mean and population variance (average squared deviation, divided by N). z=(x−mean)/√(variance+0.001); y=Scale×z+Shift. Scale/Shift are manually chosen here, though a network can learn gamma/beta. Inference represents tracked running statistics: its explicit illustrative mean/variance are frozen per preset; no moving averages or optimizer run. Epsilon makes Training std(z) slightly less than1, and Inference need not center an arriving batch. Real BatchNorm without tracked statistics is a separate configuration.\n\nThe page starts Shifted, Training, Batch size6, Scale1, Shift0. First predict: when Batch size becomes8, does normalized mean stay nearzero while examples remain distinct, become positive, or do all examples becomezero? Reply with your prediction first; then I’ll give the exact action.",
+    masteryCriteria: ["Explains centering with current batch population variance and epsilon-sensitive spread.", "Substitutes a selected activation and interprets its signed distance from the used mean.", "Separates Scale and Shift through general output mean/std identities.", "Explains why adding an outlier changes its batchmates during Training.", "Distinguishes frozen tracked inference statistics and unchanged existing outputs from changes in aggregate statistics."],
     steps: [
-      {
-        title: "Center a shifted batch",
-        experiment:
-          "Notice the page starts on the Centered scenario with batch size 6. Switch to the Shifted scenario and set batch size to 8. Compare the raw x strip, batch mean and batch std pills, and the normalized value strip. Wide and Outlier are optional stress-test scenarios after the guide.",
-        predictionQuestion:
-          "In the Shifted scenario, what should happen after normalization: stay shifted right, center near zero, or all become equal?",
-        observationPrompt:
-          "What happened to the center and spread after the raw activations became normalized values?",
-        takeaway:
-          "BatchNorm uses the batch mean and spread to turn a shifted activation cloud into a centered, scaled signal.",
-      },
-      {
-        title: "Inspect one activation",
-        experiment:
-          "Click one raw dot or normalized-value chip. Read the formula line that substitutes x, mean, and variance used into normalized = (x - mean) / sqrt(variance + epsilon). Also read the variance used pill; it is std used squared.",
-        predictionQuestion:
-          "If an activation is above the batch mean, should its normalized value be negative, near zero, or positive?",
-        observationPrompt:
-          "How did the selected x value become its displayed normalized value?",
-        takeaway:
-          "A normalized value is the activation's signed distance from the batch mean, measured in batch-standard-deviation units.",
-      },
-      {
-        title: "Give expressiveness back",
-        experiment:
-          "Move scale below and above 1.00, then move shift left and right. Watch the output y strip plus mean(y) and std(y).",
-        predictionQuestion:
-          "Which parameter should stretch the output spread, and which should move the output center?",
-        observationPrompt:
-          "What changed when scale moved, and what changed when shift moved?",
-        takeaway:
-          "Normalization stabilizes the signal, then scale and shift let the layer learn the output size and offset it needs.",
-      },
-      {
-        title: "Switch to inference",
-        experiment:
-          "Toggle from Training to Inference. Compare the using mean/std pills with the Training path and Inference path table. The momentum pill is fixed context for how running stats update during training; this step focuses on which stats are used.",
-        predictionQuestion:
-          "At inference time, should BatchNorm use the current example batch or saved running statistics?",
-        observationPrompt:
-          "Which statistics did the playground use after you switched to Inference?",
-        takeaway:
-          "Training uses the current mini-batch. Inference uses saved running estimates so predictions stay stable when examples arrive one at a time.",
-      },
+      { title: "Center without flattening", experiment: "Start in Shifted, Training, Batch size 6, Scale 1, Shift 0 and Example 1. Choose a prediction in the rail, then set Batch size to 8. Read Input x and Normalized z means and standard deviations.", predictionQuestion: "All inputs are positive; after including eight examples, will normalized mean stay near zero, become positive, or will all examples become zero?", observationPrompt: "Which mean and variance were used, and did examples stay distinct?", takeaway: "Training uses current batch mean and population variance. Subtracting the mean centers across examples; epsilon .001 makes nonconstant normalized std slightly less than 1." },
+      { title: "Follow one signed distance", experiment: "Next experiment starts Centered, Batch size 6, Scale 1, Shift 0, Training. Predict first, then choose Example 5 in Selected activation. Read Follow example 5.", predictionQuestion: "Example 5 is 0.2, above mean −0.3. What sign should z have?", observationPrompt: "Explain the displayed numerator, positive denominator and resulting z about .901425.", takeaway: "The sign comes from x minus the used mean. The denominator is √(variance+epsilon), and Scale/Shift act afterward." },
+      { title: "Separate spread from center", experiment: "Next experiment starts Wide, Batch size 8, Training, Scale .5, Shift −1. Choose a prediction. Set Scale to 2 and Shift to 1 in either order. Read x/z/y means and stds.", predictionQuestion: "Which control multiplies spread, and which translates outputs?", observationPrompt: "Which columns stayed unchanged, and what happened to output mean and standard deviation?", takeaway: "std(y)=|Scale|×std(z) and mean(y)=Scale×mean(z)+Shift. Training has mean(z)=0. Parameters are manually set here; no optimizer runs." },
+      { title: "An outlier changes its batchmates", experiment: "Next experiment starts Outlier, Batch size 7, Training, Scale 1, Shift 0 and Example 1. Predict first, then set Batch size to 8 to include 6.2. Read the same x=.1 calculation and active reference.", predictionQuestion: "Can unchanged example 1 get a different normalized value after including an outlier?", observationPrompt: "Which raw value stayed fixed, and which shared statistics changed?", takeaway: "Training compares each example with its batchmates; changing the shared mean and variance changes existing normalized values. N selects a fixed prefix, not random sampling." },
+      { title: "Use a frozen reference", experiment: "Next experiment starts Outlier, Batch size 8, Training. Predict first, then choose Inference. Read Used mean/variance, z mean and optional Per-example exact values and both references.", predictionQuestion: "Must the arriving batch have normalized mean zero in Inference?", observationPrompt: "Compare current mean1.3125 with frozen1.05 and reference variance3.4225; why is mean(z) about .142?", takeaway: "With tracked running statistics, evaluation uses a frozen reference and still applies Scale/Shift. Current batch mean need not match it. Presets are illustrative frozen estimates, not simulated training history. Transfer check: in Outlier Inference, increase Batch size7→8 while holding Scale1.5, Shift−.5 and Example1: existing z/y stay fixed although aggregate statistics can change." },
     ],
   },
   "layer-normalization": {

@@ -1,3 +1,4 @@
+import { bpeTutorPlan } from "@/modules/byte-pair-encoding/learning-experiments";
 import { tensorTutorPlan } from "@/modules/tensor-shape-broadcasting/learning-experiments";
 import { gradientTutorPlan } from "@/modules/gradient-descent/learning-experiments";
 import { klTutorPlan } from "@/modules/kl-divergence/learning-experiments";
@@ -240,56 +241,7 @@ export const playgroundTutorPlans = {
       },
     ],
   },
-  "byte-pair-encoding": {
-    intro:
-      "Work through three tokenization experiments. Predict which pair will merge, spend merge budget, then compare how learned chunks transfer to new text.",
-    whyItMatters:
-      "BPE exists because models need a practical way to turn messy text into reusable pieces without storing every possible word. It is useful because common chunks compress text, handle new words, and keep vocabulary size manageable.",
-    openingMessage:
-      "No tokenizer background needed. We will build the idea by predicting, trying one small merge budget, and explaining what changed.\n\n- BPE starts with small symbols, shown here as characters plus a word-end marker.\n- Each merge creates one new token from a frequent adjacent pair.\n- More merges usually reduce token count, but they also grow the vocabulary.\n- Learned tokens help most when new text repeats patterns from the training text.\n\nFirst prediction: after the corpus has learned l + o and lo + w, which examples should compress more: words related to low/new, or an unrelated string like xyz? Reply with your prediction first. Then I will tell you exactly what to try.",
-    masteryCriteria: [
-      "Explains BPE as repeated adjacent-pair merging.",
-      "Connects merge budget to lower token count and larger vocabulary.",
-      "Uses the pair-frequency table to predict likely next merges.",
-      "Recognizes that learned subword tokens transfer best to repeated patterns.",
-      "Explains why rare or unseen strings may remain character-like.",
-    ],
-    steps: [
-      {
-        title: "Predict reusable chunks",
-        experiment:
-          "Use the Repetition corpus with 4 merge steps. Compare lowest newer, glow tower, and xyz in the Compare Texts panel.",
-        predictionQuestion:
-          "Which examples should compress more: words related to low/new, or an unrelated string like xyz?",
-        observationPrompt:
-          "What happened to the token counts for related and unrelated text?",
-        takeaway:
-          "BPE helps when new text reuses pieces that were frequent in the training corpus.",
-      },
-      {
-        title: "Spend more merges",
-        experiment:
-          "Move Merge steps from 0 to 8. Watch the token chips, vocabulary size, and tradeoff chart update together.",
-        predictionQuestion:
-          "What should happen to token count and vocabulary size as merge steps increase?",
-        observationPrompt:
-          "How did the two tradeoff lines move as you spent more merges?",
-        takeaway:
-          "Each merge can make text shorter, but every new merged piece also adds to the vocabulary.",
-      },
-      {
-        title: "Read the next pair",
-        experiment:
-          "Set Merge steps to 4 and inspect Next pair candidates. Then step forward once and see which token appears.",
-        predictionQuestion:
-          "What should the next merge come from: a frequent candidate pair or a rare pair?",
-        observationPrompt:
-          "How did the highlighted candidate table explain the next token?",
-        takeaway:
-          "BPE training repeatedly asks which adjacent pair is most worth turning into a reusable token.",
-      },
-    ],
-  },
+  "byte-pair-encoding": bpeTutorPlan,
   "shape-skew-outliers": {
     intro: "Four experiments and a transfer check compare shape and summaries while moving only point M.",
     whyItMatters: "A center or spread number can hide tails, gaps and groups. Seeing the distribution helps choose evidence for the question instead of treating one statistic as the whole story.",

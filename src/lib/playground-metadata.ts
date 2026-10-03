@@ -452,6 +452,7 @@ const activePlaygroundDefinitions = [
   },
   {
     slug: "byte-pair-encoding",
+    layout: "guided-discovery",
     title: "Byte Pair Encoding Lab",
     tag: "tokenization",
     kicker:
@@ -467,7 +468,7 @@ const activePlaygroundDefinitions = [
     ],
     learningGoals: [
       "Understand BPE as repeated merging of frequent adjacent pieces.",
-      "See why more merge steps reduce token count while increasing vocabulary size.",
+      "Distinguish growing vocabulary from token counts that can decrease or remain unchanged for a particular text.",
       "Recognize why learned tokens transfer best to text that repeats training patterns.",
     ],
   },

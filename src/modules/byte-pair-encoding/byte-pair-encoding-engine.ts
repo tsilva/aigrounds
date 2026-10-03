@@ -1,5 +1,6 @@
 import {
   endToken,
+  bpeAlphabet,
   maxMergeSteps,
   type BpeCompareExample,
   type BpeScenario,
@@ -39,6 +40,9 @@ export type CompareAnalysis = {
 };
 
 export type BpeAnalysis = {
+  beforeLastTraining: TokenizationSummary;
+  afterTraining: TokenizationSummary;
+  vocabulary: string[];
   initialVocabularySize: number;
   vocabularySize: number;
   mergeSteps: MergeStep[];
@@ -62,10 +66,13 @@ export function analyzeBpe(
   requestedMergeCount: number,
 ): BpeAnalysis {
   const safeMergeCount = clamp(
-    Math.round(requestedMergeCount),
+    Number.isFinite(requestedMergeCount) ? Math.round(requestedMergeCount) : 0,
     0,
     maxMergeSteps,
   );
+  for (const text of [scenario.trainingText, scenario.inspectionText, ...scenario.compareExamples.map(e => e.text)]) {
+    if ([...text].some(char => !/\s/.test(char) && !bpeAlphabet.includes(char))) throw new Error("This character BPE lab supports a–z and =.");
+  }
   const trainingWords = parseWords(scenario.trainingText);
   const initialWords = trainingWords.map(tokenizeWordCharacters);
   const initialVocabulary = getVocabulary(initialWords);
@@ -88,16 +95,19 @@ export function analyzeBpe(
   });
 
   return {
+    beforeLastTraining: tokenizeText(scenario.trainingText, activeMerges.slice(0, -1)),
+    afterTraining: tokenizeText(scenario.trainingText, activeMerges),
+    vocabulary: [...vocabulary],
     initialVocabularySize: initialVocabulary.size,
     vocabularySize: vocabulary.size,
     mergeSteps,
     activeMerges,
-    nextCandidates: getPairCounts(afterTrainingWords).slice(0, 4),
+    nextCandidates: getPairCounts(afterTrainingWords),
     beforeInspection,
     afterInspection,
     compareAnalyses,
     tokenReduction: getReduction(beforeInspection.count, afterInspection.count),
-    tradeoff: [0, 2, 4, 6, 8].map((mergeCount) => {
+    tradeoff: Array.from({length: maxMergeSteps + 1}, (_, i) => i).map((mergeCount) => {
       const merges = mergeSteps.slice(0, mergeCount);
       const tokenized = tokenizeText(scenario.inspectionText, merges);
 
@@ -251,7 +261,8 @@ function getPairCounts(words: string[][]): PairCount[] {
       return right.count - left.count;
     }
 
-    return pairKey(left.pair).localeCompare(pairKey(right.pair));
+    const a = pairKey(left.pair), b = pairKey(right.pair);
+    return a < b ? -1 : a > b ? 1 : 0;
   });
   const topCount = sorted[0]?.count ?? 0;
 
@@ -262,7 +273,7 @@ function getPairCounts(words: string[][]): PairCount[] {
 }
 
 function getVocabulary(words: string[][], merges: MergeStep[] = []) {
-  return new Set([...words.flat(), ...merges.map((merge) => merge.token)]);
+  return new Set([...bpeAlphabet, ...words.flat(), ...merges.map((merge) => merge.token)]);
 }
 
 function getReduction(before: number, after: number) {

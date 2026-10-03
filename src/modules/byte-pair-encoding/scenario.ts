@@ -20,6 +20,8 @@ export type BpeScenario = {
 
 export const endToken = "</w>";
 
+export const bpeAlphabet = [..."abcdefghijklmnopqrstuvwxyz", "=", endToken];
+
 export const maxMergeSteps = 8;
 
 export const initialMergeSteps = 4;
@@ -83,7 +85,7 @@ export const bpeScenarios: BpeScenario[] = [
       },
       {
         text: "return y",
-        note: "A whole keyword emerges after enough merge budget.",
+        note: "Learned pieces can help this keyword without turning it into one token.",
       },
       {
         text: "while q",

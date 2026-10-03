@@ -1,0 +1,17 @@
+{
+  "step": 21,
+  "title": "Type I & Type II Errors Lab",
+  "slug": "type-i-type-ii-errors",
+  "modulePath": "src/modules/type-i-type-ii-errors",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-99ccd331-12e8-463a-8496-9e2727b55d83.png",
+  "approval": "Autonomous self-review explicitly authorized by user",
+  "refinements": [
+    "Canonical native slider/editor, shared toolbar and modest Guide invitation.",
+    "Raster density heights are illustrative: engine computes exact peak1/sqrt(2pi), width, axes, shaded areas and markers.",
+    "Defaultcutoff1.96; rasterillustrates2.58 firstoutcome.",
+    "Optional conditional table, precise modellimits and third outcome truthclassification added.",
+    "V1/V2 rejected broadnormalandV2observationSD1; V3restoresSD4/modelandnarrowtailstructure."
+  ]
+}

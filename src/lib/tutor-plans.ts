@@ -1,3 +1,4 @@
+import { errorsTutorPlan } from "@/modules/type-i-type-ii-errors/learning-experiments";
 import { testingTutorPlan } from "@/modules/hypothesis-testing-basics/learning-experiments";
 import { intervalTutorPlan } from "@/modules/confidence-intervals/learning-experiments";
 import { marginTutorPlan } from "@/modules/margin-of-error-sample-size/learning-experiments";
@@ -273,6 +274,7 @@ export const playgroundTutorPlans = {
   "law-large-numbers-simulation": llnTutorPlan,
   "pdf-cdf-probability-area": areaTutorPlan,
   "normal-distribution-z-scores": normalTutorPlan,
+  "type-i-type-ii-errors": errorsTutorPlan,
   "hypothesis-testing-basics": testingTutorPlan,
   "confidence-intervals": intervalTutorPlan,
   "margin-of-error-sample-size": marginTutorPlan,

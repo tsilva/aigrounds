@@ -1,3 +1,4 @@
+import { rocTutorPlan } from "@/modules/roc-auc-thresholds/learning-experiments";
 import { classificationTutorPlan } from "@/modules/classification-metrics-foundations/learning-experiments";
 import { biasTutorPlan as tradeoffTutorPlan } from "@/modules/bias-variance-tradeoff/learning-experiments";
 import { generalizationTutorPlan } from "@/modules/train-test-generalization/learning-experiments";
@@ -77,6 +78,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "roc-auc-thresholds": rocTutorPlan,
   "classification-metrics-foundations": classificationTutorPlan,
   "bias-variance-tradeoff": tradeoffTutorPlan,
   "train-test-generalization": generalizationTutorPlan,

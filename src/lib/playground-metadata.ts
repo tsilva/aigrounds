@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "roc-auc-thresholds",
+    layout: "guided-discovery",
+    title: "ROC, AUC & Thresholds Lab",
+    tag: "evaluation",
+    kicker: "Move one operating point; inspect the whole ranking.",
+    estimatedDuration: "6 to 9 minutes",
+    summary:
+      "Move a threshold across classifier scores and trace true-positive versus false-positive rates.",
+    concepts: ["ROC curves", "AUC", "Thresholds"],
+    learningGoals: [
+      "Reconstruct true-positive and false-positive rates using actual-class denominators.",
+      "Separate threshold decisions from whole-ranking ROC area.",
+      "Group tied scores and count pair ties half in AUC.",
+      "Transfer to reversed scores without calibration or future-performance guarantees.",
+    ],
+  },
+  {
     slug: "classification-metrics-foundations",
     layout: "guided-discovery",
     title: "Classification Metrics Foundations",
@@ -1073,14 +1090,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "roc-auc-thresholds",
-    title: "ROC, AUC & Thresholds Lab",
-    tag: "evaluation",
-    summary:
-      "Move a threshold across classifier scores and trace true-positive versus false-positive rates.",
-    concepts: ["ROC curves", "AUC", "Thresholds"],
-  },
+
   {
     slug: "precision-recall-curves-imbalance",
     title: "Precision-Recall Curves & Imbalance",

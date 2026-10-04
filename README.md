@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [ROC, AUC & Thresholds](https://aigrounds.tsilva.eu/playgrounds/roc-auc-thresholds) separates a threshold’s operating point from whole-ranking area, with grouped scores and half-credit ties.
+
 - [Classification Metrics Foundations](https://aigrounds.tsilva.eu/playgrounds/classification-metrics-foundations) traces binary predictions to confusion counts, metric denominators and undefined boundaries before threshold tuning.
 
 - [Bias–Variance Tradeoff](https://aigrounds.tsilva.eu/playgrounds/bias-variance-tradeoff) separates average-fit bias, repeated-training variance and independent response noise in an exactly enumerated finite model.

@@ -1,0 +1,17 @@
+{
+  "step": 34,
+  "title": "ROC, AUC & Thresholds Lab",
+  "slug": "roc-auc-thresholds",
+  "modulePath": "src/modules/roc-auc-thresholds",
+  "mockupPath": "src/modules/roc-auc-thresholds/design/accepted-mockup.png",
+  "promptPath": "src/modules/roc-auc-thresholds/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-d7575ff7-e33b-4eba-8c50-25eb6f0eb525.png",
+  "review": "V1 self-reviewed as schematic; teaching controls/counts correct, engine is authoritative for exact vertices",
+  "refinements": [
+    "Shared canonical two-line toolbar, Your dataset heading, rail order and open summaries",
+    "Exact engine vertices, fixed0..1axes and area replace illustrative raster positions",
+    "Single threshold editor; tables preserve twelve cases, score ties and every segment area",
+    "No interior hard-threshold point claim between tied group endpoints"
+  ],
+  "scope": "Fixed binary score rankings; operating point, ROC, trapezoidal area and half-credit ties"
+}

@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "llm-loss-perplexity",
+    layout: "guided-discovery",
+    kicker: "Change a token probability. Compare local cost with sequence cost.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: ["Trace a prior-only prefix to actual next-token log loss.", "Average all scored target costs before exponentiating.", "Relate natural-log loss, perplexity and bits per token.", "Handle probability endpoints and transfer a new sequence cost."],
+    title: "LLM Loss & Perplexity Lab",
+    tag: "llm evaluation",
+    summary:
+      "Step through next-token predictions and watch token loss, average cross entropy, perplexity, and bits per token update across a sequence.",
+    concepts: ["Next-token prediction", "NLL", "Perplexity", "Bits per token"],
+  },
+
+  {
     slug: "neural-network-forward-pass",
     layout: "guided-discovery",
     kicker: "Change one weight. Trace the signal to class scores.",
@@ -1424,14 +1437,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Remove mean-centering and watch root-mean-square scaling keep transformer activations controlled.",
     concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
-  },
-  {
-    slug: "llm-loss-perplexity",
-    title: "LLM Loss & Perplexity Lab",
-    tag: "llm evaluation",
-    summary:
-      "Step through next-token predictions and watch token loss, average cross entropy, perplexity, and bits per token update across a sequence.",
-    concepts: ["Next-token prediction", "NLL", "Perplexity", "Bits per token"],
   },
   {
     slug: "context-windows-attention-masks",

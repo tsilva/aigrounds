@@ -1,3 +1,4 @@
+import { perplexityTutorPlan } from "@/modules/llm-loss-perplexity/learning-experiments";
 import { forwardTutorPlan } from "@/modules/neural-network-forward-pass/learning-experiments";
 import { activationTutorPlan } from "@/modules/activation-functions/learning-experiments";
 import { banditTutorPlan } from "@/modules/exploration-exploitation/learning-experiments";
@@ -98,6 +99,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "llm-loss-perplexity": perplexityTutorPlan,
   "neural-network-forward-pass": forwardTutorPlan,
   "activation-functions": activationTutorPlan,
   "exploration-exploitation": banditTutorPlan,

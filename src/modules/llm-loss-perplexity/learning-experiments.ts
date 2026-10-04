@@ -1,0 +1,41 @@
+const choices = (...labels: string[]) => labels.map((label, i) => ({ id: String(i), label }));
+export const perplexityExperiments = [
+  {
+    title: "Make one target less likely",
+    question: "Start Balanced targets: all four actual next tokens have probability 50%. Lower only position 1 to 25%. Which token costs and sequence costs change?",
+    predictions: choices("Only the first token loss rises; the four-token mean, perplexity and bits per token rise.", "All four individual token losses change when any probability changes.", "Lower probability on an actual target gives lower loss."),
+    action: "Choose 1 · The under Prediction position. Set Target probability to 25%. Compare the selected token loss, all four rows and the sequence summaries.",
+    explanation: "How did one local cost reach the mean?",
+    explanations: choices("The first token NLL rises ln(2)→ln(4), while the other three stay ln(2). The mean is 5×ln(2)/4≈0.866434 nats, perplexity≈2.378414 and bits per token=1.25. All four targets still count; position selection only changes inspection.", "The first token's new loss is the sequence mean, so the mean is ln(4).", "The three later target costs must change because the displayed position changed."),
+    retry: "Read each row separately. Only one authored conditional probability changed. Sum the four token losses, then divide by the fixed count 4.",
+    takeaway: "A lower probability on an actual next token raises its logarithmic cost. The sequence mean includes that changed cost and all unchanged target costs.",
+  },
+  {
+    title: "Average before exponentiating",
+    question: "From Balanced targets, give only the last target probability 1%. Is perplexity the exponential of the total loss or of the average token loss?",
+    predictions: choices("Exponentiate the four-token average NLL; one low probability raises it sharply.", "Exponentiate the sum directly; token count does not matter.", "Average the four reciprocal probabilities to get perplexity."),
+    action: "Choose One surprise. Choose 4 · . under Prediction position to inspect its 1% probability and local cost. Compare the complete sequence summaries.",
+    explanation: "Which aggregate produced perplexity?",
+    explanations: choices("The last NLL is −ln(0.01)≈4.60517 nats; the other three remain ln(2). Their total≈6.684612 divided by 4 gives mean≈1.671153. Perplexity=exp(mean)≈5.318296; bits per token=mean/ln(2)≈2.410964. It is neither exp(total)=800 nor the arithmetic average of reciprocal probabilities=26.5.", "Perplexity is 800 because exp(total loss) is the sequence-average score.", "Perplexity is 26.5 because reciprocal probabilities should be averaged arithmetically."),
+    retry: "The denominator is four scored targets. Exponentiate the mean in nats. Equivalently, perplexity is the inverse geometric mean of actual-target probabilities.",
+    takeaway: "Perplexity converts average natural-log cost into a branching-scale number. Bits per token expresses the same average cost in base 2.",
+  },
+  {
+    title: "Keep zero probability exact",
+    question: "Start Balanced targets again. Set the last target's probability to 0%. Is its loss a finite penalty, or does the sequence contain an infinite cost?",
+    predictions: choices("The last NLL and all three sequence cost summaries become infinite.", "Its loss becomes 0 because the probability is 0.", "Its loss is capped at the largest finite value used by the slider."),
+    action: "Choose 4 · . under Prediction position. Set Target probability to 0%. Inspect the last row and the three sequence summaries.",
+    explanation: "Why is this not a capped finite loss?",
+    explanations: choices("The model assigns zero probability to an actual target, so −ln(0) is interpreted as +∞ in log-loss scoring. One infinite NLL makes the four-token mean, perplexity and bits per token infinite. The other three local costs stay finite. This demo does not replace zero with an epsilon or claim a real softmax model produced it.", "All four token losses are zero because the last target was impossible.", "The infinity mark just means the finite value 100, the probability editor's limit."),
+    retry: "A probability bound is not a loss cap. Zero assigned probability to an observed target gives infinite log loss; unchanged token rows remain finite.",
+    takeaway: "Exact zero probability has an infinite cost for an actual target. Probability 1 has zero cost; neither endpoint requires inventing a finite cap.",
+  },
+];
+const reference = `Authored four-target teacher-forced causal probability demo: actualtokensThe,cat,sat,.; prefixes<BOS>,<BOS>The,<BOS>Thecat,<BOS>Thecatsat. BOS meansbeginning-of-sequence context marker,notscored. Current/futuretoken neverinitsownprefix. No realmodel/tokenizer/generation/training/calibration/benchmarkclaims. Four independentlyeditable true-target conditional probabilities percentinteger0..100. Remaininggroup allother tokenshasmass1-p, notspecificsecondtoken. Targetprobability isconditionalonthefixedactualprefix; editing doesnotchange anyprovidedactualtoken orrerunmodel. Positionselect onlyinspection, alwaysall4targetsaggregated. NLLnegative loglikelihood=-ln(p) natural logarithm nats; localbits=-log2(p)=NLL/ln2. meanCE=sumNLL/4;PPL=exp(meanCE)=2^BPT=inversegeometricmeanoftrue-targetprobs; BPT=meanCE/ln2. Not exp(sum) norarithmeticmean1/p. p0=NLLInfinity,mean/PPL/BPTInfinity withanyzero;p1=NLL0;all1PPL1/BPT0. Finitep>=.01 means finiteNLL<=ln100=4.605170185988,mean<=ln100,PPL<=100,BPT<=6.643856189775. Balancedall.5NLLln2mean.69314718056/PPL2/BPT1. OneSurprise[.5,.5,.5,.01]total6.684611727668,mean1.671152931917,PPL5.318295896945,BPT2.410964047444. Step1[.25,.5,.5,.5]mean.8664339757,PPL2.378414230005,BPT1.25. Step3[.5,.5,.5,0]infiniteaggregate,first3finite. Certainall1. Reset/predictionBalancedcurrentexperimentselectedposition0forstep1,3forsteps2/3,transferselected1;freeResetstep1. Actualprobability/presetchangeclears staleexplanations/transfer; noops/positionselection preserve. Sixdecimalsdisplaynotcalculation. LowerPPL onfixedtokens/protocolmeanshigherlikelihood butdoesnotprovebettergeneral answers, safety, truth, calibratedconfidence oraccuracy. Comparisonrequiresconsistenttokenization/data/scoredtokens/contextpolicy; bitspertoken notbitspercharacter. No mask/window lesson here. Do notleakexacttransferanswer beforeattempt; explaingenericlocalcost/average/exp/log2principles. Repliesbriefreadablewithoutdensetables.`;
+export const perplexityTutorPlan = {
+  intro: "Trace next-token probability to local log loss, average cross entropy, perplexity and bits per token.",
+  whyItMatters: "A sequence score combines costs for actual next tokens. Separating local cost, averaging and log bases prevents misleading perplexity comparisons.",
+  openingMessage: "This lab uses four illustrative actual tokens: The, cat, sat, and a period. Each is scored using its previous actual tokens as context, called teacher forcing. <BOS> is a beginning-of-sequence context marker and is not itself scored. No real model or tokenizer runs here.\n\nChoose Prediction position to inspect a prefix and actual next token, then edit Target probability. NLL means negative log likelihood: −ln(p), using the natural logarithm and units called nats. Lower probability on an actual target means higher cost. Probability 1 gives zero loss; probability 0 gives infinite loss. All other tokens share the remaining mass.\n\nAll four targets always count in mean cross entropy=sum(NLL)/4. Perplexity is exp(that mean); bits per token is the mean divided by ln(2). Selecting a position changes only inspection. Start Balanced targets and predict what happens when the first probability falls from 50% to 25%.",
+  masteryCriteria: ["Separates actual next token from its prior-only context.", "Distinguishes one token NLL from the fixed four-target mean.", "Uses exp(mean NLL) and mean NLL/ln2 correctly.", "Handles exact probability endpoints and a new aggregate without general quality claims."],
+  steps: perplexityExperiments.map((e, i) => ({ title: e.title, experiment: e.action, predictionQuestion: e.question, observationPrompt: e.explanation, takeaway: e.takeaway + (i === 0 ? "\n\nReference only; do not recite or leak transfer:\n" + reference : "") })),
+};

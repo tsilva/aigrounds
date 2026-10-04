@@ -1,3 +1,4 @@
+import { PerplexityPlayground } from "@/modules/llm-loss-perplexity/PerplexityPlayground";
 import { ForwardPassPlayground } from "@/modules/neural-network-forward-pass/ForwardPassPlayground";
 import { ActivationPlayground } from "@/modules/activation-functions/ActivationPlayground";
 import { ExplorationPlayground } from "@/modules/exploration-exploitation/ExplorationPlayground";
@@ -87,6 +88,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "llm-loss-perplexity": PerplexityPlayground,
   "neural-network-forward-pass": ForwardPassPlayground,
   "activation-functions": ActivationPlayground,
   "exploration-exploitation": ExplorationPlayground,

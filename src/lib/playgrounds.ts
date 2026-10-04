@@ -1,3 +1,4 @@
+import { ReferencePlayground } from "@/modules/reference-answer-metrics/ReferencePlayground";
 import { RmsPlayground } from "@/modules/rms-normalization/RmsPlayground";
 import { PositionPlayground } from "@/modules/positional-encoding-token-order/PositionPlayground";
 import { MaskPlayground } from "@/modules/context-windows-attention-masks/MaskPlayground";
@@ -91,6 +92,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "reference-answer-metrics": ReferencePlayground,
   "rms-normalization": RmsPlayground,
   "positional-encoding-token-order": PositionPlayground,
   "context-windows-attention-masks": MaskPlayground,

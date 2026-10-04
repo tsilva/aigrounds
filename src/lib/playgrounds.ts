@@ -1,3 +1,4 @@
+import { KMeansPlayground } from "@/modules/k-means-clustering/KMeansPlayground";
 import { RegularizationPlayground } from "@/modules/regularization/RegularizationPlayground";
 import { ContrastivePlayground } from "@/modules/contrastive-loss/ContrastivePlayground";
 import { CalibrationPlayground } from "@/modules/calibration-reliability-diagrams/CalibrationPlayground";
@@ -83,6 +84,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "k-means-clustering": KMeansPlayground,
   "regularization": RegularizationPlayground,
   "contrastive-loss": ContrastivePlayground,
   "calibration-reliability-diagrams": CalibrationPlayground,

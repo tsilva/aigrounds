@@ -1,3 +1,4 @@
+import { kmeansTutorPlan } from "@/modules/k-means-clustering/learning-experiments";
 import { regularizationTutorPlan } from "@/modules/regularization/learning-experiments";
 import { contrastiveTutorPlan } from "@/modules/contrastive-loss/learning-experiments";
 import { calibrationTutorPlan } from "@/modules/calibration-reliability-diagrams/learning-experiments";
@@ -94,6 +95,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "k-means-clustering": kmeansTutorPlan,
   "regularization": regularizationTutorPlan,
   "contrastive-loss": contrastiveTutorPlan,
   "calibration-reliability-diagrams": calibrationTutorPlan,

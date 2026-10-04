@@ -1,3 +1,4 @@
+import { biasTutorPlan as tradeoffTutorPlan } from "@/modules/bias-variance-tradeoff/learning-experiments";
 import { generalizationTutorPlan } from "@/modules/train-test-generalization/learning-experiments";
 import { diagnosticsTutorPlan } from "@/modules/r-squared-residual-diagnostics/learning-experiments";
 import { landscapeTutorPlan } from "@/modules/least-squares-loss-landscape/learning-experiments";
@@ -75,6 +76,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "bias-variance-tradeoff": tradeoffTutorPlan,
   "train-test-generalization": generalizationTutorPlan,
   "r-squared-residual-diagnostics": diagnosticsTutorPlan,
   "least-squares-loss-landscape": landscapeTutorPlan,

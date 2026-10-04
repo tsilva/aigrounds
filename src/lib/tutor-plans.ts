@@ -1,3 +1,4 @@
+import { scoreTutorPlan } from "@/modules/class-score-logits/learning-experiments";
 import { entropyTutorPlan } from "@/modules/entropy-information/learning-experiments";
 import { rankingTutorPlan } from "@/modules/retrieval-ranking-metrics/learning-experiments";
 import { retrievalTutorPlan } from "@/modules/embedding-retrieval/learning-experiments";
@@ -89,6 +90,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "class-score-logits": scoreTutorPlan,
   "entropy-information": entropyTutorPlan,
   "retrieval-ranking-metrics": rankingTutorPlan,
   "embedding-retrieval": retrievalTutorPlan,

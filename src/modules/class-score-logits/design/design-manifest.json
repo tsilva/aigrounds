@@ -1,0 +1,18 @@
+{
+  "step": 48,
+  "slug": "class-score-logits",
+  "title": "Class Scores & Logits Lab",
+  "modulePath": "src/modules/class-score-logits",
+  "mockupPath": "src/modules/class-score-logits/design/accepted-mockup.png",
+  "promptPath": "src/modules/class-score-logits/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-df1f9336-e261-4140-8fb8-1cd78cd5fe6b.png",
+  "approval": "User authorized self-review; corrected original-reference V3 accepted",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "styleReference": "src/modules/mean-median-mode/design/accepted-mockup.png",
+  "refinements": [
+    "Actual shared Guided discovery eyebrow/compact progress/rail and controls remain authoritative",
+    "Engine exact signed geometry and zero-width bars, full all-ID table with maximum flags",
+    "No boxed summaries, blue control theme or duplicated Guide CTA",
+    "Three raw-score experiments and tied transfer before probability conversion"
+  ]
+}

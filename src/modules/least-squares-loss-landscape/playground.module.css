@@ -1,0 +1,27 @@
+.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
+.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.evidence p { font-size: 15px; line-height: 1.6; margin: 9px 0; }
+.controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; margin: 20px 0; }
+.chart, .preview { width: 100%; min-width: 0; }
+.chart svg, .preview svg { display: block; width: 100%; }
+.chart svg { touch-action: none; cursor: crosshair; }
+.chart text, .preview text { fill: #33486d; font: 12px var(--font-ibm-plex-mono), monospace; }
+.chart circle[data-contour] { stroke: white; stroke-opacity: .8; stroke-width: 1.5; }
+.chart polygon[data-minimum-star] { fill: #087c78; stroke: white; stroke-width: 2; }
+.chart polygon[data-parameter-point] { fill: #fbb675; stroke: #0c1230; stroke-width: 2; }
+.preview line { stroke: #dfe4f4; stroke-width: 1; }
+.preview line[data-own-line] { stroke: #5031dc; stroke-width: 3; }
+.preview line[data-preview-residual] { stroke: #ad4508; stroke-width: 2; }
+.preview circle { fill: #536487; stroke: white; stroke-width: 2; }
+.colorKey { display: flex; flex-wrap: wrap; gap: 12px 20px; font: 12px var(--font-ibm-plex-mono), monospace; }
+.colorKey span { display: inline-flex; align-items: center; gap: 6px; }
+.colorKey i { width: 20px; height: 16px; border: 1px solid #536487; }
+.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
+.evidence details { margin: 16px 0; }
+.evidence summary { cursor: pointer; font-weight: 600; }
+.evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+@container (max-width:799px) { .controls { grid-template-columns: minmax(0,1fr); gap: 16px; } }
+.table { overflow-x: auto; margin-top: 12px; }
+.table:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
+.table table { border-collapse: collapse; width: 100%; min-width: 530px; font-size: 14px; }
+.table th, .table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #dfe4f4; }

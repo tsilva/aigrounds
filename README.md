@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Regularization Lab](https://aigrounds.tsilva.eu/playgrounds/regularization) separates penalty selection from an explicit two-weight grid fit and compares data loss, L1 zeros, L2 shrinkage, score ties and decision boundaries.
 - [Contrastive Loss Lab](https://aigrounds.tsilva.eu/playgrounds/contrastive-loss): move three scalar embeddings and tune a positive margin to reconstruct two fixed labeled pair penalties and their mean.
 - [Calibration & Reliability Diagrams](https://aigrounds.tsilva.eu/playgrounds/calibration-reliability-diagrams) compares count-weighted confidence bins, ECE binning effects and confidence-based abstention with explicit coverage and retained denominators.
 - [Log Loss Confidence Penalties](https://aigrounds.tsilva.eu/playgrounds/log-loss-confidence-penalties) compares individual probability penalties, unchanged accuracy and three-example mean loss, including exact zero/one endpoints.

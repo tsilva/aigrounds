@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "regularization",
+    layout: "guided-discovery",
+    kicker: "Choose a penalty. Then fit the weights.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: [
+      "Separate data loss, penalty and objective before fitting.",
+      "Compare L1 coefficient zeros with L2 common shrinkage.",
+      "Reconstruct fixed-case scores, ties and decision boundaries.",
+      "Interpret grid optima without a held-out performance claim.",
+    ],
+    title: "Regularization Lab",
+    tag: "optimization",
+    summary:
+      "Compare None, L1 and L2 on a fixed toy scorer, separate penalty selection from an explicit weight-grid fit, and track data loss, sparse weights, score ties and boundaries.",
+    concepts: ["L1", "L2", "Penalty strength"],
+  },
+  {
     slug: "contrastive-loss",
     layout: "guided-discovery",
     kicker: "Move pairs. Watch the margin stop the penalty.",
@@ -1347,14 +1364,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "regularization",
-    title: "Regularization Lab",
-    tag: "optimization",
-    summary:
-      "Compare no regularization, L1, and L2 while weights and decision boundaries change.",
-    concepts: ["L1", "L2", "Penalty strength"],
-  },
+
   {
     slug: "k-means-clustering",
     title: "K-Means Clustering Studio",

@@ -1,3 +1,4 @@
+import { RegularizationPlayground } from "@/modules/regularization/RegularizationPlayground";
 import { ContrastivePlayground } from "@/modules/contrastive-loss/ContrastivePlayground";
 import { CalibrationPlayground } from "@/modules/calibration-reliability-diagrams/CalibrationPlayground";
 import { LogLossPlayground } from "@/modules/log-loss-confidence-penalties/LogLossPlayground";
@@ -82,6 +83,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "regularization": RegularizationPlayground,
   "contrastive-loss": ContrastivePlayground,
   "calibration-reliability-diagrams": CalibrationPlayground,
   "log-loss-confidence-penalties": LogLossPlayground,

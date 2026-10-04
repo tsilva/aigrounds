@@ -1,3 +1,4 @@
+import { RocPlayground } from "@/modules/roc-auc-thresholds/RocPlayground";
 import { ClassificationPlayground } from "@/modules/classification-metrics-foundations/ClassificationPlayground";
 import { BiasVariancePlayground } from "@/modules/bias-variance-tradeoff/BiasVariancePlayground";
 import { GeneralizationPlayground } from "@/modules/train-test-generalization/GeneralizationPlayground";
@@ -66,6 +67,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "roc-auc-thresholds": RocPlayground,
   "classification-metrics-foundations": ClassificationPlayground,
   "bias-variance-tradeoff": BiasVariancePlayground,
   "train-test-generalization": GeneralizationPlayground,

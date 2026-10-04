@@ -5,7 +5,7 @@
   "modulePath": "src/modules/retrieval-ranking-metrics",
   "mockupPath": "src/modules/retrieval-ranking-metrics/design/accepted-mockup.png",
   "promptPath": "src/modules/retrieval-ranking-metrics/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-8ffaa34e-7b2e-4713-87b9-edb4d1cb1681.png",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5b6a68a5-6a15-485a-b90c-89c894273b66.png",
   "approval": "User authorized self-review without approval questions; V2 accepted",
   "review": [
     {
@@ -28,5 +28,17 @@
     "Native selected-item/rank controls make every permutation reachable without mandatory dragging",
     "No relevant Q2: recall/nDCG Undefined, RR0 included in mean; convention explicit",
     "Short Guide opening, full reference only as background"
-  ]
+  ],
+  "designSystem": "DESIGN_SYSTEM.md",
+  "styleReference": "src/modules/mean-median-mode/design/accepted-mockup.png",
+  "styleCorrection": {
+    "reason": "User identified blue drift in recent generated mockups",
+    "review": "Restored navy, indigo/lavender, open summaries, boxed predictions and one outlined Guide CTA. Corrected draft cutoff to horizontal boundary after rank3.",
+    "implementation": "Existing shared renderer verified faithful; no application style or teaching changes",
+    "refinements": [
+      "Actual shared progress uses compact inline circle labels",
+      "Summary colors remain existing semantic indigo/teal/orange/slate mapping",
+      "Chart geometry and exact table scroll remain engine/shared implementation owned"
+    ]
+  }
 }

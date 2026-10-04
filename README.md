@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Neural Network Forward Pass Lab](https://aigrounds.tsilva.eu/playgrounds/neural-network-forward-pass) traces editable weights through fixed inputs, hidden biases and ReLU to raw class scores, including clipped paths and exact ties.
 - [Activation Functions Lab](https://aigrounds.tsilva.eu/playgrounds/activation-functions) compares ReLU, sigmoid and tanh through a shared input, selected-rule flow, exact outputs, zero-input behavior and bounded saturation.
 - [Exploration vs Exploitation Lab](https://aigrounds.tsilva.eu/playgrounds/exploration-exploitation) compares Greedy and UCB on authored option rewards, with manual trials, count bonuses, exact score ties and a twelve-trial budget.
 - [K-Means Clustering Studio](https://aigrounds.tsilva.eu/playgrounds/k-means-clustering) separates nearest-center assignment from coordinate-mean updates with editable points and centroids, exact ties, held SSE and an explicit empty-cluster policy.

@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": 61,
+  "title": "Neural Network Forward Pass Lab",
+  "slug": "neural-network-forward-pass",
+  "modulePath": "src/modules/neural-network-forward-pass",
+  "mockupPath": "src/modules/neural-network-forward-pass/design/accepted-mockup.png",
+  "promptPath": "src/modules/neural-network-forward-pass/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-ebc67148-2a53-42cf-a73d-2e002bd7aa07.png",
+  "approval": "Self-reviewed under user authorization; original shared design system",
+  "review": "Six correct node values, eight correctly directed connections, all four exact rows and original purple/lavender shell; no material model defect.",
+  "approvedRefinements": [
+    "Shared native range/exact value pair maps weight geometry precisely; raster slider illustrative.",
+    "Construction details live in workbench instead of rail.",
+    "Graph placed below introductory text and only selected weight labeled; table is exact accessible equivalent.",
+    "Open summaries use shared semantic colors; no copied shell/control CSS.",
+    "Place the selected weight label below the graph rather than on an edge, preventing overlap with node circles on narrow desktop layouts.",
+    "Long exact node values use readable 12px type inside the fixed circle; full-size scores and the calculation table provide independent data equivalents."
+  ]
+}

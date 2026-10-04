@@ -1,3 +1,4 @@
+import { forwardTutorPlan } from "@/modules/neural-network-forward-pass/learning-experiments";
 import { activationTutorPlan } from "@/modules/activation-functions/learning-experiments";
 import { banditTutorPlan } from "@/modules/exploration-exploitation/learning-experiments";
 import { kmeansTutorPlan } from "@/modules/k-means-clustering/learning-experiments";
@@ -97,6 +98,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "neural-network-forward-pass": forwardTutorPlan,
   "activation-functions": activationTutorPlan,
   "exploration-exploitation": banditTutorPlan,
   "k-means-clustering": kmeansTutorPlan,

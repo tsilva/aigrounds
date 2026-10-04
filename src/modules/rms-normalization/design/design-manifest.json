@@ -1,0 +1,21 @@
+{
+  "lessonPlanStep": 75,
+  "title": "RMSNorm Lab",
+  "slug": "rms-normalization",
+  "modulePath": "src/modules/rms-normalization",
+  "mockupPath": "src/modules/rms-normalization/design/accepted-mockup.png",
+  "promptPath": "src/modules/rms-normalization/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-e99f6871-2ccf-432a-8bb7-fa09d32207a6.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 construction before controls and extra summary column",
+    "V2 missing centered square and wrong progress number",
+    "V3 missing explicit zero in LayerNorm table"
+  ],
+  "review": "V4 correct squared variance, explicit table zeros, inside-root epsilon and original white/lavender/purple scheme.",
+  "approvedRefinements": [
+    "Shared controls reflow three/two/one columns.",
+    "Paired SVG uses unrounded engine geometry and Undefined text without fabricated zero marks.",
+    "Exact table adds same-parameter Positive-reference columns and keyboard scrolling."
+  ]
+}

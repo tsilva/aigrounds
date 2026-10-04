@@ -5,7 +5,7 @@
   "modulePath": "src/modules/entropy-information",
   "mockupPath": "src/modules/entropy-information/design/accepted-mockup.png",
   "promptPath": "src/modules/entropy-information/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-6b441645-a4e0-434e-b177-e85de91f5adb.png",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-412ffae0-dd69-4cbf-8e9c-6e4120852527.png",
   "approval": "User authorized self-review without approval questions; V2 accepted",
   "review": [
     {
@@ -23,8 +23,19 @@
     "Actual probability bar widths from engine, fixed0..100% scale",
     "Shared native pair selector and bounded first-mass slider/editor; other buckets fixed",
     "All outcomes retain exact probabilities/surprises/weighted terms; two groups expose conditional denominators and weights",
-    "Impossible outcome surprise limit\u221e but contribution0; impossible group conditionalUndefined, weighted0",
+    "Impossible outcome surprise limit∞ but contribution0; impossible group conditionalUndefined, weighted0",
     "Observation gain from expected conditional entropy, not arbitrary before/after distribution edit",
     "Short Guide opening, full context only as background"
-  ]
+  ],
+  "designSystem": "DESIGN_SYSTEM.md",
+  "styleReference": "src/modules/mean-median-mode/design/accepted-mockup.png",
+  "styleCorrection": {
+    "reason": "User identified blue drift in recent generated mockups",
+    "review": "Original navy/indigo/lavender scheme restored. Rejected drafts with rail summaries, misplaced slider thumb and incorrect AB group probability. Final accepted with summaries in workbench, stacked tables, midpoint thumb and both group probabilities0.500000.",
+    "implementation": "All59completedlabs matched reference palette/shared anatomy; no application style or teaching changes",
+    "refinements": [
+      "Actual full-width tables and summaries use shared component sizing",
+      "Engine-derived chart/table values and responsive rail remain authoritative"
+    ]
+  }
 }

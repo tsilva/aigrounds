@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Positional Encoding & Token Order](https://aigrounds.tsilva.eu/playgrounds/positional-encoding-token-order) compares fixed token identity, absolute sine/cosine additions and rotary query/key signals through exact vector construction and signed raw-score changes under reordering or a common shift.
 - [Context Windows & Attention Masks](https://aigrounds.tsilva.eu/playgrounds/context-windows-attention-masks) intersects a shared context slice, self-inclusive causal direction and padding-key eligibility in an exact eight-token permission grid, with explicit inactive-query and padding-query policies.
 - [LLM Loss & Perplexity Lab](https://aigrounds.tsilva.eu/playgrounds/llm-loss-perplexity) traces authored next-token probabilities through local NLL, four-target mean cross entropy, perplexity and bits per token, with exact zero-probability costs.
 - [Neural Network Forward Pass Lab](https://aigrounds.tsilva.eu/playgrounds/neural-network-forward-pass) traces editable weights through fixed inputs, hidden biases and ReLU to raw class scores, including clipped paths and exact ties.

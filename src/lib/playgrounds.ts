@@ -1,3 +1,4 @@
+import { PositionPlayground } from "@/modules/positional-encoding-token-order/PositionPlayground";
 import { MaskPlayground } from "@/modules/context-windows-attention-masks/MaskPlayground";
 import { PerplexityPlayground } from "@/modules/llm-loss-perplexity/PerplexityPlayground";
 import { ForwardPassPlayground } from "@/modules/neural-network-forward-pass/ForwardPassPlayground";
@@ -89,6 +90,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "positional-encoding-token-order": PositionPlayground,
   "context-windows-attention-masks": MaskPlayground,
   "llm-loss-perplexity": PerplexityPlayground,
   "neural-network-forward-pass": ForwardPassPlayground,

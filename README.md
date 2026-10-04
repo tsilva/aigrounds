@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Distance Metrics](https://aigrounds.tsilva.eu/playgrounds/distance-metrics) moves a query through an equal-scale grid, compares Euclidean and Manhattan nearest cases, and retains exact ties and coincident identities under an explicit decision policy.
+
 - [Feature Scaling](https://aigrounds.tsilva.eu/playgrounds/feature-scaling) compares raw units, per-feature min–max normalization and z-score standardization with exact reference recipes, outliers and a constant-feature boundary.
 
 - [Precision-Recall Curves & Imbalance](https://aigrounds.tsilva.eu/playgrounds/precision-recall-curves-imbalance) isolates prevalence effects on accepted predictions and distinguishes a threshold point from non-interpolated average precision.

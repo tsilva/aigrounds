@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "distance-metrics",
+    layout: "guided-discovery",
+    title: "Distance Metrics Lab",
+    tag: "features",
+    kicker: "Move a query; compare what closest means.",
+    estimatedDuration: "6 to 9 minutes",
+    summary: "Move points on a grid and compare nearest-neighbor decisions.",
+    concepts: ["Euclidean distance", "Manhattan distance", "Nearest neighbors"],
+    learningGoals: [
+      "Compute Euclidean and Manhattan distances from the same coordinate differences.",
+      "Isolate metric-only and query-only changes to one-neighbor decisions.",
+      "Retain exact ties and coincident identities under an explicit decision policy.",
+      "Distinguish nearest labels from probabilities and measured accuracy.",
+    ],
+  },
+  {
     slug: "feature-scaling",
     layout: "guided-discovery",
     title: "Feature Scaling Lab",
@@ -1125,14 +1141,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "distance-metrics",
-    title: "Distance Metrics Lab",
-    tag: "features",
-    summary:
-      "Move points on a grid and compare nearest-neighbor decisions.",
-    concepts: ["Euclidean distance", "Manhattan distance", "Nearest neighbors"],
-  },
   {
     slug: "entropy-information",
     title: "Entropy & Information Starter",

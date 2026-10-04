@@ -1,3 +1,4 @@
+import { DistancePlayground } from "@/modules/distance-metrics/DistancePlayground";
 import { ScalingPlayground } from "@/modules/feature-scaling/ScalingPlayground";
 import { PrPlayground } from "@/modules/precision-recall-curves-imbalance/PrPlayground";
 import { RocPlayground } from "@/modules/roc-auc-thresholds/RocPlayground";
@@ -69,6 +70,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "distance-metrics": DistancePlayground,
   "feature-scaling": ScalingPlayground,
   "precision-recall-curves-imbalance": PrPlayground,
   "roc-auc-thresholds": RocPlayground,

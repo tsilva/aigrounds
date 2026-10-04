@@ -1,3 +1,4 @@
+import { projectionTutorPlan } from "@/modules/projection-foundations/learning-experiments";
 import { vectorTutorPlan } from "@/modules/vector-geometry-similarity/learning-experiments";
 import { distanceTutorPlan } from "@/modules/distance-metrics/learning-experiments";
 import { scalingTutorPlan } from "@/modules/feature-scaling/learning-experiments";
@@ -82,6 +83,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "projection-foundations": projectionTutorPlan,
   "vector-geometry-similarity": vectorTutorPlan,
   "distance-metrics": distanceTutorPlan,
   "feature-scaling": scalingTutorPlan,

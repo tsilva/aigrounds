@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Projection Foundations](https://aigrounds.tsilva.eu/playgrounds/projection-foundations) rotates a unit direction, separates signed scalar components from reconstructed points, and traces perpendicular squared loss without task-quality claims.
 - [Vector Geometry & Similarity](https://aigrounds.tsilva.eu/playgrounds/vector-geometry-similarity) moves signed 2D vectors, separates dot-product magnitude from cosine alignment, and treats zero vectors as an undefined-direction boundary.
 
 - [Distance Metrics](https://aigrounds.tsilva.eu/playgrounds/distance-metrics) moves a query through an equal-scale grid, compares Euclidean and Manhattan nearest cases, and retains exact ties and coincident identities under an explicit decision policy.

@@ -1,0 +1,25 @@
+.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
+.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.evidence p { font-size: 15px; line-height: 1.6; margin: 9px 0; }
+.chart { width: 100%; min-width: 0; margin: 20px 0 0; }
+.chart svg { display: block; width: 100%; }
+.chart line { stroke: #dfe4f4; stroke-width: 1; }
+.chart line.axis { stroke: #536487; }
+.chart text { fill: #33486d; font: 12px var(--font-ibm-plex-mono), monospace; }
+.chart line.projectionAxis { stroke: #5031dc; stroke-width: 2; }
+.arrowhead { fill: #5031dc; }
+.chart line.residual { stroke: #ad4508; stroke-width: 2; stroke-dasharray: 5 3; }
+.circle { fill: #087c78; stroke: white; stroke-width: 1; }
+.square { fill: white; stroke: #5031dc; stroke-width: 2; }
+.legend { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.legend span:nth-child(1) { color: #087c78; }
+.legend span:nth-child(2), .legend span:nth-child(4) { color: #5031dc; }
+.legend span:nth-child(3) { color: #ad4508; }
+.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
+.evidence details { margin: 16px 0; }
+.evidence summary { cursor: pointer; font-weight: 600; }
+.evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.table { overflow-x: auto; margin-top: 12px; }
+.table:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
+.table table { border-collapse: collapse; width: 100%; min-width: 650px; font-size: 14px; }
+.table th, .table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #dfe4f4; }

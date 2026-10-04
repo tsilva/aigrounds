@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": 41,
+  "title": "Projection Foundations Lab",
+  "slug": "projection-foundations",
+  "modulePath": "src/modules/projection-foundations",
+  "mockupPath": "src/modules/projection-foundations/design/accepted-mockup.png",
+  "promptPath": "src/modules/projection-foundations/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-9e8b70f7-5ee4-4196-b2b0-2cb91f3c3b9e.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 2,
+  "refinements": [
+    "Use shared compact progress, choices and one Guide invitation.",
+    "Exact equal-scale originals, reconstructions and residuals derive from the engine.",
+    "Keep one native angle editor/slider directly below plot; no draggable original points.",
+    "Open summary columns use per-point means with divisor4.",
+    "All original identities remain in the table when reconstructed coordinates coincide.",
+    "Shared table and evidence styling replaces raster table outlines; every formula remains workbench evidence."
+  ]
+}

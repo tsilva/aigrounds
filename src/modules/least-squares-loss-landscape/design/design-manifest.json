@@ -13,5 +13,12 @@
     "External minimum legend avoids inline marker collisions",
     "Optional paired table and observation plot"
   ],
-  "scope": "Fixed five-pair descriptive straight-line SSE; no optimizer or inference"
+  "scope": "Fixed five-pair descriptive straight-line SSE; no optimizer or inference",
+  "step": 27,
+  "title": "Least Squares Loss Landscape",
+  "slug": "least-squares-loss-landscape",
+  "modulePath": "src/modules/least-squares-loss-landscape",
+  "mockupPath": "src/modules/least-squares-loss-landscape/design/accepted-mockup.png",
+  "promptPath": "src/modules/least-squares-loss-landscape/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-2f3002b1-ce44-4913-95be-f36643644d7e.png"
 }

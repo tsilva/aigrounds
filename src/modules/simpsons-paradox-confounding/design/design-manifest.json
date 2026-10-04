@@ -1,0 +1,16 @@
+{
+  "step": 25,
+  "title": "Simpson's Paradox & Confounding Lab",
+  "slug": "simpsons-paradox-confounding",
+  "modulePath": "src/modules/simpsons-paradox-confounding",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-9950d956-19a5-41e2-84a6-1ca3725208da.png",
+  "approval": "Autonomous self-review authorized by user",
+  "refinements": [
+    "V1 rejected unnecessary cards and extra textarea; V2 keeps continuous white workbench and one Guide invitation.",
+    "Canonical shared toolbar buttons and exact editors used; no redundant view actions.",
+    "All numeric counts, null rates and bar geometry derive from pure engine.",
+    "Detailed table optional; fixed construction rates explicitly separate from absent observed rates."
+  ]
+}

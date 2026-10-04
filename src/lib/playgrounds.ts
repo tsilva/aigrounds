@@ -1,3 +1,4 @@
+import { SimpsonPlayground } from "@/modules/simpsons-paradox-confounding/SimpsonPlayground";
 import { ShapePlayground } from "@/modules/correlation-shape-outliers/ShapePlayground";
 import { CovariancePlayground } from "@/modules/covariance-correlation/CovariancePlayground";
 import { PowerPlayground } from "@/modules/power-effect-size-sample-size/PowerPlayground";
@@ -59,6 +60,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "simpsons-paradox-confounding": SimpsonPlayground,
   "correlation-shape-outliers": ShapePlayground,
   "covariance-correlation": CovariancePlayground,
   "mean-median-mode": MeanMedianModePlayground,

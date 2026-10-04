@@ -1,3 +1,4 @@
+import { simpsonTutorPlan } from "@/modules/simpsons-paradox-confounding/learning-experiments";
 import { shapeTutorPlan } from "@/modules/correlation-shape-outliers/learning-experiments";
 import { covarianceTutorPlan } from "@/modules/covariance-correlation/learning-experiments";
 import { powerTutorPlan } from "@/modules/power-effect-size-sample-size/learning-experiments";
@@ -70,6 +71,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "simpsons-paradox-confounding": simpsonTutorPlan,
   "correlation-shape-outliers": shapeTutorPlan,
   "covariance-correlation": covarianceTutorPlan,
   "mean-median-mode": {

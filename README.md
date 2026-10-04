@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Simpson’s Paradox & Confounding Lab](https://aigrounds.tsilva.eu/playgrounds/simpsons-paradox-confounding) reconstructs aggregate success from different task mixes, exposing grouped reversals and causal limits.
 - [Lesson details](docs/lessons.md) cover the experiments and current subject coverage. The gallery also supports search and sorting by the latest committed lesson update.
 - [Correlation Shape & Outliers Lab](https://aigrounds.tsilva.eu/playgrounds/correlation-shape-outliers) compares Pearson and average-rank Spearman across curves, turning patterns, influential pairs and ties.
 - [Covariance & Correlation Map](https://aigrounds.tsilva.eu/playgrounds/covariance-correlation) connects editable paired departures with sample covariance and unitless Pearson correlation, including unit changes and zero-spread cases.

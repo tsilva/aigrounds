@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "simpsons-paradox-confounding",
+    layout: "guided-discovery",
+    title: "Simpson's Paradox & Confounding Lab",
+    tag: "relationships",
+    kicker: "Change task mixes; compare grouped and overall success.",
+    summary: "Toggle subgroup and combined views to see an apparent relationship reverse.",
+    estimatedDuration: "6 to 9 minutes",
+    concepts: ["Confounders", "Grouped relationships", "Causation"],
+    learningGoals: [
+      "Reconstruct overall rates using each algorithm’s own subgroup weights.",
+      "Distinguish view changes from mix changes and fixed subgroup performance.",
+      "Explain reversal and amplification without causal claims from counts alone.",
+      "Transfer to a new mix and handle absent subgroups as undefined.",
+    ],
+  },
+  {
     slug: "correlation-shape-outliers",
     layout: "guided-discovery",
     title: "Correlation Shape & Outliers Lab",
@@ -951,14 +967,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "simpsons-paradox-confounding",
-    title: "Simpson's Paradox & Confounding Lab",
-    tag: "relationships",
-    summary:
-      "Toggle subgroup and combined views to see an apparent relationship reverse.",
-    concepts: ["Confounders", "Grouped relationships", "Causation"],
-  },
   {
     slug: "linear-regression-line-fitting",
     title: "Linear Regression Line Fitting",

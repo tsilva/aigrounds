@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "contrastive-loss",
+    layout: "guided-discovery",
+    kicker: "Move pairs. Watch the margin stop the penalty.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: [
+      "Choose each pair penalty from its fixed similarity label.",
+      "Explain zero dissimilar penalty at and beyond the margin.",
+      "Separate margin changes from fixed embedding coordinates.",
+      "Reconstruct two pair penalties after moving their shared anchor.",
+    ],
+    title: "Contrastive Loss Lab",
+    tag: "loss",
+    summary:
+      "Move three scalar embeddings and tune a positive margin to reconstruct fixed similar and dissimilar pair penalties, their mean, and shared-anchor effects.",
+    concepts: ["Anchor pairs", "Margins", "Representation learning"],
+  },
+  {
     slug: "calibration-reliability-diagrams",
     layout: "guided-discovery",
     kicker: "Compare confidence with observed correctness.",
@@ -1329,14 +1346,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "contrastive-loss",
-    title: "Contrastive Loss Lab",
-    tag: "loss",
-    summary:
-      "Move embedding points and tune margin or temperature to watch pairwise loss terms change.",
-    concepts: ["Anchor pairs", "Margins", "Representation learning"],
-  },
+
   {
     slug: "regularization",
     title: "Regularization Lab",

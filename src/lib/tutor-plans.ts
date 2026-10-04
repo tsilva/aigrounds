@@ -1,3 +1,4 @@
+import { entropyTutorPlan } from "@/modules/entropy-information/learning-experiments";
 import { rankingTutorPlan } from "@/modules/retrieval-ranking-metrics/learning-experiments";
 import { retrievalTutorPlan } from "@/modules/embedding-retrieval/learning-experiments";
 import { umapTutorPlan } from "@/modules/umap-manifold-projection/learning-experiments";
@@ -88,6 +89,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "entropy-information": entropyTutorPlan,
   "retrieval-ranking-metrics": rankingTutorPlan,
   "embedding-retrieval": retrievalTutorPlan,
   "umap-manifold-projection": umapTutorPlan,

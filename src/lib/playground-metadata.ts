@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "entropy-information",
+    layout: "guided-discovery",
+    kicker: "Move mass; distinguish surprise from uncertainty.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: [
+      "Move conserved probability mass and reconstruct entropy as weighted surprise in bits.",
+      "Distinguish rare-outcome surprise from average uncertainty.",
+      "Compute expected information gain from a probability-weighted group observation.",
+      "Handle impossible outcomes/groups and certainty without false infinities or accuracy claims.",
+    ],
+    title: "Entropy & Information Starter",
+    tag: "information",
+    summary:
+      "Move probability mass across buckets and watch uncertainty shrink or spread.",
+    concepts: ["Surprise", "Entropy", "Information gain"],
+  },
+  {
     slug: "retrieval-ranking-metrics",
     layout: "guided-discovery",
     kicker: "Reorder results; separate metric questions.",
@@ -1255,14 +1272,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "entropy-information",
-    title: "Entropy & Information Starter",
-    tag: "information",
-    summary:
-      "Move probability mass across buckets and watch uncertainty shrink or spread.",
-    concepts: ["Surprise", "Entropy", "Information gain"],
-  },
+
   {
     slug: "class-score-logits",
     title: "Class Scores & Logits Lab",

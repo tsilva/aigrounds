@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "retrieval-ranking-metrics",
+    layout: "guided-discovery",
+    kicker: "Reorder results; separate metric questions.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: [
+      "Separate returned-set precision/recall from rank-sensitive first-hit and graded utility.",
+      "Reconstruct precision/recall denominators as the result count changes.",
+      "Trace exponential gain, logarithmic discount and same-k ideal nDCG.",
+      "Distinguish per-query RR from two-query MRR and state empty-query conventions.",
+    ],
+    title: "Retrieval Ranking Metrics Lab",
+    tag: "retrieval",
+    summary:
+      "Reorder search results and watch recall@k, precision@k, MRR, and nDCG respond to relevant items moving up or down.",
+    concepts: ["Recall@k", "Precision@k", "MRR", "nDCG"],
+  },
+  {
     slug: "embedding-retrieval",
     layout: "guided-discovery",
     kicker: "Move a query; track the ranked results.",
@@ -1272,14 +1289,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
   },
 
 
-  {
-    slug: "retrieval-ranking-metrics",
-    title: "Retrieval Ranking Metrics Lab",
-    tag: "retrieval",
-    summary:
-      "Reorder search results and watch recall@k, precision@k, MRR, and nDCG respond to relevant items moving up or down.",
-    concepts: ["Recall@k", "Precision@k", "MRR", "nDCG"],
-  },
+
   {
     slug: "contrastive-loss",
     title: "Contrastive Loss Lab",

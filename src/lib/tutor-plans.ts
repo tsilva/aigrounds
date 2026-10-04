@@ -1,3 +1,4 @@
+import { rankingTutorPlan } from "@/modules/retrieval-ranking-metrics/learning-experiments";
 import { retrievalTutorPlan } from "@/modules/embedding-retrieval/learning-experiments";
 import { umapTutorPlan } from "@/modules/umap-manifold-projection/learning-experiments";
 import { tsneTutorPlan } from "@/modules/t-sne-neighborhood-map/learning-experiments";
@@ -87,6 +88,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "retrieval-ranking-metrics": rankingTutorPlan,
   "embedding-retrieval": retrievalTutorPlan,
   "umap-manifold-projection": umapTutorPlan,
   "t-sne-neighborhood-map": tsneTutorPlan,

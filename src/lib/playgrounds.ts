@@ -1,3 +1,4 @@
+import { GeneralizationPlayground } from "@/modules/train-test-generalization/GeneralizationPlayground";
 import { DiagnosticsPlayground } from "@/modules/r-squared-residual-diagnostics/DiagnosticsPlayground";
 import { LandscapePlayground } from "@/modules/least-squares-loss-landscape/LandscapePlayground";
 import { LinePlayground } from "@/modules/linear-regression-line-fitting/LinePlayground";
@@ -63,6 +64,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "train-test-generalization": GeneralizationPlayground,
   "r-squared-residual-diagnostics": DiagnosticsPlayground,
   "least-squares-loss-landscape": LandscapePlayground,
   "linear-regression-line-fitting": LinePlayground,

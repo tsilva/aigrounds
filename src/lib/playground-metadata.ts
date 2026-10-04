@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "train-test-generalization",
+    layout: "guided-discovery",
+    title: "Train/Test Split & Generalization Lab",
+    tag: "generalization",
+    kicker: "Fit on one group; evaluate on another.",
+    estimatedDuration: "6 to 9 minutes",
+    summary:
+      "Compare known-data fit with held-out prediction and expose data leakage.",
+    concepts: ["Train/test split", "Validation sets", "Data leakage"],
+    learningGoals: [
+      "Distinguish fitting-row errors from unused validation and test errors.",
+      "Use validation for model choice and later test evaluation without refitting.",
+      "Trace leaked fitting information and reject contaminated score guarantees.",
+      "Transfer to a different fixed split without universal error-ordering claims.",
+    ],
+  },
+  {
     slug: "r-squared-residual-diagnostics",
     layout: "guided-discovery",
     title: "R Squared & Residual Diagnostics",
@@ -1019,14 +1036,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "train-test-generalization",
-    title: "Train/Test Split & Generalization Lab",
-    tag: "generalization",
-    summary:
-      "Compare known-data fit with held-out prediction and expose data leakage.",
-    concepts: ["Train/test split", "Validation sets", "Data leakage"],
-  },
+
   {
     slug: "bias-variance-tradeoff",
     title: "Bias-Variance Tradeoff Lab",

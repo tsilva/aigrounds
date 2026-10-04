@@ -1,3 +1,4 @@
+import { generalizationTutorPlan } from "@/modules/train-test-generalization/learning-experiments";
 import { diagnosticsTutorPlan } from "@/modules/r-squared-residual-diagnostics/learning-experiments";
 import { landscapeTutorPlan } from "@/modules/least-squares-loss-landscape/learning-experiments";
 import { lineTutorPlan } from "@/modules/linear-regression-line-fitting/learning-experiments";
@@ -74,6 +75,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "train-test-generalization": generalizationTutorPlan,
   "r-squared-residual-diagnostics": diagnosticsTutorPlan,
   "least-squares-loss-landscape": landscapeTutorPlan,
   "linear-regression-line-fitting": lineTutorPlan,

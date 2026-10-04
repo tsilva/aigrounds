@@ -1,0 +1,18 @@
+{
+  "step": 52,
+  "slug": "calibration-reliability-diagrams",
+  "title": "Calibration & Reliability Diagrams",
+  "modulePath": "src/modules/calibration-reliability-diagrams",
+  "mockupPath": "src/modules/calibration-reliability-diagrams/design/accepted-mockup.png",
+  "promptPath": "src/modules/calibration-reliability-diagrams/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-e3721f47-f459-4ed1-b006-131356e23a84.png",
+  "approval": "User authorized self-review; direct original shared-render V3 accepted",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "refinements": [
+    "Exact shared tokens, native controls and spacing",
+    "Engine-derived point/gap positions, no editable derived chart handles or crowded labels",
+    "Complete5/10bin interval table includes all empty-bin undefined rates",
+    "Accepted-subset optional bin calculation and explicit empty-denominator states",
+    "Open workbench summaries and single rail Guide CTA"
+  ]
+}

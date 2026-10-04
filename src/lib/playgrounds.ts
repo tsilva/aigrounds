@@ -1,3 +1,4 @@
+import { CalibrationPlayground } from "@/modules/calibration-reliability-diagrams/CalibrationPlayground";
 import { LogLossPlayground } from "@/modules/log-loss-confidence-penalties/LogLossPlayground";
 import { ClassScorePlayground } from "@/modules/class-score-logits/ClassScorePlayground";
 import { EntropyPlayground } from "@/modules/entropy-information/EntropyPlayground";
@@ -80,6 +81,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "calibration-reliability-diagrams": CalibrationPlayground,
   "log-loss-confidence-penalties": LogLossPlayground,
   "class-score-logits": ClassScorePlayground,
   "entropy-information": EntropyPlayground,

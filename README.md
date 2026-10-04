@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Calibration & Reliability Diagrams](https://aigrounds.tsilva.eu/playgrounds/calibration-reliability-diagrams) compares count-weighted confidence bins, ECE binning effects and confidence-based abstention with explicit coverage and retained denominators.
 - [Log Loss Confidence Penalties](https://aigrounds.tsilva.eu/playgrounds/log-loss-confidence-penalties) compares individual probability penalties, unchanged accuracy and three-example mean loss, including exact zero/one endpoints.
 - [Class Scores & Logits Lab](https://aigrounds.tsilva.eu/playgrounds/class-score-logits) edits raw signed scores, separates common shifts from positive gap scaling, and handles tied maxima before any probability conversion.
 - [Entropy & Information Starter](https://aigrounds.tsilva.eu/playgrounds/entropy-information) conserves categorical mass, separates rare-outcome surprise from average entropy, and computes expected information gain from a group observation with explicit zero-probability handling.

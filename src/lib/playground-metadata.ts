@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "calibration-reliability-diagrams",
+    layout: "guided-discovery",
+    kicker: "Compare confidence with observed correctness.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: [
+      "Reconstruct bin means, observed rates and count-weighted gaps.",
+      "Separate confidence edits from fixed correctness counts.",
+      "Explain ECE binning dependence without claiming improved predictions.",
+      "Interpret abstention coverage, retained denominators and empty sets.",
+    ],
+    title: "Calibration & Reliability Diagrams",
+    tag: "evaluation",
+    summary:
+      "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
+    concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
+  },
+  {
     slug: "log-loss-confidence-penalties",
     layout: "guided-discovery",
     kicker: "Same labels; different penalties.",
@@ -1309,14 +1326,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "calibration-reliability-diagrams",
-    title: "Calibration & Reliability Diagrams",
-    tag: "evaluation",
-    summary:
-      "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
-    concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
-  },
 
 
 

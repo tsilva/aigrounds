@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": 36,
+  "title": "Feature Scaling Lab",
+  "slug": "feature-scaling",
+  "modulePath": "src/modules/feature-scaling",
+  "mockupPath": "src/modules/feature-scaling/design/accepted-mockup.png",
+  "promptPath": "src/modules/feature-scaling/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-4455c176-d3ae-486f-996d-052ad70e3047.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 2,
+  "refinements": [
+    "Canonical shared typography puts the lesson title above the small Guided discovery eyebrow; active toolbar is indigo.",
+    "Use the shared compact progress and gated plain action rather than early instruction.",
+    "Exact common-axis bar widths from engine; never inflate the tiny A contribution.",
+    "Open shared summaries and exact table/recipes retain all reference cases and zero-scale exception."
+  ]
+}

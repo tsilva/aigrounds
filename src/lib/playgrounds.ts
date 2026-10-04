@@ -1,3 +1,4 @@
+import { ScalingPlayground } from "@/modules/feature-scaling/ScalingPlayground";
 import { PrPlayground } from "@/modules/precision-recall-curves-imbalance/PrPlayground";
 import { RocPlayground } from "@/modules/roc-auc-thresholds/RocPlayground";
 import { ClassificationPlayground } from "@/modules/classification-metrics-foundations/ClassificationPlayground";
@@ -68,6 +69,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "feature-scaling": ScalingPlayground,
   "precision-recall-curves-imbalance": PrPlayground,
   "roc-auc-thresholds": RocPlayground,
   "classification-metrics-foundations": ClassificationPlayground,

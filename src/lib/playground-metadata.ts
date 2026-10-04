@@ -33,6 +33,18 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "exploration-exploitation",
+    layout: "guided-discovery",
+    kicker: "Compare observed reward with a reason to explore.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: ["Separate observed rewards, means and policy scores.", "Compare greedy selection with a UCB count bonus.", "Explain a rule change without changing past observations.", "Reconstruct new trial counts and alphabetical score ties."],
+    title: "Exploration vs Exploitation Lab",
+    tag: "search",
+    summary:
+      "Allocate trials across options and watch a policy balance rewards against learning value.",
+    concepts: ["Exploration", "Exploitation", "UCB"],
+  },
+  {
     slug: "k-means-clustering",
     layout: "guided-discovery",
     kicker: "Assign members. Then move their centroids.",
@@ -1378,14 +1390,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "exploration-exploitation",
-    title: "Exploration vs Exploitation Lab",
-    tag: "search",
-    summary:
-      "Allocate trials across options and watch a policy balance rewards against learning value.",
-    concepts: ["Exploration", "Exploitation", "UCB"],
-  },
+
   {
     slug: "activation-functions",
     title: "Activation Functions Lab",

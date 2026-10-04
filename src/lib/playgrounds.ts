@@ -1,3 +1,4 @@
+import { ExplorationPlayground } from "@/modules/exploration-exploitation/ExplorationPlayground";
 import { KMeansPlayground } from "@/modules/k-means-clustering/KMeansPlayground";
 import { RegularizationPlayground } from "@/modules/regularization/RegularizationPlayground";
 import { ContrastivePlayground } from "@/modules/contrastive-loss/ContrastivePlayground";
@@ -84,6 +85,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "exploration-exploitation": ExplorationPlayground,
   "k-means-clustering": KMeansPlayground,
   "regularization": RegularizationPlayground,
   "contrastive-loss": ContrastivePlayground,

@@ -1,0 +1,19 @@
+{
+  "step": 60,
+  "slug": "activation-functions",
+  "title": "Activation Functions Lab",
+  "modulePath": "src/modules/activation-functions",
+  "mockupPath": "src/modules/activation-functions/design/accepted-mockup.png",
+  "promptPath": "src/modules/activation-functions/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5d7c30ca-8d8e-4508-aa7c-e516c666d9c1.png",
+  "approval": "User authorized self-review; V3 flow candidate accepted after two curve drafts failed geometry",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "mockupState": "InitialPositive2ReLU, awaitingprediction",
+  "refinements": [
+    "Primaryflowusesopenvaluesandthinrulesinstead of rasterboxborders",
+    "SharedInputrange/exacteditorandactivationtoggle;allthreeopensummariesusefunctionsemanticcolors",
+    "Exactcurrent/reference2/delta table",
+    "Optionalcurveplotcommonaxeswith121enginevertices,shapes/patterns andselectedmarkerlast",
+    "Originalwhite/lavender/navy/indigo; single railGuideCTA"
+  ]
+}

@@ -1,3 +1,4 @@
+import { activationTutorPlan } from "@/modules/activation-functions/learning-experiments";
 import { banditTutorPlan } from "@/modules/exploration-exploitation/learning-experiments";
 import { kmeansTutorPlan } from "@/modules/k-means-clustering/learning-experiments";
 import { regularizationTutorPlan } from "@/modules/regularization/learning-experiments";
@@ -96,6 +97,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "activation-functions": activationTutorPlan,
   "exploration-exploitation": banditTutorPlan,
   "k-means-clustering": kmeansTutorPlan,
   "regularization": regularizationTutorPlan,

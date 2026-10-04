@@ -1,3 +1,4 @@
+import { EntropyPlayground } from "@/modules/entropy-information/EntropyPlayground";
 import { RankingPlayground } from "@/modules/retrieval-ranking-metrics/RankingPlayground";
 import { RetrievalPlayground } from "@/modules/embedding-retrieval/RetrievalPlayground";
 import { UmapPlayground } from "@/modules/umap-manifold-projection/UmapPlayground";
@@ -77,6 +78,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "entropy-information": EntropyPlayground,
   "retrieval-ranking-metrics": RankingPlayground,
   "embedding-retrieval": RetrievalPlayground,
   "umap-manifold-projection": UmapPlayground,

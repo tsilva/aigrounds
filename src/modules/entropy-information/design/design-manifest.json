@@ -1,0 +1,30 @@
+{
+  "step": 47,
+  "title": "Entropy & Information Starter",
+  "slug": "entropy-information",
+  "modulePath": "src/modules/entropy-information",
+  "mockupPath": "src/modules/entropy-information/design/accepted-mockup.png",
+  "promptPath": "src/modules/entropy-information/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-6b441645-a4e0-434e-b177-e85de91f5adb.png",
+  "approval": "User authorized self-review without approval questions; V2 accepted",
+  "review": [
+    {
+      "version": 1,
+      "defects": [
+        "Correct prediction selected prematurely in initial Predict phase"
+      ]
+    },
+    {
+      "version": 2,
+      "verdict": "Accepted; all radios empty and shared mathematical construction correct"
+    }
+  ],
+  "refinements": [
+    "Actual probability bar widths from engine, fixed0..100% scale",
+    "Shared native pair selector and bounded first-mass slider/editor; other buckets fixed",
+    "All outcomes retain exact probabilities/surprises/weighted terms; two groups expose conditional denominators and weights",
+    "Impossible outcome surprise limit\u221e but contribution0; impossible group conditionalUndefined, weighted0",
+    "Observation gain from expected conditional entropy, not arbitrary before/after distribution edit",
+    "Short Guide opening, full context only as background"
+  ]
+}

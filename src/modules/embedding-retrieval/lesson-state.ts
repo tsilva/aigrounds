@@ -1,0 +1,3 @@
+import type { RetrievalState } from "./retrieval-engine";
+export const retrievalBaseline=(index=0):RetrievalState=>({scenario:index===1?"long":"directions",metric:"euclidean",x:index===1?1:2,y:index===1?1:0,k:index===2?1:3});
+export function reachedRetrieval(index:number,s:RetrievalState){const t:RetrievalState[]=[{scenario:"directions",metric:"euclidean",x:0,y:2,k:3},{scenario:"long",metric:"cosine",x:1,y:1,k:3},{scenario:"directions",metric:"euclidean",x:2,y:0,k:3},{scenario:"boundary",metric:"cosine",x:3,y:0,k:6}];return !!t[index]&&Object.keys(t[index]).every(key=>s[key as keyof RetrievalState]===t[index][key as keyof RetrievalState]);}

@@ -1,3 +1,4 @@
+import { RetrievalPlayground } from "@/modules/embedding-retrieval/RetrievalPlayground";
 import { UmapPlayground } from "@/modules/umap-manifold-projection/UmapPlayground";
 import { TsnePlayground } from "@/modules/t-sne-neighborhood-map/TsnePlayground";
 import { PcaPlayground } from "@/modules/pca-principal-components/PcaPlayground";
@@ -75,6 +76,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "embedding-retrieval": RetrievalPlayground,
   "umap-manifold-projection": UmapPlayground,
   "t-sne-neighborhood-map": TsnePlayground,
   "pca-principal-components": PcaPlayground,

@@ -1,3 +1,4 @@
+import { PcaPlayground } from "@/modules/pca-principal-components/PcaPlayground";
 import { ProjectionPlayground } from "@/modules/projection-foundations/ProjectionPlayground";
 import { VectorPlayground } from "@/modules/vector-geometry-similarity/VectorPlayground";
 import { DistancePlayground } from "@/modules/distance-metrics/DistancePlayground";
@@ -72,6 +73,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "pca-principal-components": PcaPlayground,
   "projection-foundations": ProjectionPlayground,
   "vector-geometry-similarity": VectorPlayground,
   "distance-metrics": DistancePlayground,

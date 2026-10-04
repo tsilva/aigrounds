@@ -1,0 +1,21 @@
+{
+  "lessonPlanStep": 42,
+  "title": "PCA & Principal Components Lab",
+  "slug": "pca-principal-components",
+  "modulePath": "src/modules/pca-principal-components",
+  "mockupPath": "src/modules/pca-principal-components/design/accepted-mockup.png",
+  "promptPath": "src/modules/pca-principal-components/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-ab1db28d-bd70-442c-9c1f-8948852629ec.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 4,
+  "refinements": [
+    "Use canonical shared shell, compact progress, controls and one Guide invitation.",
+    "Raster chart is illustrative: engine provides an exact square equal-scale plot and all marks.",
+    "Current rotated axes are called manual unless aligned with computed principal directions.",
+    "One native angle editor/slider, one retained-component toggle and PC1 alignment action; no point dragging.",
+    "Covariance and variance use divisor3; mean squared reconstruction error divisor4.",
+    "Preserve every original identity and mark in exact table and grouped coincident glyphs.",
+    "Undefined variance ratios remain explicit at zero total variance; equal eigenvalues give no unique PC1.",
+    "Open summary columns and plain supporting construction replace any generated container variations."
+  ]
+}

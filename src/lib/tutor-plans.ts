@@ -1,3 +1,4 @@
+import { lineTutorPlan } from "@/modules/linear-regression-line-fitting/learning-experiments";
 import { simpsonTutorPlan } from "@/modules/simpsons-paradox-confounding/learning-experiments";
 import { shapeTutorPlan } from "@/modules/correlation-shape-outliers/learning-experiments";
 import { covarianceTutorPlan } from "@/modules/covariance-correlation/learning-experiments";
@@ -71,6 +72,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "linear-regression-line-fitting": lineTutorPlan,
   "simpsons-paradox-confounding": simpsonTutorPlan,
   "correlation-shape-outliers": shapeTutorPlan,
   "covariance-correlation": covarianceTutorPlan,

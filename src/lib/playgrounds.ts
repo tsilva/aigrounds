@@ -1,3 +1,4 @@
+import { LinePlayground } from "@/modules/linear-regression-line-fitting/LinePlayground";
 import { SimpsonPlayground } from "@/modules/simpsons-paradox-confounding/SimpsonPlayground";
 import { ShapePlayground } from "@/modules/correlation-shape-outliers/ShapePlayground";
 import { CovariancePlayground } from "@/modules/covariance-correlation/CovariancePlayground";
@@ -60,6 +61,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "linear-regression-line-fitting": LinePlayground,
   "simpsons-paradox-confounding": SimpsonPlayground,
   "correlation-shape-outliers": ShapePlayground,
   "covariance-correlation": CovariancePlayground,

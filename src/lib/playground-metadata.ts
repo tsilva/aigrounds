@@ -33,6 +33,18 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "activation-functions",
+    layout: "guided-discovery",
+    kicker: "Change the input. Compare three activation rules.",
+    estimatedDuration: "5 to 8 minutes",
+    learningGoals: ["Separate shared input from activation-specific output.", "Apply ReLU clipping and compare zero-input outputs.", "Compare linear growth with bounded saturation.", "Interpret a new negative input without probability claims."],
+    title: "Activation Functions Lab",
+    tag: "neural networks",
+    summary:
+      "Move input signals through ReLU, sigmoid, and tanh to see how neurons reshape values.",
+    concepts: ["ReLU", "Sigmoid", "Tanh"],
+  },
+  {
     slug: "exploration-exploitation",
     layout: "guided-discovery",
     kicker: "Compare observed reward with a reason to explore.",
@@ -1391,14 +1403,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "activation-functions",
-    title: "Activation Functions Lab",
-    tag: "neural networks",
-    summary:
-      "Move input signals through ReLU, sigmoid, and tanh to see how neurons reshape values.",
-    concepts: ["ReLU", "Sigmoid", "Tanh"],
-  },
+
   {
     slug: "neural-network-forward-pass",
     title: "Neural Network Forward Pass Lab",

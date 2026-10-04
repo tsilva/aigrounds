@@ -1,0 +1,32 @@
+{
+  "step": 46,
+  "title": "Retrieval Ranking Metrics Lab",
+  "slug": "retrieval-ranking-metrics",
+  "modulePath": "src/modules/retrieval-ranking-metrics",
+  "mockupPath": "src/modules/retrieval-ranking-metrics/design/accepted-mockup.png",
+  "promptPath": "src/modules/retrieval-ranking-metrics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-8ffaa34e-7b2e-4713-87b9-edb4d1cb1681.png",
+  "approval": "User authorized self-review without approval questions; V2 accepted",
+  "review": [
+    {
+      "version": 1,
+      "defects": [
+        "Redundant standalone two-query grade lists duplicate exact ranked table",
+        "Missing Guided discovery eyebrow"
+      ]
+    },
+    {
+      "version": 2,
+      "verdict": "Accepted; exact engine-derived discounted gain bars and shared controls authoritative"
+    }
+  ],
+  "refinements": [
+    "One selected-query all-ID table retains all grades/relevance; query selection exposes Q2 evidence",
+    "Use exact gain divided by log2(rank+1); raster axis caption abbreviated, formula explicitly in table and text",
+    "Fixed bar scale0..7 and adaptive inside labels preserve boundaries at narrow widths",
+    "Two-query full-list RR mean explicit; selected-query P/R/nDCG are not means",
+    "Native selected-item/rank controls make every permutation reachable without mandatory dragging",
+    "No relevant Q2: recall/nDCG Undefined, RR0 included in mean; convention explicit",
+    "Short Guide opening, full reference only as background"
+  ]
+}

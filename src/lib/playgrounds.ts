@@ -1,3 +1,4 @@
+import { RankingPlayground } from "@/modules/retrieval-ranking-metrics/RankingPlayground";
 import { RetrievalPlayground } from "@/modules/embedding-retrieval/RetrievalPlayground";
 import { UmapPlayground } from "@/modules/umap-manifold-projection/UmapPlayground";
 import { TsnePlayground } from "@/modules/t-sne-neighborhood-map/TsnePlayground";
@@ -76,6 +77,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "retrieval-ranking-metrics": RankingPlayground,
   "embedding-retrieval": RetrievalPlayground,
   "umap-manifold-projection": UmapPlayground,
   "t-sne-neighborhood-map": TsnePlayground,

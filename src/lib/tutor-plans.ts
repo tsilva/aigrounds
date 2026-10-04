@@ -1,3 +1,4 @@
+import { prTutorPlan } from "@/modules/precision-recall-curves-imbalance/learning-experiments";
 import { rocTutorPlan } from "@/modules/roc-auc-thresholds/learning-experiments";
 import { classificationTutorPlan } from "@/modules/classification-metrics-foundations/learning-experiments";
 import { biasTutorPlan as tradeoffTutorPlan } from "@/modules/bias-variance-tradeoff/learning-experiments";
@@ -78,6 +79,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "precision-recall-curves-imbalance": prTutorPlan,
   "roc-auc-thresholds": rocTutorPlan,
   "classification-metrics-foundations": classificationTutorPlan,
   "bias-variance-tradeoff": tradeoffTutorPlan,

@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": 35,
+  "title": "Precision-Recall Curves & Imbalance",
+  "slug": "precision-recall-curves-imbalance",
+  "modulePath": "src/modules/precision-recall-curves-imbalance",
+  "mockupPath": "src/modules/precision-recall-curves-imbalance/design/accepted-mockup.png",
+  "promptPath": "src/modules/precision-recall-curves-imbalance/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-20960bc1-fccc-40f1-9989-1fe9d7867ad3.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 2,
+  "refinements": [
+    "Use canonical shared toolbar and rail; remove generated Next step action button, use plain gated instruction.",
+    "Derive every curve point, AP rectangle and selected diamond from the engine; raster geometry is illustrative.",
+    "Preserve all score-group points, including non-monotonic precision and zero-width groups.",
+    "Expose precision undefined with no selected diamond when no prediction is positive."
+  ]
+}

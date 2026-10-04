@@ -1,3 +1,4 @@
+import { TsnePlayground } from "@/modules/t-sne-neighborhood-map/TsnePlayground";
 import { PcaPlayground } from "@/modules/pca-principal-components/PcaPlayground";
 import { ProjectionPlayground } from "@/modules/projection-foundations/ProjectionPlayground";
 import { VectorPlayground } from "@/modules/vector-geometry-similarity/VectorPlayground";
@@ -73,6 +74,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "t-sne-neighborhood-map": TsnePlayground,
   "pca-principal-components": PcaPlayground,
   "projection-foundations": ProjectionPlayground,
   "vector-geometry-similarity": VectorPlayground,

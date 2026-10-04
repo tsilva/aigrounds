@@ -1,3 +1,4 @@
+import { tsneTutorPlan } from "@/modules/t-sne-neighborhood-map/learning-experiments";
 import { pcaTutorPlan } from "@/modules/pca-principal-components/learning-experiments";
 import { projectionTutorPlan } from "@/modules/projection-foundations/learning-experiments";
 import { vectorTutorPlan } from "@/modules/vector-geometry-similarity/learning-experiments";
@@ -84,6 +85,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "t-sne-neighborhood-map": tsneTutorPlan,
   "pca-principal-components": pcaTutorPlan,
   "projection-foundations": projectionTutorPlan,
   "vector-geometry-similarity": vectorTutorPlan,

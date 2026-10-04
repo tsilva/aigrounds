@@ -1,3 +1,4 @@
+import { retrievalTutorPlan } from "@/modules/embedding-retrieval/learning-experiments";
 import { umapTutorPlan } from "@/modules/umap-manifold-projection/learning-experiments";
 import { tsneTutorPlan } from "@/modules/t-sne-neighborhood-map/learning-experiments";
 import { pcaTutorPlan } from "@/modules/pca-principal-components/learning-experiments";
@@ -86,6 +87,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "embedding-retrieval": retrievalTutorPlan,
   "umap-manifold-projection": umapTutorPlan,
   "t-sne-neighborhood-map": tsneTutorPlan,
   "pca-principal-components": pcaTutorPlan,

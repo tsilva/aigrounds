@@ -1,0 +1,32 @@
+{
+  "step": 45,
+  "title": "Embedding Retrieval Lab",
+  "slug": "embedding-retrieval",
+  "modulePath": "src/modules/embedding-retrieval",
+  "mockupPath": "src/modules/embedding-retrieval/design/accepted-mockup.png",
+  "promptPath": "src/modules/embedding-retrieval/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5d40b124-9e35-4e24-b4c5-b013bb9f5fdb.png",
+  "approval": "User authorized self-review without approval questions; V2 accepted",
+  "review": [
+    {
+      "version": 1,
+      "defects": [
+        "Perpendicular nonzero C/E cosine incorrectly Undefined instead of 0",
+        "Redundant coordinate list",
+        "Rotated y-axis title risks tick overlap"
+      ]
+    },
+    {
+      "version": 2,
+      "verdict": "Accepted with exact engine geometry and shared control styles authoritative"
+    }
+  ],
+  "refinements": [
+    "Actual equal-unit square uses fixed \u22125..5 axes from engine, rather than illustrative raster \u22124..4",
+    "Use shared Similarity rule toggle buttons, not illustrative radios",
+    "One query handle; native component editors and sliders are equivalent",
+    "Exact coincident source IDs share glyphs but retain separate table rows; moved labels use leaders",
+    "Short Guide opening; detailed mathematical context remains background",
+    "All six ranked rows provide coordinates, both scores and per-ID inclusion without duplicate result cards"
+  ]
+}

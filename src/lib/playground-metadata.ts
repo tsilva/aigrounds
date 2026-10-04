@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "embedding-retrieval",
+    layout: "guided-discovery",
+    kicker: "Move a query; track the ranked results.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: [
+      "Trace query-caused reordering while stored vectors stay fixed.",
+      "Distinguish raw Euclidean proximity from nonzero cosine alignment.",
+      "Separate top-k selection from scores and semantic relevance.",
+      "Preserve duplicate IDs and handle undefined zero-vector cosine.",
+    ],
+    title: "Embedding Retrieval Lab",
+    tag: "retrieval",
+    summary:
+      "Move a query point and watch retrieved items reorder.",
+    concepts: ["Embeddings", "Query vectors", "Nearest-neighbor retrieval"],
+  },
+  {
     slug: "umap-manifold-projection",
     layout: "guided-discovery",
     title: "UMAP Manifold Projection Lab",
@@ -1254,14 +1271,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
   },
 
-  {
-    slug: "embedding-retrieval",
-    title: "Embedding Retrieval Lab",
-    tag: "retrieval",
-    summary:
-      "Move a query point and watch retrieved items reorder.",
-    concepts: ["Embeddings", "Query vectors", "Nearest-neighbor retrieval"],
-  },
+
   {
     slug: "retrieval-ranking-metrics",
     title: "Retrieval Ranking Metrics Lab",

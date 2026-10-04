@@ -1,0 +1,22 @@
+{
+  "step": 31,
+  "title": "Bias-Variance Tradeoff Lab",
+  "slug": "bias-variance-tradeoff",
+  "modulePath": "src/modules/bias-variance-tradeoff",
+  "mockupPath": "src/modules/bias-variance-tradeoff/design/accepted-mockup.png",
+  "promptPath": "src/modules/bias-variance-tradeoff/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-a489eafe-04bb-42c4-b73a-9b915e1bca80.png",
+  "review": "V3 self-reviewed under user authorization; schematic curves replaced with oracle-verified numerical geometry",
+  "rejected": [
+    "V1 misplaced probe truth and individual fit band",
+    "V2 lost experiment rail contents"
+  ],
+  "refinements": [
+    "Canonical shared horizontal progress, native controls, open summaries and Guide CTA",
+    "All32 exact curve paths replace schematic raster plot",
+    "Three-decimal summaries fit narrow columns; six-decimal formulas/tables",
+    "Exact probe square/diamond and readable numeric equivalents",
+    "Fixed X−2..2/Y−4..12 scales"
+  ],
+  "scope": "Finite exact independent-noise training distribution, actual polynomial least squares and fresh-response error; no universal complexity rule"
+}

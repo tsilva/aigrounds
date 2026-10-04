@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "bias-variance-tradeoff",
+    layout: "guided-discovery",
+    title: "Bias-Variance Tradeoff Lab",
+    tag: "generalization",
+    kicker: "Compare repeated fits, not just one training score.",
+    estimatedDuration: "7 to 10 minutes",
+    summary:
+      "Tune model flexibility and see underfitting, useful fit, and overfitting as bias and variance move.",
+    concepts: ["Bias", "Variance", "Model flexibility"],
+    learningGoals: [
+      "Separate average-fit bias from repeated-training variance at a fixed prediction location.",
+      "Reconstruct expected squared error with independent response noise.",
+      "Reject zero-training-error and universal model-complexity guarantees.",
+      "Transfer to a new noise and probe condition without conflating one fit with an expectation.",
+    ],
+  },
+  {
     slug: "train-test-generalization",
     layout: "guided-discovery",
     title: "Train/Test Split & Generalization Lab",
@@ -1037,14 +1054,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "bias-variance-tradeoff",
-    title: "Bias-Variance Tradeoff Lab",
-    tag: "generalization",
-    summary:
-      "Tune model flexibility and see underfitting, useful fit, and overfitting as bias and variance move.",
-    concepts: ["Bias", "Variance", "Model flexibility"],
-  },
+
   {
     slug: "classification-metrics-foundations",
     title: "Classification Metrics Foundations",

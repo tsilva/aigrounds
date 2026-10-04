@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Bias–Variance Tradeoff](https://aigrounds.tsilva.eu/playgrounds/bias-variance-tradeoff) separates average-fit bias, repeated-training variance and independent response noise in an exactly enumerated finite model.
+
 - [Train/Test Split & Generalization](https://aigrounds.tsilva.eu/playgrounds/train-test-generalization) separates fitting, validation-based choice and later Test evaluation, with an explicit contaminated-fitting comparison.
 
 - [R Squared & Residual Diagnostics](https://aigrounds.tsilva.eu/playgrounds/r-squared-residual-diagnostics) compares equal-score residual patterns and interprets zero or negative scores against the observed-mean benchmark.

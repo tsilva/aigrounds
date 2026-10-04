@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [R Squared & Residual Diagnostics](https://aigrounds.tsilva.eu/playgrounds/r-squared-residual-diagnostics) compares equal-score residual patterns and interprets zero or negative scores against the observed-mean benchmark.
+
 - [Least Squares Loss Landscape](https://aigrounds.tsilva.eu/playgrounds/least-squares-loss-landscape) maps slope and intercept to squared error, distinguishing equal-error contours from one joint minimum.
 
 - [Linear Regression Line Fitting](https://aigrounds.tsilva.eu/playgrounds/linear-regression-line-fitting) moves a candidate line through fixed observations and compares its signed vertical residuals with a revealed least-squares reference.

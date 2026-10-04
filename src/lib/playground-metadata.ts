@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "r-squared-residual-diagnostics",
+    layout: "guided-discovery",
+    title: "R Squared & Residual Diagnostics",
+    tag: "regression",
+    kicker: "Compare the score; inspect what the residuals hide.",
+    estimatedDuration: "6 to 9 minutes",
+    summary:
+      "Pair the same fit score with different residual patterns to spot misleading models.",
+    concepts: ["R squared", "Residual plots", "Unexplained variance"],
+    learningGoals: [
+      "Reconstruct R² against the observed-mean squared-error benchmark.",
+      "Distinguish coordinate changes from data and prediction changes.",
+      "Compare equal-score residual patterns without causal or validity claims.",
+      "Interpret zero, negative and new-scale scores with appropriate limits.",
+    ],
+  },
+  {
     slug: "least-squares-loss-landscape",
     layout: "guided-discovery",
     title: "Least Squares Loss Landscape",
@@ -1001,14 +1018,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "r-squared-residual-diagnostics",
-    title: "R Squared & Residual Diagnostics",
-    tag: "regression",
-    summary:
-      "Pair the same fit score with different residual patterns to spot misleading models.",
-    concepts: ["R squared", "Residual plots", "Unexplained variance"],
-  },
+
   {
     slug: "train-test-generalization",
     title: "Train/Test Split & Generalization Lab",

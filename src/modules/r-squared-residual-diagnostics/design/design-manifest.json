@@ -1,0 +1,17 @@
+{
+  "step": 28,
+  "title": "R Squared & Residual Diagnostics",
+  "slug": "r-squared-residual-diagnostics",
+  "modulePath": "src/modules/r-squared-residual-diagnostics",
+  "mockupPath": "src/modules/r-squared-residual-diagnostics/design/accepted-mockup.png",
+  "promptPath": "src/modules/r-squared-residual-diagnostics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-0e303e05-16c6-4635-8882-a1ea1e291cb5.png",
+  "review": "V1 self-reviewed under explicit user authorization",
+  "refinements": [
+    "Canonical shared horizontal Predict/Try/Explain progress replaces raster vertical labels",
+    "Native shared model/view controls and residual-scale slider/editor",
+    "Engine numeric axes and eight preserved identities replace schematic raster geometry",
+    "Multiplicity labels and optional exact table preserve coincident pairs"
+  ],
+  "scope": "Constructed equal-score patterns and descriptive mean-benchmark R\u00b2; no random-error, inference, causal or held-out performance claim"
+}

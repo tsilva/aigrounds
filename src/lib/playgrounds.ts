@@ -1,3 +1,4 @@
+import { DiagnosticsPlayground } from "@/modules/r-squared-residual-diagnostics/DiagnosticsPlayground";
 import { LandscapePlayground } from "@/modules/least-squares-loss-landscape/LandscapePlayground";
 import { LinePlayground } from "@/modules/linear-regression-line-fitting/LinePlayground";
 import { SimpsonPlayground } from "@/modules/simpsons-paradox-confounding/SimpsonPlayground";
@@ -62,6 +63,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "r-squared-residual-diagnostics": DiagnosticsPlayground,
   "least-squares-loss-landscape": LandscapePlayground,
   "linear-regression-line-fitting": LinePlayground,
   "simpsons-paradox-confounding": SimpsonPlayground,

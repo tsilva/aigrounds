@@ -1,3 +1,4 @@
+import { regularizationTutorPlan } from "@/modules/regularization/learning-experiments";
 import { contrastiveTutorPlan } from "@/modules/contrastive-loss/learning-experiments";
 import { calibrationTutorPlan } from "@/modules/calibration-reliability-diagrams/learning-experiments";
 import { penaltyTutorPlan } from "@/modules/log-loss-confidence-penalties/learning-experiments";
@@ -93,6 +94,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "regularization": regularizationTutorPlan,
   "contrastive-loss": contrastiveTutorPlan,
   "calibration-reliability-diagrams": calibrationTutorPlan,
   "log-loss-confidence-penalties": penaltyTutorPlan,

@@ -1,0 +1,18 @@
+{
+  "step": 56,
+  "slug": "regularization",
+  "title": "Regularization Lab",
+  "modulePath": "src/modules/regularization",
+  "mockupPath": "src/modules/regularization/design/accepted-mockup.png",
+  "promptPath": "src/modules/regularization/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-84863cda-7a1f-4ee6-aeb2-b4fc297eebea.png",
+  "approval": "User authorized self-review; V5 accepted after rejecting slope and label defects",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "mockupState": "Completed Experiment2: L1strength.25,weights(.5,0),data.3125pen.125obj.4375accuracy7/8. Initial page separatelystartsExperiment1 Unregularized.",
+  "refinements": [
+    "Engine maps exact sites, clipped score-zero line and both halfplanes instead of rastergeometry",
+    "Full verified8case table belowplot ratherthan tiny mockup table",
+    "Shared native weight/strength sliders, exactgrid search and allbestfit evidence",
+    "Threeopen summaries andinline trainingaccuracy; one rail Guide; original white/lavender/navy/indigo"
+  ]
+}

@@ -5,7 +5,7 @@
   "modulePath": "src/modules/embedding-retrieval",
   "mockupPath": "src/modules/embedding-retrieval/design/accepted-mockup.png",
   "promptPath": "src/modules/embedding-retrieval/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5d40b124-9e35-4e24-b4c5-b013bb9f5fdb.png",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-961cc88f-f44c-4cd2-b334-2f54f9c34064.png",
   "approval": "User authorized self-review without approval questions; V2 accepted",
   "review": [
     {
@@ -22,11 +22,22 @@
     }
   ],
   "refinements": [
-    "Actual equal-unit square uses fixed \u22125..5 axes from engine, rather than illustrative raster \u22124..4",
+    "Actual equal-unit square uses fixed −5..5 axes from engine, rather than illustrative raster −4..4",
     "Use shared Similarity rule toggle buttons, not illustrative radios",
     "One query handle; native component editors and sliders are equivalent",
     "Exact coincident source IDs share glyphs but retain separate table rows; moved labels use leaders",
     "Short Guide opening; detailed mathematical context remains background",
     "All six ranked rows provide coordinates, both scores and per-ID inclusion without duplicate result cards"
-  ]
+  ],
+  "designSystem": "DESIGN_SYSTEM.md",
+  "styleReference": "src/modules/mean-median-mode/design/accepted-mockup.png",
+  "styleCorrection": {
+    "reason": "User identified blue drift in recent generated mockups",
+    "review": "Restored navy text, indigo controls, lavender rail, boxed prediction choices, open summaries and single outlined rail Guide CTA.",
+    "implementation": "Existing shared renderer confirmed faithful to reference; no application style or teaching changes",
+    "refinements": [
+      "Actual Similarity rule uses shared two-button toggle, not mockup radio glyphs",
+      "Actual shared progress circles use inline labels and engine owns exact geometry"
+    ]
+  }
 }

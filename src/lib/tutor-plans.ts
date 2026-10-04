@@ -1,3 +1,4 @@
+import { diagnosticsTutorPlan } from "@/modules/r-squared-residual-diagnostics/learning-experiments";
 import { landscapeTutorPlan } from "@/modules/least-squares-loss-landscape/learning-experiments";
 import { lineTutorPlan } from "@/modules/linear-regression-line-fitting/learning-experiments";
 import { simpsonTutorPlan } from "@/modules/simpsons-paradox-confounding/learning-experiments";
@@ -73,6 +74,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "r-squared-residual-diagnostics": diagnosticsTutorPlan,
   "least-squares-loss-landscape": landscapeTutorPlan,
   "linear-regression-line-fitting": lineTutorPlan,
   "simpsons-paradox-confounding": simpsonTutorPlan,

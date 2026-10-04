@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "pca-principal-components",
+    layout: "guided-discovery",
+    title: "PCA & Principal Components Lab",
+    tag: "dimensionality",
+    kicker: "Rotate centered axes; decide what to keep.",
+    estimatedDuration: "7 to 10 minutes",
+    summary: "Rotate principal axes and watch variance concentrate into fewer dimensions.",
+    concepts: ["PCA", "Principal components", "Variance captured"],
+    learningGoals: [
+      "Center original points and distinguish scores from raw reconstruction.",
+      "Compare manual-axis variance with the computed PC1 maximum.",
+      "Explain one-component loss and a complete two-component reconstruction.",
+      "Handle non-unique principal directions and undefined zero-variance ratios without task-quality claims.",
+    ],
+  },
+  {
     slug: "projection-foundations",
     layout: "guided-discovery",
     title: "Projection Foundations Lab",
@@ -1204,14 +1220,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
-  },
-  {
-    slug: "pca-principal-components",
-    title: "PCA & Principal Components Lab",
-    tag: "dimensionality",
-    summary:
-      "Rotate principal axes and watch variance concentrate into fewer dimensions.",
-    concepts: ["PCA", "Principal components", "Variance captured"],
   },
   {
     slug: "t-sne-neighborhood-map",

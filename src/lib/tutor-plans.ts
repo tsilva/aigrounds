@@ -1,3 +1,4 @@
+import { pcaTutorPlan } from "@/modules/pca-principal-components/learning-experiments";
 import { projectionTutorPlan } from "@/modules/projection-foundations/learning-experiments";
 import { vectorTutorPlan } from "@/modules/vector-geometry-similarity/learning-experiments";
 import { distanceTutorPlan } from "@/modules/distance-metrics/learning-experiments";
@@ -83,6 +84,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "pca-principal-components": pcaTutorPlan,
   "projection-foundations": projectionTutorPlan,
   "vector-geometry-similarity": vectorTutorPlan,
   "distance-metrics": distanceTutorPlan,

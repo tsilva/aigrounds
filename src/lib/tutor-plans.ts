@@ -1,3 +1,4 @@
+import { scalingTutorPlan } from "@/modules/feature-scaling/learning-experiments";
 import { prTutorPlan } from "@/modules/precision-recall-curves-imbalance/learning-experiments";
 import { rocTutorPlan } from "@/modules/roc-auc-thresholds/learning-experiments";
 import { classificationTutorPlan } from "@/modules/classification-metrics-foundations/learning-experiments";
@@ -79,6 +80,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "feature-scaling": scalingTutorPlan,
   "precision-recall-curves-imbalance": prTutorPlan,
   "roc-auc-thresholds": rocTutorPlan,
   "classification-metrics-foundations": classificationTutorPlan,

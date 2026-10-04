@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Feature Scaling](https://aigrounds.tsilva.eu/playgrounds/feature-scaling) compares raw units, per-feature min–max normalization and z-score standardization with exact reference recipes, outliers and a constant-feature boundary.
+
 - [Precision-Recall Curves & Imbalance](https://aigrounds.tsilva.eu/playgrounds/precision-recall-curves-imbalance) isolates prevalence effects on accepted predictions and distinguishes a threshold point from non-interpolated average precision.
 
 - [ROC, AUC & Thresholds](https://aigrounds.tsilva.eu/playgrounds/roc-auc-thresholds) separates a threshold’s operating point from whole-ranking area, with grouped scores and half-credit ties.

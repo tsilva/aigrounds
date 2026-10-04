@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "feature-scaling",
+    layout: "guided-discovery",
+    title: "Feature Scaling Lab",
+    tag: "features",
+    kicker: "Change units; compare column transformations.",
+    estimatedDuration: "7 to 10 minutes",
+    summary:
+      "Rescale axes or features and watch the same points become comparable.",
+    concepts: ["Normalization", "Standardization", "Min-max scaling"],
+    learningGoals: [
+      "Trace unit changes to raw numerical contributions without adding information.",
+      "Reconstruct column-specific min–max normalization and unit cancellation.",
+      "Distinguish z-score center and spread from bounds, normality and outlier removal.",
+      "Handle constant reference features without a unit-variance or accuracy guarantee.",
+    ],
+  },
+  {
     slug: "precision-recall-curves-imbalance",
     layout: "guided-discovery",
     title: "Precision-Recall Curves & Imbalance",
@@ -1108,14 +1125,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "feature-scaling",
-    title: "Feature Scaling Lab",
-    tag: "features",
-    summary:
-      "Rescale axes or features and watch the same points become comparable.",
-    concepts: ["Normalization", "Standardization", "Min-max scaling"],
-  },
   {
     slug: "distance-metrics",
     title: "Distance Metrics Lab",

@@ -1,3 +1,4 @@
+import { VectorPlayground } from "@/modules/vector-geometry-similarity/VectorPlayground";
 import { DistancePlayground } from "@/modules/distance-metrics/DistancePlayground";
 import { ScalingPlayground } from "@/modules/feature-scaling/ScalingPlayground";
 import { PrPlayground } from "@/modules/precision-recall-curves-imbalance/PrPlayground";
@@ -70,6 +71,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "vector-geometry-similarity": VectorPlayground,
   "distance-metrics": DistancePlayground,
   "feature-scaling": ScalingPlayground,
   "precision-recall-curves-imbalance": PrPlayground,

@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Vector Geometry & Similarity](https://aigrounds.tsilva.eu/playgrounds/vector-geometry-similarity) moves signed 2D vectors, separates dot-product magnitude from cosine alignment, and treats zero vectors as an undefined-direction boundary.
+
 - [Distance Metrics](https://aigrounds.tsilva.eu/playgrounds/distance-metrics) moves a query through an equal-scale grid, compares Euclidean and Manhattan nearest cases, and retains exact ties and coincident identities under an explicit decision policy.
 
 - [Feature Scaling](https://aigrounds.tsilva.eu/playgrounds/feature-scaling) compares raw units, per-feature min–max normalization and z-score standardization with exact reference recipes, outliers and a constant-feature boundary.

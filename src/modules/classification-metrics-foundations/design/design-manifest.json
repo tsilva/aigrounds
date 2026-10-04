@@ -1,0 +1,16 @@
+{
+  "step": 32,
+  "title": "Classification Metrics Foundations",
+  "slug": "classification-metrics-foundations",
+  "modulePath": "src/modules/classification-metrics-foundations",
+  "mockupPath": "src/modules/classification-metrics-foundations/design/accepted-mockup.png",
+  "promptPath": "src/modules/classification-metrics-foundations/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-202306b9-4095-4da4-bcdc-27912b52ca52.png",
+  "review": "V1 self-reviewed; correct actual-row/predicted-column matrix counts and denominator states",
+  "refinements": [
+    "Canonical shared toolbar selected indigo state instead of literal selected text",
+    "Shared controls, rail, open summary definitions and optional details",
+    "Engine exact counts/ratios and full case identity table replace static illustration"
+  ],
+  "scope": "Twelve fixed binary labels, editable predictions and four positive-class metrics; no threshold or fitting"
+}

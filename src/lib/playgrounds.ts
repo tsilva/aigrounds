@@ -1,3 +1,4 @@
+import { ClassificationPlayground } from "@/modules/classification-metrics-foundations/ClassificationPlayground";
 import { BiasVariancePlayground } from "@/modules/bias-variance-tradeoff/BiasVariancePlayground";
 import { GeneralizationPlayground } from "@/modules/train-test-generalization/GeneralizationPlayground";
 import { DiagnosticsPlayground } from "@/modules/r-squared-residual-diagnostics/DiagnosticsPlayground";
@@ -65,6 +66,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "classification-metrics-foundations": ClassificationPlayground,
   "bias-variance-tradeoff": BiasVariancePlayground,
   "train-test-generalization": GeneralizationPlayground,
   "r-squared-residual-diagnostics": DiagnosticsPlayground,

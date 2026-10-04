@@ -1,0 +1,21 @@
+{
+  "lessonPlanStep": 71,
+  "title": "Context Windows & Attention Masks",
+  "slug": "context-windows-attention-masks",
+  "modulePath": "src/modules/context-windows-attention-masks",
+  "mockupPath": "src/modules/context-windows-attention-masks/design/accepted-mockup.png",
+  "promptPath": "src/modules/context-windows-attention-masks/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-acb6f98e-7a59-4646-a4c3-5ab647a581a6.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 universal self-always-allowed claim",
+    "V2 and V3 omitted/misnumbered token headers",
+    "V4 accurate grid but irrelevant point instruction and unsupported help shortcut"
+  ],
+  "review": "V5 has all eight correct global headers,10allowedcells in baseline, correct selected row and4/3/1/0 counts; original white/lavender/purple scheme and single rail Guide.",
+  "approvedRefinements": [
+    "Use shared native control layout with responsive two-column or stacked controls; exact slider mapping comes from native ranges, not raster thumb positions.",
+    "Show one full read-only permission matrix and a selected-query reason table with color-independent glyphs, semantic labels and keyboard scrolling.",
+    "Keep query-outside-window and separate padding-query policy explicit. No redundant token strip."
+  ]
+}

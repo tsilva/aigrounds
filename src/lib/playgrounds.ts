@@ -1,3 +1,4 @@
+import { MaskPlayground } from "@/modules/context-windows-attention-masks/MaskPlayground";
 import { PerplexityPlayground } from "@/modules/llm-loss-perplexity/PerplexityPlayground";
 import { ForwardPassPlayground } from "@/modules/neural-network-forward-pass/ForwardPassPlayground";
 import { ActivationPlayground } from "@/modules/activation-functions/ActivationPlayground";
@@ -88,6 +89,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "context-windows-attention-masks": MaskPlayground,
   "llm-loss-perplexity": PerplexityPlayground,
   "neural-network-forward-pass": ForwardPassPlayground,
   "activation-functions": ActivationPlayground,

@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": 72,
+  "title": "Positional Encoding & Token Order",
+  "slug": "positional-encoding-token-order",
+  "modulePath": "src/modules/positional-encoding-token-order",
+  "mockupPath": "src/modules/positional-encoding-token-order/design/accepted-mockup.png",
+  "promptPath": "src/modules/positional-encoding-token-order/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-9a961332-00e1-4ffd-a5ee-bac231903777.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 ambiguous Queryposition relative-to-reference definition and missing visible slot order"
+  ],
+  "review": "V2 correct actualzero-basedposition, allthree slots, signed1/0/-1 bars/reference, vector table andoriginalwhite/lavender/purple scheme.",
+  "approvedRefinements": [
+    "Sharedcontrols reflowinto two columns orstack; no dragged tokens or plot handles.",
+    "Exact constructiontable includes vectorlength andscoredifferences tosupportnorm/relativeoffset misconceptions.",
+    "SVGsignedscores derivefromengineunroundedgeometry; native chart/table keyboard scrolling andexacttable equivalents."
+  ]
+}

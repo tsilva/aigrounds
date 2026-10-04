@@ -1,3 +1,4 @@
+import { positionTutorPlan } from "@/modules/positional-encoding-token-order/learning-experiments";
 import { maskTutorPlan } from "@/modules/context-windows-attention-masks/learning-experiments";
 import { perplexityTutorPlan } from "@/modules/llm-loss-perplexity/learning-experiments";
 import { forwardTutorPlan } from "@/modules/neural-network-forward-pass/learning-experiments";
@@ -100,6 +101,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "positional-encoding-token-order": positionTutorPlan,
   "context-windows-attention-masks": maskTutorPlan,
   "llm-loss-perplexity": perplexityTutorPlan,
   "neural-network-forward-pass": forwardTutorPlan,

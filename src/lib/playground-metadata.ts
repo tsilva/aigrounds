@@ -33,6 +33,18 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "positional-encoding-token-order",
+    layout: "guided-discovery",
+    kicker: "Rearrange tokens. Compare identity with position signals.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: ["Separate token identity from zero-based position.", "Compare unchanged, additive and rotary query/key vectors.", "Explain raw-score dependence on relative offsets.", "Transfer a reordered and shifted sequence without language-understanding claims."],
+    title: "Positional Encoding & Token Order",
+    tag: "transformers",
+    summary:
+      "Rearrange tokens and compare position signals that let attention recover word order.",
+    concepts: ["Token order", "Position encodings", "Sequence representations"],
+  },
+  {
     slug: "context-windows-attention-masks",
     layout: "guided-discovery",
     kicker: "Move the context window. See which keys each query may use.",
@@ -1451,14 +1463,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
   },
 
-  {
-    slug: "positional-encoding-token-order",
-    title: "Positional Encoding & Token Order",
-    tag: "transformers",
-    summary:
-      "Rearrange tokens and compare position signals that let attention recover word order.",
-    concepts: ["Token order", "Position encodings", "Sequence representations"],
-  },
+
   {
     slug: "reference-answer-metrics",
     title: "Reference Answer Metrics Lab",

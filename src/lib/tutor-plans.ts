@@ -1,3 +1,4 @@
+import { banditTutorPlan } from "@/modules/exploration-exploitation/learning-experiments";
 import { kmeansTutorPlan } from "@/modules/k-means-clustering/learning-experiments";
 import { regularizationTutorPlan } from "@/modules/regularization/learning-experiments";
 import { contrastiveTutorPlan } from "@/modules/contrastive-loss/learning-experiments";
@@ -95,6 +96,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "exploration-exploitation": banditTutorPlan,
   "k-means-clustering": kmeansTutorPlan,
   "regularization": regularizationTutorPlan,
   "contrastive-loss": contrastiveTutorPlan,

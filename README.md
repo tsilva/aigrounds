@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Exploration vs Exploitation Lab](https://aigrounds.tsilva.eu/playgrounds/exploration-exploitation) compares Greedy and UCB on authored option rewards, with manual trials, count bonuses, exact score ties and a twelve-trial budget.
 - [K-Means Clustering Studio](https://aigrounds.tsilva.eu/playgrounds/k-means-clustering) separates nearest-center assignment from coordinate-mean updates with editable points and centroids, exact ties, held SSE and an explicit empty-cluster policy.
 - [Regularization Lab](https://aigrounds.tsilva.eu/playgrounds/regularization) separates penalty selection from an explicit two-weight grid fit and compares data loss, L1 zeros, L2 shrinkage, score ties and decision boundaries.
 - [Contrastive Loss Lab](https://aigrounds.tsilva.eu/playgrounds/contrastive-loss): move three scalar embeddings and tune a positive margin to reconstruct two fixed labeled pair penalties and their mean.

@@ -1,0 +1,18 @@
+{
+  "step": 50,
+  "slug": "log-loss-confidence-penalties",
+  "title": "Log Loss Confidence Penalties",
+  "modulePath": "src/modules/log-loss-confidence-penalties",
+  "mockupPath": "src/modules/log-loss-confidence-penalties/design/accepted-mockup.png",
+  "promptPath": "src/modules/log-loss-confidence-penalties/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-1620c7e5-8333-41b0-9453-79e0d8c4285d.png",
+  "approval": "User authorized self-review; original shared-render reference V5 accepted",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "styleReference": "Class Scores actual shared-component rendering, original Mean Median Mode palette",
+  "refinements": [
+    "Exact shared tokens/control typography; no blue alternate theme",
+    "Engine finite geometry, explicit unbounded marker for infinity",
+    "Predictions before atomic editor actions; actual scenario labels and known-label evidence",
+    "Open workbench summaries, single rail Guide"
+  ]
+}

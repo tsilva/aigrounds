@@ -1,3 +1,4 @@
+import { LogLossPlayground } from "@/modules/log-loss-confidence-penalties/LogLossPlayground";
 import { ClassScorePlayground } from "@/modules/class-score-logits/ClassScorePlayground";
 import { EntropyPlayground } from "@/modules/entropy-information/EntropyPlayground";
 import { RankingPlayground } from "@/modules/retrieval-ranking-metrics/RankingPlayground";
@@ -79,6 +80,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "log-loss-confidence-penalties": LogLossPlayground,
   "class-score-logits": ClassScorePlayground,
   "entropy-information": EntropyPlayground,
   "retrieval-ranking-metrics": RankingPlayground,

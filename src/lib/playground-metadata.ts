@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "umap-manifold-projection",
+    layout: "guided-discovery",
+    title: "UMAP Manifold Projection Lab",
+    tag: "dimensionality",
+    kicker: "Change graph scale; inspect map packing.",
+    estimatedDuration: "7 to 10 minutes",
+    summary: "Adjust neighbor and distance settings to compare local clusters with global shape.",
+    concepts: ["UMAP", "Nearest neighbors", "Manifold structure"],
+    learningGoals: [
+      "Trace source graph connectivity as neighborhood scale changes.",
+      "Separate map packing from source graph membership and normalized probability rows.",
+      "Explain soft minimum-distance behavior and finite graph-objective fitting.",
+      "Transfer local distance normalization to uniform source rescaling without global-unit guarantees.",
+    ],
+  },
+  {
     slug: "t-sne-neighborhood-map",
     layout: "guided-discovery",
     title: "t-SNE Neighborhood Map",
@@ -1237,14 +1253,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
       "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
   },
-  {
-    slug: "umap-manifold-projection",
-    title: "UMAP Manifold Projection Lab",
-    tag: "dimensionality",
-    summary:
-      "Adjust neighbor and distance settings to compare local clusters with global shape.",
-    concepts: ["UMAP", "Nearest neighbors", "Manifold structure"],
-  },
+
   {
     slug: "embedding-retrieval",
     title: "Embedding Retrieval Lab",

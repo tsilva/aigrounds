@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Contrastive Loss Lab](https://aigrounds.tsilva.eu/playgrounds/contrastive-loss): move three scalar embeddings and tune a positive margin to reconstruct two fixed labeled pair penalties and their mean.
 - [Calibration & Reliability Diagrams](https://aigrounds.tsilva.eu/playgrounds/calibration-reliability-diagrams) compares count-weighted confidence bins, ECE binning effects and confidence-based abstention with explicit coverage and retained denominators.
 - [Log Loss Confidence Penalties](https://aigrounds.tsilva.eu/playgrounds/log-loss-confidence-penalties) compares individual probability penalties, unchanged accuracy and three-example mean loss, including exact zero/one endpoints.
 - [Class Scores & Logits Lab](https://aigrounds.tsilva.eu/playgrounds/class-score-logits) edits raw signed scores, separates common shifts from positive gap scaling, and handles tied maxima before any probability conversion.

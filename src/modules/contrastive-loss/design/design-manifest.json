@@ -1,0 +1,17 @@
+{
+  "step": 54,
+  "slug": "contrastive-loss",
+  "title": "Contrastive Loss Lab",
+  "modulePath": "src/modules/contrastive-loss",
+  "mockupPath": "src/modules/contrastive-loss/design/accepted-mockup.png",
+  "promptPath": "src/modules/contrastive-loss/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-a4ae5a11-5bb0-4bb5-bd15-51cf3b5de037.png",
+  "approval": "User authorized self-review; original shared reference, accepted",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "refinements": [
+    "Exact engine-driven shared0..100 coordinates and distance-strip endpoints replace illustrative raster positions",
+    "Shared native handles and collision packing with fixed3-rowheight prevent controljump",
+    "One exact point editor and margin control; no temperature/training or force arrows",
+    "Two-pair accessible calculation table, squared coordinate units, open3column summaries; one rail Guide CTA"
+  ]
+}

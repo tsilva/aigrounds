@@ -1,3 +1,4 @@
+import { maskTutorPlan } from "@/modules/context-windows-attention-masks/learning-experiments";
 import { perplexityTutorPlan } from "@/modules/llm-loss-perplexity/learning-experiments";
 import { forwardTutorPlan } from "@/modules/neural-network-forward-pass/learning-experiments";
 import { activationTutorPlan } from "@/modules/activation-functions/learning-experiments";
@@ -99,6 +100,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "context-windows-attention-masks": maskTutorPlan,
   "llm-loss-perplexity": perplexityTutorPlan,
   "neural-network-forward-pass": forwardTutorPlan,
   "activation-functions": activationTutorPlan,

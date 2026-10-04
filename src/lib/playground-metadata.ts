@@ -33,6 +33,18 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "context-windows-attention-masks",
+    layout: "guided-discovery",
+    kicker: "Move the context window. See which keys each query may use.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: ["Read query rows and key columns with self-inclusive causal direction.", "Intersect window, direction and padding-key eligibility.", "Separate key exclusion from padding-query policy.", "Transfer to new masks without inventing attention weights."],
+    title: "Context Windows & Attention Masks",
+    tag: "transformers",
+    summary:
+      "Slide a context window and apply masks to see which tokens can attend to which past text.",
+    concepts: ["Context windows", "Attention masks", "Token visibility"],
+  },
+  {
     slug: "llm-loss-perplexity",
     layout: "guided-discovery",
     kicker: "Change a token probability. Compare local cost with sequence cost.",
@@ -1438,14 +1450,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
       "Remove mean-centering and watch root-mean-square scaling keep transformer activations controlled.",
     concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
   },
-  {
-    slug: "context-windows-attention-masks",
-    title: "Context Windows & Attention Masks",
-    tag: "transformers",
-    summary:
-      "Slide a context window and apply masks to see which tokens can attend to which past text.",
-    concepts: ["Context windows", "Attention masks", "Token visibility"],
-  },
+
   {
     slug: "positional-encoding-token-order",
     title: "Positional Encoding & Token Order",

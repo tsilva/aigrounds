@@ -1,3 +1,4 @@
+import { RmsPlayground } from "@/modules/rms-normalization/RmsPlayground";
 import { PositionPlayground } from "@/modules/positional-encoding-token-order/PositionPlayground";
 import { MaskPlayground } from "@/modules/context-windows-attention-masks/MaskPlayground";
 import { PerplexityPlayground } from "@/modules/llm-loss-perplexity/PerplexityPlayground";
@@ -90,6 +91,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "rms-normalization": RmsPlayground,
   "positional-encoding-token-order": PositionPlayground,
   "context-windows-attention-masks": MaskPlayground,
   "llm-loss-perplexity": PerplexityPlayground,

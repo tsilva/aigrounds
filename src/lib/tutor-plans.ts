@@ -1,3 +1,4 @@
+import { rmsTutorPlan } from "@/modules/rms-normalization/learning-experiments";
 import { positionTutorPlan } from "@/modules/positional-encoding-token-order/learning-experiments";
 import { maskTutorPlan } from "@/modules/context-windows-attention-masks/learning-experiments";
 import { perplexityTutorPlan } from "@/modules/llm-loss-perplexity/learning-experiments";
@@ -101,6 +102,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "rms-normalization": rmsTutorPlan,
   "positional-encoding-token-order": positionTutorPlan,
   "context-windows-attention-masks": maskTutorPlan,
   "llm-loss-perplexity": perplexityTutorPlan,

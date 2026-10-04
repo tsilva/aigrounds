@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "rms-normalization",
+    layout: "guided-discovery",
+    kicker: "Rescale a vector. Compare RMS scaling with mean centering.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: ["Separate RMS scaling from mean centering.", "Trace epsilon inside the root and gain after normalization.", "Explain exact rescaling and singular denominator boundaries.", "Transfer to a centered vector without a unit-RMS guarantee."],
+    title: "RMSNorm Lab",
+    tag: "transformers",
+    summary:
+      "Remove mean-centering and watch root-mean-square scaling keep transformer activations controlled.",
+    concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
+  },
+
+  {
     slug: "positional-encoding-token-order",
     layout: "guided-discovery",
     kicker: "Rearrange tokens. Compare identity with position signals.",
@@ -1454,14 +1467,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "rms-normalization",
-    title: "RMSNorm Lab",
-    tag: "transformers",
-    summary:
-      "Remove mean-centering and watch root-mean-square scaling keep transformer activations controlled.",
-    concepts: ["RMS scaling", "Residual streams", "Transformer stability"],
-  },
 
 
   {

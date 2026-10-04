@@ -1,0 +1,19 @@
+{
+  "step": 57,
+  "slug": "k-means-clustering",
+  "title": "K-Means Clustering Studio",
+  "modulePath": "src/modules/k-means-clustering",
+  "mockupPath": "src/modules/k-means-clustering/design/accepted-mockup.png",
+  "promptPath": "src/modules/k-means-clustering/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-d57d425b-855b-4de1-81ac-493dfb2d1637.png",
+  "approval": "User authorized self-review; V2 accepted after correcting misleading drag instruction",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "mockupState": "Completed Experiment1 assigned baseline; centers unchanged, counts3/3,SSE2600. Initial application starts unassigned.",
+  "refinements": [
+    "Shared LearningPage/rail/styles enforce original white/lavender/navy/indigo",
+    "Exact static engine chart, editable points and centroids through one object selector and native continuous X/Y controls",
+    "Full distance/member and coordinate-mean tables below open summaries, preserving coincidence evidence",
+    "Separate Assign and Update actions; full precision fractional means retained",
+    "Engine separates all eight labels on vertical lanes with leaders while retaining exact mark geometry"
+  ]
+}

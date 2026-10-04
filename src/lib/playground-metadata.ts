@@ -33,6 +33,18 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "k-means-clustering",
+    layout: "guided-discovery",
+    kicker: "Assign members. Then move their centroids.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: ["Assign nearest members from squared distances and the tie rule.", "Compute coordinate means while keeping memberships fixed.", "Handle an empty group's undefined mean under an explicit policy.", "Reconstruct held SSE without accuracy or global-optimum claims."],
+    title: "K-Means Clustering Studio",
+    tag: "clustering",
+    summary:
+      "Place points and centroids, then step through assign/update cycles.",
+    concepts: ["Centroids", "Assignment", "Clusters"],
+  },
+  {
     slug: "regularization",
     layout: "guided-discovery",
     kicker: "Choose a penalty. Then fit the weights.",
@@ -1365,14 +1377,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "k-means-clustering",
-    title: "K-Means Clustering Studio",
-    tag: "clustering",
-    summary:
-      "Place points and centroids, then step through assign/update cycles.",
-    concepts: ["Centroids", "Assignment", "Clusters"],
-  },
+
   {
     slug: "exploration-exploitation",
     title: "Exploration vs Exploitation Lab",

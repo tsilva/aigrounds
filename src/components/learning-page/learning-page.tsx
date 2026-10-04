@@ -158,7 +158,7 @@ export function LessonAction({ children, onClick, disabled = false }: {
 }
 
 export function LessonRangeControl({ label, value, min, max, step, unit = "", help, onChange }: {
-  label: string; value: number; min: number; max: number; step: number;
+  label: string; value: number; min: number; max: number; step: number | "any";
   unit?: string; help: string; onChange: (value: number) => void;
 }) {
   const helpId = useId();
@@ -170,6 +170,7 @@ export function LessonRangeControl({ label, value, min, max, step, unit = "", he
   }
   function normalize(next: number) {
     const bounded = Math.min(max, Math.max(min, next));
+    if (step === "any") return bounded;
     const snapped = Number((min + Math.round((bounded - min) / step + 1e-9) * step).toFixed(10));
     return Math.min(max, Math.max(min, snapped));
   }

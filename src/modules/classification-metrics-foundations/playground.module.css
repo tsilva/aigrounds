@@ -1,0 +1,22 @@
+.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
+.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.evidence p { font-size: 15px; line-height: 1.6; margin: 9px 0; }
+.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
+.matrix { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 22px 0; }
+.matrix caption { text-align: left; font-size: 14px; color: #536487; margin-bottom: 12px; }
+.matrix th, .matrix td { border: 1px solid #dfe4f4; padding: 16px 8px; text-align: center; font-size: 14px; overflow-wrap: anywhere; }
+.matrix th { background: #f6f5ff; font-weight: 600; }
+.matrix td strong { display: block; margin-top: 6px; font-size: 32px; font-family: var(--font-ibm-plex-mono), monospace; }
+.matrix [data-bucket="tp"], .matrix [data-bucket="tn"] { color: #087c78; }
+.matrix [data-bucket="fp"], .matrix [data-bucket="fn"] { color: #ad4508; }
+.editor { display: grid; grid-template-columns: minmax(140px,1fr) minmax(0,2fr); gap: 24px; align-items: start; }
+.bulk { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.evidence details { margin: 16px 0; }
+.evidence summary { cursor: pointer; font-weight: 600; }
+.evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.table { overflow-x: auto; margin-top: 12px; }
+.table:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
+.table table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 14px; }
+.table th, .table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #dfe4f4; }
+.table [aria-current] { background: #f6f5ff; }
+@media (max-width:520px) { .editor { grid-template-columns: minmax(0,1fr); gap: 10px; } }

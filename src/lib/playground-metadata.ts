@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "classification-metrics-foundations",
+    layout: "guided-discovery",
+    title: "Classification Metrics Foundations",
+    tag: "evaluation",
+    kicker: "Count the cases behind each score.",
+    estimatedDuration: "6 to 9 minutes",
+    summary:
+      "Build confusion-matrix intuition before tuning a decision threshold or reading benchmark scores.",
+    concepts: ["Accuracy", "Precision", "Recall", "F1"],
+    learningGoals: [
+      "Trace actual and predicted labels to the four confusion cells.",
+      "Distinguish accuracy, precision and recall denominators.",
+      "Calculate F1 and preserve undefined zero-denominator cases.",
+      "Transfer across class balance without universal metric or future-performance claims.",
+    ],
+  },
+  {
     slug: "bias-variance-tradeoff",
     layout: "guided-discovery",
     title: "Bias-Variance Tradeoff Lab",
@@ -1055,14 +1072,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "classification-metrics-foundations",
-    title: "Classification Metrics Foundations",
-    tag: "evaluation",
-    summary:
-      "Build confusion-matrix intuition before tuning a decision threshold or reading benchmark scores.",
-    concepts: ["Accuracy", "Precision", "Recall", "F1"],
-  },
+
   {
     slug: "roc-auc-thresholds",
     title: "ROC, AUC & Thresholds Lab",

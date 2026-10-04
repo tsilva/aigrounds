@@ -44,6 +44,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Classification Metrics Foundations](https://aigrounds.tsilva.eu/playgrounds/classification-metrics-foundations) traces binary predictions to confusion counts, metric denominators and undefined boundaries before threshold tuning.
+
 - [Bias–Variance Tradeoff](https://aigrounds.tsilva.eu/playgrounds/bias-variance-tradeoff) separates average-fit bias, repeated-training variance and independent response noise in an exactly enumerated finite model.
 
 - [Train/Test Split & Generalization](https://aigrounds.tsilva.eu/playgrounds/train-test-generalization) separates fitting, validation-based choice and later Test evaluation, with an explicit contaminated-fitting comparison.

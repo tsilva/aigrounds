@@ -1,0 +1,24 @@
+{
+  "step": 29,
+  "title": "Train/Test Split & Generalization Lab",
+  "slug": "train-test-generalization",
+  "modulePath": "src/modules/train-test-generalization",
+  "mockupPath": "src/modules/train-test-generalization/design/accepted-mockup.png",
+  "promptPath": "src/modules/train-test-generalization/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-cd9ee59e-5c3f-4423-8b1c-e6cf00ab8305.png",
+  "review": "V4 self-reviewed under user authorization",
+  "rejected": [
+    "V1: instruction text leaked into learner action and one validation marker absent",
+    "V2: essential model/fitting-source controls absent",
+    "V3: validation symbol count still inconsistent"
+  ],
+  "refinements": [
+    "Canonical shared navigation/toolbar/progress/actions",
+    "Engine fixed numeric axes and all12prediction markers replace schematic raster positions",
+    "3decimal MSE display supports exact comparisons",
+    "Visible Model and Fitting rows group labels",
+    "Native table preserves12identities with Test targets and errors withheld until evaluation",
+    "Explicit contaminated-fit status and repeatable-toy limitations"
+  ],
+  "scope": "Fixed12pair actual OLS/one-nearest-neighbor fits with disjoint role groups; no statistical future-performance guarantee"
+}

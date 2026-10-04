@@ -1,0 +1,18 @@
+{
+  "lessonPlanStep": 37,
+  "title": "Distance Metrics Lab",
+  "slug": "distance-metrics",
+  "modulePath": "src/modules/distance-metrics",
+  "mockupPath": "src/modules/distance-metrics/design/accepted-mockup.png",
+  "promptPath": "src/modules/distance-metrics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-f22d2e2e-f0b6-41b3-a457-20cf267ca922.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 2,
+  "refinements": [
+    "Use canonical shared header, separate scenario buttons, progress and single Guide invitation.",
+    "Exact square equal-axis geometry and all paths come from the engine, not raster marks.",
+    "Place metric control above plot and compact legend below; gate Try instructions behind prediction.",
+    "Native coordinate editors and keyboard movable query provide pointer equivalence.",
+    "Retain all case identities in table and combined coincident glyph; exact ties withhold decisions."
+  ]
+}

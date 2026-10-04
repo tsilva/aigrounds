@@ -1,3 +1,4 @@
+import { distanceTutorPlan } from "@/modules/distance-metrics/learning-experiments";
 import { scalingTutorPlan } from "@/modules/feature-scaling/learning-experiments";
 import { prTutorPlan } from "@/modules/precision-recall-curves-imbalance/learning-experiments";
 import { rocTutorPlan } from "@/modules/roc-auc-thresholds/learning-experiments";
@@ -80,6 +81,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "distance-metrics": distanceTutorPlan,
   "feature-scaling": scalingTutorPlan,
   "precision-recall-curves-imbalance": prTutorPlan,
   "roc-auc-thresholds": rocTutorPlan,

@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "vector-geometry-similarity",
+    layout: "guided-discovery",
+    title: "Vector Geometry & Similarity Lab",
+    tag: "vectors",
+    kicker: "Move vectors; separate length from alignment.",
+    estimatedDuration: "6 to 9 minutes",
+    summary: "Move vectors in 2D before connecting the same geometry to embeddings.",
+    concepts: ["Dot products", "Magnitude", "Cosine similarity"],
+    learningGoals: [
+      "Reconstruct signed coordinate products and both vector magnitudes.",
+      "Explain positive length cancellation in cosine without equating dot and cosine.",
+      "Distinguish same, perpendicular and opposite nonzero directions.",
+      "Handle zero-vector undefinedness without probability or semantic guarantees.",
+    ],
+  },
+  {
     slug: "distance-metrics",
     layout: "guided-discovery",
     title: "Distance Metrics Lab",
@@ -1172,14 +1188,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
-  },
-  {
-    slug: "vector-geometry-similarity",
-    title: "Vector Geometry & Similarity Lab",
-    tag: "vectors",
-    summary:
-      "Move vectors in 2D before connecting the same geometry to embeddings.",
-    concepts: ["Dot products", "Magnitude", "Cosine similarity"],
   },
   {
     slug: "projection-foundations",

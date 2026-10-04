@@ -1,0 +1,19 @@
+{
+  "lessonPlanStep": 38,
+  "title": "Vector Geometry & Similarity Lab",
+  "slug": "vector-geometry-similarity",
+  "modulePath": "src/modules/vector-geometry-similarity",
+  "mockupPath": "src/modules/vector-geometry-similarity/design/accepted-mockup.png",
+  "promptPath": "src/modules/vector-geometry-similarity/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-c79968a8-c417-4132-8197-2ca877540e04.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 2,
+  "refinements": [
+    "Canonical Your dataset heading, shared compact progress and one Guide invitation.",
+    "Use shared native slider/number editors directly below the plot and open 40px summaries.",
+    "Exact equal-scale vector shafts and arrowheads derive from engine geometry.",
+    "One selected-vector handle prevents overlapping interactive tips; coincident IDs retain both glyphs and rows.",
+    "Zero vector has no direction arrow; cosine and angle are explicitly undefined.",
+    "Separate neighboring tip labels with leader lines while preserving exact vector endpoints."
+  ]
+}

@@ -1,3 +1,4 @@
+import { vectorTutorPlan } from "@/modules/vector-geometry-similarity/learning-experiments";
 import { distanceTutorPlan } from "@/modules/distance-metrics/learning-experiments";
 import { scalingTutorPlan } from "@/modules/feature-scaling/learning-experiments";
 import { prTutorPlan } from "@/modules/precision-recall-curves-imbalance/learning-experiments";
@@ -81,6 +82,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "vector-geometry-similarity": vectorTutorPlan,
   "distance-metrics": distanceTutorPlan,
   "feature-scaling": scalingTutorPlan,
   "precision-recall-curves-imbalance": prTutorPlan,

@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "linear-regression-line-fitting",
+    layout: "guided-discovery",
+    title: "Linear Regression Line Fitting",
+    tag: "regression",
+    kicker: "Move a line; explain slope, intercept and vertical residuals.",
+    summary: "Drag a regression line before revealing the least-squares best-fit line.",
+    estimatedDuration: "6 to 9 minutes",
+    concepts: ["Slope", "Intercept", "Residuals"],
+    learningGoals: [
+      "Separate slope pivots from intercept shifts while observations stay fixed.",
+      "Compute signed vertical observed-minus-predicted residuals and their squared sum.",
+      "Compare a preserved attempt with a revealed least-squares reference.",
+      "Transfer to descending data without causal or new-data guarantees.",
+    ],
+  },
+  {
     slug: "simpsons-paradox-confounding",
     layout: "guided-discovery",
     title: "Simpson's Paradox & Confounding Lab",
@@ -967,14 +983,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "linear-regression-line-fitting",
-    title: "Linear Regression Line Fitting",
-    tag: "regression",
-    summary:
-      "Drag a regression line before revealing the least-squares best-fit line.",
-    concepts: ["Slope", "Intercept", "Residuals"],
-  },
   {
     slug: "least-squares-loss-landscape",
     title: "Least Squares Loss Landscape",

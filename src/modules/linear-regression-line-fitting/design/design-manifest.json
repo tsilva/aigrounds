@@ -1,0 +1,17 @@
+{
+  "step": 26,
+  "title": "Linear Regression Line Fitting",
+  "slug": "linear-regression-line-fitting",
+  "modulePath": "src/modules/linear-regression-line-fitting",
+  "mockupPath": "design/accepted-mockup.png",
+  "promptPath": "design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-8f630c27-b5fe-4162-abab-98289e6b6b47.png",
+  "approval": "Autonomous self-review authorized by user",
+  "refinements": [
+    "Canonical shared controls, exact editors, selected toolbar and phases used.",
+    "Live own-line/SSE/midpoint evidence above full-width numeric chart.",
+    "Square and diamond control independent parameters; body drag translates only intercept.",
+    "Reference explicit reveal/hide preserves attempt; paired residual table optional.",
+    "Engine-derived fixed axes include every permitted prediction; no clipped endpoints."
+  ]
+}

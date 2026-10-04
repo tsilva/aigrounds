@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "reference-answer-metrics",
+    layout: "guided-discovery",
+    kicker: "Compare answers. See what each metric counts.",
+    estimatedDuration: "7 to 10 minutes",
+    learningGoals: ["State the text normalization and metric conventions.", "Separate clipped overlap, adjacent pairs and ordered subsequences.", "Reject similarity as a correctness probability.", "Transfer to a changed reference and boundary examples."],
+    title: "Reference Answer Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Compare authored answers with references and trace why exact match, token F1, BLEU, ROUGE, and toy vector similarity disagree.",
+    concepts: ["Exact match", "Token F1", "BLEU", "ROUGE"],
+  },
+
+  {
     slug: "rms-normalization",
     layout: "guided-discovery",
     kicker: "Rescale a vector. Compare RMS scaling with mean centering.",
@@ -1469,14 +1482,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "reference-answer-metrics",
-    title: "Reference Answer Metrics Lab",
-    tag: "llm evaluation",
-    summary:
-      "Compare generated answers with references and see why exact match, token F1, BLEU, ROUGE, and semantic similarity can disagree.",
-    concepts: ["Exact match", "Token F1", "BLEU", "ROUGE"],
-  },
   {
     slug: "benchmark-scores-pass-k",
     title: "Benchmark Scores & Pass@k Lab",

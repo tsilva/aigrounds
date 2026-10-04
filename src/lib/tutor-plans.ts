@@ -1,3 +1,4 @@
+import { referenceTutorPlan } from "@/modules/reference-answer-metrics/learning-experiments";
 import { rmsTutorPlan } from "@/modules/rms-normalization/learning-experiments";
 import { positionTutorPlan } from "@/modules/positional-encoding-token-order/learning-experiments";
 import { maskTutorPlan } from "@/modules/context-windows-attention-masks/learning-experiments";
@@ -102,6 +103,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "reference-answer-metrics": referenceTutorPlan,
   "rms-normalization": rmsTutorPlan,
   "positional-encoding-token-order": positionTutorPlan,
   "context-windows-attention-masks": maskTutorPlan,

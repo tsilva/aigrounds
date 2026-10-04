@@ -1,0 +1,22 @@
+{
+  "lessonPlanStep": 77,
+  "title": "Reference Answer Metrics Lab",
+  "slug": "reference-answer-metrics",
+  "modulePath": "src/modules/reference-answer-metrics",
+  "mockupPath": "src/modules/reference-answer-metrics/design/accepted-mockup.png",
+  "promptPath": "src/modules/reference-answer-metrics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-2356a2f8-b0fc-48b4-9d83-4fef5b583434.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 incorrect normalized-policy heading and unfilled selected preset",
+    "V2/V3 blue text drift from original reference",
+    "V4 duplicate navigation Guide copied from historic reference"
+  ],
+  "review": "V5 original navy/white/lavender/purple, correct baseline counts and five scores, single rail Guide.",
+  "approvedRefinements": [
+    "Use shared controls in two columns then stack rather than crowded four-column mockup.",
+    "Engine-derived unrounded bars and explicit Undefined text without fabricated zero geometry.",
+    "Add processed strings, clipped occurrence evidence, ordered subsequence and disclosed toy vector construction.",
+    "Keep readonly quotes as plain mono paragraphs; no nested containers."
+  ]
+}

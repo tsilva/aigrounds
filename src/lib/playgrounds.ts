@@ -1,3 +1,4 @@
+import { UmapPlayground } from "@/modules/umap-manifold-projection/UmapPlayground";
 import { TsnePlayground } from "@/modules/t-sne-neighborhood-map/TsnePlayground";
 import { PcaPlayground } from "@/modules/pca-principal-components/PcaPlayground";
 import { ProjectionPlayground } from "@/modules/projection-foundations/ProjectionPlayground";
@@ -74,6 +75,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "umap-manifold-projection": UmapPlayground,
   "t-sne-neighborhood-map": TsnePlayground,
   "pca-principal-components": PcaPlayground,
   "projection-foundations": ProjectionPlayground,

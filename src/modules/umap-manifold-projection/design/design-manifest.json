@@ -1,0 +1,32 @@
+{
+  "step": 44,
+  "title": "UMAP Manifold Projection Lab",
+  "slug": "umap-manifold-projection",
+  "modulePath": "src/modules/umap-manifold-projection",
+  "mockupPath": "src/modules/umap-manifold-projection/design/accepted-mockup.png",
+  "promptPath": "src/modules/umap-manifold-projection/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-ebab3211-6e44-45cc-9e50-0eddb07efaf8.png",
+  "approval": "User authorized self-review without approval questions; V2 accepted",
+  "review": [
+    {
+      "version": 1,
+      "defects": [
+        "all-point labels despite inspected-only design",
+        "wrong closest-pair value supplied in prompt (.447214 versus correct .223607)",
+        "duplicated iteration ticks"
+      ]
+    },
+    {
+      "version": 2,
+      "verdict": "accepted with exact engine geometry authoritative"
+    }
+  ],
+  "refinements": [
+    "Use exact equal-unit square geometry from engine rather than raster dimensions",
+    "Only inspected label and ring; all8IDs in exact table",
+    "Source graph spokes encode union strength using dash and width, not original distance",
+    "Include incoming directed membership to verify symmetric union; local table scroll",
+    "Show weighted map-edge distance as descriptive packing evidence",
+    "Short Guide opening; detailed reference only as system context"
+  ]
+}

@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "precision-recall-curves-imbalance",
+    layout: "guided-discovery",
+    title: "Precision-Recall Curves & Imbalance",
+    tag: "evaluation",
+    kicker: "Make positives rare; inspect accepted predictions.",
+    estimatedDuration: "7 to 10 minutes",
+    summary:
+      "Change class balance and trace why precision-recall curves reveal rare-positive tradeoffs.",
+    concepts: ["Precision-recall curves", "Class imbalance", "Rare positives"],
+    learningGoals: [
+      "Isolate prevalence effects while preserving class-specific score frequencies.",
+      "Reconstruct precision and recall with their different denominators.",
+      "Separate threshold precision from non-interpolated average precision.",
+      "Handle non-monotonic precision, tied scores and undefined empty-set precision.",
+    ],
+  },
+  {
     slug: "roc-auc-thresholds",
     layout: "guided-discovery",
     title: "ROC, AUC & Thresholds Lab",
@@ -1091,14 +1108,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "precision-recall-curves-imbalance",
-    title: "Precision-Recall Curves & Imbalance",
-    tag: "evaluation",
-    summary:
-      "Change class balance and trace why precision-recall curves reveal rare-positive tradeoffs.",
-    concepts: ["Precision-recall curves", "Class imbalance", "Rare positives"],
-  },
   {
     slug: "feature-scaling",
     title: "Feature Scaling Lab",

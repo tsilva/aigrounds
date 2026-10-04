@@ -1,3 +1,4 @@
+import { PrPlayground } from "@/modules/precision-recall-curves-imbalance/PrPlayground";
 import { RocPlayground } from "@/modules/roc-auc-thresholds/RocPlayground";
 import { ClassificationPlayground } from "@/modules/classification-metrics-foundations/ClassificationPlayground";
 import { BiasVariancePlayground } from "@/modules/bias-variance-tradeoff/BiasVariancePlayground";
@@ -67,6 +68,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "precision-recall-curves-imbalance": PrPlayground,
   "roc-auc-thresholds": RocPlayground,
   "classification-metrics-foundations": ClassificationPlayground,
   "bias-variance-tradeoff": BiasVariancePlayground,

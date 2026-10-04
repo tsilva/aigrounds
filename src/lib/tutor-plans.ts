@@ -1,3 +1,4 @@
+import { landscapeTutorPlan } from "@/modules/least-squares-loss-landscape/learning-experiments";
 import { lineTutorPlan } from "@/modules/linear-regression-line-fitting/learning-experiments";
 import { simpsonTutorPlan } from "@/modules/simpsons-paradox-confounding/learning-experiments";
 import { shapeTutorPlan } from "@/modules/correlation-shape-outliers/learning-experiments";
@@ -72,6 +73,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "least-squares-loss-landscape": landscapeTutorPlan,
   "linear-regression-line-fitting": lineTutorPlan,
   "simpsons-paradox-confounding": simpsonTutorPlan,
   "correlation-shape-outliers": shapeTutorPlan,

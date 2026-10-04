@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "least-squares-loss-landscape",
+    layout: "guided-discovery",
+    title: "Least Squares Loss Landscape",
+    tag: "regression",
+    kicker: "Move two parameters; compare squared error across lines.",
+    estimatedDuration: "6 to 9 minutes",
+    summary:
+      "Move slope and intercept across a loss surface to see why one line minimizes squared residuals.",
+    concepts: ["Squared error", "Loss surfaces", "Best fit"],
+    learningGoals: [
+      "Read slope/intercept coordinates as one line for fixed observations.",
+      "Distinguish signed cancellation from squared error.",
+      "Explain equal-error contours and a unique positive joint minimum.",
+      "Transfer to a balanced but nonminimal pair without causal guarantees.",
+    ],
+  },
+  {
     slug: "linear-regression-line-fitting",
     layout: "guided-discovery",
     title: "Linear Regression Line Fitting",
@@ -983,14 +1000,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "least-squares-loss-landscape",
-    title: "Least Squares Loss Landscape",
-    tag: "regression",
-    summary:
-      "Move slope and intercept across a loss surface to see why one line minimizes squared residuals.",
-    concepts: ["Squared error", "Loss surfaces", "Best fit"],
-  },
+
   {
     slug: "r-squared-residual-diagnostics",
     title: "R Squared & Residual Diagnostics",

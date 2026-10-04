@@ -1,0 +1,17 @@
+{
+  "lesson": "least-squares-loss-landscape",
+  "review": "Self-reviewed under user authorization",
+  "accepted": "V3",
+  "rejected": [
+    "V1: misplaced rail and contour centers",
+    "V2: omitted toolbar and live context"
+  ],
+  "refinements": [
+    "Canonical shared navigation, toolbar and rail",
+    "Exact engine axes, heatmap and analytical contour geometry replace schematic raster",
+    "Discrete compressed-scale color samples",
+    "External minimum legend avoids inline marker collisions",
+    "Optional paired table and observation plot"
+  ],
+  "scope": "Fixed five-pair descriptive straight-line SSE; no optimizer or inference"
+}

@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "projection-foundations",
+    layout: "guided-discovery",
+    title: "Projection Foundations Lab",
+    tag: "vectors",
+    kicker: "Rotate an axis; see what one component keeps.",
+    estimatedDuration: "6 to 9 minutes",
+    summary: "Rotate a projection axis and watch points collapse onto one dimension.",
+    concepts: ["Projection", "Components", "Reconstruction error"],
+    learningGoals: [
+      "Distinguish a signed scalar component from its reconstructed 2D projection.",
+      "Compute squared perpendicular loss while original points stay fixed.",
+      "Explain when an origin-line projection exactly reconstructs these points.",
+      "Transfer to perpendicular collapse and direction reversal without task-quality claims.",
+    ],
+  },
+  {
     slug: "vector-geometry-similarity",
     layout: "guided-discovery",
     title: "Vector Geometry & Similarity Lab",
@@ -1188,14 +1204,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
-  },
-  {
-    slug: "projection-foundations",
-    title: "Projection Foundations Lab",
-    tag: "vectors",
-    summary:
-      "Rotate a projection axis and watch points collapse onto one dimension.",
-    concepts: ["Projection", "Components", "Reconstruction error"],
   },
   {
     slug: "pca-principal-components",

@@ -1,3 +1,4 @@
+import { penaltyTutorPlan } from "@/modules/log-loss-confidence-penalties/learning-experiments";
 import { scoreTutorPlan } from "@/modules/class-score-logits/learning-experiments";
 import { entropyTutorPlan } from "@/modules/entropy-information/learning-experiments";
 import { rankingTutorPlan } from "@/modules/retrieval-ranking-metrics/learning-experiments";
@@ -90,6 +91,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "log-loss-confidence-penalties": penaltyTutorPlan,
   "class-score-logits": scoreTutorPlan,
   "entropy-information": entropyTutorPlan,
   "retrieval-ranking-metrics": rankingTutorPlan,

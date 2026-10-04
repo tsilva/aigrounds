@@ -33,6 +33,24 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "log-loss-confidence-penalties",
+    layout: "guided-discovery",
+    kicker: "Same labels; different penalties.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: [
+      "Use each known true outcome to determine its probability penalty.",
+      "Explain increasing confident-mistake loss at unchanged accuracy.",
+      "Handle zero and one probabilities without hiding infinite loss.",
+      "Average all examples without omitting mistakes or zero terms.",
+    ],
+    title: "Log Loss Confidence Penalties",
+    tag: "loss",
+    summary:
+      "Move probability mass onto and away from the true class to see confident mistakes get punished.",
+    concepts: ["Log loss", "Confidence", "Prediction penalties"],
+  },
+
+  {
     slug: "class-score-logits",
     layout: "guided-discovery",
     kicker: "Move scores; separate the winner from its gap.",
@@ -1291,14 +1309,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "log-loss-confidence-penalties",
-    title: "Log Loss Confidence Penalties",
-    tag: "loss",
-    summary:
-      "Move probability mass onto and away from the true class to see confident mistakes get punished.",
-    concepts: ["Log loss", "Confidence", "Prediction penalties"],
-  },
   {
     slug: "calibration-reliability-diagrams",
     title: "Calibration & Reliability Diagrams",

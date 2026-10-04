@@ -1,3 +1,4 @@
+import { ForwardPassPlayground } from "@/modules/neural-network-forward-pass/ForwardPassPlayground";
 import { ActivationPlayground } from "@/modules/activation-functions/ActivationPlayground";
 import { ExplorationPlayground } from "@/modules/exploration-exploitation/ExplorationPlayground";
 import { KMeansPlayground } from "@/modules/k-means-clustering/KMeansPlayground";
@@ -86,6 +87,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "neural-network-forward-pass": ForwardPassPlayground,
   "activation-functions": ActivationPlayground,
   "exploration-exploitation": ExplorationPlayground,
   "k-means-clustering": KMeansPlayground,

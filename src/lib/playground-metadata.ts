@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "neural-network-forward-pass",
+    layout: "guided-discovery",
+    kicker: "Change one weight. Trace the signal to class scores.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: ["Trace weighted inputs, bias and ReLU through a tiny network.", "Compare upstream changes with direct output-edge changes.", "Explain a changed hidden sum with unchanged activation.", "Reconstruct a new path to raw class scores."],
+    title: "Neural Network Forward Pass Lab",
+    tag: "neural networks",
+    summary:
+      "Move weights in a tiny network and watch inputs become class scores.",
+    concepts: ["Layers", "Weights", "Activations"],
+  },
+
+  {
     slug: "activation-functions",
     layout: "guided-discovery",
     kicker: "Change the input. Compare three activation rules.",
@@ -1404,14 +1417,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "neural-network-forward-pass",
-    title: "Neural Network Forward Pass Lab",
-    tag: "neural networks",
-    summary:
-      "Move weights in a tiny network and watch inputs become class scores.",
-    concepts: ["Layers", "Weights", "Activations"],
-  },
   {
     slug: "rms-normalization",
     title: "RMSNorm Lab",

@@ -1,3 +1,4 @@
+import { ClassScorePlayground } from "@/modules/class-score-logits/ClassScorePlayground";
 import { EntropyPlayground } from "@/modules/entropy-information/EntropyPlayground";
 import { RankingPlayground } from "@/modules/retrieval-ranking-metrics/RankingPlayground";
 import { RetrievalPlayground } from "@/modules/embedding-retrieval/RetrievalPlayground";
@@ -78,6 +79,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "class-score-logits": ClassScorePlayground,
   "entropy-information": EntropyPlayground,
   "retrieval-ranking-metrics": RankingPlayground,
   "embedding-retrieval": RetrievalPlayground,

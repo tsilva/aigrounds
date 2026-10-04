@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Class Scores & Logits Lab](https://aigrounds.tsilva.eu/playgrounds/class-score-logits) edits raw signed scores, separates common shifts from positive gap scaling, and handles tied maxima before any probability conversion.
 - [Entropy & Information Starter](https://aigrounds.tsilva.eu/playgrounds/entropy-information) conserves categorical mass, separates rare-outcome surprise from average entropy, and computes expected information gain from a group observation with explicit zero-probability handling.
 - [Retrieval Ranking Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/retrieval-ranking-metrics) reorders judged toy results, separates precision/recall from full-list two-query MRR and graded nDCG, and makes empty-query conventions explicit.
 - [Embedding Retrieval Lab](https://aigrounds.tsilva.eu/playgrounds/embedding-retrieval) moves one query around six fixed vectors, contrasts raw Euclidean and cosine ranking, separates top-k inclusion from relevance, and handles tied identities and zero vectors.

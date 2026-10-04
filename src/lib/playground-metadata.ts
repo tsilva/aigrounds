@@ -33,6 +33,23 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "class-score-logits",
+    layout: "guided-discovery",
+    kicker: "Move scores; separate the winner from its gap.",
+    estimatedDuration: "6 to 9 minutes",
+    learningGoals: [
+      "Edit one raw class score and reconstruct the winner and top-two gap.",
+      "Explain common-shift invariance, including negative scores.",
+      "Separate positive scale-dependent margins from probabilities or correctness.",
+      "Handle tied maxima and deterministic class selection.",
+    ],
+    title: "Class Scores & Logits Lab",
+    tag: "classification",
+    summary:
+      "Move raw class scores before converting them into probabilities.",
+    concepts: ["Class scores", "Logits", "Decision margins"],
+  },
+  {
     slug: "entropy-information",
     layout: "guided-discovery",
     kicker: "Move mass; distinguish surprise from uncertainty.",
@@ -1273,14 +1290,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "class-score-logits",
-    title: "Class Scores & Logits Lab",
-    tag: "classification",
-    summary:
-      "Move raw class scores before converting them into probabilities.",
-    concepts: ["Class scores", "Logits", "Decision margins"],
-  },
+
   {
     slug: "log-loss-confidence-penalties",
     title: "Log Loss Confidence Penalties",

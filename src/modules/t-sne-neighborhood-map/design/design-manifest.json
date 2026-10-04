@@ -1,0 +1,22 @@
+{
+  "lessonPlanStep": 43,
+  "title": "t-SNE Neighborhood Map",
+  "slug": "t-sne-neighborhood-map",
+  "modulePath": "src/modules/t-sne-neighborhood-map",
+  "mockupPath": "src/modules/t-sne-neighborhood-map/design/accepted-mockup.png",
+  "promptPath": "src/modules/t-sne-neighborhood-map/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-7bf62a03-680a-4e1a-add0-1b4a881f6915.png",
+  "approval": "User-authorized self-review",
+  "acceptedVersion": 2,
+  "refinements": [
+    "Use shared compact progress and controls; do not show Try instructions before a prediction is selected.",
+    "The first experiment raises perplexity from2to6; supported bounds2..6.",
+    "Raster plot is illustrative: engine supplies exact equal-scale adaptive fitting, coordinates, probabilities and labels.",
+    "Only inspected ID has a map label/ring; all eight exact IDs remain in the table, including overlaps.",
+    "Initial map at iteration0 is explicitly unoptimized.",
+    "Deterministic exact full-pair t-SNE with backtracking descent and finite checkpoints, no animations or drag handles.",
+    "Gaussian conditional rows normalize separately; symmetric P and Student-t Q normalize over global ordered pairs.",
+    "Open summaries, one Guide invitation and plain supporting evidence follow the canonical shell."
+  ],
+  "renderedRefinement": "Put the vertical-coordinate title above the plot to avoid collision with numeric y-axis ticks; equal-scale geometry unchanged."
+}

@@ -33,6 +33,22 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "t-sne-neighborhood-map",
+    layout: "guided-discovery",
+    title: "t-SNE Neighborhood Map",
+    tag: "dimensionality",
+    kicker: "Tune neighborhoods; inspect the map’s limits.",
+    estimatedDuration: "7 to 10 minutes",
+    summary: "Tune perplexity and see how local neighborhoods become a two-dimensional map.",
+    concepts: ["t-SNE", "Perplexity", "Local neighborhoods"],
+    learningGoals: [
+      "Interpret perplexity as effective neighborhood size rather than a hard count.",
+      "Distinguish conditional Gaussian rows from globally normalized joint P and Q.",
+      "Trace fixed-objective optimization without global-distance or accuracy guarantees.",
+      "Handle initialization dependence and duplicate identities in finite maps.",
+    ],
+  },
+  {
     slug: "pca-principal-components",
     layout: "guided-discovery",
     title: "PCA & Principal Components Lab",
@@ -1220,14 +1236,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
     summary:
       "Compare predicted confidence bins with observed frequencies to spot overconfident classifiers and LLM answers.",
     concepts: ["Calibration", "Reliability diagrams", "ECE", "Abstention"],
-  },
-  {
-    slug: "t-sne-neighborhood-map",
-    title: "t-SNE Neighborhood Map",
-    tag: "dimensionality",
-    summary:
-      "Tune perplexity and see how local neighborhoods become a two-dimensional map.",
-    concepts: ["t-SNE", "Perplexity", "Local neighborhoods"],
   },
   {
     slug: "umap-manifold-projection",

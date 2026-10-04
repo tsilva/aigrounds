@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [t-SNE Neighborhood Map](https://aigrounds.tsilva.eu/playgrounds/t-sne-neighborhood-map) computes exact eight-point affinities and finite optimization checkpoints, separates perplexity from a hard neighbor count, and exposes initialization and global-geometry limits.
 - [PCA & Principal Components](https://aigrounds.tsilva.eu/playgrounds/pca-principal-components) centers fixed clouds, compares manual axes with computed principal directions, and reconstructs with one or two components while handling tied and zero variance.
 - [Projection Foundations](https://aigrounds.tsilva.eu/playgrounds/projection-foundations) rotates a unit direction, separates signed scalar components from reconstructed points, and traces perpendicular squared loss without task-quality claims.
 - [Vector Geometry & Similarity](https://aigrounds.tsilva.eu/playgrounds/vector-geometry-similarity) moves signed 2D vectors, separates dot-product magnitude from cosine alignment, and treats zero vectors as an undefined-direction boundary.

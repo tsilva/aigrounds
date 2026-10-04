@@ -1,3 +1,4 @@
+import { calibrationTutorPlan } from "@/modules/calibration-reliability-diagrams/learning-experiments";
 import { penaltyTutorPlan } from "@/modules/log-loss-confidence-penalties/learning-experiments";
 import { scoreTutorPlan } from "@/modules/class-score-logits/learning-experiments";
 import { entropyTutorPlan } from "@/modules/entropy-information/learning-experiments";
@@ -91,6 +92,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "calibration-reliability-diagrams": calibrationTutorPlan,
   "log-loss-confidence-penalties": penaltyTutorPlan,
   "class-score-logits": scoreTutorPlan,
   "entropy-information": entropyTutorPlan,

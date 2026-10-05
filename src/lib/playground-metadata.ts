@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "safety-refusal-robustness-metrics",
+    layout: "guided-discovery",
+    kicker: "Compare safety decisions with their labeled denominators.",
+    estimatedDuration: "8 to 11 minutes",
+    learningGoals: ["Separate harmful compliance and benign false refusal.", "Audit conditional jailbreak eligibility and denominators.", "Distinguish all-variant correctness from consistency.", "Explain missing-class Undefined rates."],
+    title: "Safety, Refusal & Robustness Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Vary prompts and policies to compare harmful-compliance rate, false-refusal rate, jailbreak success, and robustness across prompt variants.",
+    concepts: ["Harmful compliance", "False refusal", "Jailbreak success", "Robustness"],
+  },
+
+  {
     slug: "rag-groundedness-metrics",
     layout: "guided-discovery",
     kicker: "Separate evidence, citations and coverage.",
@@ -1523,14 +1536,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "safety-refusal-robustness-metrics",
-    title: "Safety, Refusal & Robustness Metrics Lab",
-    tag: "llm evaluation",
-    summary:
-      "Vary prompts and policies to compare harmful-compliance rate, false-refusal rate, jailbreak success, and robustness across prompt variants.",
-    concepts: ["Harmful compliance", "False refusal", "Jailbreak success", "Robustness"],
-  },
+
   {
     slug: "llm-app-ops-metrics",
     title: "LLM App Ops Metrics Lab",

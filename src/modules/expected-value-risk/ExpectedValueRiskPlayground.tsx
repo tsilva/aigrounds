@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { analyzeBets, updateBet, type BetAnalysis, type BetId, type BetInput } from "./expected-value-risk-engine";
 import { expectedValuePresets, roundOptions } from "./scenario";
@@ -70,12 +71,13 @@ export function ExpectedValueRiskPlayground() {
   }
   function choosePreset(id: string) { setBets(preset(id).bets); clearAnswers(); }
   function edit(id: BetId, patch: Partial<Pick<BetInput, "probability" | "winAmount" | "lossAmount">>) { setBets((current) => updateBet(current, id, patch)); clearAnswers(); }
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 4`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="payoff-prediction" choices={experiment.predictions} value={prediction} onChange={(id) => { start(); setPrediction(id); }} /><p className={sharedStyles.small}>Choosing a prediction restores {experiment.baseline === "trap" ? "Bad Long Shot" : "Steady vs Swingy"} and 60 rounds.</p></>}
-    {prediction && !reached && <div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Keep the other parameters at their starting values. Reset starts this experiment again.</p></div>}
-    {reached && <><p role="status" className={sharedStyles.observation}>{prediction === experiment.correctPrediction ? "Your prediction matches the evidence." : "The evidence challenges your prediction. Compare the weighted payoffs and sample."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="payoff-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />{explanation && !complete && <p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 3 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "A positive average, mostly losses" : "Explore your own pair of bets"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 4`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="payoff-prediction" explanationName="payoff-explanation"
+    onPredict={(id) => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Choosing a prediction restores {experiment.baseline === "trap" ? "Bad Long Shot" : "Steady vs Swingy"} and 60 rounds.</>} observation={prediction === experiment.correctPrediction ? "Your prediction matches the evidence." : "The evidence challenges your prediction. Compare the weighted payoffs and sample."}
+    action={<div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Keep the other parameters at their starting values. Reset starts this experiment again.</p></div>}
+    onNext={() => start(index + 1)} nextLabel={index === 3 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "A positive average, mostly losses" : "Explore your own pair of bets"}>
     {transfer ? <><p>Choose Bad Long Shot. Set Bet B win probability (%) to 20, leaving its win amount at 210 and loss amount at −36. What does its positive EV say about one round?</p><ExperimentChoices legend="Transfer explanation" name="payoff-transfer" choices={[{ id: "weighted", label: "EV is +$13.20 per round in the model, but any round still has an 80% loss chance." }, { id: "next", label: "The next round is guaranteed to earn $13.20." }, { id: "most", label: "A positive EV means more wins than losses." }]} value={transferAnswer} onChange={setTransferAnswer} />{transferAnswer && (!transferReached ? <p role="status" className={sharedStyles.feedback}>First choose Bad Long Shot and set Bet B’s win probability to 20, leaving all other values at that preset.</p> : transferAnswer !== "weighted" ? <p role="status" className={sharedStyles.feedback}>Try again. Weight the $210 and −$36 payoffs by 20% and 80%. Neither possible outcome is $13.20.</p> : <><ExperimentResult title="Transfer explained">0.20 × 210 + 0.80 × (−36) = +13.20. That long-run average is between the two possible payoffs; it is not a possible payoff on a single round.</ExperimentResult><ExperimentButton onClick={() => setIndex(5)}>Explore freely</ExperimentButton></>)}</> : <><p>Try all presets, all six parameters and 24, 60 or 120 rounds. Compare the weighted payoff with spread and loss chance. Neither the larger prize nor higher EV alone decides which uncertain choice suits a person.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
   </ExperimentRail>;
   const [a, b] = analysis.bets;

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import shared from "@/components/learning-page/learning-page.module.css";
 import { analyzeDistance, boundCoordinate, distanceChart, distanceMetrics, distanceNumber as number, distanceScenarios, type DistanceState } from "./distance-engine";
 import { distanceBaseline, reachedDistance } from "./lesson-state";
@@ -44,19 +45,12 @@ export function DistancePlayground() {
     const py = (event.clientY - rect.top) * chart.height / rect.height;
     edit({ x: boundCoordinate((px - chart.left) * 10 / chart.span), y: boundCoordinate((chart.bottom - py) * 10 / chart.span) });
   }
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p>
-      <ExperimentChoices legend="Your prediction" name="distance-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }} />
-      <p className={shared.small}>Changing prediction restores this experiment’s starting state. Reset restarts it.</p>
-    </>}
-    {prediction && !reached && <p className={shared.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
-    {reached && <><p role="status" className={shared.observation}>{prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}</p>
-      <h3>{experiment.explanation}</h3>
-      <ExperimentChoices legend="Your explanation" name="distance-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />
-      {explanation && !complete && <p role="status" className={shared.feedback}>Try again. {experiment.retry}</p>}
-    </>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Zero distance, distinct cases" : "Choose what closest means"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="distance-prediction" explanationName="distance-explanation"
+    onPredict={id => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Changing prediction restores this experiment’s starting state. Reset restarts it.</>} observation={prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}
+    onNext={() => start(index + 1)} nextLabel={index === 2 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Zero distance, distinct cases" : "Choose what closest means"}>
     {transfer ? <>
       <p>Without Guide help, choose Coincident cases, choose Manhattan under Distance metric, and set Query X and Query Y to 2. Identify every nearest case and explain the decision. Would switching to Euclidean resolve coincident references with different labels?</p>
       {reachedDistance(3, state) && <>
@@ -74,7 +68,7 @@ export function DistancePlayground() {
   </ExperimentRail>;
   return <LearningPage title="Distance Metrics Lab" subtitle="Move a query; compare what closest means." rail={rail}>
     <LessonToolbar scenarios={distanceScenarios} selectedId={state.scenario} onSelect={scenario => edit({ scenario: scenario as DistanceState["scenario"] })} onReset={() => start(experiment || transfer ? index : 0)} />
-    <section className={styles.evidence} aria-label="Fixed references and movable query">
+    <section className={shared.evidence} aria-label="Fixed references and movable query">
       <h2>Your dataset</h2>
       <p>Four fixed labeled reference cases A..D and one query with no known true label. One-nearest-neighbor (1-NN) uses the unique closest reference’s label. This lesson withholds a decision for every nonunique nearest neighbor.</p>
       <h3>Distance metric</h3>
@@ -119,11 +113,11 @@ export function DistancePlayground() {
       </div>
       <p className={styles.legend}><span>● Circle class</span><span>■ Square class</span><span>◇ Query (movable)</span><span>Ring = nearest</span></p>
       <p id="distance-query-help">Drag the query diamond to an integer grid point, or focus it and use arrows (Shift: two units). Up increases Y; Right increases X. Home sets (0,0); End sets (10,10). Enter or click focuses Query X. Reference cases stay fixed.</p>
-      <div className={styles.controls}>
+      <div className={shared.controlGrid}>
         <div ref={editorRef}><LessonRangeControl label="Query X" value={state.x} min={0} max={10} step={1} help="Horizontal query coordinate, 0..10 in whole units." onChange={x => edit({ x })} /></div>
         <LessonRangeControl label="Query Y" value={state.y} min={0} max={10} step={1} help="Vertical query coordinate, 0..10 in whole units." onChange={y => edit({ y })} />
       </div>
-      <p role="status" data-distance-status className={styles.formula}>{metricLabel} · Query ({state.x}, {state.y}) · Nearest {a.nearestIds.join(", ")} · Minimum {number(a.minimum)} · {a.decision ? `${a.decision} class decision` : "Tie: decision withheld"}</p>
+      <p role="status" data-distance-status className={shared.math}>{metricLabel} · Query ({state.x}, {state.y}) · Nearest {a.nearestIds.join(", ")} · Minimum {number(a.minimum)} · {a.decision ? `${a.decision} class decision` : "Tie: decision withheld"}</p>
       <p>{state.metric === "euclidean" ? "Euclidean = sqrt(dx² + dy²): the straight-line length." : "Manhattan = |dx| + |dy|: one shown horizontal-then-vertical route. Other equally short grid routes can exist; no obstacles are modeled."} Both axes have equal numerical weight. Distance is not a class probability.</p>
     </section>
     <LessonSummaries label="Nearest cases and declared one-neighbor decision" summaries={[
@@ -131,9 +125,9 @@ export function DistancePlayground() {
       { label: "Minimum distance", color: "#087c78", value: a.minimum.toFixed(3), definition: `Smallest ${metricLabel} distance to the query.`, formula: state.metric === "euclidean" ? "sqrt(dx² + dy²)" : "|dx| + |dy|", comparison: "Equal numerical weights; no true query label." },
       { label: "1-NN decision", color: "#ad4508", value: a.decision ?? "Tie", definition: a.decision ? "Stored label of the unique nearest reference." : "Nonunique nearest neighbor: decision withheld.", formula: "This lesson’s declared tie policy.", comparison: "A label decision does not establish accuracy." },
     ]} />
-    <section className={styles.evidence} aria-label="Distance construction and decision limits">
+    <section className={shared.evidence} aria-label="Distance construction and decision limits">
       <details><summary>Case distances and decisions</summary>
-        <div className={styles.table} role="region" tabIndex={0} aria-label="All reference identities, distances and nearest status">
+        <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="All reference identities, distances and nearest status">
           <table><caption>All four fixed references, separate even when coincident. dx/dy are absolute differences from query ({state.x},{state.y}). Euclidean = sqrt(dx²+dy²); Manhattan = dx+dy. Distances are rounded to six decimals; exact values decide nearest ties.</caption>
             <thead><tr>{["Case", "Coordinates", "Class", "|ΔX|", "|ΔY|", "Euclidean", "Manhattan", "Nearest"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead>
             <tbody>{a.cases.map(c => <tr data-distance-case={c.id} key={c.id}><th scope="row">{c.id}</th><td>({c.x}, {c.y})</td><td>{c.className}</td><td>{c.dx}</td><td>{c.dy}</td><td>{number(c.euclidean)}</td><td>{number(c.manhattan)}</td><td>{a.nearestIds.includes(c.id) ? "Yes" : "No"}</td></tr>)}</tbody>

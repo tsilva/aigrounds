@@ -1,4 +1,4 @@
-const choices = (...labels: string[]) => labels.map((label, i) => ({ id: String(i), label }));
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 export const penaltyExperiments = [
   { title: "Reward a correct probability", question: "All correct assigns 80% to the true class of each example. Raise A to 95%, keeping B and C at 80%. Does mean loss change even though all predicted labels remain correct?",
     predictions: choices("Mean loss decreases; accuracy stays 3/3.", "Mean loss is unchanged because accuracy stays 3/3.", "95% on the true class proves calibration."), action: "Choose A under Selected example; set Probability of true class (%) to 95. Leave B and C at 80. Read A’s loss and the three-term mean.", explanation: "Why can loss improve while accuracy stays fixed?",

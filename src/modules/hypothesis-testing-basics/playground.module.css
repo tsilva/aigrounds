@@ -1,7 +1,3 @@
-.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
-.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-.evidence p { font-size: 15px; line-height: 1.6; margin: 9px 0; }
-.controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
 .chart { min-width: 0; width: 100%; }
 .chart svg { display: block; width: 100%; height: 300px; }
 .chart text { fill: #33486d; font: 13px var(--font-ibm-plex-mono), monospace; }
@@ -11,8 +7,3 @@
 .chart line[data-critical] { stroke: #5031dc; stroke-dasharray: 4 4; }
 .chart line[data-extreme] { stroke: #ad4508; }
 .chart circle[data-observed] { fill: #0c1230; }
-.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
-.evidence details { margin: 16px 0; }
-.evidence summary { cursor: pointer; font-weight: 600; }
-.evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
-@container (max-width:799px) { .controls { grid-template-columns: minmax(0,1fr); gap: 16px; } }

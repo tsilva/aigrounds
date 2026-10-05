@@ -1,10 +1,11 @@
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 import { defaultBeta, defaultGamma, initialLayerTokens, type LayerToken, type LayerTokenId } from "./scenario";
 
 export type LayerState = { tokens: LayerToken[]; token: LayerTokenId; feature: number; gamma: number[]; beta: number[]; compare: boolean };
 export const layerStart = (identity = false): LayerState => ({ tokens: initialLayerTokens.map(t => ({ ...t, values: [...t.values] })), token: "cat", feature: 0, gamma: identity ? [1,1,1,1] : [...defaultGamma], beta: identity ? [0,0,0,0] : [...defaultBeta], compare: false });
 export const changeFeature = (s: LayerState, value: number): LayerState => ({ ...s, tokens: s.tokens.map(t => t.id === s.token ? { ...t, values: t.values.map((x,i) => i === s.feature ? value : x) } : t) });
 export const constantRow = (s: LayerState): LayerState => ({ ...s, tokens: s.tokens.map(t => t.id === s.token ? { ...t, values: [0,0,0,0] } : t) });
-const choices = (...labels: string[]) => labels.map((label,i) => ({id:String(i),label}));
+
 const first = layerStart();
 const firstTarget = { ...changeFeature({ ...first, token: "the" },2), token: "cat" as const };
 const fourth = { ...layerStart(true), feature: 2 };

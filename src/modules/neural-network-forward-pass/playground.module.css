@@ -1,20 +1,9 @@
-.evidence { margin-block: 28px; }
-.evidence h2 { font-size: 18px; margin-bottom: 10px; }
-.evidence p { font-size: 14px; line-height: 1.7; margin-block: 10px; }
 .chart { max-width: 640px; width: 100%; margin-block: 16px; }
 .chart svg { display: block; width: 100%; height: auto; }
-.chart text { font-family: var(--font-mono), monospace; font-size: 12px; fill: #536487; }
+.chart text { font-family: var(--font-ibm-plex-mono), monospace; font-size: 12px; fill: #536487; }
 .chart .nodeValue { font-size: 18px; font-weight: 600; fill: #0c1230; }
 .chart .selectedWeight { fill: #5031dc; }
 .controls { display: grid; grid-template-columns: minmax(190px,1fr) minmax(220px,2fr); gap: 24px; align-items: start; }
-.formula { font-family: var(--font-mono), monospace; overflow-wrap: anywhere; }
-.table { overflow-x: auto; border-block: 1px solid #dfe4f4; }
-.table:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
-.table table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 13px; }
-.table caption { padding: 10px; line-height: 1.6; }
-.table th,.table td { padding: 12px 10px; border-bottom: 1px solid #dfe4f4; text-align: left; }
-.table td:nth-child(2) { font-family: var(--font-mono), monospace; }
-.evidence details { border-block: 1px solid #dfe4f4; padding-block: 16px; }
-.evidence summary { cursor: pointer; font-weight: 600; }
-.evidence summary:focus-visible,.evidence a:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
+.table { --table-min-width: 600px; }
+.table td:nth-child(2) { font-family: var(--font-ibm-plex-mono), monospace; }
 @container (max-width: 799px) { .controls { grid-template-columns: 1fr; } }

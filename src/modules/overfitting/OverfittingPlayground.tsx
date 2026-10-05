@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { analyzeOverfitting, type OverfittingAnalysis } from "./overfitting-engine";
 import { overfittingScenarios } from "./scenario";
@@ -43,12 +44,13 @@ export function OverfittingPlayground() {
   function clearAnswers(){setExplanation(null);setTransferAnswer(null);}
   function start(next=index){setIndex(next);setState(fitExperiments[next]?.baseline??fitDefaults);setPrediction(null);clearAnswers();}
   function edit(patch:Partial<FitState>){setState(current=>({...current,...patch}));clearAnswers();}
-  const rail=experiment?<ExperimentRail label={`Experiment ${index+1} of 3`} title={experiment.title} phase={!prediction?0:reached?2:1}>
-    {!reached&&<><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="fit-prediction" choices={experiment.predictions} value={prediction} onChange={id=>{start();setPrediction(id);}}/><p className={sharedStyles.small}>Choosing a prediction restores this experiment’s starting data, degree and noise.</p></>}
-    {prediction&&!reached&&<div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Reset starts this experiment again.</p></div>}
-    {reached&&<><p role="status" className={sharedStyles.observation}>{prediction===experiment.correctPrediction?"Your prediction matches the evidence.":"The two errors challenge your prediction. Compare the same data across degrees."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="fit-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation}/>{explanation&&!complete&&<p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
-    {complete&&<><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={()=>start(index+1)}>{index===2?"Try the transfer check":"Next experiment"}</ExperimentButton></>}
-  </ExperimentRail>:<ExperimentRail label={transfer?"Transfer check":"Free exploration"} title={transfer?"Test the comparison on sparse data":"Compare before labeling"}>
+  const rail=experiment?<GuidedExperiment label={`Experiment ${index+1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="fit-prediction" explanationName="fit-explanation"
+    onPredict={id=>{start();setPrediction(id);}} onExplain={setExplanation}
+    predictionHelp={<>Choosing a prediction restores this experiment’s starting data, degree and noise.</>} observation={prediction===experiment.correctPrediction?"Your prediction matches the evidence.":"The two errors challenge your prediction. Compare the same data across degrees."}
+    action={<div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Reset starts this experiment again.</p></div>}
+    onNext={()=>start(index+1)} nextLabel={index===2?"Try the transfer check":"Next experiment"} />:<ExperimentRail label={transfer?"Transfer check":"Free exploration"} title={transfer?"Test the comparison on sparse data":"Compare before labeling"}>
     {transfer?<><p>Choose Sparse Training, set Polynomial degree to 10 and Noise amplitude to 0.34. In All degree losses, compare degrees 4 and 10. Which explanation fits the evidence?</p><ExperimentChoices legend="Transfer explanation" name="fit-transfer" choices={[{id:"diverge",label:"Training MSE falls from about 0.02222 to a tiny positive value; held-out MSE rises from 0.00903 to 0.40228. The more flexible fit generalizes worse on these held-out points."},{id:"degree",label:"Degree 10 is always worse on held-out data, even without looking at losses."},{id:"testfit",label:"The curve was fitted to the training and held-out points together."}]} value={transferAnswer} onChange={setTransferAnswer}/>{transferAnswer&&(!transferReached?<p role="status" className={sharedStyles.feedback}>First choose Sparse Training, set Polynomial degree to 10 and Noise amplitude to 0.34.</p>:transferAnswer!=="diverge"?<p role="status" className={sharedStyles.feedback}>Try again. Compare the two degree rows on the same points; held-out data never enters the fit.</p>:<><ExperimentResult title="Transfer explained">With fewer training examples, a flexible fit can nearly interpolate the training points and still miss held-out points. This example supports overfitting through the error comparison, not a universal degree threshold.</ExperimentResult><ExperimentButton onClick={()=>setIndex(4)}>Explore freely</ExperimentButton></>)}</>:<><p>Try all three scenarios and degrees 1–12. Change noise, then compare errors on the same points before deciding whether extra flexibility helps. A wiggly line or a positive gap alone is not proof.</p><ExperimentButton onClick={()=>start(0)}>Restart experiments</ExperimentButton></>}
   </ExperimentRail>;
   return <LearningPage title="Overfitting" subtitle="Fit familiar points. Check predictions on held-out points." rail={rail}>

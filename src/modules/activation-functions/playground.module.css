@@ -1,23 +1,15 @@
-.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
-.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-.evidence p { font-size: 15px; line-height: 1.6; margin: 9px 0; }
 .flow { display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,2fr) 24px minmax(0,1fr); gap: 12px; align-items: center; padding: 24px 0; text-align: center; }
 .flow h3 { font-size: 14px; }
 .flow p.value { font-size: clamp(20px, 3cqw, 36px); font-weight: 700; overflow-wrap: anywhere; }
 .flow p.rule { font-size: 25px; font-weight: 700; }
 .flow > span { font-size: 24px; }
 .controls { display: grid; grid-template-columns: minmax(0,1fr) minmax(240px,1fr); gap: 24px; align-items: start; }
-.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
 .chart { width: 100%; max-width: 640px; margin: 16px 0; }
 .chart svg { display: block; width: 100%; }
 .chart text { fill: #33486d; font: 13px var(--font-ibm-plex-mono), monospace; }
 .grid { stroke: #dfe4f4; stroke-width: 1; }
 .axis { stroke: #8a9ab7; stroke-width: 1; }
 .guide { stroke: #5031dc; stroke-width: 1; stroke-dasharray: 4 4; }
-.table { overflow-x: auto; margin-top: 12px; }
-.table table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 14px; }
-.table th, .table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #dfe4f4; }
-.evidence summary { cursor: pointer; font-weight: 600; }
-.table:focus-visible, .evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
+.table { --table-min-width: 600px; }
 @container (max-width: 799px) { .controls { grid-template-columns: 1fr; } }
 @container (max-width: 599px) { .flow { grid-template-columns: 1fr; gap: 6px; padding: 16px 0; } .flow > span { transform: rotate(90deg); } .flow p.value { font-size: 36px; } }

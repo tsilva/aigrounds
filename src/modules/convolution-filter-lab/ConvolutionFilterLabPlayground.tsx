@@ -178,7 +178,7 @@ export function ConvolutionFilterLabPlayground() {
         <MatrixTable label="Products" matrix={analysis.elementProducts} exact />
       </div>
       <p className={styles.rowSums}>Row sums: {rowSums.map(exactValue).join("; ")}. Fractions are exact.</p>
-      <p className={styles.formula}>y[{state.rowIndex},{state.colIndex}] = {rowSums.map(formulaTerm).join(" + ")} = {exactValue(analysis.sum)}</p>
+      <p className={`${sharedStyles.math} ${styles.formula}`}>y[{state.rowIndex},{state.colIndex}] = {rowSums.map(formulaTerm).join(" + ")} = {exactValue(analysis.sum)}</p>
     </section>
     <LessonSummaries label="Live convolution summaries" summaries={[
       { label: "Selected sum", color: "#5031dc", value: formatValue(analysis.sum), definition: "Nine products added.", formula: "Σ patch value × weight" },

@@ -111,7 +111,7 @@ pnpm test:deps        # check patched dependency security boundaries
 - Playgrounds run in the browser. The MNIST inference debugger needs WebGPU support.
 - The optional AI Guide uses a server API route backed by OpenRouter. API keys stay on the server.
 - Analytics and Sentry monitoring depend on environment configuration; see [configuration](docs/configuration.md) for settings and local credential handling.
-- Contributors use the [learning-page design system](DESIGN_SYSTEM.md). [Development notes](docs/development.md) explain lesson registration, validation, update dates, branding, and project workflows.
+- All lessons use the shared [learning-page design system](DESIGN_SYSTEM.md), including reusable experiment presentation, evidence typography, parameter grids and accessible table styles. Lesson state, answer checking and mathematical representations stay in each module. [Development notes](docs/development.md) explain lesson registration, validation, update dates, branding, and project workflows.
 
 ## License
 

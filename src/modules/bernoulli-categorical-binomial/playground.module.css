@@ -1,6 +1,6 @@
 .question { margin: 24px 0 18px; border-top: 1px solid #dfe4f4; padding-top: 20px; }
 .question h2, .mass h2 { margin: 0 0 10px; font-size: 20px; }
-.question p, .mass p, .evidence p { color: #536487; font-size: 14px; line-height: 1.6; }
+.question p, .mass p { color: #536487; font-size: 14px; line-height: 1.6; }
 .parameters { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
 .mass { margin-top: 24px; }
 .chartScroller, .tableScroller { overflow: auto; }
@@ -16,10 +16,6 @@
 .bar { width: 70%; background: #b4c3dc; }
 .bar[data-mode='true'] { background: #5031dc; outline: 2px solid #5031dc; outline-offset: 3px; }
 .scrollHelp { font-size: 12px !important; }
-.evidence { border-top: 1px solid #dfe4f4; padding-top: 20px; }
-.evidence details { margin-bottom: 20px; font-size: 14px; }
-.evidence summary { cursor: pointer; color: #5031dc; }
-.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
 .tableScroller { max-height: 350px; margin-top: 14px; }
 .tableScroller table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .tableScroller th, .tableScroller td { text-align: left; border-bottom: 1px solid #dfe4f4; padding: 10px 6px; }

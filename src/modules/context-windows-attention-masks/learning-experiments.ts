@@ -1,4 +1,4 @@
-const choices = (...labels: string[]) => labels.map((label, i) => ({ id: String(i), label }));
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 export const maskExperiments = [
   {
     title: "Read the causal row",

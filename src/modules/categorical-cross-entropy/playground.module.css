@@ -1,10 +1,7 @@
 .context { color:#536487; font-size:14px; line-height:1.7; margin:18px 0; }
-.controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; padding:14px 0; }
-.evidence,.optional { border-top:1px solid #dfe4f4; }
-.evidence { padding:22px 0; }
-.evidence h2 { font-size:21px; font-weight:600; }
-.evidence p,.optional p { color:#536487; font-size:14px; line-height:1.7; margin:8px 0; }
-.axis,.barRow { display:grid; grid-template-columns:74px minmax(0,1fr) 78px; gap:10px; align-items:center; }
+.optional { border-top:1px solid #dfe4f4; }
+.optional p { color:#536487; font-size:14px; line-height:1.7; margin:8px 0; }
+.axis, .barRow { display:grid; grid-template-columns:74px minmax(0,1fr) 78px; gap:10px; align-items:center; }
 .axis { margin:18px 0 10px; color:#536487; font-size:12px; }
 .axis div { display:flex; justify-content:space-between; }
 .barRow { margin:14px 0; font-size:14px; }
@@ -17,9 +14,8 @@
 .scroller { overflow-x:auto; margin-top:14px; }
 .scroller table { width:100%; min-width:580px; border-collapse:collapse; font-size:13px; text-align:left; }
 .scroller caption { text-align:left; font-size:13px; color:#536487; line-height:1.7; margin:8px 0 12px; }
-.scroller th,.scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
+.scroller th, .scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
 .scroller td { white-space:nowrap; font-family:var(--font-ibm-plex-mono),monospace; }
-@container (max-width:699px) { .controls { grid-template-columns:minmax(0,1fr); } }
 
 .barRow small { display:block; font-size:12px; color:#536487; margin-top:3px; }
 .termRow { border-bottom:1px solid #edf0f7; padding:8px 0; }
@@ -29,7 +25,5 @@
 .targets label { display:flex; align-items:center; gap:8px; font-size:14px; }
 .targets input { width:18px; height:18px; accent-color:#5031dc; }
 .targets input:focus-visible { outline:2px solid #5031dc; outline-offset:4px; }
-
-.controls[data-single="true"] { grid-template-columns:minmax(0,1fr); }
 
 .targetHeading { font-size:14px; font-weight:600; margin:18px 0 10px; }

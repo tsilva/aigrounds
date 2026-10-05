@@ -1,11 +1,7 @@
-.evidence { padding: 22px 0; border-bottom: 1px solid #dfe4f4; }
-.evidence h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-.evidence p { font-size: 15px; line-height: 1.6; margin: 9px 0; }
-.controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
 .batchAction { margin: 12px 0; }
 .chart { min-width: 0; width: 100%; }
 .plotScroll { height: 480px; overflow-y: auto; }
-.plotScroll:focus-visible, .tableScroll:focus-visible, .evidence summary:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.plotScroll:focus-visible, .tableScroll:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
 .plotScroll svg { display: block; width: 100%; height: 2024px; }
 .axis svg { display: block; width: 100%; height: 54px; }
 .chart text { fill: #33486d; font: 13px var(--font-ibm-plex-mono), monospace; }
@@ -16,12 +12,5 @@
 .chart g[data-captures="false"] line { stroke: #ad4508; }
 .chart line[data-interval-line] { stroke-width: 2; }
 .chart g[data-captures="false"] line[data-interval-line] { stroke-dasharray: 4 3; }
-.formula { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
 .tableScroll { max-height: 360px; overflow-y: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; margin: 12px 0; }
-.table caption { text-align: left; color: #536487; margin: 10px 0; font-size: 13px; }
-.table th, .table td { text-align: left; padding: 9px 6px; border-bottom: 1px solid #dfe4f4; overflow-wrap: anywhere; }
-.table td { font-family: var(--font-ibm-plex-mono), monospace; }
-.evidence details { margin: 16px 0; }
-.evidence summary { cursor: pointer; font-weight: 600; }
-@container (max-width:799px) { .controls { grid-template-columns: minmax(0,1fr); gap: 16px; } }
+.table { --table-min-width: 0px; }

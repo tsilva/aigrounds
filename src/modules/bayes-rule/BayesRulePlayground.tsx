@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { analyzeBayesRule, type BayesInputs, type BayesScenarioId } from "./bayes-rule-engine";
 import { bayesScenarios } from "./scenario";
@@ -47,12 +48,13 @@ export function BayesRulePlayground() {
   function edit(key: "prevalence" | "sensitivity" | "falsePositiveRate", value: number) {
     setInputs((current) => ({ ...current, [key]: value / 100 })); clearAnswers();
   }
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="bayes-prediction" choices={experiment.predictions} value={prediction} onChange={(id) => { start(); setPrediction(id); }} /><p className={sharedStyles.small}>Choosing a prediction restores Medical Test with 1% prevalence, 95% sensitivity and a 5% false-positive rate.</p></>}
-    {prediction && !reached && <div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Use Medical Test. Reset starts this experiment again.</p></div>}
-    {reached && <><p role="status" className={sharedStyles.observation}>{prediction === experiment.correctPrediction ? "Your prediction matches the model." : "The evidence challenges your prediction. Compare the positive-result pools."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="bayes-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />{explanation && !complete && <p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Test the same reasoning on fraud" : "Explore the evidence model"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="bayes-prediction" explanationName="bayes-explanation"
+    onPredict={(id) => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Choosing a prediction restores Medical Test with 1% prevalence, 95% sensitivity and a 5% false-positive rate.</>} observation={prediction === experiment.correctPrediction ? "Your prediction matches the model." : "The evidence challenges your prediction. Compare the positive-result pools."}
+    action={<div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Use Medical Test. Reset starts this experiment again.</p></div>}
+    onNext={() => start(index + 1)} nextLabel={index === 2 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Test the same reasoning on fraud" : "Explore the evidence model"}>
     {transfer ? <><p>Choose Fraud Alert. Raise False-positive rate (%) from 8 to 16, leaving Prevalence at 2 and Sensitivity at 90. What happens to the probability of real fraud among flagged cases?</p><ExperimentChoices legend="Transfer explanation" name="bayes-transfer" choices={[{ id: "falls", label: "It falls: true positives stay at 18 while expected false positives rise to 156.8." }, { id: "rises", label: "It rises: a larger flagged pool must contain a higher share of real fraud." }, { id: "sensitivity", label: "It stays at 90% because sensitivity determines the posterior." }]} value={transferAnswer} onChange={setTransferAnswer} />{transferAnswer && (!transferReached ? <p role="status" className={sharedStyles.feedback}>First choose Fraud Alert and set its False-positive rate to 16, with the other rates at their defaults.</p> : transferAnswer !== "falls" ? <p role="status" className={sharedStyles.feedback}>Try again. Only false positives increased. Which group occupies more of the positive-result denominator?</p> : <><ExperimentResult title="Transfer explained">The posterior falls from 18/96.4 ≈ 18.7% to 18/174.8 ≈ 10.3%. A larger pool of false alarms makes the same positive signal less convincing.</ExperimentResult><ExperimentButton onClick={() => setIndex(4)}>Explore freely</ExperimentButton></>)}</> : <><p>Try both scenarios and all presets. Change one parameter at a time; explain which expected pool changes and which stays fixed.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
   </ExperimentRail>;
   const c = analysis.counts;
@@ -60,7 +62,7 @@ export function BayesRulePlayground() {
   const selectedPreset = presets.find((preset) => sameInputs(inputs, preset.values))?.id ?? "";
   return <LearningPage title="Bayes’ Rule" subtitle="Count every positive signal before judging it." rail={rail}>
     <LessonToolbar scenarios={bayesScenarios.map((entry) => ({ ...entry, label: entry.title }))} selectedId={scenarioId} onSelect={chooseScenario} onReset={() => start(experiment || transfer ? index : 0)} />
-    <section className={styles.controls} aria-label="Evidence model parameters">
+    <section className={sharedStyles.controlGrid} data-columns="3" aria-label="Evidence model parameters">
       <LessonRangeControl label="Prevalence" unit="%" min={0.1} max={20} step={0.1} value={Number((inputs.prevalence * 100).toFixed(10))} onChange={(value) => edit("prevalence", value)} help="Prior: real cases out of everyone before a signal." />
       <LessonRangeControl label="Sensitivity" unit="%" min={50} max={99} step={1} value={Number((inputs.sensitivity * 100).toFixed(10))} onChange={(value) => edit("sensitivity", value)} help="Positive signals out of real cases." />
       <LessonRangeControl label="False-positive rate" unit="%" min={0} max={20} step={0.1} value={Number((inputs.falsePositiveRate * 100).toFixed(10))} onChange={(value) => edit("falsePositiveRate", value)} help="Positive signals out of non-cases." />

@@ -37,6 +37,6 @@
 .products > span { color: #536487; font-size: 22px; }
 .products .matrix td, .products .matrix td > span { min-width: 42px; width: 42px; }
 .rowSums { margin-top: 12px; color: #536487; font-size: 12px; text-align: center; }
-.formula { margin-top: 10px; font-family: var(--font-ibm-plex-mono), monospace; font-size: 14px; line-height: 1.7; text-align: center; overflow-wrap: anywhere; }
+.formula { margin-top: 10px; font-size: 14px; line-height: 1.7; text-align: center; }
 @container (max-width: 699px) { .imageFlow { gap: 10px; } .products { gap: 10px; } .settings { gap: 14px; } }
 @container (max-width: 639px) { .imageFlow { grid-template-columns: minmax(0, 1fr); gap: 16px; } .flowArrow { transform: rotate(90deg); } .products { flex-wrap: wrap; } }

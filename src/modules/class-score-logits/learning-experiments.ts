@@ -1,4 +1,4 @@
-const choices = (...labels: string[]) => labels.map((label, i) => ({ id: String(i), label }));
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 export const scoreExperiments = [
   { title: "Change the leader", question: "Close call has base scores A=1, B=0.5, C=−1. Keep Positive scale 1 and Common shift 0. Raise C’s Selected base score to 2. Which class wins and what is the top-two gap?",
     predictions: choices("C wins with a gap of 1 score unit.", "A stays ahead because a class with a negative starting score cannot win.", "C becomes a 200% probability."),

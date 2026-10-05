@@ -4,7 +4,7 @@ This is the canonical visual and layout scheme for new playgrounds and material 
 
 ## Shared implementation
 
-The first three lessons share the components in `src/components/learning-page/`; use them as the starting shell for future lessons. Mark the lesson's metadata `layout: "guided-discovery"` so the assistant shell leaves Guide access to the rail CTA.
+All published lessons share the components in `src/components/learning-page/`; use them as the starting shell for future lessons. Mark the lesson's metadata `layout: "guided-discovery"` so the assistant shell leaves Guide access to the rail CTA.
 
 | Shared component | Responsibility |
 | --- | --- |
@@ -12,6 +12,7 @@ The first three lessons share the components in `src/components/learning-page/`;
 | `LessonToolbar` | Two-line scenario buttons, selected state, Reset |
 | `DatasetHeading`, `PointValueEditor` | Dataset heading, finite numeric input, keyboard instructions |
 | `ExperimentRail` | Experiment label/title, optional progress, exercise container, single Guide CTA |
+| `GuidedExperiment` | The common prediction/action/explanation/retry/completion presentation, with lesson-owned state and callbacks |
 | `ExperimentChoices` | Accessible prediction/explanation radio groups |
 | `ExperimentResult`, `ExperimentButton` | Completion feedback and exercise actions |
 | `LessonSummaries` | Labeled values, definitions, formulas and comparisons |
@@ -19,9 +20,11 @@ The first three lessons share the components in `src/components/learning-page/`;
 | `LessonSelect`, `LessonToggleGroup`, `LessonAction` | Labeled discrete choices, selected workbench modes, and compact actions |
 | `LessonRangeControl` | A bounded parameter with a native keyboard slider, exact number editor, units and explanatory help |
 
-Page and experiment components are exported from `learning-page.tsx`; number-line controls are in `number-line-controls.tsx`. `ExperimentRail` places `ExperimentProgress` and `GuideInvitation` automatically. Omit its `phase` for free exploration. Keep scenario datasets, experiment state, answer checking, chart geometry and supporting mathematical evidence in the module. In particular, a lesson can check explanations immediately or require an explicit check action without duplicating the rail.
+Page and experiment primitives are exported from `learning-page.tsx`; the common guided sequence is in `guided-experiment.tsx`, and number-line controls are in `number-line-controls.tsx`. Prefer `GuidedExperiment` for the common immediate-feedback sequence. It receives the lesson's `reached` and `complete` decisions and callbacks; it never checks answers, resets settings, or advances state itself. Its optional `action` slot preserves instructions that need extra markup. Use `ExperimentRail` directly for distinct flows, including explicit check actions, recorded predictions, transfer checks and free exploration. `ExperimentRail` places `ExperimentProgress` and `GuideInvitation` automatically. Omit its `phase` for free exploration. Keep scenario datasets, experiment state, answer checking, chart geometry and supporting mathematical evidence in the module.
 
 Module CSS should contain only concept-specific representations and arrangements. Shared components own their control styles; import `learning-page.module.css` directly for shared instructional text classes when needed. Do not merge shared and module CSS objects, copy shell markup, or override shared control classes. Change shared styling and interactions centrally.
+
+Reuse the stylesheet's `evidence` class for supporting sections, `math` for formula typography, and `controlGrid` for parameter groups. `controlGrid` defaults to two columns; `data-columns="1"` or `"3"` selects those arrangements, and narrow containers stack automatically. Keep unequal column ratios local when they serve a specific representation. Use `tableScroll` on keyboard-focusable, named scrolling table regions and `dataTable` on compact fixed-layout tables. A local class may supply `--table-min-width` and semantic row/cell highlighting. Ordinal prediction/explanation choices can use `experimentChoices` from `src/lib/experiment-choices.ts`; lessons with meaningful answer IDs keep those IDs.
 
 ```tsx
 <LearningPage title={title} subtitle={subtitle} rail={

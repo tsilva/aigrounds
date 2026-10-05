@@ -55,7 +55,7 @@ function ComputationGraph({ analysis, phase }: { analysis: BackpropAnalysis; pha
 }
 
 function GradientEvidence({ analysis }: { analysis: BackpropAnalysis }) {
-  return <section className={styles.evidence} aria-label="Output weight gradients">
+  return <section className={shared.evidence} aria-label="Output weight gradients">
     <h2>One output gradient, two local multipliers</h2>
     <p className={shared.small}>A gradient is the loss’s sensitivity to a tiny increase. For this sigmoid output with binary cross entropy, dL/dz = p − y = {formatSigned(analysis.outputDelta)}.</p>
     <div className={styles.gradientColumns}>{[analysis.h1, analysis.h2].map((h, index) => {
@@ -67,7 +67,7 @@ function GradientEvidence({ analysis }: { analysis: BackpropAnalysis }) {
 }
 
 function UpdateEvidence({ analysis, learningRate, onRateChange }: { analysis: BackpropAnalysis; learningRate: number; onRateChange: (value: number) => void }) {
-  return <section className={styles.evidence} aria-label="One gradient descent step">
+  return <section className={shared.evidence} aria-label="One gradient descent step">
     <h2>Turn the gradient into a step</h2>
     <p className={shared.small}>Gradient descent subtracts the gradient: new weight = old weight − η × gradient. η (eta) is the learning rate, which controls step size.</p>
     <div className={styles.rateEditor}><label htmlFor="backprop-rate">Learning rate η</label><input id="backprop-rate" type="range" min="0" max="1" step="0.01" value={learningRate} aria-valuetext={formatFixed(learningRate)} onChange={(event) => onRateChange(Number(event.currentTarget.value))} /><label className={shared.srOnly} htmlFor="backprop-rate-value">Exact learning rate</label><input id="backprop-rate-value" type="number" min="0" max="1" step="0.01" value={learningRate} onChange={(event) => { if (Number.isFinite(event.currentTarget.valueAsNumber)) onRateChange(event.currentTarget.valueAsNumber); }} /></div>
@@ -140,7 +140,7 @@ export function BackpropagationInspectorPlayground() {
     <div className={styles.phases} role="group" aria-label="Computation stage">{(["forward", "backward", "update"] as const).map((item) => <button key={item} type="button" aria-pressed={phase === item} onClick={() => choosePhase(item)} className={shared.reset}>{item[0].toUpperCase() + item.slice(1)}</button>)}</div>
     <section className={styles.visualFlow} aria-label="Visual computation"><h2>Visual view</h2>
     <ComputationGraph analysis={analysis} phase={phase} />
-    {phase === "forward" && <section className={styles.evidence} aria-label="Forward computation"><h2>Build the prediction</h2><p className={shared.formula}>z = {formatFixed(outputWeights.wOut1)} × {formatFixed(analysis.h1)} + ({formatFixed(outputWeights.wOut2)}) × {formatFixed(analysis.h2)} − 0.25 = {formatFixed(analysis.z, 3)}<br />p = sigmoid(z) = 1 / (1 + exp(−z)) = {formatProbability(analysis.probability)}<br />L = {analysis.target === 1 ? "−ln(p)" : "−ln(1 − p)"} = {formatFixed(analysis.loss, 3)}</p><p className={shared.small}>The sigmoid maps the weighted sum z to a probability. ln is the natural logarithm. Switch to Backward to ask how a small change would affect loss.</p></section>}
+    {phase === "forward" && <section className={shared.evidence} aria-label="Forward computation"><h2>Build the prediction</h2><p className={shared.formula}>z = {formatFixed(outputWeights.wOut1)} × {formatFixed(analysis.h1)} + ({formatFixed(outputWeights.wOut2)}) × {formatFixed(analysis.h2)} − 0.25 = {formatFixed(analysis.z, 3)}<br />p = sigmoid(z) = 1 / (1 + exp(−z)) = {formatProbability(analysis.probability)}<br />L = {analysis.target === 1 ? "−ln(p)" : "−ln(1 − p)"} = {formatFixed(analysis.loss, 3)}</p><p className={shared.small}>The sigmoid maps the weighted sum z to a probability. ln is the natural logarithm. Switch to Backward to ask how a small change would affect loss.</p></section>}
     </section>
     <MatrixComputation analysis={analysis} phase={phase} />
     {phase !== "forward" && <><GradientEvidence analysis={analysis} /><MatrixWeightGradients analysis={analysis} /></>}

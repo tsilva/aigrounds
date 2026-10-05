@@ -1,5 +1,5 @@
 .caseEditor { margin-top: 28px; }
-.caseEditor h2, .evidence h2 { font-size: 16px; font-weight: 700; }
+.caseEditor h2 { font-size: 16px; font-weight: 700; }
 .editors { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; }
 .editors label { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; }
 .editors input, .editors select, .rateEditor input[type="number"] { border: 1px solid #9faec9; border-radius: 7px; padding: 8px; width: 80px; background: #fff; }
@@ -12,7 +12,6 @@
 .node { fill: #f6f5ff; stroke: #8271c7; stroke-width: 1.5; }
 .graphText { fill: #0c1230; font-family: var(--font-ibm-plex-mono), monospace; font-size: 15px; }
 .gradient { fill: #ad4508; }
-.evidence { padding: 20px 0; border-top: 1px solid #dfe4f4; }
 .gradientColumns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 16px; }
 .gradientColumns > div + div { border-left: 1px solid #dfe4f4; padding-left: 24px; }
 .gradientColumns h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }

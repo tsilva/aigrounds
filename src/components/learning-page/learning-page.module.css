@@ -2,6 +2,34 @@
 .page button, .page input, .page select { font: inherit; }
 .page button { cursor: pointer; }
 .page button:focus-visible, .page input:focus-visible, .page select:focus-visible, .page a:focus-visible { outline: 3px solid var(--indigo); outline-offset: 4px; }
+.evidence { min-width: 0; padding: 22px 0; border-bottom: 1px solid var(--line); container-type: inline-size; }
+.evidence :where(h2) { color: var(--ink); font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.evidence :where(h3) { color: var(--ink); font-size: 15px; font-weight: 600; margin: 12px 0; }
+.evidence :where(p, li) { font-size: 15px; line-height: 1.6; margin: 9px 0; }
+.evidence :where(details) { margin: 16px 0; }
+.evidence :where(summary) { color: var(--ink); cursor: pointer; font-weight: 600; }
+.evidence summary:focus-visible { outline: 3px solid var(--indigo); outline-offset: 4px; }
+.math { font-family: var(--font-ibm-plex-mono), monospace; overflow-wrap: anywhere; }
+.controlGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; margin: 20px 0; }
+.controlGrid[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.controlGrid[data-columns="1"], .controlGrid[data-single="true"] { grid-template-columns: minmax(0, 1fr); }
+.controlGrid :where(h3) { font-size: 14px; margin-bottom: 10px; }
+.tableScroll { max-width: 100%; overflow-x: auto; margin: 12px 0; }
+.tableScroll:focus-visible { outline: 3px solid var(--indigo); outline-offset: 4px; }
+.tableScroll :where(table) { width: 100%; min-width: var(--table-min-width, 0px); border-collapse: collapse; font-size: 14px; }
+.tableScroll :where(caption) { text-align: left; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 10px 0; }
+.tableScroll :where(th, td) { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+.dataTable { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14px; margin: 12px 0; }
+.dataTable :where(caption) { text-align: left; color: var(--muted); font-size: 13px; line-height: 1.6; margin: 10px 0; }
+.dataTable :where(th, td) { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.dataTable :where(td) { font-family: var(--font-ibm-plex-mono), monospace; }
+@container (max-width: 699px) {
+  .controlGrid, .controlGrid[data-columns="3"] { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+}
+@container (max-width: 599px) {
+  .dataTable { font-size: 12px; }
+  .dataTable :where(th, td) { padding: 8px 3px; }
+}
 .controlField { display: grid; gap: 7px; font-size: 14px; font-weight: 600; min-width: 0; }
 .controlField select { width: 100%; min-width: 0; padding: 9px 12px; border: 1px solid #9faec9; border-radius: 7px; background: white; color: var(--ink); font-size: 14px; }
 .toggleGroup { display: flex; flex-wrap: wrap; gap: 8px; }

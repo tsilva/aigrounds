@@ -1,4 +1,4 @@
-const choices = (...labels: string[]) => labels.map((label, i) => ({ id: String(i), label }));
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 export const calibrationExperiments = [
   { title: "Lower overconfidence", question: "Mixed confidence has D at 95% confidence but only 2/5 correct (40%). With Bin count 10 and Abstention threshold (%) 50, lower D’s Group confidence (%) to 60. Do the known correctness counts change?",
     predictions: choices("All-example ECE falls while full accuracy stays 70%.", "Accuracy improves because the confidence changes.", "60% now guarantees population calibration."), action: "Choose D under Selected group and set Group confidence (%) to 60. Keep Bin count 10 and Abstention threshold (%) 50. Read D’s group evidence and the all-example bin table.", explanation: "Which quantities changed, and which stayed fixed?",

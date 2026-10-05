@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "preference-judge-metrics",
+    layout: "guided-discovery",
+    kicker: "Trace the judge. Explain the ranking.",
+    estimatedDuration: "8 to 11 minutes",
+    learningGoals: ["Trace rubric weights into preference rates.", "Audit position and length bonuses with fixed identities.", "Separate reference agreement from human validity.", "Construct sequential pairwise ratings and explain order dependence."],
+    title: "Preference & Judge Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Compare two authored answer sets with disclosed toy judges and trace how rubric weights, preference rates, reference agreement and pairwise ratings shape rankings.",
+    concepts: ["Win rate", "Rubrics", "Judge bias", "Agreement"],
+  },
+
+  {
     slug: "benchmark-scores-pass-k",
     layout: "guided-discovery",
     kicker: "Change the budget. Separate finding an answer from selecting one.",
@@ -1495,14 +1508,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "preference-judge-metrics",
-    title: "Preference & Judge Metrics Lab",
-    tag: "llm evaluation",
-    summary:
-      "Compare two model answers with rubrics and judge votes to see how win rates, pairwise ratings, and evaluator bias shape rankings.",
-    concepts: ["Win rate", "Rubrics", "Judge bias", "Agreement"],
-  },
+
   {
     slug: "rag-groundedness-metrics",
     title: "RAG Groundedness Metrics Lab",

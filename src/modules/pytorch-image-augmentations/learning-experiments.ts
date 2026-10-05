@@ -1,6 +1,7 @@
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 import { isolatedSettings, moveTransform, type Settings, type TransformId } from "./augmentation-engine";
 export type LessonState = { image: "cat" | "sneaker" | "stop-sign" | "leaf"; settings: Settings };
-const choices = (...labels: string[]) => labels.map((label, i) => ({ id: String(i), label }));
+
 const first = isolatedSettings(["horizontal-flip", "to-tensor"]); first.horizontalFlipProbability = 0;
 const order = isolatedSettings(["random-resized-crop", "horizontal-flip", "to-tensor"]); order.cropMinArea = .5; order.horizontalFlipProbability = 1;
 const type = isolatedSettings(["random-erasing"], 2);

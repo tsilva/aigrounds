@@ -13,7 +13,7 @@
 .scroller { overflow-x:auto; margin-top:12px; }
 .scroller table { border-collapse:collapse; width:100%; min-width:440px; text-align:left; font-size:13px; color:#0c1230; }
 .scroller caption { text-align:left; color:#536487; line-height:1.7; margin-bottom:10px; }
-.scroller th,.scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
+.scroller th, .scroller td { padding:10px 8px; border-bottom:1px solid #dfe4f4; }
 .scroller td { white-space:nowrap; font-family:var(--font-ibm-plex-mono),monospace; }
 .scroller tr[data-current=true] { background:#f6f5ff; }
 @container (max-width:699px) { .parameters { grid-template-columns:1fr; } }

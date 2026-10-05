@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import shared from "@/components/learning-page/learning-page.module.css";
 import { analyzeProjection, projectionChart, projectionNumber as number, projectionScenarios, type ProjectionState } from "./projection-engine";
 import { projectionBaseline, reachedProjection } from "./lesson-state";
@@ -33,18 +34,12 @@ export function ProjectionPlayground() {
     if (next.angle === state.angle && next.scenario === state.scenario) return;
     setState(next); clear();
   }
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p>
-      <ExperimentChoices legend="Your prediction" name="projection-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }} />
-      <p className={shared.small}>Changing prediction restores this experiment’s starting dataset and angle. Reset restarts it.</p>
-    </>}
-    {prediction && !reached && <p className={shared.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
-    {reached && <><p role="status" className={shared.observation}>{prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}</p>
-      <h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="projection-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />
-      {explanation && !complete && <p role="status" className={shared.feedback}>Try again. {experiment.retry}</p>}
-    </>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Project across the diagonal" : "Choose what one component keeps"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="projection-prediction" explanationName="projection-explanation"
+    onPredict={id => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Changing prediction restores this experiment’s starting dataset and angle. Reset restarts it.</>} observation={prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}
+    onNext={() => start(index + 1)} nextLabel={index === 2 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Project across the diagonal" : "Choose what one component keeps"}>
     {transfer ? <><p>Without Guide help, choose Diagonal line and set Projection axis angle to 135°. Reconstruct the four signed components, projected coordinates and mean Error². Do coincident reconstructions preserve all original distinctions?</p>
       {reachedProjection(3, state) && <><ExperimentChoices legend="Transfer explanation" name="projection-transfer" choices={[
         { id: "collapsed", label: "This direction is perpendicular to the diagonal originals: all four components are 0 and all reconstructed points are (0,0). Mean Error² is 20, retained squared length is 0, original squared length is 20. Four distinct originals retain their IDs, but this component loses their distinctions. No task-quality claim follows." },
@@ -60,7 +55,7 @@ export function ProjectionPlayground() {
   </ExperimentRail>;
   return <LearningPage title="Projection Foundations Lab" subtitle="Rotate an axis; see what one component keeps." rail={rail}>
     <LessonToolbar scenarios={projectionScenarios} selectedId={state.scenario} onSelect={scenario => edit({ ...state, scenario: scenario as ProjectionState["scenario"] })} onReset={() => start(experiment || transfer ? index : 0)} />
-    <section className={styles.evidence} aria-label="Fixed originals and orthogonal reconstruction">
+    <section className={shared.evidence} aria-label="Fixed originals and orthogonal reconstruction">
       <h2>Your dataset</h2><p>Four fixed 2D points. Rotate a unit direction to keep one signed component per point; reconstructing from it drops perpendicular information. Original points stay fixed. Equal scales preserve the geometry.</p>
       <div className={styles.chart} ref={chartRef}><svg data-projection-chart viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label="Equal-scale coordinate grid with four original points, reconstructed points on the origin line and perpendicular residuals. Exact values and every ID are in the table below.">
         {chart.ticks.map(t => <g key={t.value}><line x1={t.x} x2={t.x} y1={chart.top} y2={chart.bottom} /><line x1={chart.left} x2={chart.left + chart.span} y1={t.y} y2={t.y} /><text x={t.x} y={chart.bottom + 22} textAnchor="middle">{t.value}</text><text x={chart.left - 12} y={t.y + 4} textAnchor="end">{t.value}</text></g>)}
@@ -73,21 +68,21 @@ export function ProjectionPlayground() {
       </svg></div>
       <p className={styles.legend}><span>● Original p</span><span>□ Reconstructed q</span><span>┄ Perpendicular residual p−q</span><span>→ Unit direction u</span></p>
       <LessonRangeControl label="Projection axis angle" value={state.angle} min={0} max={180} step={5} unit="°" help="Rotate the unit direction 0..180° in five-degree steps. Use the slider or exact number editor; arrows move one step, Home/End reach the bounds." onChange={angle => edit({ ...state, angle })} />
-      <p role="status" data-projection-status className={styles.formula}>{projectionScenarios.find(s => s.id === state.scenario)!.label} · Angle {state.angle}° · u = ({number(a.direction[0])}, {number(a.direction[1])}) · Mean Error² {number(a.meanError)}</p>
+      <p role="status" data-projection-status className={shared.math}>{projectionScenarios.find(s => s.id === state.scenario)!.label} · Angle {state.angle}° · u = ({number(a.direction[0])}, {number(a.direction[1])}) · Mean Error² {number(a.meanError)}</p>
     </section>
-    <section className={styles.evidence} aria-label="Components, reconstruction and squared error">
-      <p className={styles.formula}>Component t = Xux + Yuy (one number). Reconstruction q = tu (two coordinates on the line). Error² = (X−qx)² + (Y−qy)².</p>
-      <div className={styles.table} role="region" tabIndex={0} aria-label="All four originals, components, reconstructions and squared residuals"><table><caption>Every original ID remains, even at coincident reconstructions. Full-precision calculations are displayed rounded.</caption>
+    <section className={shared.evidence} aria-label="Components, reconstruction and squared error">
+      <p className={shared.math}>Component t = Xux + Yuy (one number). Reconstruction q = tu (two coordinates on the line). Error² = (X−qx)² + (Y−qy)².</p>
+      <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="All four originals, components, reconstructions and squared residuals"><table><caption>Every original ID remains, even at coincident reconstructions. Full-precision calculations are displayed rounded.</caption>
         <thead><tr>{["Case", "Original (X,Y)", "Component t", "Reconstructed (X,Y)", "Error²"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead><tbody>{a.rows.map(row => <tr data-projection-row={row.id} key={row.id}><th scope="row">{row.id}</th><td>({row.original.join(", ")})</td><td>{number(row.component)}</td><td>({row.projected.map(number).join(", ")})</td><td>{number(row.errorSquared)}</td></tr>)}</tbody>
       </table></div>
-      <p data-projection-decomposition className={styles.formula}>Per-point means: Error² {number(a.meanError)} + retained squared length {number(a.meanRetained)} = original squared length {number(a.meanOriginal)} (up to floating arithmetic). Divisor: 4 points.</p>
+      <p data-projection-decomposition className={shared.math}>Per-point means: Error² {number(a.meanError)} + retained squared length {number(a.meanRetained)} = original squared length {number(a.meanOriginal)} (up to floating arithmetic). Divisor: 4 points.</p>
     </section>
     <LessonSummaries label="Per-point mean squared lengths" summaries={[
       { label: "Mean Error²", color: "#ad4508", value: a.meanError.toFixed(3), definition: "Squared perpendicular reconstruction loss, averaged per point.", formula: "Σ ||p−q||² / 4", comparison: "Geometric loss; not prediction error or task accuracy." },
       { label: "Retained squared length", color: "#5031dc", value: a.meanRetained.toFixed(3), definition: "Squared reconstructed length, averaged per point.", formula: "Σ ||q||² / 4", comparison: "Depends on the chosen line; not a learned best axis." },
       { label: "Original squared length", color: "#087c78", value: a.meanOriginal.toFixed(3), definition: "Squared original length, averaged per point.", formula: "Σ ||p||² / 4", comparison: "Fixed when rotating the axis for the same dataset." },
     ]} />
-    <section className={styles.evidence} aria-label="Projection construction and limits"><details><summary>Construction and limits</summary>
+    <section className={shared.evidence} aria-label="Projection construction and limits"><details><summary>Construction and limits</summary>
       <p>The axis is an infinite line through the origin with nonzero unit direction u=(cosθ,sinθ). Its drawn arrow segment indicates orientation, not a finite-segment constraint. Projection uses t=p·u and q=tu; p−q is perpendicular to u. Scalar t and 2D reconstructed q are different objects. Reversing u reverses t and preserves q.</p>
       <p>All four originals stay fixed within each named cloud. Per-point mean Error² divides the sum of squared Euclidean residuals by 4, not by 8 coordinates. The orthogonal decomposition gives original squared length = retained squared length + squared residual. Special angles use algebraically equivalent exact outer-product matrix entries; other angles use floating trigonometry. Rounded displays do not define coincidences or zero errors.</p>
       <p>One component exactly reconstructs points lying on its origin line; off-line points lose perpendicular information. Coincident reconstructions keep all original IDs in separate table rows. Choosing a line manually is not PCA fitting, centering, eigenvector computation, learned compression or a task-accuracy guarantee. This lesson has no translated line, original-point editor or multiple-component representation. Scenario changes preserve angle; numeric/scenario edits clear stale answers. Prediction changes and Reset restore the current step.</p>

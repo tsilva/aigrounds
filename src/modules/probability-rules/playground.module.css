@@ -1,7 +1,5 @@
-.controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin: 24px 0 16px; }
-.evidence { padding: 24px 0; border-bottom: 1px solid #dfe4f4; }
-.evidence h2, .simulation h2 { font-size: 18px; margin: 0 0 8px; }
-.evidence p, .simulation p { color: #536487; font-size: 14px; line-height: 1.6; }
+.simulation h2 { font-size: 18px; margin: 0 0 8px; }
+.simulation p { color: #536487; font-size: 14px; line-height: 1.6; }
 .space { width: 100%; table-layout: fixed; border-spacing: 5px; margin-top: 14px; }
 .space caption { text-align: left; font-size: 13px; color: #536487; margin-bottom: 8px; }
 .space th { font-size: 13px; font-weight: 600; }

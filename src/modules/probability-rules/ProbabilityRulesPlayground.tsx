@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonAction, LessonSelect, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import { advanceSimulation, analyzeProbabilityRule, type EventRuleId, type RuleView, type SimulationState } from "./probability-rules-engine";
 import { eventAOptions, eventBOptions } from "./scenario";
@@ -36,23 +37,24 @@ export function ProbabilityRulesPlayground() {
   }
   function chooseView(id: string) { setView(id as RuleView); setSimulation(initialSimulation); clearAnswers(); }
   function roll(count: number) { setSimulation((state) => advanceSimulation(state, eventA, eventB, view, count)); clearAnswers(); }
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of ${ruleExperiments.length}`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="rule-prediction" choices={experiment.predictions} value={prediction} onChange={(id) => { start(index); setPrediction(id); }} /><p className={sharedStyles.small}>Choosing a prediction restores this experiment’s events, rule and empty sample.</p></>}
-    {prediction && !reached && <div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Use Event A = Sum is 7 and Event B = First die even. Reset starts again.</p></div>}
-    {reached && <><p role="status" className={sharedStyles.observation}>{prediction === experiment.correctPrediction ? "Your prediction matches the model." : "The evidence challenges your prediction. Compare the grid, formula and sample."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="rule-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />{explanation && !complete && <p role="status" className={sharedStyles.feedback}>Try again. {experiment.retry}</p>}</>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 3 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Apply a rule to new events" : "Explore the sample space"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of ${ruleExperiments.length}`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="rule-prediction" explanationName="rule-explanation"
+    onPredict={(id) => { start(index); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Choosing a prediction restores this experiment’s events, rule and empty sample.</>} observation={prediction === experiment.correctPrediction ? "Your prediction matches the model." : "The evidence challenges your prediction. Compare the grid, formula and sample."}
+    action={<div className={sharedStyles.actionPrompt}><p><strong>Now try it.</strong> {experiment.action}</p><p className={sharedStyles.small}>Use Event A = Sum is 7 and Event B = First die even. Reset starts again.</p></div>}
+    onNext={() => start(index + 1)} nextLabel={index === 3 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Apply a rule to new events" : "Explore the sample space"}>
     {transfer ? <><p>Choose Event A = Doubles, Event B = At least one 6, and A only. What fraction is selected, and why?</p><ExperimentChoices legend="Transfer explanation" name="rule-transfer" choices={[{ id: "five", label: "5/36: remove (6,6) from the six doubles." }, { id: "six", label: "6/36: A only keeps every double." }, { id: "one", label: "1/36: A only means both events." }]} value={transferAnswer} onChange={setTransferAnswer} />{transferAnswer && (!transferReached ? <p className={sharedStyles.feedback}>First set the three named controls and inspect the selected region.</p> : transferAnswer !== "five" ? <p className={sharedStyles.feedback}>Try again. A only keeps A outcomes that are outside B. Is (6,6) outside B?</p> : <><ExperimentResult title="Transfer explained">Exactly five doubles remain. The same set rule works for a different pair of events; its count depends on the overlap.</ExperimentResult><ExperimentButton onClick={() => setIndex(5)}>Explore freely</ExperimentButton></>)}</> : <><p>Try all event pairs and rules. Count the selected region before simulating it.</p><ExperimentButton onClick={() => start(0)}>Restart experiments</ExperimentButton></>}
   </ExperimentRail>;
   const selectedLabel = views.find((item) => item.id === view)!.label;
   return <LearningPage title="Probability Rules" subtitle="Select outcomes. Count what belongs to each event." rail={rail}>
     <LessonToolbar label="Experiment starting points" scenarios={ruleExperiments} selectedId={experiment?.id ?? ""} onSelect={(id) => start(ruleExperiments.findIndex((item) => item.id === id))} onReset={() => start()} />
-    <div className={styles.controls}>
+    <div className={sharedStyles.controlGrid}>
       <LessonSelect label="Event A" choices={eventAOptions} value={eventA} onChange={(id) => { setEventA(id as EventRuleId); setSimulation(initialSimulation); clearAnswers(); }} />
       <LessonSelect label="Event B" choices={eventBOptions} value={eventB} onChange={(id) => { setEventB(id as EventRuleId); setSimulation(initialSimulation); clearAnswers(); }} />
     </div>
     <LessonToggleGroup label="Rule" choices={views} value={view} onChange={chooseView} />
-    <section className={styles.evidence} aria-label="Dice sample space">
+    <section className={sharedStyles.evidence} aria-label="Dice sample space">
       <h2>Your sample space</h2><p>Two fair, independent dice give 36 equally likely ordered outcomes. A+B means both events; — means neither. ✓ marks outcomes counted by {selectedLabel}.</p>
       <table className={styles.space}><caption>First die = row; second die = column. Each cell is one possible ordered pair.</caption>
         <thead><tr><th scope="col">1st / 2nd</th>{dice.map((die) => <th scope="col" key={die}>{die}</th>)}</tr></thead>

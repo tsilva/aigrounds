@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import shared from "@/components/learning-page/learning-page.module.css";
 import { analyzePr, prChart, prPercent as percent, prScenarios, prThreshold as threshold, type PrState } from "./pr-engine";
 import { prBaseline, reachedPr } from "./lesson-state";
@@ -33,23 +34,12 @@ export function PrPlayground() {
   function start(next = index) { setIndex(next); setState(prBaseline(next)); setPrediction(null); clear(); }
   function edit(patch: Partial<PrState>) { setState(s => ({ ...s, ...patch })); clear(); }
 
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <>
-      <h3>Make a prediction</h3><p>{experiment.question}</p>
-      <ExperimentChoices legend="Your prediction" name="pr-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }} />
-      <p className={shared.small}>Changing prediction restores this experiment’s starting state. Reset restarts it.</p>
-    </>}
-    {prediction && !reached && <p className={shared.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
-    {reached && <>
-      <p role="status" className={shared.observation}>{prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}</p>
-      <h3>{experiment.explanation}</h3>
-      <ExperimentChoices legend="Your explanation" name="pr-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />
-      {explanation && !complete && <p role="status" className={shared.feedback}>Try again. {experiment.retry}</p>}
-    </>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult>
-      <ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton>
-    </>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Tied scores, new class balance" : "Read the whole score sweep"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="pr-prediction" explanationName="pr-explanation"
+    onPredict={id => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Changing prediction restores this experiment’s starting state. Reset restarts it.</>} observation={prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}
+    onNext={() => start(index + 1)} nextLabel={index === 2 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Tied scores, new class balance" : "Read the whole score sweep"}>
     {transfer ? <>
       <p>Without Guide help, choose All tied, set Negative copies per score to 3, and set Decision threshold to 0.50. Reconstruct precision, recall and AP. Then reason about a cutoff above 0.50 without assigning perfect precision to no accepted cases.</p>
       {reachedPr(3, state) && <>
@@ -68,10 +58,10 @@ export function PrPlayground() {
 
   return <LearningPage title="Precision-Recall Curves & Imbalance" subtitle="Make positives rare; inspect accepted predictions." rail={rail}>
     <LessonToolbar scenarios={prScenarios} selectedId={state.scenario} onSelect={scenario => edit({ scenario: scenario as PrState["scenario"] })} onReset={() => start(experiment || transfer ? index : 0)} />
-    <section className={styles.evidence} aria-label="Class balance and precision-recall evidence">
+    <section className={shared.evidence} aria-label="Class balance and precision-recall evidence">
       <h2>Your dataset</h2>
       <p>Six positive cases and six negative score types. Copy every negative score equally to change prevalence (the actual-positive fraction) while preserving each class’s score frequencies. Copies are illustrative accounting, not new independent observations. Scores are fixed ranking signals; score ≥ threshold predicts Positive, including equality.</p>
-      <p role="status" data-pr-status className={styles.formula}>6 positives · {a.negatives} negatives · prevalence {percent(a.prevalence)} · threshold {threshold(state.tick)} · TP {a.tp} · FP {a.fp} · FN {a.fn} · TN {a.tn} · precision {a.precision === null ? "undefined" : a.precision.toFixed(6)} · recall {a.recall.toFixed(6)} · AP {a.ap.toFixed(6)}</p>
+      <p role="status" data-pr-status className={shared.math}>6 positives · {a.negatives} negatives · prevalence {percent(a.prevalence)} · threshold {threshold(state.tick)} · TP {a.tp} · FP {a.fp} · FN {a.fn} · TN {a.tn} · precision {a.precision === null ? "undefined" : a.precision.toFixed(6)} · recall {a.recall.toFixed(6)} · AP {a.ap.toFixed(6)}</p>
       <div className={styles.chart} ref={chartRef}>
         <svg data-pr-chart viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`Recall horizontally, precision vertically, both 0 to 1. ${chart.points.length} grouped score outcomes. Current threshold ${threshold(state.tick)}: recall ${a.recall.toFixed(6)}, precision ${a.precision === null ? "undefined; no operating diamond" : a.precision.toFixed(6)}. Average precision ${a.ap.toFixed(6)} from recall-weighted rectangles. Open square (0,1) is a drawing endpoint without a threshold. Exact tables follow.`}>
           {chart.ticks.map(t => <g key={t.value}>
@@ -91,19 +81,19 @@ export function PrPlayground() {
         </svg>
       </div>
       <p>Circles = grouped threshold outcomes. Hollow diamond = current operating point. Pale rectangles = average precision (AP) weights. Dashed line = prevalence, the precision when all cases are predicted positive. Open square at (recall 0, precision 1) = drawing convention with no threshold. Steps summarize AP; intermediate points need not be attainable hard cutoffs.</p>
-      {a.precision === null && <p role="status" data-pr-empty className={styles.formula}>No predicted positives: precision = 0/0 is undefined, recall = 0/6 = 0. No operating diamond is drawn; the open square is not this threshold’s precision.</p>}
+      {a.precision === null && <p role="status" data-pr-empty className={shared.math}>No predicted positives: precision = 0/0 is undefined, recall = 0/6 = 0. No operating diamond is drawn; the open square is not this threshold’s precision.</p>}
       <LessonRangeControl label="Negative copies per score" value={state.copies} min={1} max={4} step={1} help="Copy all six negative score types equally. Six positives remain fixed; negatives = 6 × copies. This changes prevalence and precision, not the positive scores or recall at a fixed threshold." onChange={copies => edit({ copies })} />
       <LessonRangeControl label="Decision threshold" value={state.tick / 20} min={0} max={1} step={.05} help="Score ≥ threshold predicts Positive. Equal scores enter together. Lowering the cutoff can raise, lower or preserve precision. A cutoff edit selects one point without changing AP." onChange={value => edit({ tick: Math.round(value * 20) })} />
-      <p className={styles.formula} data-pr-ap>AP = sum(recall increase × score-group precision) = {a.ap.toFixed(6)}. Non-interpolated recall weights; not trapezoidal PR area, ROC AUC or one cutoff’s precision.</p>
+      <p className={shared.math} data-pr-ap>AP = sum(recall increase × score-group precision) = {a.ap.toFixed(6)}. Non-interpolated recall weights; not trapezoidal PR area, ROC AUC or one cutoff’s precision.</p>
     </section>
     <LessonSummaries label="Current rates and whole-curve average precision" summaries={[
       { label: "Precision", color: "#ad4508", value: percent(a.precision), definition: "True positives among accepted predictions.", formula: `TP/(TP + FP) = ${a.tp}/${a.tp + a.fp}`, comparison: a.precision === null ? "Undefined: no prediction is positive." : "Uses predicted positives, not all cases." },
       { label: "Recall", color: "#087c78", value: percent(a.recall), definition: "Found actual positives among all six actual positives.", formula: `TP/(TP + FN) = ${a.tp}/6`, comparison: "Changing uniform negative copies preserves this rate." },
       { label: "Average precision", color: "#5031dc", value: a.ap.toFixed(3), definition: "Whole-curve summary from each score group’s precision weighted by its increase in recall.", formula: "AP = sum(Δrecall × precision)", comparison: "Depends on class balance; unchanged by one cutoff edit." },
     ]} />
-    <section className={styles.evidence} aria-label="Case identities, AP construction and limits">
+    <section className={shared.evidence} aria-label="Case identities, AP construction and limits">
       <details><summary>Cases and decisions</summary>
-        <div className={styles.table} role="region" tabIndex={0} aria-label="Positive cases and negative copy identities">
+        <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="Positive cases and negative copy identities">
           <table><caption>P1..P6 are fixed positives. N-type.copy identifies each illustrative negative copy. Score ≥ {threshold(state.tick)} predicts Positive.</caption>
             <thead><tr>{["Case", "Score", "Actual", "Predicted", "Confusion cell"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead>
             <tbody>{a.rows.map(r => <tr key={r.id}><th scope="row">{r.id}</th><td>{threshold(r.scoreTick)}</td><td>{r.actual ? "Positive" : "Negative"}</td><td>{r.predicted ? "Positive" : "Negative"}</td><td>{r.bucket}</td></tr>)}</tbody>
@@ -111,12 +101,12 @@ export function PrPlayground() {
         </div>
       </details>
       <details><summary>Score groups and AP</summary>
-        <div className={styles.table} role="region" tabIndex={0} aria-label="Grouped thresholds and average precision contributions">
+        <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="Grouped thresholds and average precision contributions">
           <table><caption>Distinct scores enter together in descending order. AP term = increase in recall × this group’s precision; zero recall-width contributes zero. The drawing endpoint has no threshold and no AP term.</caption>
             <thead><tr>{["Threshold", "TP", "FP", "Recall", "Precision", "Δrecall", "AP term"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead>
             <tbody>{a.groups.map(g => <tr key={g.tick}><th scope="row">{threshold(g.tick)}</th><td>{g.tp}</td><td>{g.fp}</td><td>{g.recall.toFixed(6)}</td><td>{g.precision.toFixed(6)}</td><td>{g.deltaRecall.toFixed(6)}</td><td>{g.apTerm.toFixed(6)}</td></tr>)}</tbody>
           </table>
-          <p className={styles.formula}>Sum of full-precision AP terms = {a.ap.toFixed(6)}. Displayed terms are rounded.</p>
+          <p className={shared.math}>Sum of full-precision AP terms = {a.ap.toFixed(6)}. Displayed terms are rounded.</p>
         </div>
       </details>
       <details><summary>Construction and limits</summary>

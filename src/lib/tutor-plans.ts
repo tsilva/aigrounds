@@ -1,3 +1,4 @@
+import { benchmarkTutorPlan } from "@/modules/benchmark-scores-pass-k/learning-experiments";
 import { referenceTutorPlan } from "@/modules/reference-answer-metrics/learning-experiments";
 import { rmsTutorPlan } from "@/modules/rms-normalization/learning-experiments";
 import { positionTutorPlan } from "@/modules/positional-encoding-token-order/learning-experiments";
@@ -103,6 +104,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "benchmark-scores-pass-k": benchmarkTutorPlan,
   "reference-answer-metrics": referenceTutorPlan,
   "rms-normalization": rmsTutorPlan,
   "positional-encoding-token-order": positionTutorPlan,

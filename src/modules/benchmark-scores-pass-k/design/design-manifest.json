@@ -1,0 +1,20 @@
+{
+  "lessonPlanStep": 78,
+  "title": "Benchmark Scores & Pass@k Lab",
+  "slug": "benchmark-scores-pass-k",
+  "modulePath": "src/modules/benchmark-scores-pass-k",
+  "mockupPath": "src/modules/benchmark-scores-pass-k/design/accepted-mockup.png",
+  "promptPath": "src/modules/benchmark-scores-pass-k/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-ae1649c0-bb59-4c19-bd5a-c9d8285d89e9.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 four boxed result cards and hidden required batch variation"
+  ],
+  "review": "V2 correct six-column sample ledger, baseline counts, three open summaries, open A/B/C comparison and original scheme.",
+  "approvedRefinements": [
+    "Shared controls use two columns then stack at narrow available widths.",
+    "Exact table adds inclusion, label-frequency and tie-policy evidence.",
+    "Batch comparison adds descriptive population variance/SD and same-setting all-eight reference.",
+    "Only Construction and limits is optional/collapsed; all required score evidence stays open."
+  ]
+}

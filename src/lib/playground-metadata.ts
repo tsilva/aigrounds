@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "benchmark-scores-pass-k",
+    layout: "guided-discovery",
+    kicker: "Change the budget. Separate finding an answer from selecting one.",
+    estimatedDuration: "8 to 11 minutes",
+    learningGoals: ["Trace per-item and mean pass@k with k≤n.", "Separate answer existence from first/sample accuracy and voting.", "Interpret descriptive batch variation without inference guarantees.", "Transfer budgets and exposure filtering without causal contamination claims."],
+    title: "Benchmark Scores & Pass@k Lab",
+    tag: "llm evaluation",
+    summary:
+      "Compare authored sample batches and trace how accuracy, pass@k, voting, variation and exposure filtering change the score story.",
+    concepts: ["Benchmark accuracy", "Pass@k", "Variance", "Contamination"],
+  },
+
+  {
     slug: "reference-answer-metrics",
     layout: "guided-discovery",
     kicker: "Compare answers. See what each metric counts.",
@@ -1482,14 +1495,6 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "benchmark-scores-pass-k",
-    title: "Benchmark Scores & Pass@k Lab",
-    tag: "llm evaluation",
-    summary:
-      "Run sampled benchmark attempts and watch accuracy, pass@k, majority vote, variance, and contamination change the score story.",
-    concepts: ["Benchmark accuracy", "Pass@k", "Variance", "Contamination"],
-  },
   {
     slug: "preference-judge-metrics",
     title: "Preference & Judge Metrics Lab",

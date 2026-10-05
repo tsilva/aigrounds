@@ -1,0 +1,20 @@
+{
+  "lessonPlanStep": 80,
+  "title": "RAG Groundedness Metrics Lab",
+  "slug": "rag-groundedness-metrics",
+  "modulePath": "src/modules/rag-groundedness-metrics",
+  "mockupPath": "src/modules/rag-groundedness-metrics/design/accepted-mockup.png",
+  "promptPath": "src/modules/rag-groundedness-metrics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-7ca6e886-d015-472b-af34-93faac92e243.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 lacked explicit fictional example, changed D3 and preselected prediction"
+  ],
+  "review": "V2 correct baseline/source/claim/metric evidence, explicit fictional reference and boundary conventions.",
+  "approvedRefinements": [
+    "Use exact authored full source and claim texts with disclosed fact identifiers.",
+    "Three native controls two columns then stack at narrow available width.",
+    "All claim/source/required-fact tables open and keyboard-scrollable; only conventions optional.",
+    "Original shared navy/lavender/indigo tokens, including citation precision."
+  ]
+}

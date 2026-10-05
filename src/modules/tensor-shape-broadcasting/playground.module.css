@@ -2,20 +2,18 @@
 .shapeControls {display:grid;gap:18px;margin:20px 0;}
 .shapeControls fieldset {border:0;min-width:0;}
 .shapeControls legend {font-size:15px;font-weight:600;margin-bottom:12px;}
-.shapeControls fieldset>div,.indexControls {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.shapeControls fieldset>div, .indexControls {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .indexControls {margin:18px 0;}
-.evidence,.optional {border-top:1px solid #dfe4f4;}
-.evidence {padding:22px 0;}
-.evidence h2 {font-size:21px;font-weight:600;}
-.evidence p,.optional p {color:#536487;font-size:14px;line-height:1.7;margin:8px 0;}
+.optional {border-top:1px solid #dfe4f4;}
+.optional p {color:#536487;font-size:14px;line-height:1.7;margin:8px 0;}
 .scroller {overflow-x:auto;margin-top:14px;}
 .scroller table {width:100%;min-width:640px;border-collapse:collapse;font-size:13px;text-align:left;}
 .scroller caption {text-align:left;color:#536487;font-size:13px;line-height:1.7;margin:8px 0 12px;}
-.scroller th,.scroller td {padding:10px 8px;border-bottom:1px solid #dfe4f4;}
+.scroller th, .scroller td {padding:10px 8px;border-bottom:1px solid #dfe4f4;}
 .scroller td {font-family:var(--font-ibm-plex-mono),monospace;}
 .scroller tr[data-status="fail"] {background:#fff3f3;}
 .optional details {padding:16px 0;border-bottom:1px solid #dfe4f4;}
 .optional summary {font-size:15px;font-weight:500;cursor:pointer;}
 .trace {border-top:1px solid #dfe4f4;border-bottom:1px solid #dfe4f4;padding:14px 0;}
 .trace p {font-family:var(--font-ibm-plex-mono),monospace;font-size:16px;color:#0c1230;overflow-wrap:anywhere;}
-@container (max-width:499px) {.shapeControls fieldset>div,.indexControls {grid-template-columns:minmax(0,1fr);}}
+@container (max-width:499px) {.shapeControls fieldset>div, .indexControls {grid-template-columns:minmax(0,1fr);}}

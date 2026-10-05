@@ -1,7 +1,8 @@
 "use client";
 
 import {useMemo,useState} from "react";
-import {ExperimentButton,ExperimentChoices,ExperimentRail,ExperimentResult,LearningPage,LessonRangeControl,LessonSummaries,LessonToolbar} from "@/components/learning-page/learning-page";
+import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import sharedStyles from "@/components/learning-page/learning-page.module.css";
 import {analyzeTemperature,formatPercent,setLogit} from "./softmax-temperature-engine";
 import {softmaxClasses,softmaxPresets} from "./scenario";
@@ -27,12 +28,12 @@ export function SoftmaxTemperaturePlayground(){
   function clear(){setExplanation(null);setTransferAnswer(null)}
   function start(next=index){setIndex(next);setState(softmaxExperiments[next]?.baseline??softmaxDefaults);setPrediction(null);clear()}
   function edit(next:SoftmaxState){setState(next);clear()}
-  const rail=experiment?<ExperimentRail label={`Experiment ${index+1} of 3`} title={experiment.title} phase={!prediction?0:reached?2:1}>
-    {!reached&&<><h3>Make a prediction</h3><p>{experiment.question}</p><ExperimentChoices legend="Your prediction" name="softmax-prediction" choices={experiment.predictions} value={prediction} onChange={id=>{start();setPrediction(id)}}/><p className={sharedStyles.small}>Choosing a prediction restores the experiment’s starting scores and Temperature.</p></>}
-    {prediction&&!reached&&<p className={sharedStyles.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
-    {reached&&<><p className={sharedStyles.observation} role="status">{prediction===experiment.correctPrediction?"Your prediction matches the evidence.":"The probabilities challenge your prediction. Compare the score ranking and the largest share."}</p><h3>{experiment.explanation}</h3><ExperimentChoices legend="Your explanation" name="softmax-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation}/>{explanation&&!complete&&<p className={sharedStyles.feedback} role="status">Try again. {experiment.retry}</p>}</>}
-    {complete&&<><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={()=>start(index+1)}>{index===2?"Try the transfer check":"Next experiment"}</ExperimentButton></>}
-  </ExperimentRail>:<ExperimentRail label={transfer?"Transfer check":"Free exploration"} title={transfer?"A close call stays uncertain":"Explore relative scores"}>
+  const rail=experiment?<GuidedExperiment label={`Experiment ${index+1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="softmax-prediction" explanationName="softmax-explanation"
+    onPredict={id=>{start();setPrediction(id)}} onExplain={setExplanation}
+    predictionHelp={<>Choosing a prediction restores the experiment’s starting scores and Temperature.</>} observation={prediction===experiment.correctPrediction?"Your prediction matches the evidence.":"The probabilities challenge your prediction. Compare the score ranking and the largest share."}
+    onNext={()=>start(index+1)} nextLabel={index===2?"Try the transfer check":"Next experiment"} />:<ExperimentRail label={transfer?"Transfer check":"Free exploration"} title={transfer?"A close call stays uncertain":"Explore relative scores"}>
     {transfer?<><p>Choose Close Call and set Temperature to 0.25. Is the largest class certain, even at this lowest allowed temperature?</p><ExperimentChoices legend="Transfer explanation" name="softmax-transfer" choices={[{id:"finite",label:"No. Rover remains largest at about 48.73%; the other finite weights still get positive probability."},{id:"certain",label:"Yes. The lowest temperature guarantees 100% for Rover."},{id:"accuracy",label:"Yes. Softmax proves that Rover is the correct class."}]} value={transferAnswer} onChange={setTransferAnswer}/>{transferAnswer&&(!transferReached?<p role="status" className={sharedStyles.feedback}>First choose Close Call and set Temperature to 0.25.</p>:transferAnswer!=="finite"?<p role="status" className={sharedStyles.feedback}>Try again. The displayed largest share is below 100%, and no actual class label is supplied.</p>:<><ExperimentResult title="Transfer explained">Rover leads with about 48.73%, while Comet, Harbor and Signal retain positive probability. Lower temperature concentrates relative scores; it guarantees neither certainty nor correctness.</ExperimentResult><ExperimentButton onClick={()=>setIndex(4)}>Explore freely</ExperimentButton></>)}</>:<><p>Compare presets, score edits and Temperature separately. Equal logits stay uniform; a shared offset to every logit leaves probabilities unchanged because its exponential factor cancels from numerator and denominator.</p><ExperimentButton onClick={()=>start(0)}>Restart experiments</ExperimentButton></>}
   </ExperimentRail>;
 

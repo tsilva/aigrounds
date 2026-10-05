@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import shared from "@/components/learning-page/learning-page.module.css";
 import { analyzeVectors, boundVectorCoordinate, vectorChart, vectorNumber as number, vectorPresetId, vectorPresets, vectorScenarios, type VectorId } from "./vector-engine";
 import { vectorBaseline, reachedVectors } from "./lesson-state";
@@ -46,19 +47,12 @@ export function VectorPlayground() {
     const py = (event.clientY - rect.top) * chart.height / rect.height;
     edit(boundVectorCoordinate((px - chart.left) * 10 / chart.span - 5), boundVectorCoordinate((chart.bottom - py) * 10 / chart.span - 5));
   }
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p>
-      <ExperimentChoices legend="Your prediction" name="vector-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }} />
-      <p className={shared.small}>Changing prediction restores this experiment’s starting pair and selects B. Reset restarts it.</p>
-    </>}
-    {prediction && !reached && <p className={shared.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
-    {reached && <><p role="status" className={shared.observation}>{prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}</p>
-      <h3>{experiment.explanation}</h3>
-      <ExperimentChoices legend="Your explanation" name="vector-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />
-      {explanation && !complete && <p role="status" className={shared.feedback}>Try again. {experiment.retry}</p>}
-    </>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult><ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton></>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Reverse a nonzero direction" : "Separate length from alignment"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="vector-prediction" explanationName="vector-explanation"
+    onPredict={id => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Changing prediction restores this experiment’s starting pair and selects B. Reset restarts it.</>} observation={prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}
+    onNext={() => start(index + 1)} nextLabel={index === 2 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "Reverse a nonzero direction" : "Separate length from alignment"}>
     {transfer ? <>
       <p>Without Guide help, choose Right angle, then choose B under Vector to edit. Set Selected vector X to −3 and Selected vector Y to −4 while A stays (3,4). Reconstruct both lengths, dot, cosine and angle. What does the sign tell you, and what does it not establish?</p>
       {reachedVectors(3, state) && <>
@@ -76,7 +70,7 @@ export function VectorPlayground() {
   </ExperimentRail>;
   return <LearningPage title="Vector Geometry & Similarity Lab" subtitle="Move vectors; separate length from alignment." rail={rail}>
     <LessonToolbar scenarios={vectorScenarios} selectedId={preset} onSelect={scenario => { setState({ ...vectorPresets[scenario] }); setSelected("B"); clear(); }} onReset={() => start(experiment || transfer ? index : 0)} />
-    <section className={styles.evidence} aria-label="Two signed vectors and selected tip editor">
+    <section className={shared.evidence} aria-label="Two signed vectors and selected tip editor">
       <h2>Your dataset</h2>
       <p>Two signed 2D vectors from the same origin. Magnitude is length; direction is where a nonzero arrow points. Equal axis scales preserve geometry. Select A or B to move its one active handle; coincident tips retain both identities.</p>
       <div className={styles.chart} ref={chartRef}>
@@ -109,24 +103,24 @@ export function VectorPlayground() {
       <p className={styles.legend}><span>● A: solid arrow</span><span>■ B: dashed arrow</span><span>◇ Selected tip</span></p>
       <h3>Vector to edit</h3><LessonToggleGroup label="Vector to edit" choices={[{ id: "A", label: "A" }, { id: "B", label: "B" }]} value={selected} onChange={id => setSelected(id as VectorId)} />
       <p id="vector-tip-help">Select A or B; drag its active handle, or focus it and use arrows (Shift: two units). Up increases Y; Right increases X. Home sets the selected vector to (0,0); End sets (5,5). Enter or click focuses Selected vector X. Selecting a vector alone changes no values.</p>
-      <div className={styles.controls}><div ref={editorRef}><LessonRangeControl label="Selected vector X" value={x} min={-5} max={5} step={1} help={`Signed horizontal component of ${selected}, −5..5 in whole units.`} onChange={next => edit(next, y)} /></div>
+      <div className={shared.controlGrid}><div ref={editorRef}><LessonRangeControl label="Selected vector X" value={x} min={-5} max={5} step={1} help={`Signed horizontal component of ${selected}, −5..5 in whole units.`} onChange={next => edit(next, y)} /></div>
         <LessonRangeControl label="Selected vector Y" value={y} min={-5} max={5} step={1} help={`Signed vertical component of ${selected}, −5..5 in whole units.`} onChange={next => edit(x, next)} /></div>
-      <p role="status" data-vector-status className={styles.formula}>{preset === "custom" ? "Custom pair" : vectorScenarios.find(s => s.id === preset)!.label} · A ({state.ax}, {state.ay}), B ({state.bx}, {state.by}) · Dot {number(a.dot)} · Cosine {number(a.cosine)} · Angle {number(a.angle)}{a.angle !== null && "°"}</p>
+      <p role="status" data-vector-status className={shared.math}>{preset === "custom" ? "Custom pair" : vectorScenarios.find(s => s.id === preset)!.label} · A ({state.ax}, {state.ay}), B ({state.bx}, {state.by}) · Dot {number(a.dot)} · Cosine {number(a.cosine)} · Angle {number(a.angle)}{a.angle !== null && "°"}</p>
       {a.cosine === null && <p role="status" data-vector-zero>At least one vector has magnitude zero and no direction. Dot is still computable, but cosine would divide by zero; geometric cosine and angle are undefined.</p>}
     </section>
-    <section className={styles.evidence} aria-label="Vector components, magnitudes and signed products">
-      <div className={styles.table} role="region" tabIndex={0} aria-label="Both vector identities and exact numeric construction"><table><caption>Magnitude = sqrt(X² + Y²). Both identities remain separate at coincident tips. Values are computed at full precision and displayed rounded.</caption>
+    <section className={shared.evidence} aria-label="Vector components, magnitudes and signed products">
+      <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="Both vector identities and exact numeric construction"><table><caption>Magnitude = sqrt(X² + Y²). Both identities remain separate at coincident tips. Values are computed at full precision and displayed rounded.</caption>
         <thead><tr>{["Vector", "X", "Y", "Squared length", "Magnitude"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead><tbody>{["A", "B"].map((id, i) => <tr data-vector-row={id} key={id}><th scope="row">{id}</th><td>{i === 0 ? state.ax : state.bx}</td><td>{i === 0 ? state.ay : state.by}</td><td>{a.squared[i]}</td><td>{number(a.norms[i])}</td></tr>)}</tbody>
       </table></div>
-      <p data-vector-products className={styles.formula}>Dot = ({state.ax})×({state.bx}) + ({state.ay})×({state.by}) = {number(a.terms[0])} + {number(a.terms[1])} = {number(a.dot)}</p>
-      <p data-vector-denominator className={styles.formula}>Length product = sqrt({a.squared[0]} × {a.squared[1]}) = {number(a.denominator)}. {a.cosine === null ? "Zero denominator: cosine and angle undefined." : `Cosine = dot / length product = ${number(a.cosine)}; angle = acos(cosine) = ${number(a.angle)}°.`}</p>
+      <p data-vector-products className={shared.math}>Dot = ({state.ax})×({state.bx}) + ({state.ay})×({state.by}) = {number(a.terms[0])} + {number(a.terms[1])} = {number(a.dot)}</p>
+      <p data-vector-denominator className={shared.math}>Length product = sqrt({a.squared[0]} × {a.squared[1]}) = {number(a.denominator)}. {a.cosine === null ? "Zero denominator: cosine and angle undefined." : `Cosine = dot / length product = ${number(a.cosine)}; angle = acos(cosine) = ${number(a.angle)}°.`}</p>
     </section>
     <LessonSummaries label="Dot, nonzero-direction cosine and angle" summaries={[
       { label: "Dot product", color: "#5031dc", value: a.dot.toFixed(0), definition: "Sum of signed coordinate products.", formula: "AxBx + AyBy", comparison: "Combines length and alignment; remains defined at zero." },
       { label: "Cosine similarity", color: "#087c78", value: a.cosine === null ? "Undefined" : a.cosine.toFixed(3), definition: "Alignment ratio for two nonzero vectors.", formula: "dot / (magnitude A × magnitude B)", comparison: "−1 opposite; 0 perpendicular; +1 same direction." },
       { label: "Angle", color: "#ad4508", value: a.angle === null ? "Undefined" : `${a.angle.toFixed(3)}°`, definition: "Angle between two nonzero directions.", formula: "acos(cosine), in degrees", comparison: "Zero vector has no direction or geometric angle." },
     ]} />
-    <section className={styles.evidence} aria-label="Embedding connection and geometric limits">
+    <section className={shared.evidence} aria-label="Embedding connection and geometric limits">
       <h2>From two dimensions to embeddings</h2><p>An embedding is a numeric vector representation of an item. In more dimensions, dot sums all matching component products; magnitude uses all squared components. Cosine uses the same nonzero-length ratio. These editable coordinates illustrate the algebra; they are not learned word embeddings. Whether geometric similarity tracks task meaning depends on the representation and evaluation.</p>
       <details><summary>Construction and limits</summary>
         <p>Each component is an integer from −5 to 5. Both axes have equal numerical weight and equal visual scale. Vector to edit selects one active handle and two native component editors; the other vector stays fixed. Coincident endpoints retain both arrow styles, tip glyphs, an A/B label and separate exact table rows. Zero vectors have no direction arrowhead. Scenario changes restore the named pair and select B. Prediction changes/Reset restore the current step; numeric/preset edits clear stale explanations.</p>

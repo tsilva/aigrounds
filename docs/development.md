@@ -12,10 +12,13 @@ After application changes, run:
 pnpm typecheck
 pnpm lint
 pnpm check:cycles
+node scripts/check-learning-design.mjs
 pnpm build
 ```
 
 `pnpm test:deps` exercises patched dependency security boundaries. There is no general-purpose test framework. CI also runs a dependency audit after a frozen-lockfile install with lifecycle scripts disabled.
+
+The learning-design check validates every published lesson's shared shell and layout metadata, resolves CSS-module references, and rejects duplicated evidence styling and the obsolete monospace font token.
 
 Reuse an existing development server. Otherwise, run `pnpm dev --port auto` and open its printed URL. Do not kill or restart an existing server; report startup or automatic port-selection failures instead.
 

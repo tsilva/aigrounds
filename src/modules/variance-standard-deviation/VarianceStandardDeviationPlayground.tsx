@@ -34,7 +34,7 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
 }
 
 function DeviationEvidence({ analysis, selectedId }: { analysis: SpreadAnalysis; selectedId: string }) {
-  return <section className={styles.evidence} aria-labelledby="spread-evidence-title">
+  return <section className={sharedStyles.evidence} aria-labelledby="spread-evidence-title">
     <h2 id="spread-evidence-title">Distances from the mean</h2>
     <p>Subtract the mean, then square each deviation. Longer bars show larger distances.</p>
     <table className={styles.deviations}>

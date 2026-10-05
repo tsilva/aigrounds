@@ -1,18 +1,5 @@
-.evidence { margin-block: 28px; container-type: inline-size; }
-.evidence h2 { font-size: 18px; margin-bottom: 10px; }
-.evidence p { font-size: 14px; line-height: 1.7; margin-block: 10px; }
-.controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; align-items: start; margin-block: 24px; }
-.mono { font-family: var(--font-mono),monospace; overflow-wrap: anywhere; }
-.table { overflow-x: auto; border-block: 1px solid #dfe4f4; }
-.table table { width: 100%; min-width: 1160px; border-collapse: collapse; font-size: 13px; }
-.table caption { padding: 10px; line-height: 1.6; text-align: left; }
-.table th,.table td { padding: 12px 10px; border-bottom: 1px solid #dfe4f4; text-align: left; }
+.table { --table-min-width: 1160px; }
 .table tr[aria-current="true"] { background: #f6f5ff; }
 .itemDetails { display: block; font-size: 12px; font-weight: 400; color: #536487; margin-top: 4px; }
-.table:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
-.evidence details { border-block: 1px solid #dfe4f4; padding-block: 16px; }
-.evidence summary { cursor: pointer; font-weight: 600; }
-.evidence summary:focus-visible,.evidence a:focus-visible { outline: 3px solid #5031dc; outline-offset: 3px; }
-@container (max-width: 599px) { .controls { grid-template-columns: 1fr; } }
 
 .table [data-selected="true"] { background: #f6f5ff; font-weight: 600; }

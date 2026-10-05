@@ -1,5 +1,6 @@
+import { experimentChoices as choices } from "@/lib/experiment-choices";
 import { commitProofRound, initialProofState, openProofEdge, type ProofState } from "./zero-knowledge-proofs-engine";
-const choices=(...labels:string[])=>labels.map((label,i)=>({id:String(i),label}));
+
 export function experimentBaseline(index:number,shuffle:number):ProofState {
   if(index===0)return initialProofState();
   if(index===1)return commitProofRound(initialProofState(),shuffle);

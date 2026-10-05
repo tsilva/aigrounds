@@ -1,21 +1,18 @@
 .context {margin:18px 0;color:#536487;font-size:14px;line-height:1.7;}
-.evidence {padding:22px 0;border-top:1px solid #dfe4f4;}
-.evidence h2 {font-size:21px;font-weight:600;}
-.evidence p,.optional p {margin:8px 0;color:#536487;font-size:14px;line-height:1.7;}
-.mono {font-family:var(--font-ibm-plex-mono),monospace;overflow-wrap:anywhere;}
+.optional p {margin:8px 0;color:#536487;font-size:14px;line-height:1.7;}
 .presets {margin-top:12px;}
-.lanes,.features {display:grid;gap:14px;margin:16px 0;}
-.lane,.feature {display:grid;grid-template-columns:110px minmax(0,1fr) 80px;gap:12px;align-items:center;font-size:14px;}
-.lane strong,.feature strong {font-weight:500;overflow-wrap:anywhere;}
+.lanes, .features {display:grid;gap:14px;margin:16px 0;}
+.lane, .feature {display:grid;grid-template-columns:110px minmax(0,1fr) 80px;gap:12px;align-items:center;font-size:14px;}
+.lane strong, .feature strong {font-weight:500;overflow-wrap:anywhere;}
 .lane small {font-size:11px;color:#536487;}
-.lane output,.feature output {font-family:var(--font-ibm-plex-mono),monospace;text-align:right;}
+.lane output, .feature output {font-family:var(--font-ibm-plex-mono),monospace;text-align:right;}
 .track {height:16px;background:#edf0f7;position:relative;}
 .track::after {content:"";position:absolute;left:50%;top:0;height:100%;border-left:1px solid #c5cde2;}
-.weightBar,.valueBar {display:block;height:100%;background:#5031dc;}
+.weightBar, .valueBar {display:block;height:100%;background:#5031dc;}
 .axis {display:flex;justify-content:space-between;margin:18px 92px 0 122px;font-size:12px;color:#536487;}
 .scroller {overflow-x:auto;margin-top:14px;}
 .scroller table {width:100%;min-width:760px;border-collapse:collapse;text-align:left;font-size:13px;}
-.scroller th,.scroller td {padding:10px 8px;border-bottom:1px solid #dfe4f4;vertical-align:top;}
+.scroller th, .scroller td {padding:10px 8px;border-bottom:1px solid #dfe4f4;vertical-align:top;}
 .scroller th {font-weight:500;}
 .scroller td {font-family:var(--font-ibm-plex-mono),monospace;white-space:nowrap;}
 .scroller caption {text-align:left;margin-bottom:12px;line-height:1.7;color:#536487;}
@@ -23,4 +20,4 @@
 .optional {border-top:1px solid #dfe4f4;}
 .optional details {padding:16px 0;border-bottom:1px solid #dfe4f4;}
 .optional summary {cursor:pointer;font-size:15px;font-weight:500;}
-@container (max-width:499px) {.lane,.feature {grid-template-columns:85px minmax(0,1fr) 76px;gap:8px;font-size:13px;}.axis {margin-left:93px;margin-right:84px;}}
+@container (max-width:499px) {.lane, .feature {grid-template-columns:85px minmax(0,1fr) 76px;gap:8px;font-size:13px;}.axis {margin-left:93px;margin-right:84px;}}

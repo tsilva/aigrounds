@@ -1,0 +1,10 @@
+.network { width: 100%; max-height: 185px; }
+.network line { stroke: #9faec9; stroke-width: 2; }
+.network circle { fill: #eeebff; stroke: #5031dc; stroke-width: 2; }
+.network text, .history text { fill: #33486d; font: 13px var(--font-ibm-plex-mono), monospace; }
+.stages { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; list-style: none; }
+.stages li { padding: 8px 12px; border-bottom: 2px solid #dfe4f4; }
+.stages li[aria-current="step"] { color: #5031dc; font-weight: 700; border-color: #5031dc; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+.history { width: 100%; }
+.history line { stroke: #dfe4f4; }

@@ -1,3 +1,8 @@
+import { trainingTutorPlan } from "@/modules/neural-network-training-loop/learning-experiments";
+import { boundaryTutorPlan } from "@/modules/linear-classification-boundaries/learning-experiments";
+import { decodingTutorPlan } from "@/modules/autoregressive-generation-decoding/learning-experiments";
+import { blockTutorPlan } from "@/modules/transformer-block-residual-stream/learning-experiments";
+import { pipelineTutorPlan } from "@/modules/rag-pipeline/learning-experiments";
 import { opsTutorPlan } from "@/modules/llm-app-ops-metrics/learning-experiments";
 import { safetyTutorPlan } from "@/modules/safety-refusal-robustness-metrics/learning-experiments";
 import { ragTutorPlan } from "@/modules/rag-groundedness-metrics/learning-experiments";
@@ -108,6 +113,11 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "neural-network-training-loop": trainingTutorPlan,
+  "linear-classification-boundaries": boundaryTutorPlan,
+  "rag-pipeline": pipelineTutorPlan,
+  "transformer-block-residual-stream": blockTutorPlan,
+  "autoregressive-generation-decoding": decodingTutorPlan,
   "llm-app-ops-metrics": opsTutorPlan,
   "safety-refusal-robustness-metrics": safetyTutorPlan,
   "rag-groundedness-metrics": ragTutorPlan,

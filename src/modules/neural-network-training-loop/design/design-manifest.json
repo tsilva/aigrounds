@@ -1,0 +1,18 @@
+{
+  "step": 19,
+  "title": "The Training Loop",
+  "slug": "neural-network-training-loop",
+  "modulePath": "src/modules/neural-network-training-loop",
+  "mockupPath": "src/modules/neural-network-training-loop/design/accepted-mockup.png",
+  "promptPath": "src/modules/neural-network-training-loop/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a10b84-7ef8-7881-9979-0969f179e6ef/exec-fb3e06a8-8c4d-4730-8288-0d970bfd0d2e.png",
+  "approval": "Explicit user approval on 2026-10-05",
+  "refinements": [
+    "Reuse the shared LearningPage and ExperimentRail.",
+    "Selecting a prediction enters Try without a separate launcher.",
+    "One Predict/Try/Explain progress indicator; scenario Reset restarts the current experiment.",
+    "AI Guide remains in the experiment rail.",
+    "All mathematical geometry and readouts derive from the numeric engine.",
+    "Use actual parameter updates and computed loss history, with held-out rows excluded from fitting."
+  ]
+}

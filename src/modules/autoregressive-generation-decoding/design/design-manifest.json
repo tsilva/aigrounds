@@ -1,0 +1,17 @@
+{
+  "step": 75,
+  "title": "How Tokens Become an Answer",
+  "slug": "autoregressive-generation-decoding",
+  "modulePath": "src/modules/autoregressive-generation-decoding",
+  "mockupPath": "src/modules/autoregressive-generation-decoding/design/accepted-mockup.png",
+  "promptPath": "src/modules/autoregressive-generation-decoding/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a10b84-7ef8-7881-9979-0969f179e6ef/exec-a1542e92-bed1-459a-8c03-86afd3f5a9ab.png",
+  "approval": "Explicit user approval on 2026-10-05",
+  "refinements": [
+    "Reuse the shared LearningPage and ExperimentRail.",
+    "Selecting a prediction enters Try without a separate launcher.",
+    "One Predict/Try/Explain progress indicator; scenario Reset restarts the current experiment.",
+    "AI Guide remains in the experiment rail.",
+    "All mathematical geometry and readouts derive from the numeric engine."
+  ]
+}

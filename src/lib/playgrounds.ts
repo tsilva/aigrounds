@@ -1,3 +1,8 @@
+import { TrainingPlayground } from "@/modules/neural-network-training-loop/TrainingPlayground";
+import { BoundaryPlayground } from "@/modules/linear-classification-boundaries/BoundaryPlayground";
+import { DecodingPlayground } from "@/modules/autoregressive-generation-decoding/DecodingPlayground";
+import { BlockPlayground } from "@/modules/transformer-block-residual-stream/BlockPlayground";
+import { PipelinePlayground } from "@/modules/rag-pipeline/PipelinePlayground";
 import { OpsPlayground } from "@/modules/llm-app-ops-metrics/OpsPlayground";
 import { SafetyPlayground } from "@/modules/safety-refusal-robustness-metrics/SafetyPlayground";
 import { RagPlayground } from "@/modules/rag-groundedness-metrics/RagPlayground";
@@ -97,6 +102,11 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "neural-network-training-loop": TrainingPlayground,
+  "linear-classification-boundaries": BoundaryPlayground,
+  "rag-pipeline": PipelinePlayground,
+  "transformer-block-residual-stream": BlockPlayground,
+  "autoregressive-generation-decoding": DecodingPlayground,
   "llm-app-ops-metrics": OpsPlayground,
   "safety-refusal-robustness-metrics": SafetyPlayground,
   "rag-groundedness-metrics": RagPlayground,

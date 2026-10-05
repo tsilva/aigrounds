@@ -15,7 +15,9 @@
 
 AI Grounds is a web app for people learning artificial intelligence through hands-on experiments. Move data points, tune parameters, and step through algorithms to see how their behavior changes. Try the [live playgrounds](https://aigrounds.tsilva.eu) to explore statistics, probability, neural networks, and more.
 
-The gallery follows a learning sequence and distinguishes published lessons from planned ones. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide to talk through the result. Probability lessons connect exact outcome counts, model expectations and reference groups to the formulas through guided experiments. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds.
+The gallery opens with a **20-step AI core** and optional paths for probability, inference, evaluation, retrieval, transformers, vision and search. Five pairs share a curriculum entry with linked chapters; every published chapter keeps its original URL. The Concept Atlas and Zero Knowledge Proofs sit under Explore & reference. Five new bridge lessons connect classification scores to decisions, backward gradients to training, token probabilities to generation, attention to a complete decoder block, and retrieval to answer evidence.
+
+Lessons show prerequisites, chapter links and a path-aware next step. Visits, self-reported review and explained transfer checks are saved separately in this browser, with resume and delayed recall practice; no account is required. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide in the experiment rail. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds. See the [curriculum](docs/curriculum.md) for the core, path map, chapter consolidations and bridge lessons.
 
 ## Install
 
@@ -39,11 +41,17 @@ pnpm start --port auto # serve a production build
 pnpm typecheck        # check TypeScript separately
 pnpm lint             # run ESLint
 pnpm check:cycles     # check for import cycles
+pnpm check:bridges    # verify the five bridge engines independently
 pnpm test:deps        # check patched dependency security boundaries
 ```
 
 ## Notes
 
+- [The Training Loop](src/modules/neural-network-training-loop) steps an actual tiny model through forward values, batch loss, backward gradients and parameter updates while keeping held-out rows out of fitting.
+- [Linear Classification & Decision Boundaries](src/modules/linear-classification-boundaries) connects editable weights, bias and cutoff policy to fixed observations, sigmoid readouts and degenerate boundaries.
+- [How Tokens Become an Answer](src/modules/autoregressive-generation-decoding) feeds selected tokens into an authored prefix with reproducible sampling, candidate filtering and distinct EOS/length stopping.
+- [Inside a Transformer Block](src/modules/transformer-block-residual-stream) traces a disclosed two-token pre-norm block, causal attention and separate attention/MLP residual additions.
+- [From Retrieval to a Grounded Answer](src/modules/rag-pipeline) separates authored rankings, supplied context and answer evidence, including unsupported, outdated and incomplete claims.
 - [LLM App Ops Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/llm-app-ops-metrics) traces a toy single-worker request timeline, model/client first content, queueing, finite-window throughput, cold prefix reuse and fictional token charges.
 - [Safety, Refusal & Robustness Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/safety-refusal-robustness-metrics) traces harmful compliance, benign false refusal, conditional jailbreak success and all-variant robustness through a disclosed authored outcome bank.
 - [RAG Groundedness Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/rag-groundedness-metrics) separates retrieved context relevance, claim faithfulness, citation support/precision and reference completeness through disclosed fictional sources, fragments, invalid citations and outdated evidence.

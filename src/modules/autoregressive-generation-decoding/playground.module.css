@@ -1,0 +1,6 @@
+.prefix { font: 700 32px var(--font-ibm-plex-mono), monospace !important; overflow-wrap: anywhere; }
+.distribution { margin: 20px 0; }
+.row { display: grid; grid-template-columns: 120px minmax(0,1fr) 80px; align-items: center; gap: 14px; margin: 14px 0; font-size: 14px; }
+.track { height: 18px; background: #e5e7f1; }
+.track span { display: block; height: 100%; background: #5031dc; }
+@media (max-width: 1000px) { .row { grid-template-columns: 100px minmax(0,1fr) 70px; gap: 10px; } }

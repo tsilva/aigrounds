@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowPathIcon, ArrowRightIcon, ChatBubbleLeftRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { useId, useState, type CSSProperties, type ReactNode, type Ref } from "react";
 import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
+import { LessonJourneyIntro, LessonNext, TransferCompletion } from "@/components/curriculum/lesson-journey";
 import styles from "./learning-page.module.css";
 
 export function LearningPage({ title, subtitle, children, rail }: {
@@ -23,6 +24,7 @@ export function LearningPage({ title, subtitle, children, rail }: {
           <p className={styles.eyebrow}>Guided discovery</p>
           <h1>{title}</h1><p>{subtitle}</p>
         </header>
+        <LessonJourneyIntro />
         {children}
       </div>
       {rail}
@@ -90,6 +92,7 @@ export function ExperimentRail({ label, title, phase, children }: {
     {phase !== undefined && <ExperimentProgress phase={phase} />}
     <div className={styles.exercise}>{children}</div>
     <GuideInvitation />
+    <LessonNext />
   </aside>;
 }
 
@@ -112,8 +115,9 @@ export function ExperimentResult({ title = "Experiment explained", children, com
   children: ReactNode;
   compact?: boolean;
 }) {
-  if (compact) return <div className={styles.success} role="status"><strong>{title}</strong><p>{children}</p></div>;
-  return <div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>{title}</h3><p>{children}</p></div></div>;
+  const next = title === "Transfer explained" ? <TransferCompletion /> : null;
+  if (compact) return <><div className={styles.success} role="status"><strong>{title}</strong><p>{children}</p></div>{next}</>;
+  return <><div className={styles.takeaway} role="status"><CheckCircleIcon aria-hidden="true" /><div><h3>{title}</h3><p>{children}</p></div></div>{next}</>;
 }
 
 export function ExperimentButton({ children, onClick, disabled, arrow = false }: {

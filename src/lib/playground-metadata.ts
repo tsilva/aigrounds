@@ -33,6 +33,81 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    "slug": "autoregressive-generation-decoding",
+    "title": "How Tokens Become an Answer",
+    "tag": "llm systems",
+    "layout": "guided-discovery",
+    "kicker": "Append a token. Update the prefix.",
+    "estimatedDuration": "8 to 11 minutes",
+    "summary": "Append selected tokens to an authored prefix and compare greedy decoding, reproducible sampling, candidate filtering and stopping.",
+    "concepts": [
+      "Autoregression",
+      "Sampling",
+      "Top-k / top-p",
+      "Stopping"
+    ],
+    "learningGoals": [
+      "Connect token selection to updated prefix context.",
+      "Separate greedy selection from sampling.",
+      "Explain filtering and renormalization.",
+      "Distinguish EOS from a length limit."
+    ]
+  },
+  {
+    "slug": "transformer-block-residual-stream",
+    "title": "Inside a Transformer Block",
+    "tag": "transformers",
+    "layout": "guided-discovery",
+    "kicker": "Follow the stream. Isolate each branch.",
+    "estimatedDuration": "9 to 12 minutes",
+    "summary": "Trace a tiny numeric hidden state through causal attention, an MLP, normalization and residual additions in a disclosed pre-normalized decoder block.",
+    "concepts": [
+      "Residual stream",
+      "Causal attention",
+      "MLP",
+      "RMSNorm"
+    ],
+    "learningGoals": [
+      "Trace both residual additions from their incoming streams.",
+      "Separate attention and MLP ablations.",
+      "Explain causal masking and tokenwise processing."
+    ]
+  },
+  {
+    "slug": "rag-pipeline",
+    "title": "From Retrieval to a Grounded Answer",
+    "tag": "retrieval",
+    "layout": "guided-discovery",
+    "kicker": "Retrieve evidence. Inspect the answer.",
+    "estimatedDuration": "8 to 11 minutes",
+    "summary": "Trace authored ranked chunks into supplied context and evidence-linked answers to separate retrieval, support, completeness and current-reference correctness.",
+    "concepts": [
+      "Ranking",
+      "Context budget",
+      "Answer evidence",
+      "Failure diagnosis"
+    ],
+    "learningGoals": [
+      "Separate retrieved chunks from supplied context.",
+      "Isolate retrieval and answering failures.",
+      "Distinguish source support, requested-field coverage and current correctness."
+    ]
+  },
+  {
+    slug: "neural-network-training-loop", title: "The Training Loop", tag: "neural networks", layout: "guided-discovery",
+    kicker: "Step a batch. Watch weights change.", estimatedDuration: "9 to 12 minutes",
+    summary: "Step through forward values, batch loss, backward gradients and parameter updates, then compare repeated learning and held-out error.",
+    concepts: ["Batches", "Epochs", "Gradient averaging", "Parameter updates"],
+    learningGoals: ["Separate forward computation from parameter updates.", "Explain average batch gradients and epoch counts.", "Keep held-out rows out of fitting.", "Use parameter evidence to explain zero-rate updates."],
+  },
+  {
+    slug: "linear-classification-boundaries", title: "Linear Classification & Decision Boundaries", tag: "classification", layout: "guided-discovery",
+    kicker: "Move a weight. Trace the decision boundary.", estimatedDuration: "7 to 10 minutes",
+    summary: "Edit weights, bias and a decision cutoff on labeled 2D points to connect signed scores, sigmoid probabilities and classification boundaries.",
+    concepts: ["Weights", "Bias", "Sigmoid", "Decision boundaries"],
+    learningGoals: ["Trace bias shifts and weight direction changes.", "Separate cutoff policy from score and probability.", "Explain vertical and constant-score boundaries."],
+  },
+  {
     slug: "llm-app-ops-metrics",
     layout: "guided-discovery",
     kicker: "Trace first content, completion and work over time.",
@@ -1523,122 +1598,9 @@ export const activePlaygroundMetadata: Array<
 }));
 
 export const upcomingPlaygrounds: UpcomingPlayground[] = [
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ];
 
-export const dashboardLessonPlanOrder = [
-  "mean-median-mode",
-  "range-quartiles-iqr",
-  "variance-standard-deviation",
-  "shape-skew-outliers",
-  "probability-rules",
-  "conditional-probability",
-  "bayes-rule",
-  "expected-value-risk",
-  "law-large-numbers-simulation",
-  "bernoulli-categorical-binomial",
-  "waiting-arrival-distributions",
-  "pdf-cdf-probability-area",
-  "normal-distribution-z-scores",
-  "sampling-sample-size",
-  "sampling-bias",
-  "sampling-distributions-standard-error",
-  "central-limit-theorem",
-  "margin-of-error-sample-size",
-  "confidence-intervals",
-  "hypothesis-testing-basics",
-  "type-i-type-ii-errors",
-  "power-effect-size-sample-size",
-  "covariance-correlation",
-  "correlation-shape-outliers",
-  "simpsons-paradox-confounding",
-  "linear-regression-line-fitting",
-  "least-squares-loss-landscape",
-  "r-squared-residual-diagnostics",
-  "train-test-generalization",
-  "overfitting",
-  "bias-variance-tradeoff",
-  "classification-metrics-foundations",
-  "confusion-matrix-thresholds",
-  "roc-auc-thresholds",
-  "precision-recall-curves-imbalance",
-  "feature-scaling",
-  "distance-metrics",
-  "vector-geometry-similarity",
-  "matrix-multiplication",
-  "tensor-shape-broadcasting",
-  "projection-foundations",
-  "pca-principal-components",
-  "t-sne-neighborhood-map",
-  "umap-manifold-projection",
-  "embedding-retrieval",
-  "retrieval-ranking-metrics",
-  "entropy-information",
-  "class-score-logits",
-  "softmax-temperature",
-  "log-loss-confidence-penalties",
-  "categorical-cross-entropy",
-  "calibration-reliability-diagrams",
-  "kl-divergence",
-  "contrastive-loss",
-  "gradient-descent",
-  "regularization",
-  "k-means-clustering",
-  "exploration-exploitation",
-  "monte-carlo-tree-search",
-  "activation-functions",
-  "neural-network-forward-pass",
-  "mnist-mlp-inference-debugger",
-  "convolution-filter-lab",
-  "pytorch-image-augmentations",
-  "label-mixing-image-transforms",
-  "autograd-graphs",
-  "backpropagation-inspector",
-  "batch-normalization",
-  "byte-pair-encoding",
-  "llm-loss-perplexity",
-  "context-windows-attention-masks",
-  "positional-encoding-token-order",
-  "transformer-attention",
-  "layer-normalization",
-  "rms-normalization",
-  "linear-quantization-int4",
-  "reference-answer-metrics",
-  "benchmark-scores-pass-k",
-  "preference-judge-metrics",
-  "rag-groundedness-metrics",
-  "safety-refusal-robustness-metrics",
-  "llm-app-ops-metrics",
-  "zero-knowledge-proofs",
-  "ai-concept-atlas",
-] as const;
+export { dashboardLessonPlanOrder } from "@/lib/curriculum";
 
 function getPlaygroundMetadata(slug: string) {
   return activePlaygroundMetadata.find((playground) => playground.slug === slug);

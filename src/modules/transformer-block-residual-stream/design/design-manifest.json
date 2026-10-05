@@ -1,0 +1,18 @@
+{
+  "step": 73,
+  "title": "Inside a Transformer Block",
+  "slug": "transformer-block-residual-stream",
+  "modulePath": "src/modules/transformer-block-residual-stream",
+  "mockupPath": "src/modules/transformer-block-residual-stream/design/accepted-mockup.png",
+  "promptPath": "src/modules/transformer-block-residual-stream/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a10b84-7ef8-7881-9979-0969f179e6ef/exec-b4a52375-7b7b-4c84-9e48-6df7e164234f.png",
+  "approval": "Explicit user approval on 2026-10-05",
+  "refinements": [
+    "Reuse the shared LearningPage and ExperimentRail.",
+    "Selecting a prediction enters Try without a separate launcher.",
+    "One Predict/Try/Explain progress indicator; scenario Reset restarts the current experiment.",
+    "AI Guide remains in the experiment rail.",
+    "All mathematical geometry and readouts derive from the numeric engine.",
+    "Show the first residual addition by default and retain the complete two-token block trace."
+  ]
+}

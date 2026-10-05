@@ -1,0 +1,28 @@
+import { experimentChoices as choices } from "@/lib/experiment-choices";
+export const trainingExperiments = [
+  { title: "Forward is not an update", question: "In Four corners, will one Forward stage change any model parameter?",
+    predictions: choices("No. It computes predictions from the current parameters.", "Yes. Every stage fits weights.", "Only the held-out labels change."),
+    action: "Press Step stage once. Read Changed parameters beside the update count; the Initial/Current table gives the exact values.", explanation: "Why are the parameters unchanged?",
+    explanations: choices("Forward computes activations and predictions. Loss and Backward prepare the learning signal; only Update applies it.", "The network cannot learn from these points.", "A zero update count proves the predictions are correct."),
+    retry: "Look at Next stage and the update count. Computing an output is different from changing a parameter.", takeaway: "A training loop has separate operations: Forward, Loss, Backward and Update. Inference alone does not fit a model." },
+  { title: "An epoch visits training rows", question: "Four training rows, batch size 2: how many update applications finish one epoch?",
+    predictions: choices("Two, one per batch.", "Four, one per operation.", "Six, including the held-out rows."),
+    action: "Press Run one epoch. Read Epoch, Updates and the separate Training and Validation loss values.", explanation: "What was fitted, and what was only evaluated?",
+    explanations: choices("Each update uses the mean gradient of its two training rows. The two held-out rows contribute only to validation loss.", "Validation rows supply extra gradients when training loss is high.", "An epoch guarantees validation loss decreases."),
+    retry: "Inspect exact examples and batch arithmetic. Validation is a separate evaluation, not an extra batch.", takeaway: "An epoch covers the training rows once. Fitting training loss and evaluating held-out loss are different jobs; neither proves future accuracy." },
+  { title: "A batch controls update timing", question: "If Batch size becomes All, will one epoch still apply two updates?",
+    predictions: choices("No. All four gradients are averaged at one parameter state, then one update is applied.", "Yes. An epoch always means two updates.", "No. It stops computing gradients."),
+    action: "Choose Batch size All. This restarts the run. Press Run one epoch.", explanation: "Why can this differ from the two-batch run?",
+    explanations: choices("All averages four row gradients before one update. With two batches, the second gradient uses parameters changed by the first update.", "All multiplies learning rate by four automatically.", "Held-out points are now fitted too."),
+    retry: "Batch gradients are averaged, not summed. The learning rate stays visible; compare Updates.", takeaway: "Batch size changes the gradient sample and update timing. Equal epochs need not mean equal parameter trajectories." },
+];
+export const trainingTransfer = { title: "Updates with zero learning rate", action: "On Shifted points, set Learning rate to 0 and press Run one epoch. Compare parameters and both losses with their initial values.", question: "Did two update applications necessarily learn new parameters?",
+  choices: choices("No. Δparameter = −rate × mean gradient is zero at rate 0. The update applications are counted, but parameters and losses stay unchanged.", "Yes. An update count proves learning.", "No. Validation labels must have been used incorrectly."),
+  retry: "A counted application can have zero size. Compare the parameter table, not just Epoch or Updates.", takeaway: "A loop can run without changing its model. With rate 0, gradient computations and update counts continue but every parameter step is zero." };
+export const trainingTutorPlan = {
+  intro: "Predict, step the four operations, then explain batch and epoch behavior. Finish a different zero-rate case without Guide help.",
+  whyItMatters: "Forward values, gradients and updates become learning only when the operations are repeated over training data.",
+  openingMessage: "Prerequisites: weighted sums, ReLU, sigmoid probability loss, backward gradients and train/validation roles. This is a fixed 2-input, 2-ReLU-hidden, 1-sigmoid-output teaching network. ReLU is max(0,input), with derivative zero at zero. Training uses mean binary cross entropy and mean batch gradients; Update subtracts Learning rate times that gradient. There is no fitting on held-out rows and no final-test set. Validation here is a tiny diagnostic, not a generalization guarantee. Use Step stage to execute Forward, Loss, Backward, Update in order. Run one epoch finishes the remaining training batches in the current epoch. Batch size or scenario changes restart the model; changing Learning rate discards pending batch arithmetic while keeping parameters. History plots full-training and held-out loss after each update, not batch loss. Runs stop after 100 update applications. First prediction: Does Forward alone change a weight? Reply with your prediction before trying Step stage. For the final transfer, invite the learner to inspect values and explain before giving its conclusion.",
+  masteryCriteria: ["Separate forward inference, loss, backward gradients and parameter updates.", "Count batches per epoch and explain mean gradients.", "Keep held-out rows out of fitting.", "Explain a zero-rate update using parameter evidence."],
+  steps: trainingExperiments.map(e => ({ title: e.title, experiment: e.action, predictionQuestion: e.question, observationPrompt: e.explanation, takeaway: e.takeaway })),
+};

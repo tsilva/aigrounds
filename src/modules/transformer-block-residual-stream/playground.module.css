@@ -1,0 +1,7 @@
+.flow { width: 100%; margin: 18px 0; }
+.flow rect, .flow circle { fill: #eeebff; stroke: #9faec9; }
+.flow text, .bars text { fill: #33486d; font: 13px var(--font-ibm-plex-mono), monospace; }
+.bars { width: 100%; margin: 12px 0; }
+.bars line { stroke: #dfe4f4; }
+.bars rect, .bars circle { fill: #5031dc; }
+.traceTable { --table-min-width: 660px; }

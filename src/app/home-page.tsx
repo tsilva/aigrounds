@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
+import { canonicalLessonSlug, getLearningPath, learningPaths, lessonHref } from "@/lib/curriculum";
+import { useLearningProgress } from "@/lib/learning-progress";
+import { ReadinessCheck } from "@/components/curriculum/readiness-check";
 
 export type HomePlaygroundCard = {
   step: number;
@@ -16,6 +19,11 @@ export type HomePlaygroundCard = {
   status: "live" | "coming-soon";
   href?: string;
   lastUpdated: string | null;
+  coreStep: number;
+  paths: string[];
+  chapters: { slug: string; title: string }[];
+  reference: boolean;
+  recallGoals: Record<string, string>;
 };
 
 type HomePageProps = {
@@ -27,6 +35,11 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
+  const [pathId, setPathId] = useState("core");
+  const progress = useLearningProgress();
+  const selectedPath = getLearningPath(pathId);
+  const lastLesson = playgrounds.find(item => item.slug === canonicalLessonSlug(progress.last?.slug ?? "") && item.status === "live");
+  const resumeSlug = lastLesson ? progress.last!.slug : undefined;
 
   useEffect(() => {
     const refresh = () => setNow(Date.now());
@@ -42,6 +55,8 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
     const normalizedQuery = query.trim().toLowerCase();
 
     const filteredPlaygrounds = playgrounds.filter((playground) => {
+      if (!normalizedQuery && selectedPath && !selectedPath.lessons.includes(playground.slug)) return false;
+      if (!normalizedQuery && pathId === "extras" && !playground.reference) return false;
       const searchableText = [
         playground.title,
         playground.slug,
@@ -51,6 +66,8 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
         playground.level,
         playground.status,
         ...playground.concepts,
+        ...playground.chapters.map(chapter => chapter.title),
+        ...playground.paths.map(id => getLearningPath(id)?.title ?? id),
       ]
         .join(" ")
         .toLowerCase();
@@ -69,9 +86,10 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
         if (dateDifference !== 0) return dateDifference;
       }
 
+      if (!normalizedQuery && selectedPath) return selectedPath.lessons.indexOf(a.slug) - selectedPath.lessons.indexOf(b.slug);
       return a.step - b.step;
     });
-  }, [playgrounds, query, sortOrder]);
+  }, [playgrounds, query, sortOrder, selectedPath, pathId]);
 
   return (
     <main className="min-h-screen bg-[#f7faff] px-4 py-5 text-slate-950 sm:px-6 lg:px-10">
@@ -102,8 +120,8 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
               AI Grounds
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-              Learn AI concepts through small interactive playgrounds, ordered
-              from the foundations to the systems they unlock.
+              Start with the AI core, follow a specialist path, or explore an
+              idea you need today. Learn by predicting, trying and explaining.
             </p>
           </div>
 
@@ -119,9 +137,50 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           </label>
         </header>
 
+        <section aria-label="Start or continue learning" className="grid gap-4 rounded-xl border border-indigo-100 bg-white p-5 md:grid-cols-2">
+          <div>
+            <h2 className="text-xl font-semibold">Start here</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Twenty recommended steps from understanding data to a working neural network. Familiar concepts can be skipped.</p>
+            <Link href={lessonHref("mean-median-mode", "core")} className="mt-3 inline-block rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white!">Start the AI core →</Link>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold">Continue</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{lastLesson ? `Return to ${lastLesson.title}.` : "Your place is saved in this browser as you explore. No account needed."}</p>
+            {resumeSlug && <Link href={lessonHref(resumeSlug, progress.last?.path)} className="mt-3 inline-block font-semibold text-indigo-700! underline! underline-offset-2">Resume your last chapter →</Link>}
+            <p className="mt-2 text-xs text-slate-500">{Object.keys(progress.transfers).length} chapter transfer checks explained · {progress.reviewed.length} marked reviewed</p>
+          </div>
+        </section>
+
+        <section aria-label="Choose a learning path">
+          <label className="text-sm font-semibold text-slate-700">Learning path
+            <select value={pathId} onChange={event => setPathId(event.target.value)} className="ml-3 max-w-full rounded-lg border border-blue-200 bg-white px-3 py-2">
+              {learningPaths.map(path => <option key={path.id} value={path.id}>{path.title}</option>)}
+              <option value="all">Browse all lessons</option>
+              <option value="extras">Explore & reference</option>
+            </select>
+          </label>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{query.trim() ? "Searching across all lessons, chapters and paths." : selectedPath?.summary ?? (pathId === "extras" ? "Browse the concept atlas and related ideas outside the main curriculum." : "All lessons in learning order. Specialist paths share foundations; chapters retain their original links.")}</p>
+          {selectedPath && !query.trim() && <ReadinessCheck key={selectedPath.id} pathId={selectedPath.id} />}
+        </section>
+
+        {now !== null && Object.entries(progress.transfers).some(([, time]) => now - time >= 86_400_000) && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">
+          <h2 className="text-lg font-semibold">Recall an earlier idea</h2>
+          <p className="mt-1 text-sm text-slate-600">Explain one idea from memory before reopening its experiment.</p>
+          {Object.entries(progress.transfers).filter(([, time]) => now - time >= 86_400_000).sort((a, b) => a[1] - b[1]).slice(0, 3).map(([slug]) => {
+            const lesson = playgrounds.find(item => item.slug === canonicalLessonSlug(slug));
+            if (!lesson) return null;
+            const title = lesson.chapters.find(chapter => chapter.slug === slug)?.title ?? lesson.title;
+            return <div key={slug} className="mt-3 border-t border-blue-100 pt-3 text-sm">
+              <p className="font-semibold">{title}</p>
+              <p className="mt-1">From memory: {lesson.recallGoals[slug] ?? "Explain what you changed, what changed as a result, and why."}</p>
+              <Link href={lessonHref(slug)} className="mt-2 inline-block text-indigo-700! underline! underline-offset-2">Revisit the experiment →</Link>
+            </div>;
+          })}
+        </section>}
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-slate-500">
-            {visiblePlaygrounds.length} playgrounds
+            {visiblePlaygrounds.length} {pathId === "extras" && !query.trim() ? "explore entries" : visiblePlaygrounds.length === 1 ? "lesson" : "lessons"} · {visiblePlaygrounds.filter(item => item.status === "coming-soon").length} coming soon
           </p>
           <div role="group" aria-label="Sort playgrounds" className="flex items-center gap-1 rounded-xl border border-blue-200 bg-white p-1">
             {([
@@ -135,7 +194,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
                 onClick={() => setSortOrder(value)}
                 className={`rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-4 focus:ring-indigo-100 ${
                   sortOrder === value
-                    ? "bg-indigo-50 text-indigo-700"
+                    ? "bg-indigo-50 text-indigo-700!"
                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
@@ -147,7 +206,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
 
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => (
-            <PlaygroundTile key={playground.slug} playground={playground} now={now} />
+            <PlaygroundTile key={playground.slug} playground={playground} now={now} pathId={query.trim() ? undefined : selectedPath?.id} progress={progress} />
           ))}
         </section>
 
@@ -165,8 +224,12 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   );
 }
 
-function PlaygroundTile({ playground, now }: { playground: HomePlaygroundCard; now: number | null }) {
+function PlaygroundTile({ playground, now, pathId, progress }: { playground: HomePlaygroundCard; now: number | null; pathId?: string; progress: ReturnType<typeof useLearningProgress> }) {
   const isComingSoon = playground.status === "coming-soon";
+  const chapters = playground.chapters.length ? playground.chapters.map(chapter => chapter.slug) : [playground.slug];
+  const checked = chapters.filter(slug => progress.transfers[slug]).length;
+  const reviewedCount = chapters.filter(slug => progress.reviewed.includes(slug)).length;
+  const localStep = pathId ? getLearningPath(pathId)!.lessons.indexOf(playground.slug) + 1 : playground.step;
   const updateLabel = playground.lastUpdated
     ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
     : null;
@@ -183,7 +246,7 @@ function PlaygroundTile({ playground, now }: { playground: HomePlaygroundCard; n
     : "mt-4 text-2xl leading-tight font-semibold text-slate-950";
   const stepClassName = isComingSoon
     ? "shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs font-medium text-slate-400"
-    : "shrink-0 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 font-mono text-xs font-medium text-indigo-700";
+    : "shrink-0 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 font-mono text-xs font-medium text-indigo-700!";
   const tagClassName = isComingSoon
     ? "text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
     : "text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600";
@@ -195,15 +258,13 @@ function PlaygroundTile({ playground, now }: { playground: HomePlaygroundCard; n
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className={levelClassName}>
-            {playground.level}
+            {pathId ? `step ${String(localStep).padStart(2, "0")}` : playground.level}
           </p>
           <h2 className={titleClassName}>
             {playground.title}
           </h2>
         </div>
-        <span className={stepClassName}>
-          {String(playground.step).padStart(2, "0")}
-        </span>
+        {!playground.reference && <span className={stepClassName}>{String(localStep).padStart(2, "0")}</span>}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -219,6 +280,8 @@ function PlaygroundTile({ playground, now }: { playground: HomePlaygroundCard; n
       <p className={outcomeClassName}>
         {playground.outcome}.
       </p>
+      <p className="mt-3 text-xs text-slate-500">{playground.duration}</p>
+      {checked > 0 ? <p className="mt-2 text-xs font-medium text-indigo-700!">{checked}/{chapters.length} transfer checks explained</p> : reviewedCount > 0 ? <p className="mt-2 text-xs text-slate-500">{chapters.length > 1 ? `${reviewedCount}/${chapters.length} chapters marked reviewed` : "Marked reviewed"}</p> : chapters.some(slug => progress.visited.includes(slug)) ? <p className="mt-2 text-xs text-slate-500">Visited</p> : null}
       {!isComingSoon ? (
         <p className="mt-auto pt-4 font-mono text-xs text-slate-500">
           {playground.lastUpdated && updateLabel ? (
@@ -237,7 +300,7 @@ function PlaygroundTile({ playground, now }: { playground: HomePlaygroundCard; n
   if (playground.href) {
     return (
       <Link
-        href={playground.href}
+        href={lessonHref(playground.slug, pathId)}
         prefetch={false}
         className={liveTileClassName}
       >

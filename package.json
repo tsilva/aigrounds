@@ -11,7 +11,8 @@
     "start": "node scripts/dev-server.mjs next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --pretty false",
-    "test:deps": "node scripts/dependency-smoke.mjs"
+    "test:deps": "node scripts/dependency-smoke.mjs",
+    "check:bridges": "node scripts/verify-bridge-engines.mjs"
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",

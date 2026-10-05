@@ -1,0 +1,2 @@
+.chart { display: block; width: 100%; max-width: 650px; margin: 12px auto; }
+.chart text { fill: #33486d; font: 13px var(--font-ibm-plex-mono), monospace; }

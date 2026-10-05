@@ -154,21 +154,3 @@ export const lessonPrerequisites: Record<string, readonly Prerequisite[]> = {
   "exploration-exploitation": [{ concept: "Observed sample means and rewards", lesson: "expected-value-risk" }],
   "monte-carlo-tree-search": [{ concept: "UCB exploration scores", lesson: "exploration-exploitation" }],
 };
-
-export type ReadinessCheck = { question: string; choices: readonly string[]; answer: number; explanation: string };
-export const readinessChecks: Record<string, ReadinessCheck> = {
-  core: { question: "For values 2, 4 and 6, what is the mean?", choices: ["4", "6", "12"], answer: 0, explanation: "The sum is 12; divide by three values to get 4. This checks one foundation, not mastery of the whole core." },
-  probability: { question: "Two of eight equally likely outcomes satisfy an event. What is its probability?", choices: ["25%", "50%", "Two outcomes means certainty"], answer: 0, explanation: "Count eligible outcomes over all equally likely outcomes: 2/8 = 25%." },
-  inference: { question: "Across repeated samples, standard error describes the spread of…", choices: ["Sample estimates", "Individual observations", "Guaranteed estimation errors"], answer: 0, explanation: "SE describes estimate-to-estimate spread under a sampling model. Review Sampling Distributions & Standard Error if this is unfamiliar." },
-  relationships: { question: "A fitted line has small residuals. Does that establish a causal effect?", choices: ["No", "Yes", "Only when the slope is positive"], answer: 0, explanation: "A descriptive association or fit alone cannot establish causation." },
-  evaluation: { question: "Precision divides true positives by…", choices: ["Predicted positives", "Actual positives", "All cases"], answer: 0, explanation: "Precision asks how many predicted positives are truly positive. Recall uses actual positives." },
-  retrieval: { question: "Doubling a nonzero vector's length without changing direction changes its cosine with another nonzero vector by…", choices: ["Nothing", "Doubling it", "Making it zero"], answer: 0, explanation: "Cosine measures alignment after dividing by both lengths. The dot product can change." },
-  projection: { question: "A centroid update takes the mean of…", choices: ["Its assigned points", "Every point regardless of group", "The class labels"], answer: 0, explanation: "K-means alternates assignment and coordinate means; it does not need known class labels." },
-  tools: { question: "A 2×3 matrix times a 3×4 matrix produces what shape?", choices: ["2×4", "3×3", "2×3×4"], answer: 0, explanation: "The inner sizes agree; each output cell uses one row and column." },
-  information: { question: "Entropy averages outcome surprise using…", choices: ["Outcome probabilities as weights", "Equal weights for every outcome", "Only the rarest outcome"], answer: 0, explanation: "Entropy is expected surprise. A rare event's large surprise need not dominate that average." },
-  vision: { question: "A convolution kernel's weights are applied to…", choices: ["Each local input patch", "The labels only", "One random output pixel"], answer: 0, explanation: "Shared local weighted sums produce an output feature map." },
-  transformers: { question: "In attention, which vectors determine the weights before values are mixed?", choices: ["Queries and keys", "Values alone", "Token names alone"], answer: 0, explanation: "Query/key scores are normalized into weights; those weights then mix values." },
-  generation: { question: "After appending a generated token, the next prediction uses…", choices: ["The updated prefix", "The original prefix only", "The true future answer"], answer: 0, explanation: "Generation feeds the selected token back as context. Teacher-forced evaluation instead uses actual prior tokens." },
-  "llm-evaluation": { question: "A candidate has high word overlap with a reference. Does that prove it is correct?", choices: ["No", "Yes", "Only for long answers"], answer: 0, explanation: "Overlap is one score. Incorrect answers can share many words with the reference." },
-  search: { question: "An exploration bonus changes which option to try next. Does it change past observed rewards?", choices: ["No", "Yes", "Only for low-count options"], answer: 0, explanation: "The policy changes priorities; it does not rewrite the evidence already collected." },
-};

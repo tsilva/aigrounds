@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
 
 export type HomePlaygroundCard = {
   step: number;
@@ -25,6 +26,17 @@ type HomePageProps = {
 export function HomePage({ playgrounds, version }: HomePageProps) {
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
+  const [now, setNow] = useState<number | null>(null);
+
+  useEffect(() => {
+    const refresh = () => setNow(Date.now());
+    const initialRefresh = window.setTimeout(refresh, 0);
+    const interval = window.setInterval(refresh, 60_000);
+    return () => {
+      window.clearTimeout(initialRefresh);
+      window.clearInterval(interval);
+    };
+  }, []);
 
   const visiblePlaygrounds = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -135,7 +147,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
 
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => (
-            <PlaygroundTile key={playground.slug} playground={playground} />
+            <PlaygroundTile key={playground.slug} playground={playground} now={now} />
           ))}
         </section>
 
@@ -153,8 +165,11 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   );
 }
 
-function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
+function PlaygroundTile({ playground, now }: { playground: HomePlaygroundCard; now: number | null }) {
   const isComingSoon = playground.status === "coming-soon";
+  const updateLabel = playground.lastUpdated
+    ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
+    : null;
   const baseTileClassName =
     "group flex min-h-56 flex-col rounded-xl border p-5";
   const liveTileClassName =
@@ -206,16 +221,11 @@ function PlaygroundTile({ playground }: { playground: HomePlaygroundCard }) {
       </p>
       {!isComingSoon ? (
         <p className="mt-auto pt-4 font-mono text-xs text-slate-500">
-          {playground.lastUpdated ? (
+          {playground.lastUpdated && updateLabel ? (
             <>
               Updated{" "}
-              <time dateTime={playground.lastUpdated}>
-                {new Intl.DateTimeFormat("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  timeZone: "UTC",
-                }).format(new Date(playground.lastUpdated))}
+              <time dateTime={playground.lastUpdated} title={new Date(playground.lastUpdated).toUTCString()}>
+                {updateLabel}
               </time>
             </>
           ) : "Update date unavailable"}

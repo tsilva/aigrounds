@@ -2,7 +2,7 @@
 
 The [live gallery](https://aigrounds.tsilva.eu) is the current catalog of published and planned lessons. Published lessons open directly; planned lessons are marked coming soon.
 
-The gallery opens in curriculum order. Use the sort buttons to switch to newest updates first; search works in either view, and planned lessons follow published lessons when sorting by update date. Published cards show the date of the latest committed change in their module.
+The gallery opens in curriculum order. Use the sort buttons to switch to newest updates first; search works in either view, and planned lessons follow published lessons when sorting by update date. Published cards show the latest committed change in their module as “Updated X time ago” through seven days old, then as a calendar date. Hover over the update time to see its exact UTC timestamp.
 
 ## Guided experiments
 

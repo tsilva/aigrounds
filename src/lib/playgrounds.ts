@@ -1,3 +1,4 @@
+import { BenchmarkPlayground } from "@/modules/benchmark-scores-pass-k/BenchmarkPlayground";
 import { ReferencePlayground } from "@/modules/reference-answer-metrics/ReferencePlayground";
 import { RmsPlayground } from "@/modules/rms-normalization/RmsPlayground";
 import { PositionPlayground } from "@/modules/positional-encoding-token-order/PositionPlayground";
@@ -92,6 +93,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "benchmark-scores-pass-k": BenchmarkPlayground,
   "reference-answer-metrics": ReferencePlayground,
   "rms-normalization": RmsPlayground,
   "positional-encoding-token-order": PositionPlayground,

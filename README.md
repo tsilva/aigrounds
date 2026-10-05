@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [Benchmark Scores & Pass@k Lab](https://aigrounds.tsilva.eu/playgrounds/benchmark-scores-pass-k) separates first/sample accuracy, exact per-item pass@k and plurality voting in disclosed authored batches, with descriptive variation and exposure-subset comparisons.
 - [Reference Answer Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/reference-answer-metrics) traces normalization, clipped token F1, fixed BLEU-1/2, sentence ROUGE-L F1 and a disclosed toy vector cosine through authored answer counterexamples and boundary conventions.
 - [RMSNorm Lab](https://aigrounds.tsilva.eu/playgrounds/rms-normalization) compares RMS scaling with mean-centered LayerNorm through editable feature coordinates, epsilon, shared gain and exact output construction, including undefined zero denominators.
 - [Positional Encoding & Token Order](https://aigrounds.tsilva.eu/playgrounds/positional-encoding-token-order) compares fixed token identity, absolute sine/cosine additions and rotary query/key signals through exact vector construction and signed raw-score changes under reordering or a common shift.

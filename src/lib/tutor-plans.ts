@@ -1,3 +1,4 @@
+import { preferenceTutorPlan } from "@/modules/preference-judge-metrics/learning-experiments";
 import { benchmarkTutorPlan } from "@/modules/benchmark-scores-pass-k/learning-experiments";
 import { referenceTutorPlan } from "@/modules/reference-answer-metrics/learning-experiments";
 import { rmsTutorPlan } from "@/modules/rms-normalization/learning-experiments";
@@ -104,6 +105,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "preference-judge-metrics": preferenceTutorPlan,
   "benchmark-scores-pass-k": benchmarkTutorPlan,
   "reference-answer-metrics": referenceTutorPlan,
   "rms-normalization": rmsTutorPlan,

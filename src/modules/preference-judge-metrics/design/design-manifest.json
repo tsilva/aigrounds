@@ -1,0 +1,21 @@
+{
+  "lessonPlanStep": 79,
+  "title": "Preference & Judge Metrics Lab",
+  "slug": "preference-judge-metrics",
+  "modulePath": "src/modules/preference-judge-metrics",
+  "mockupPath": "src/modules/preference-judge-metrics/design/accepted-mockup.png",
+  "promptPath": "src/modules/preference-judge-metrics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-60fc88ef-dd66-4f0d-9033-52ace39f1278.png",
+  "approval": "User-authorized self review; original shared scheme",
+  "rejectedDrafts": [
+    "V1 invalid later Elo probabilities and altered prompts",
+    "V2 false earlier-item influence claim"
+  ],
+  "review": "V3 correct first Elo update, final forward/reverse values, scores, summaries and disclosed toy/reference limits.",
+  "approvedRefinements": [
+    "Use complete literal authored text and exact whitespace word counts.",
+    "Display all six exact sequential updates, not only mockup first example.",
+    "Controls two columns then stack; all three required tables keyboard-scrollable.",
+    "Use original shared navy/lavender/indigo tokens."
+  ]
+}

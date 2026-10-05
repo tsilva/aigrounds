@@ -1,3 +1,4 @@
+import { PreferencePlayground } from "@/modules/preference-judge-metrics/PreferencePlayground";
 import { BenchmarkPlayground } from "@/modules/benchmark-scores-pass-k/BenchmarkPlayground";
 import { ReferencePlayground } from "@/modules/reference-answer-metrics/ReferencePlayground";
 import { RmsPlayground } from "@/modules/rms-normalization/RmsPlayground";
@@ -93,6 +94,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "preference-judge-metrics": PreferencePlayground,
   "benchmark-scores-pass-k": BenchmarkPlayground,
   "reference-answer-metrics": ReferencePlayground,
   "rms-normalization": RmsPlayground,

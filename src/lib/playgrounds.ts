@@ -1,3 +1,4 @@
+import { SafetyPlayground } from "@/modules/safety-refusal-robustness-metrics/SafetyPlayground";
 import { RagPlayground } from "@/modules/rag-groundedness-metrics/RagPlayground";
 import { PreferencePlayground } from "@/modules/preference-judge-metrics/PreferencePlayground";
 import { BenchmarkPlayground } from "@/modules/benchmark-scores-pass-k/BenchmarkPlayground";
@@ -95,6 +96,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "safety-refusal-robustness-metrics": SafetyPlayground,
   "rag-groundedness-metrics": RagPlayground,
   "preference-judge-metrics": PreferencePlayground,
   "benchmark-scores-pass-k": BenchmarkPlayground,

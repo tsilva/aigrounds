@@ -1,0 +1,17 @@
+{
+  "lessonPlanStep": 81,
+  "title": "Safety, Refusal & Robustness Metrics Lab",
+  "slug": "safety-refusal-robustness-metrics",
+  "modulePath": "src/modules/safety-refusal-robustness-metrics",
+  "mockupPath": "src/modules/safety-refusal-robustness-metrics/design/accepted-mockup.png",
+  "promptPath": "src/modules/safety-refusal-robustness-metrics/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-661d4c62-d175-4e6b-9292-b486a1eaa9cb.png",
+  "approval": "User-authorized self-review; original shared scheme",
+  "review": "Baseline eight-row outcome bank and all five fractions correct; no preselected prediction.",
+  "approvedRefinements": [
+    "Apply exact original shared CSS tokens centrally, including navy headings.",
+    "Use two-column controls then stack at narrow available widths.",
+    "Expose eligibility, all-variant correctness/consistency and inclusion as textual table columns.",
+    "No copied scenario icons or custom control chrome."
+  ]
+}

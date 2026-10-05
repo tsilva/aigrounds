@@ -17,7 +17,7 @@ AI Grounds is a web app for people learning artificial intelligence through hand
 
 The gallery opens with a **20-step AI core** and optional paths for probability, inference, evaluation, retrieval, transformers, vision and search. Five pairs share a curriculum entry with linked chapters; every published chapter keeps its original URL. The Concept Atlas and Zero Knowledge Proofs sit under Explore & reference. Five new bridge lessons connect classification scores to decisions, backward gradients to training, token probabilities to generation, attention to a complete decoder block, and retrieval to answer evidence.
 
-Lessons show prerequisites, chapter links and a path-aware next step. Visits, self-reported review and explained transfer checks are saved separately in this browser, with resume and delayed recall practice; no account is required. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide in the experiment rail. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds. See the [curriculum](docs/curriculum.md) for the core, path map, chapter consolidations and bridge lessons.
+Lessons show prerequisites, chapter links and a path-aware next step. Visits, self-reported review and explained transfer checks are saved separately in this browser, with delayed recall practice; no account is required. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide in the experiment rail. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds. See the [curriculum](docs/curriculum.md) for the core, path map, chapter consolidations and bridge lessons.
 
 ## Install
 

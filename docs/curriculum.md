@@ -8,12 +8,11 @@ defines published versus planned status.
 
 ## Applied structure
 
-- Start, continue, global search, Browse all, and 13 specialist paths alongside
+- Global search, Browse all, and 13 specialist paths alongside
   the core. Regression is core step 5 and gradient descent is step 6.
-- Optional prerequisite refreshers and path-entry questions. A single question
-  checks one concept, not readiness for an entire path.
+- Optional prerequisite refreshers appear within lessons.
 - Path-aware next links, explicit skips over planned steps, chapter links and
-  browser-local resume. No account is required.
+  browser-local progress. No account is required.
 - Visits, self-reported reviews and successful **explicit transfer checks** are
   separate records. Regular experiment completion does not establish transfer.
   Lessons without an explicit transfer result do not produce a transfer record.

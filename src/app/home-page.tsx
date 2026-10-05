@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
 import { canonicalLessonSlug, getLearningPath, learningPaths, lessonHref } from "@/lib/curriculum";
 import { useLearningProgress } from "@/lib/learning-progress";
-import { ReadinessCheck } from "@/components/curriculum/readiness-check";
 
 export type HomePlaygroundCard = {
   step: number;
@@ -38,8 +37,6 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   const [pathId, setPathId] = useState("core");
   const progress = useLearningProgress();
   const selectedPath = getLearningPath(pathId);
-  const lastLesson = playgrounds.find(item => item.slug === canonicalLessonSlug(progress.last?.slug ?? "") && item.status === "live");
-  const resumeSlug = lastLesson ? progress.last!.slug : undefined;
 
   useEffect(() => {
     const refresh = () => setNow(Date.now());
@@ -137,20 +134,6 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           </label>
         </header>
 
-        <section aria-label="Start or continue learning" className="grid gap-4 rounded-xl border border-indigo-100 bg-white p-5 md:grid-cols-2">
-          <div>
-            <h2 className="text-xl font-semibold">Start here</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">Twenty recommended steps from understanding data to a working neural network. Familiar concepts can be skipped.</p>
-            <Link href={lessonHref("mean-median-mode", "core")} className="mt-3 inline-block rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white!">Start the AI core →</Link>
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold">Continue</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{lastLesson ? `Return to ${lastLesson.title}.` : "Your place is saved in this browser as you explore. No account needed."}</p>
-            {resumeSlug && <Link href={lessonHref(resumeSlug, progress.last?.path)} className="mt-3 inline-block font-semibold text-indigo-700! underline! underline-offset-2">Resume your last chapter →</Link>}
-            <p className="mt-2 text-xs text-slate-500">{Object.keys(progress.transfers).length} chapter transfer checks explained · {progress.reviewed.length} marked reviewed</p>
-          </div>
-        </section>
-
         <section aria-label="Choose a learning path">
           <label className="text-sm font-semibold text-slate-700">Learning path
             <select value={pathId} onChange={event => setPathId(event.target.value)} className="ml-3 max-w-full rounded-lg border border-blue-200 bg-white px-3 py-2">
@@ -159,8 +142,6 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
               <option value="extras">Explore & reference</option>
             </select>
           </label>
-          <p className="mt-3 text-sm leading-6 text-slate-600">{query.trim() ? "Searching across all lessons, chapters and paths." : selectedPath?.summary ?? (pathId === "extras" ? "Browse the concept atlas and related ideas outside the main curriculum." : "All lessons in learning order. Specialist paths share foundations; chapters retain their original links.")}</p>
-          {selectedPath && !query.trim() && <ReadinessCheck key={selectedPath.id} pathId={selectedPath.id} />}
         </section>
 
         {now !== null && Object.entries(progress.transfers).some(([, time]) => now - time >= 86_400_000) && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">

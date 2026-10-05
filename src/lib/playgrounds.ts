@@ -1,3 +1,4 @@
+import { RagPlayground } from "@/modules/rag-groundedness-metrics/RagPlayground";
 import { PreferencePlayground } from "@/modules/preference-judge-metrics/PreferencePlayground";
 import { BenchmarkPlayground } from "@/modules/benchmark-scores-pass-k/BenchmarkPlayground";
 import { ReferencePlayground } from "@/modules/reference-answer-metrics/ReferencePlayground";
@@ -94,6 +95,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "rag-groundedness-metrics": RagPlayground,
   "preference-judge-metrics": PreferencePlayground,
   "benchmark-scores-pass-k": BenchmarkPlayground,
   "reference-answer-metrics": ReferencePlayground,

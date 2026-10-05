@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "rag-groundedness-metrics",
+    layout: "guided-discovery",
+    kicker: "Separate evidence, citations and coverage.",
+    estimatedDuration: "8 to 11 minutes",
+    learningGoals: ["Separate retrieved context relevance and claim faithfulness.", "Identify faithful but incomplete or off-topic answers.", "Trace actual citation retrieval and entailment.", "Distinguish source support from current-reference correctness."],
+    title: "RAG Groundedness Metrics Lab",
+    tag: "llm evaluation",
+    summary:
+      "Connect authored retrieved context to answer claims and inspect context relevance, faithfulness, citation support and current-reference completeness.",
+    concepts: ["Context relevance", "Faithfulness", "Citation support", "Completeness"],
+  },
+
+  {
     slug: "preference-judge-metrics",
     layout: "guided-discovery",
     kicker: "Trace the judge. Explain the ranking.",
@@ -1509,14 +1522,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "rag-groundedness-metrics",
-    title: "RAG Groundedness Metrics Lab",
-    tag: "llm evaluation",
-    summary:
-      "Connect retrieved context to an answer and inspect context relevance, faithfulness, citation support, and answer completeness.",
-    concepts: ["Context relevance", "Faithfulness", "Citation support", "Completeness"],
-  },
+
   {
     slug: "safety-refusal-robustness-metrics",
     title: "Safety, Refusal & Robustness Metrics Lab",

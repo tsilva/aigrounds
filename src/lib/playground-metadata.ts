@@ -33,6 +33,19 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "llm-app-ops-metrics",
+    layout: "guided-discovery",
+    kicker: "Trace first content, completion and work over time.",
+    estimatedDuration: "8 to 11 minutes",
+    learningGoals: ["Separate model TTFT, client first content and completion.", "Trace output work into latency and fictional cost.", "Explain queueing and finite-window throughput.", "Audit cold prefix reuse and request-hit rates."],
+    title: "LLM App Ops Metrics Lab",
+    tag: "llm systems",
+    summary:
+      "Tune a disclosed toy request workload and delivery mode to compare latency, time to first token, throughput, fictional cost and prefix-cache request-hit rate.",
+    concepts: ["Latency", "TTFT", "Throughput", "Cost per request"],
+  },
+
+  {
     slug: "safety-refusal-robustness-metrics",
     layout: "guided-discovery",
     kicker: "Compare safety decisions with their labeled denominators.",
@@ -1537,14 +1550,7 @@ export const upcomingPlaygrounds: UpcomingPlayground[] = [
 
 
 
-  {
-    slug: "llm-app-ops-metrics",
-    title: "LLM App Ops Metrics Lab",
-    tag: "llm systems",
-    summary:
-      "Tune request patterns and streaming behavior to compare latency, time to first token, throughput, cost, and cache hit rate.",
-    concepts: ["Latency", "TTFT", "Throughput", "Cost per request"],
-  },
+
 ];
 
 export const dashboardLessonPlanOrder = [

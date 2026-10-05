@@ -1,3 +1,4 @@
+import { opsTutorPlan } from "@/modules/llm-app-ops-metrics/learning-experiments";
 import { safetyTutorPlan } from "@/modules/safety-refusal-robustness-metrics/learning-experiments";
 import { ragTutorPlan } from "@/modules/rag-groundedness-metrics/learning-experiments";
 import { preferenceTutorPlan } from "@/modules/preference-judge-metrics/learning-experiments";
@@ -107,6 +108,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "llm-app-ops-metrics": opsTutorPlan,
   "safety-refusal-robustness-metrics": safetyTutorPlan,
   "rag-groundedness-metrics": ragTutorPlan,
   "preference-judge-metrics": preferenceTutorPlan,

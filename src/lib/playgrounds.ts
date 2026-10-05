@@ -1,3 +1,4 @@
+import { OpsPlayground } from "@/modules/llm-app-ops-metrics/OpsPlayground";
 import { SafetyPlayground } from "@/modules/safety-refusal-robustness-metrics/SafetyPlayground";
 import { RagPlayground } from "@/modules/rag-groundedness-metrics/RagPlayground";
 import { PreferencePlayground } from "@/modules/preference-judge-metrics/PreferencePlayground";
@@ -96,6 +97,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "llm-app-ops-metrics": OpsPlayground,
   "safety-refusal-robustness-metrics": SafetyPlayground,
   "rag-groundedness-metrics": RagPlayground,
   "preference-judge-metrics": PreferencePlayground,

@@ -44,6 +44,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [LLM App Ops Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/llm-app-ops-metrics) traces a toy single-worker request timeline, model/client first content, queueing, finite-window throughput, cold prefix reuse and fictional token charges.
 - [Safety, Refusal & Robustness Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/safety-refusal-robustness-metrics) traces harmful compliance, benign false refusal, conditional jailbreak success and all-variant robustness through a disclosed authored outcome bank.
 - [RAG Groundedness Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/rag-groundedness-metrics) separates retrieved context relevance, claim faithfulness, citation support/precision and reference completeness through disclosed fictional sources, fragments, invalid citations and outdated evidence.
 - [Preference & Judge Metrics Lab](https://aigrounds.tsilva.eu/playgrounds/preference-judge-metrics) traces disclosed rubric weights, toy position/length judge bonuses, win and tie-adjusted rates, reference agreement and exact sequential pairwise rating updates.

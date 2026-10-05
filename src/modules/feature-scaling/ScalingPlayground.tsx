@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonRangeControl, LessonSummaries, LessonToggleGroup, LessonToolbar } from "@/components/learning-page/learning-page";
+import { GuidedExperiment } from "@/components/learning-page/guided-experiment";
 import shared from "@/components/learning-page/learning-page.module.css";
 import { analyzeScaling, scalingChart, scalingModes, scalingNumber as number, scalingScenarios, type ScalingState } from "./scaling-engine";
 import { scalingBaseline, reachedScaling } from "./lesson-state";
@@ -34,21 +35,12 @@ export function ScalingPlayground() {
   function start(next = index) { setIndex(next); setState(scalingBaseline(next)); setPrediction(null); clear(); }
   function edit(patch: Partial<ScalingState>) { setState(s => ({ ...s, ...patch })); clear(); }
 
-  const rail = experiment ? <ExperimentRail label={`Experiment ${index + 1} of 3`} title={experiment.title} phase={!prediction ? 0 : reached ? 2 : 1}>
-    {!reached && <><h3>Make a prediction</h3><p>{experiment.question}</p>
-      <ExperimentChoices legend="Your prediction" name="scaling-prediction" choices={experiment.predictions} value={prediction} onChange={id => { start(); setPrediction(id); }} />
-      <p className={shared.small}>Changing prediction restores this experiment’s starting state. Reset restarts it.</p>
-    </>}
-    {prediction && !reached && <p className={shared.actionPrompt}><strong>Now try it.</strong> {experiment.action}</p>}
-    {reached && <><p role="status" className={shared.observation}>{prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}</p>
-      <h3>{experiment.explanation}</h3>
-      <ExperimentChoices legend="Your explanation" name="scaling-explanation" choices={experiment.explanations} value={explanation} onChange={setExplanation} />
-      {explanation && !complete && <p role="status" className={shared.feedback}>Try again. {experiment.retry}</p>}
-    </>}
-    {complete && <><ExperimentResult>{experiment.takeaway}</ExperimentResult>
-      <ExperimentButton arrow onClick={() => start(index + 1)}>{index === 2 ? "Try the transfer check" : "Next experiment"}</ExperimentButton>
-    </>}
-  </ExperimentRail> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "A constant feature in new units" : "Choose a reference recipe"}>
+  const rail = experiment ? <GuidedExperiment label={`Experiment ${index + 1} of 3`} experiment={experiment}
+    reached={reached} complete={complete} prediction={prediction} explanation={explanation}
+    predictionName="scaling-prediction" explanationName="scaling-explanation"
+    onPredict={id => { start(); setPrediction(id); }} onExplain={setExplanation}
+    predictionHelp={<>Changing prediction restores this experiment’s starting state. Reset restarts it.</>} observation={prediction === "0" ? "The evidence matches your prediction." : "The evidence challenges your prediction."}
+    onNext={() => start(index + 1)} nextLabel={index === 2 ? "Try the transfer check" : "Next experiment"} /> : <ExperimentRail label={transfer ? "Transfer check" : "Free exploration"} title={transfer ? "A constant feature in new units" : "Choose a reference recipe"}>
     {transfer ? <>
       <p>Without Guide help, choose Constant feature, choose Z-score under Scaling method, and set Feature B unit multiplier to 7. Explain A’s zero-scale convention, reconstruct B’s outputs, and account for the P1/P4 squared distance.</p>
       {reachedScaling(3, state) && <>
@@ -67,25 +59,25 @@ export function ScalingPlayground() {
 
   return <LearningPage title="Feature Scaling Lab" subtitle="Change units; compare column transformations." rail={rail}>
     <LessonToolbar scenarios={scalingScenarios} selectedId={state.scenario} onSelect={scenario => edit({ scenario: scenario as ScalingState["scenario"] })} onReset={() => start(experiment || transfer ? index : 0)} />
-    <section className={styles.evidence} aria-label="Reference cases and column transformations">
+    <section className={shared.evidence} aria-label="Reference cases and column transformations">
       <h2>Your dataset</h2>
       <p>Four reference cases, two feature columns. Scaling uses these four rows’ statistics. A positive unit multiplier changes only feature B’s numerical units, not case identity, ordering or information. Min–max is per-feature normalization here; it is not per-row unit-length normalization.</p>
       <h3>Scaling method</h3>
       <LessonToggleGroup label="Scaling method" choices={scalingModes} value={state.mode} onChange={mode => edit({ mode: mode as ScalingState["mode"] })} />
-      <div className={styles.table} role="region" tabIndex={0} aria-label="Raw and transformed reference case identities">
+      <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="Raw and transformed reference case identities">
         <table><caption>Each feature uses one column recipe across all four cases. Output = (raw value − reference center)/used denominator; Raw uses center 0 and denominator 1.</caption>
           <thead><tr>{["Case", "Raw A", "Raw B", "Output A", "Output B"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead>
           <tbody>{a.raw.map((row, i) => <tr key={i}><th scope="row">P{i + 1}</th><td>{row[0]}</td><td>{row[1]}</td><td>{number(a.values[i][0])}</td><td>{number(a.values[i][1])}</td></tr>)}</tbody>
         </table>
       </div>
-      <p role="status" data-scaling-status className={styles.formula}>{modeLabel} · B multiplier {state.multiplier} · P1/P4 squared distance {number(a.distanceSquared)}</p>
-      {state.scenario === "constant" && state.mode !== "raw" && <p role="status" data-scaling-constant className={styles.formula}>A has zero reference {state.mode === "minmax" ? "range" : "SD"}. Used denominator = 1 after subtracting its center. All four observed A outputs = 0; output SD = 0, not 1.</p>}
+      <p role="status" data-scaling-status className={shared.math}>{modeLabel} · B multiplier {state.multiplier} · P1/P4 squared distance {number(a.distanceSquared)}</p>
+      {state.scenario === "constant" && state.mode !== "raw" && <p role="status" data-scaling-constant className={shared.math}>A has zero reference {state.mode === "minmax" ? "range" : "SD"}. Used denominator = 1 after subtracting its center. All four observed A outputs = 0; output SD = 0, not 1.</p>}
       <LessonRangeControl label="Feature B unit multiplier" value={state.multiplier} min={1} max={10} step={1} help="Multiply every raw B value equally. The reference minimum, maximum, mean and SD change into those units. Min–max and z-score recompute their column recipes; a positive unit factor cancels." onChange={multiplier => edit({ multiplier })} />
     </section>
-    <section className={styles.evidence} aria-label="Squared differences and numerical contribution shares">
+    <section className={shared.evidence} aria-label="Squared differences and numerical contribution shares">
       <h2>Squared differences between P1 and P4</h2>
       <p>Distance² = (Output A4 − Output A1)² + (Output B4 − Output B1)². This treats feature numbers with equal numerical weight; it is not a physical mixed-unit distance or learned feature importance.</p>
-      {a.terms.map((term, i) => <p className={styles.formula} data-scaling-term={i} key={i}>Feature {i === 0 ? "A" : "B"} term = ({number(a.values[3][i])} − {number(a.values[0][i])})² = {number(term)} · share {number(100 * a.shares[i])}%</p>)}
+      {a.terms.map((term, i) => <p className={shared.math} data-scaling-term={i} key={i}>Feature {i === 0 ? "A" : "B"} term = ({number(a.values[3][i])} − {number(a.values[0][i])})² = {number(term)} · share {number(100 * a.shares[i])}%</p>)}
       <div className={styles.chart} ref={chartRef}>
         <svg data-scaling-chart viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`Feature A contributes ${number(a.terms[0])}, ${number(100 * a.shares[0])}% of current squared distance. Feature B contributes ${number(a.terms[1])}, ${number(100 * a.shares[1])}%. Both bar widths use one 0 to 100% share axis. Exact values and identities are given in text and tables.`}>
           {chart.ticks.map(t => <g key={t.value}><line x1={t.x} x2={t.x} y1="24" y2="158" /><text x={t.x} y="190" textAnchor="middle">{t.value * 100}%</text></g>)}
@@ -100,9 +92,9 @@ export function ScalingPlayground() {
       { label: "Output B mean", color: "#087c78", value: Number(a.outputs[1].mean.toFixed(3)).toFixed(3), definition: "Average across the four transformed B values.", formula: `Population SD = ${number(a.outputs[1].std)}`, comparison: "SD uses divisor 4, the reference case count." },
       { label: "P1/P4 distance²", color: "#ad4508", value: a.distanceSquared.toFixed(3), definition: "Sum of the two squared transformed feature differences.", formula: `${number(a.terms[0])} + ${number(a.terms[1])}`, comparison: "Numerical distance, not an accuracy or importance score." },
     ]} />
-    <section className={styles.evidence} aria-label="Reference recipes and scaling limits">
+    <section className={shared.evidence} aria-label="Reference recipes and scaling limits">
       <details><summary>Reference statistics and recipes</summary>
-        <div className={styles.table} role="region" tabIndex={0} aria-label="Reference feature statistics and used recipes">
+        <div className={`${shared.tableScroll} ${styles.table}`} role="region" tabIndex={0} aria-label="Reference feature statistics and used recipes">
           <table><caption>Statistics use all four reference rows in the displayed units. Population SD = sqrt(sum((value − mean)²)/4). Zero range/SD uses denominator 1 after centering; it is not a unit-variance claim.</caption>
             <thead><tr>{["Feature", "Minimum", "Maximum", "Range", "Mean", "Population SD", "Used center", "Used denominator"].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead>
             <tbody>{a.stats.map((s, i) => <tr key={i}><th scope="row">{i === 0 ? "A" : "B"}</th>{[s.min, s.max, s.range, s.mean, s.std, a.recipes[i].center, a.recipes[i].denominator].map((value, j) => <td key={j}>{number(value)}</td>)}</tr>)}</tbody>

@@ -516,7 +516,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "OpenRouter is not configured. Add OPENROUTER_API_KEY to .env.local and restart the dev server.",
+          "The AI Guide is temporarily unavailable. Please try again later.",
       },
       { status: 500 },
     );

@@ -33,17 +33,24 @@ Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. S
 
 ## Local credentials
 
-Private local values declared in `.keyenv.toml` live in macOS Keychain. Run
-`keyenv doctor` to verify them and launch credential-dependent commands with
-`keyenv run -- <command>`. Python, Node, and their child processes receive the
-values through their normal environment APIs. Keep only public or non-secret
-configuration in dotenv files.
-
-In that macOS setup, launch credential-dependent development with:
+Private values live in Infisical, in the linked `aigrounds` project, Development environment, root folder. `.infisical.json` contains public connection settings only. Authenticate with your human account once:
 
 ```bash
-keyenv doctor
-keyenv run -- pnpm dev --port auto
+infisical login
+pnpm secrets:check
+pnpm dev --port auto
 ```
+
+The launcher fetches only `OPENROUTER_API_KEY` and `SENTRY_AUTH_TOKEN`, keeps them in memory, and removes manager credentials from the app process. Missing values cannot fall back to old dotenv credentials. A failed fetch stops before starting the app. Keep public settings such as the model name and Sentry DSN in local dotenv files.
+
+`pnpm build:secrets` and `pnpm start:secrets` use the same development project. Vercel uses the ordinary `pnpm build` command with deployment variables supplied by its production sync.
+
+The one-time `pnpm secrets:migrate` command copies only authorized `.keyenv.toml` Keychain accounts, refuses conflicting destination values, and verifies an exact readback without displaying values. Keychain originals are retained until the migration and rotation are verified.
+
+## Production
+
+The separate `aigrounds-production` project, Production environment, root folder supplies the `aigrounds` Vercel project's Production environment through the organization Vercel app connection. Keep original variable names and deletion protection enabled. Do not import sensitive variables from Vercel: Vercel cannot return their values. Populate and validate the source before syncing. A new deployment is needed after a sync for the live app to use changed variables.
+
+Development and production project separation is an access boundary; separate provider keys are also needed to isolate their budgets and revocation. Credential rotation is tracked in the migration report until verified.
 
 The chat route uses the OpenRouter key only on the server. Deploy the app with a server runtime for `/api/chat`; a static file host alone cannot serve the Guide.

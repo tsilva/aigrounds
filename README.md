@@ -30,8 +30,6 @@ pnpm install --frozen-lockfile
 pnpm dev --port auto
 ```
 
-Open the local URL printed by the dev server. Playground experiments work without an API key; see [configuration](docs/configuration.md) to enable the AI Guide or monitoring.
-
 ## Commands
 
 ```bash

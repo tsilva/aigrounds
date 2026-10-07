@@ -1,0 +1,21 @@
+{
+  "repository": "tsilva/aigrounds",
+  "githubRepositoryId": 1176162073,
+  "identityId": "41967dbc-cdfe-409a-be9f-0483223ce233",
+  "infisicalProjectId": "392be922-1a8f-4a1f-8e85-0e455e10fbbf",
+  "secretNames": [
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "OPENROUTER_API_KEY",
+    "OPENROUTER_APP_NAME",
+    "OPENROUTER_MODEL",
+    "OPENROUTER_SITE_URL",
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_DSN",
+    "SENTRY_ORG",
+    "SENTRY_PROJECT"
+  ],
+  "destination": "vercel",
+  "vercelProjectId": "prj_Ktcv99ngBNGKzh3hFdM1XbzEl1PS",
+  "vercelProjectName": "aigrounds",
+  "vercelTeamId": "team_eE2Iv7IMqPOx8ZVN2xNfR2f0"
+}

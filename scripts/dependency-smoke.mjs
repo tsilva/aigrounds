@@ -30,6 +30,7 @@ for (const expected of [
   "nanoid@3.3.18:",
   "postcss@8.5.23:",
   "postcss@8.5.26:",
+  "source-map-js@1.2.2:",
 ]) {
   assert.ok(lock.includes(expected), `missing fixed lock entry: ${expected}`);
 }
@@ -71,6 +72,32 @@ const extractedContext = new W3CBaggagePropagator().extract(
   { get: (carrier, key) => carrier[key], keys: (carrier) => Object.keys(carrier) },
 );
 assert.equal(propagation.getBaggage(extractedContext).getAllEntries().length, 180);
+
+// Reject indexed maps that would expand into billions of generated lines.
+const { SourceMapConsumer, SourceNode } = virtualRequire("source-map-js");
+const flatSourceMap = {
+  version: 3, sources: ["lesson.js"], names: [], mappings: "AAAA", sourcesContent: ["x"],
+};
+const indexedSourceMap = (line, column = 0, map = flatSourceMap) => ({
+  version: 3, sections: [{ offset: { line, column }, map }],
+});
+for (const line of [1_000_000_000, Infinity, -1, 0.5, "1"]) {
+  assert.throws(() => new SourceMapConsumer(indexedSourceMap(line)), /Section offset/);
+}
+for (const column of [Infinity, -1, 0.5, "1"]) {
+  assert.throws(() => new SourceMapConsumer(indexedSourceMap(0, column)), /Section offset/);
+}
+assert.throws(
+  () => new SourceMapConsumer(indexedSourceMap(6_000_000, 0, indexedSourceMap(6_000_000))),
+  /including offsets of nested sections/,
+);
+const validSourceMap = new SourceMapConsumer(indexedSourceMap(1));
+const copiedSource = SourceNode.fromStringWithSourceMap("prefix\nx\n", validSourceMap).toStringWithSourceMap();
+assert.equal(copiedSource.code, "prefix\nx\n");
+const copiedSourceMap = new SourceMapConsumer(copiedSource.map.toJSON());
+assert.deepEqual(copiedSourceMap.originalPositionFor({ line: 2, column: 0 }), {
+  source: "lesson.js", line: 1, column: 0, name: null,
+});
 
 // Exercise the Next ESLint plugin's real caller of the replacement glob API.
 const { getRootDirs } = virtualRequire("@next/eslint-plugin-next/dist/utils/get-root-dirs");

@@ -27,7 +27,7 @@ for (const expected of [
   "brace-expansion@5.0.12:",
   "fast-uri@3.1.8:",
   "js-yaml@4.3.2:",
-  "nanoid@3.3.18:",
+  "nanoid@3.3.19:",
   "postcss@8.5.23:",
   "postcss@8.5.26:",
   "source-map-js@1.2.2:",

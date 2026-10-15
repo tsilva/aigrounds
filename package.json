@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "node -e \"const ua = process.env.npm_config_user_agent || ''; if (!ua.startsWith('pnpm/')) { console.error('Use pnpm for this repo.'); process.exit(1); }\"",
     "dev": "python3 scripts/infisical/run.py dev",
-    "build": "node scripts/update-playground-dates.mjs && next build",
+    "build": "node scripts/update-playground-dates.mjs && node scripts/verify-provider-routing.mjs && next build",
     "check:cycles": "node scripts/check-import-cycles.mjs",
     "start": "node scripts/dev-server.mjs next start",
     "lint": "eslint",
@@ -18,8 +18,8 @@
     "build:secrets": "python3 scripts/infisical/run.py build",
     "start:secrets": "python3 scripts/infisical/run.py start",
     "secrets:check": "python3 scripts/infisical/run.py check",
-    "secrets:migrate": "python3 scripts/infisical/migrate_keyenv.py",
-    "test:secrets": "python3 -m unittest discover -s scripts/infisical -p test_secrets.py"
+    "test:secrets": "python3 -m unittest discover -s scripts/infisical -p test_secrets.py",
+    "test:provider": "node scripts/verify-provider-routing.mjs"
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",

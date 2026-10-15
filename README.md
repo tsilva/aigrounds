@@ -115,10 +115,20 @@ pnpm test:deps        # check patched dependency security boundaries
 - The [Law of Large Numbers Simulator](https://aigrounds.tsilva.eu/playgrounds/law-large-numbers-simulation) compares reproducible short and long runs, temporary movement away from a model expectation, and averages of coin and die outcomes.
 - The Monte Carlo Tree Search lesson demonstrates UCB selection and count backup with explicitly scripted outcomes; it does not implement a game solver.
 - Playgrounds run in the browser. The MNIST inference debugger needs WebGPU support.
-- The optional AI Guide uses a server API route backed by OpenRouter. API keys stay on the server.
+- The optional AI Guide uses a server API route with OpenRouter in production and AgentBridge in development. Credentials stay on the server.
 - Analytics and Sentry monitoring depend on environment configuration; see [configuration](docs/configuration.md) for settings and local credential handling.
 - All lessons use the shared [learning-page design system](DESIGN_SYSTEM.md), including reusable experiment presentation, evidence typography, parameter grids and accessible table styles. Lesson state, answer checking and mathematical representations stay in each module. [Development notes](docs/development.md) explain lesson registration, validation, update dates, branding, and project workflows.
 
 ## License
 
 [MIT](LICENSE)
+
+
+## Model routing
+
+Development uses AgentBridge (`AGENTBRIDGE_BASE_URL`, default
+`http://127.0.0.1:8082/api/v1`, and optional `AGENTBRIDGE_API_KEY`).
+Production and Preview call OpenRouter directly using their own server-only
+`OPENROUTER_API_KEY`; a missing production key disables model requests.
+Production credentials come from this app’s isolated Infisical project.
+Production text requests use `deepseek/deepseek-v4.1-flash` with reasoning disabled.

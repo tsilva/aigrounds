@@ -65,7 +65,7 @@ Modules are described in `src/lib/playground-metadata.ts` and wired to component
 
 ## Product Specifications
 
-Before every task in this repository, use the `$specs-author` skill to read the entire root `SPECS.md`. Before finishing, reread it and check the task and conversation for new or changed stakeholder intent.
+At the start of substantive repository work, use `$specs-author` to read the entire root `SPECS.md` once per ongoing task. Reuse unchanged contents across follow-ups and composed skills. Reread when the file or repository association changes, or new stakeholder intent requires a fresh comparison. Before finishing, always check for new or changed stakeholder intent; reread if the file or intent changed. Purely conversational follow-ups do not require another full read.
 
 - Treat `SPECS.md` as the persistent source of stakeholder requirements that cannot be inferred reliably from code or remembered conversations.
 - Apply the scope test to proposed and existing requirements: root `SPECS.md` contains only project-wide intent; scoped intent belongs in its nearest authoritative specification and must not be broadened to fit the root.
@@ -93,4 +93,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Secrets
 
-`pnpm dev --port auto` fetches only the linked Infisical development project through the saved human CLI login. Private keys must remain out of dotenv files, command arguments, logs, and browser bundles. Use `pnpm secrets:check` for presence-only verification and `pnpm secrets:migrate` for manifest-bound Keychain migration. Production uses the separate `aigrounds-production` project and its Vercel Production sync. Do not inject production credentials into local development.
+`pnpm dev --port auto` fetches only the linked Infisical development project through the saved human CLI login. Private keys must remain out of dotenv files, command arguments, logs, and browser bundles. Use `pnpm secrets:check` for presence-only verification. Production uses the separate `aigrounds-production` project and its Vercel Production sync. Do not inject production credentials into local development.

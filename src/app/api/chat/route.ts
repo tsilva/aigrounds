@@ -1,3 +1,4 @@
+import { providerBaseUrl, providerModel, providerApiKey, productionChatModel, usesProductionProvider } from "@/lib/agentbridge";
 import { NextResponse } from "next/server";
 import { getPlaygroundMetadataFromPathname } from "@/lib/playground-metadata";
 import { getTutorOpeningMessage } from "@/lib/tutor-plans";
@@ -62,7 +63,6 @@ type OpenRouterStreamChunk = {
   };
 };
 
-const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const DEFAULT_MODEL = "openai/gpt-5.5";
 const MAX_MESSAGES = 16;
 const MAX_CONTENT_LENGTH = 4000;
@@ -510,16 +510,11 @@ function streamOpenRouterResponse(response: Response) {
 }
 
 export async function POST(request: Request) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          "The AI Guide is temporarily unavailable. Please try again later.",
-      },
-      { status: 500 },
-    );
+  let apiKey: string;
+  try {
+    apiKey = providerApiKey();
+  } catch {
+    return NextResponse.json({ error: "AI Guide is temporarily unavailable." }, { status: 503 });
   }
 
   let body: ChatRequestBody;
@@ -561,7 +556,7 @@ export async function POST(request: Request) {
   );
   const offerScreenshotTool = shouldOfferScreenshotTool(body.tutor, screenshot);
 
-  const response = await fetch(OPENROUTER_ENDPOINT, {
+  const response = await fetch(`${providerBaseUrl()}/chat/completions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -571,7 +566,8 @@ export async function POST(request: Request) {
       "X-Title": process.env.OPENROUTER_APP_NAME ?? "AI Grounds",
     },
     body: JSON.stringify({
-      model: process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL,
+      model: providerModel(usesProductionProvider() ? productionChatModel : process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL),
+      ...(usesProductionProvider() ? { reasoning: { enabled: false } } : {}),
       messages,
       max_completion_tokens: MAX_COMPLETION_TOKENS,
       ...(!offerScreenshotTool

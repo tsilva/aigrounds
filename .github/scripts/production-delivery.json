@@ -17,5 +17,14 @@
   "destination": "vercel",
   "vercelProjectId": "prj_Ktcv99ngBNGKzh3hFdM1XbzEl1PS",
   "vercelProjectName": "aigrounds",
-  "vercelTeamId": "team_eE2Iv7IMqPOx8ZVN2xNfR2f0"
+  "vercelTeamId": "team_eE2Iv7IMqPOx8ZVN2xNfR2f0",
+  "configNames": [
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "OPENROUTER_APP_NAME",
+    "OPENROUTER_MODEL",
+    "OPENROUTER_SITE_URL",
+    "SENTRY_DSN",
+    "SENTRY_ORG",
+    "SENTRY_PROJECT"
+  ]
 }

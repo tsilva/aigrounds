@@ -21,7 +21,7 @@ export type GuidedExperimentContent = {
 // answer is correct, and how prediction changes, edits, reset and next behave.
 export function GuidedExperiment({ label, experiment, reached, complete,
   prediction, explanation, predictionName, explanationName, onPredict, onExplain,
-  predictionHelp, observation, action, onNext, nextLabel }: {
+  predictionHelp, observation, action, onNext, nextLabel, disabled = false }: {
   label: string;
   experiment: GuidedExperimentContent;
   reached: boolean;
@@ -37,13 +37,14 @@ export function GuidedExperiment({ label, experiment, reached, complete,
   action?: ReactNode;
   onNext: () => void;
   nextLabel: ReactNode;
+  disabled?: boolean;
 }) {
   return <ExperimentRail label={label} title={experiment.title}
     phase={prediction === null ? 0 : reached ? 2 : 1}>
     {!reached && <>
       <h3>Make a prediction</h3><p>{experiment.question}</p>
       <ExperimentChoices legend="Your prediction" name={predictionName}
-        choices={experiment.predictions} value={prediction} onChange={onPredict} />
+        choices={experiment.predictions} value={prediction} onChange={onPredict} disabled={disabled} />
       <p className={styles.small}>{predictionHelp}</p>
     </>}
     {prediction !== null && !reached && (action ??
@@ -52,13 +53,13 @@ export function GuidedExperiment({ label, experiment, reached, complete,
       <p role="status" className={styles.observation}>{observation}</p>
       <h3>{experiment.explanation}</h3>
       <ExperimentChoices legend="Your explanation" name={explanationName}
-        choices={experiment.explanations} value={explanation} onChange={onExplain} />
+        choices={experiment.explanations} value={explanation} onChange={onExplain} disabled={disabled} />
       {explanation !== null && !complete &&
         <p role="status" className={styles.feedback}>Try again. {experiment.retry}</p>}
     </>}
     {complete && <>
       <ExperimentResult>{experiment.takeaway}</ExperimentResult>
-      <ExperimentButton arrow onClick={onNext}>{nextLabel}</ExperimentButton>
+      <ExperimentButton arrow onClick={onNext} disabled={disabled}>{nextLabel}</ExperimentButton>
     </>}
   </ExperimentRail>;
 }

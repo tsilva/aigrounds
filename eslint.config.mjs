@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "public/ocr-line-detection/vendor/**",
+    "public/ocr-line-detection/runtime/**",
   ]),
 ]);
 

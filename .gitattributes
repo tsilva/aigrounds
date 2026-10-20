@@ -1,0 +1,5 @@
+# Preserve model and classroom PDF bytes; these are not text patches.
+public/ocr-line-detection/document.pdf binary
+public/ocr-line-detection/model/det.onnx binary
+# Retain the upstream model license verbatim, including its original whitespace.
+public/ocr-line-detection/model/LICENSE.txt whitespace=-blank-at-eol

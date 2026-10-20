@@ -45,6 +45,8 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
+- [OCR Line Detection](https://aigrounds.tsilva.eu/playgrounds/ocr-line-detection) runs the actual Indra ONNX detector in a browser WebAssembly worker on a real raster PDF. Inspect three output channels, change decoding controls and export tensors; local files stay in the browser. The model and its outputs use the bundled modified OpenRAIL-M license. [Lesson details](docs/ocr-line-detection.md) cover model provenance, runtime assets and verification.
+
 - [The Training Loop](src/modules/neural-network-training-loop) steps an actual tiny model through forward values, batch loss, backward gradients and parameter updates while keeping held-out rows out of fitting.
 - [Linear Classification & Decision Boundaries](src/modules/linear-classification-boundaries) connects editable weights, bias and cutoff policy to fixed observations, sigmoid readouts and degenerate boundaries.
 - [How Tokens Become an Answer](src/modules/autoregressive-generation-decoding) feeds selected tokens into an authored prefix with reproducible sampling, candidate filtering and distinct EOS/length stopping.
@@ -131,6 +133,8 @@ Development uses AgentBridge (`AGENTBRIDGE_BASE_URL`, default
 Production and Preview call OpenRouter directly using their own server-only
 `OPENROUTER_API_KEY`; a missing production key disables model requests.
 Production credentials come from this app’s isolated Infisical project.
-Production text requests use `deepseek/deepseek-v4.1-flash` with reasoning disabled.
+Production text requests use `deepseek/deepseek-v4.1-flash-1017` with reasoning disabled.
+
+Production secrets are delivered through GitHub Actions. Infisical production secret changes automatically trigger sync and deployment; see [production delivery](docs/production-delivery.md) for scope and recovery.
 
 Production delivery keeps Vercel secret isolation enabled and distinguishes public configuration from private credentials; see [production delivery](docs/production-delivery.md).

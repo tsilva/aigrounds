@@ -54,6 +54,6 @@ The separate `aigrounds-production` project, Production environment, root folder
 
 Development and production project separation is an access boundary; separate provider keys are also needed to isolate their budgets and revocation. Credential rotation is tracked in the migration report until verified.
 
-Production chat uses its own server-only `OPENROUTER_API_KEY` and `deepseek/deepseek-v4.1-flash`; AgentBridge is development-only. Deploy the app with a server runtime for `/api/chat`; a static file host alone cannot serve the Guide.
+Production chat uses its own server-only `OPENROUTER_API_KEY` and `deepseek/deepseek-v4.1-flash-1017`; AgentBridge is development-only. Deploy the app with a server runtime for `/api/chat`; a static file host alone cannot serve the Guide.
 
 Production builds and `next start` require the deployment’s own `OPENROUTER_API_KEY`. The development launcher supplies AgentBridge only; it does not deliver production credentials.

@@ -68,3 +68,5 @@ The Guide CTA opens the existing assistant. Do not add a second Guide launcher i
 - Preserve exact numeric mapping, non-overlapping point handles, accessible data equivalents, live feedback, selected states, visible focus, and reduced-motion behavior.
 - Verify scenario switching, reset, value editing, keyboard manipulation, incorrect-explanation recovery, completion, Guide opening/closing, and one unaffected lesson after shared changes.
 - Store and refresh approved mockups, prompts, and manifests for material redesigns. Record explicit refinements such as removed redundant controls; generated chart marks are illustrative, not a numeric oracle.
+
+Async lessons can pass `disabled` to `LessonToolbar`, `LessonSelect`, `ExperimentChoices` and `GuidedExperiment` while current evidence is loading. Defaults preserve synchronous lessons; use native disabled states rather than silently discarding learner actions.

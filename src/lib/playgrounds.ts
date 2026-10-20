@@ -1,3 +1,4 @@
+import { OcrPlayground } from "@/modules/ocr-line-detection/OcrPlayground";
 import { TrainingPlayground } from "@/modules/neural-network-training-loop/TrainingPlayground";
 import { BoundaryPlayground } from "@/modules/linear-classification-boundaries/BoundaryPlayground";
 import { DecodingPlayground } from "@/modules/autoregressive-generation-decoding/DecodingPlayground";
@@ -102,6 +103,7 @@ export type ActivePlayground = PlaygroundMetadata & {
 };
 
 const playgroundComponents: Record<ActivePlaygroundSlug, ComponentType> = {
+  "ocr-line-detection": OcrPlayground,
   "neural-network-training-loop": TrainingPlayground,
   "linear-classification-boundaries": BoundaryPlayground,
   "rag-pipeline": PipelinePlayground,

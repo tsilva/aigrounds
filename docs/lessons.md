@@ -189,3 +189,7 @@ The Training Loop uses a real two-hidden-unit model with staged forward, loss, b
 How Tokens Become an Answer feeds each selected token back into an authored prefix, with reproducible sampling, greedy selection, temperature, top-k/top-p filters and independent EOS/length stopping. Inside a Transformer Block retains a complete two-token pre-norm numeric trace while emphasizing residual bypasses, independent attention/MLP ablations and causality. From Retrieval to a Grounded Answer separates ranked candidates, retrieved chunks, supplied context and authored answers, with distinct source-support, requested-field and full-reference checks.
 
 Each bridge has three Predict → Try → Explain experiments, recovery from an incorrect explanation, optional exact evidence and a different-case transfer check. The deterministic exercises work without the AI Guide.
+
+## OCR Line Detection
+
+The Vision path includes [OCR Line Detection](/playgrounds/ocr-line-detection), after convolution and tensor shape refreshers. Its three experiments distinguish dense network output from decoded boxes, isolate threshold changes, and reconstruct stride-two edge coordinates. A numeric near-transfer check uses a selected cell on a new page. The real pinned Indra detector executes through ONNX Runtime Web on browser CPU; PDF.js rasterizes pages locally. See [model, runtime and verification details](ocr-line-detection.md).

@@ -29,7 +29,7 @@ PDF rendering is capped at 200 dpi / 2400 pixels on the long edge. Images are li
 
 Input `x`: float32 `[1,1,H,W]`, with `0=paper`, `1=ink`, dimensions padded to multiples of 32. Output `out`: float32 `[1,3,H/2,W/2]`. Channel 0 is the raw centre-band logit; channels 1/2 are top/bottom distances in **input pixels**. Output cell `[y,x]` is centered at input `(2*x+1,2*y+1)`. Its top estimate is `2*y+1 - top_distance`, not `2*(y - top_distance)`.
 
-Threshold and area changes decode the cached raw output. Resolution changes and Run detector execute a new model pass. Timings cover model execution only, excluding initialization, PDF rendering, preprocessing and display-map creation. The inspector/export uses uncapped values; map colors alone cap active distance predictions at the 98th percentile. Inactive-cell edge predictions are not reliable bounds.
+Input and decoding controls use a native disabled fieldset until the current baseline pass has finished, preventing a fast edit from replacing the baseline before the exercise can demonstrate cached decoding. Threshold and area changes decode the cached raw output. Resolution changes and Run detector execute a new model pass. Timings cover model execution only, excluding initialization, PDF rendering, preprocessing and display-map creation. The inspector/export uses uncapped values; map colors alone cap active distance predictions at the 98th percentile. Inactive-cell edge predictions are not reliable bounds.
 
 ## Assets and build
 

@@ -102,3 +102,5 @@ explained insight, unnecessary navigation, misconception recovery, near
 transfer and delayed retention. Analyze skip-ahead separately. Fewer clicks
 and completion alone do not establish better learning; no learner study has
 yet validated the 20-step route.
+
+The Vision path includes **OCR Line Detection** after the convolution and tensor-shape lessons. It applies dense prediction and stride-two geometry to real PDF pixels, with the activation lesson linked as a sigmoid refresher. The 20-step core is unchanged.

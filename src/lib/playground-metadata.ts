@@ -33,6 +33,13 @@ type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
 // should show.
 const activePlaygroundDefinitions = [
   {
+    slug: "ocr-line-detection", title: "OCR Line Detection", tag: "computer vision", layout: "guided-discovery",
+    kicker: "Turn page pixels into line boxes.", estimatedDuration: "10 to 14 minutes",
+    summary: "Run the actual Indra line detector on a PDF in your browser, inspect its score and edge-distance maps, and decode them into line boxes.",
+    concepts: ["Dense prediction", "ONNX inference", "Connected components", "Output stride"],
+    learningGoals: ["Interpret the score and two edge-distance channels.", "Separate decoding controls from model execution.", "Reconstruct line edges in input and source-page pixels."],
+  },
+  {
     "slug": "autoregressive-generation-decoding",
     "title": "How Tokens Become an Answer",
     "tag": "llm systems",

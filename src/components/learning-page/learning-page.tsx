@@ -41,21 +41,22 @@ export function ExperimentProgress({ phase }: { phase: number }) {
   </ol>;
 }
 
-export function LessonToolbar({ scenarios, selectedId, onSelect, onReset, label = "Dataset scenarios" }: {
+export function LessonToolbar({ scenarios, selectedId, onSelect, onReset, disabled = false, label = "Dataset scenarios" }: {
   scenarios: readonly { id: string; label: string; shortLabel: string }[];
   selectedId: string;
   onSelect: (id: string) => void;
   onReset: () => void;
   label?: string;
+  disabled?: boolean;
 }) {
   return <div className={styles.toolbar}>
     <div className={styles.presets} aria-label={label}>
       {scenarios.map((scenario) => <button key={scenario.id} type="button"
-        aria-pressed={selectedId === scenario.id} onClick={() => onSelect(scenario.id)}>
+        disabled={disabled} aria-pressed={selectedId === scenario.id} onClick={() => onSelect(scenario.id)}>
         <strong>{scenario.label}</strong><span>{scenario.shortLabel}</span>
       </button>)}
     </div>
-    <button type="button" className={styles.reset} onClick={onReset}><ArrowPathIcon aria-hidden="true" />Reset</button>
+    <button type="button" className={styles.reset} disabled={disabled} onClick={onReset}><ArrowPathIcon aria-hidden="true" />Reset</button>
   </div>;
 }
 
@@ -96,14 +97,15 @@ export function ExperimentRail({ label, title, phase, children }: {
   </aside>;
 }
 
-export function ExperimentChoices({ legend, name, choices, value, onChange }: {
+export function ExperimentChoices({ legend, name, choices, value, onChange, disabled = false }: {
   legend: string;
   name: string;
   choices: readonly { id: string; label: string }[];
   value: string | null;
   onChange: (id: string) => void;
+  disabled?: boolean;
 }) {
-  return <fieldset className={styles.choices}><legend className={styles.srOnly}>{legend}</legend>
+  return <fieldset disabled={disabled} className={styles.choices}><legend className={styles.srOnly}>{legend}</legend>
     {choices.map((choice) => <label key={choice.id} data-checked={value === choice.id}>
       <input type="radio" name={name} value={choice.id} checked={value === choice.id} onChange={() => onChange(choice.id)} />{choice.label}
     </label>)}
@@ -131,13 +133,14 @@ export function ExperimentButton({ children, onClick, disabled, arrow = false }:
   </button>;
 }
 
-export function LessonSelect({ label, choices, value, onChange }: {
+export function LessonSelect({ label, choices, value, onChange, disabled = false }: {
   label: string;
   choices: readonly { id: string; label: string }[];
   value: string;
   onChange: (id: string) => void;
+  disabled?: boolean;
 }) {
-  return <label className={styles.controlField}>{label}<select value={value}
+  return <label className={styles.controlField}>{label}<select disabled={disabled} value={value}
     onChange={(event) => onChange(event.currentTarget.value)}>
     {choices.map((choice) => <option key={choice.id} value={choice.id}>{choice.label}</option>)}
   </select></label>;

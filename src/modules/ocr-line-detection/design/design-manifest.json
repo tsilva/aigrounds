@@ -1,0 +1,15 @@
+{
+  "lessonPlanStep": null,
+  "title": "OCR Line Detection",
+  "slug": "ocr-line-detection",
+  "modulePath": "src/modules/ocr-line-detection",
+  "mockupPath": "src/modules/ocr-line-detection/design/accepted-mockup.png",
+  "promptPath": "src/modules/ocr-line-detection/design/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a1599f-e255-7870-96ad-04ed8f00aa9b/exec-0c513131-1766-4737-bfb0-f1d03701c5bb.png",
+  "approved": "2026-10-20: Approve and implement",
+  "refinements": [
+    "Retain original 9x9 pixel neighborhood rather than illustrative mockup grid.",
+    "Keep model license attribution with the lesson.",
+    "Runtime values and overlays come from actual inference, never the image."
+  ]
+}

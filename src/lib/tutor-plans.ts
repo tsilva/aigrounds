@@ -1,3 +1,4 @@
+import { ocrTutorPlan } from "@/modules/ocr-line-detection/learning-experiments";
 import { trainingTutorPlan } from "@/modules/neural-network-training-loop/learning-experiments";
 import { boundaryTutorPlan } from "@/modules/linear-classification-boundaries/learning-experiments";
 import { decodingTutorPlan } from "@/modules/autoregressive-generation-decoding/learning-experiments";
@@ -113,6 +114,7 @@ export function getTutorOpeningMessage(plan: TutorPlan) {
 }
 
 export const playgroundTutorPlans = {
+  "ocr-line-detection": ocrTutorPlan,
   "neural-network-training-loop": trainingTutorPlan,
   "linear-classification-boundaries": boundaryTutorPlan,
   "rag-pipeline": pipelineTutorPlan,

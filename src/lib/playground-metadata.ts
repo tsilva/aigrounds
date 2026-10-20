@@ -37,7 +37,7 @@ const activePlaygroundDefinitions = [
     kicker: "Turn page pixels into line boxes.", estimatedDuration: "10 to 14 minutes",
     summary: "Run the actual Indra line detector on a PDF in your browser, inspect its score and edge-distance maps, and decode them into line boxes.",
     concepts: ["Dense prediction", "ONNX inference", "Connected components", "Output stride"],
-    learningGoals: ["Interpret the score and two edge-distance channels.", "Separate decoding controls from model execution.", "Reconstruct line edges in input and source-page pixels."],
+    learningGoals: ["Read stored out[0,0,y,x] as a raw unbounded centre-band logit. Sigmoid is applied after inference for the probability display and threshold mask; it is not already stored in channel 0.", "Read channels 1 and 2 as top and bottom distances in input-image pixels, not probabilities or output-cell units.", "Separate decoding controls from model execution and reconstruct line edges in input and source-page pixels."],
   },
   {
     "slug": "autoregressive-generation-decoding",

@@ -33,7 +33,7 @@ Input and decoding controls use a native disabled fieldset until the current bas
 
 ## Assets and build
 
-`pnpm prepare:ocr` copies assets from the locked npm packages and the module's runtime source into ignored `public/ocr-line-detection/{vendor,runtime}` directories. `pnpm dev --port auto` and `pnpm build` run it automatically. Build does not fetch models, libraries or PDFs from an external host. Commit the small pinned model, its license, ORT license and authored PDF; do not commit generated runtime bundles. Keep the seven-day pnpm release-age protection and disabled dependency lifecycle scripts.
+`pnpm prepare:ocr` copies assets from the locked npm packages and the module's runtime source into ignored `public/ocr-line-detection/{vendor,runtime}` directories. It uses PDF.js's matching minified library and worker builds, preserving the existing `pdf.mjs` and `pdf.worker.mjs` URLs, fonts, CMaps and licenses. `pnpm dev --port auto` and `pnpm build` run it automatically. Build does not fetch models, libraries or PDFs from an external host. Commit the small pinned model, its license, ORT license and authored PDF; do not commit generated runtime bundles. Keep the seven-day pnpm release-age protection and disabled dependency lifecycle scripts.
 
 The source is in `src/modules/ocr-line-detection/`; generated vendor code is excluded from ESLint while source runtime files remain checked. PDF.js font/CMap licenses accompany their generated assets. Runtime reference: [ONNX Runtime Web deployment](https://onnxruntime.ai/docs/tutorials/web/deploy.html), [PDF.js examples](https://mozilla.github.io/pdf.js/examples/).
 

@@ -45,7 +45,7 @@ pnpm test:deps        # check patched dependency security boundaries
 
 ## Notes
 
-- [OCR Line Detection](https://aigrounds.tsilva.eu/playgrounds/ocr-line-detection) runs the actual Indra ONNX detector in a browser WebAssembly worker on a real raster PDF. Inspect three output channels, change decoding controls and export tensors; local files stay in the browser. The model and its outputs use the bundled modified OpenRAIL-M license. [Lesson details](docs/ocr-line-detection.md) cover model provenance, runtime assets and verification.
+- [OCR Line Detection](https://aigrounds.tsilva.eu/playgrounds/ocr-line-detection) runs the actual Indra ONNX detector in a browser WebAssembly worker on a real raster PDF. Inspect three output channels, change decoding controls and export tensors; local files stay in the browser. The model and its outputs use the bundled modified OpenRAIL-M license. The self-hosted PDF.js library and worker use minified builds from the locked dependency. [Lesson details](docs/ocr-line-detection.md) cover model provenance, runtime assets and verification.
 
 - [The Training Loop](src/modules/neural-network-training-loop) steps an actual tiny model through forward values, batch loss, backward gradients and parameter updates while keeping held-out rows out of fitting.
 - [Linear Classification & Decision Boundaries](src/modules/linear-classification-boundaries) connects editable weights, bias and cutoff policy to fixed observations, sigmoid readouts and degenerate boundaries.
@@ -119,7 +119,7 @@ pnpm test:deps        # check patched dependency security boundaries
 - Playgrounds run in the browser. The MNIST inference debugger needs WebGPU support.
 - The optional AI Guide uses a server API route with OpenRouter in production and AgentBridge in development. Credentials stay on the server.
 - Analytics and Sentry monitoring depend on environment configuration; see [configuration](docs/configuration.md) for settings and local credential handling.
-- All lessons use the shared [learning-page design system](DESIGN_SYSTEM.md), including reusable experiment presentation, evidence typography, parameter grids and accessible table styles. Lesson state, answer checking and mathematical representations stay in each module. [Development notes](docs/development.md) explain lesson registration, validation, update dates, branding, and project workflows.
+- All lessons use the shared [learning-page design system](DESIGN_SYSTEM.md), including reusable experiment presentation, evidence typography, parameter grids and accessible table styles. Lesson state, answer checking and mathematical representations stay in each module. [Development notes](docs/development.md) explain lesson registration, validation, update dates, branding, and project workflows. Branding sources and store graphics are kept in `assets/brand/`; only the web icons, manifest and social image are served from `public/brand/web-seo/`.
 
 ## License
 

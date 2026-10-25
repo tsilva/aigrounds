@@ -38,6 +38,6 @@ Read [SPECS.md](../SPECS.md) and [AGENTS.md](../AGENTS.md) before repository wor
 
 ## Branding
 
-The indigo learning-blocks branding includes a README logo at `logo.png`, transparent source artwork in `public/brand/sources/`, and web icons, favicons, and an Open Graph image in `public/brand/web-seo/`. The app metadata already uses these web assets. `public/brand/manifest.json` records the current export dimensions; generation prompts are saved with the sources. Older store graphics are retained separately and are not part of the current web asset pack.
+The indigo learning-blocks branding includes a README logo at `logo.png`, transparent source artwork in `assets/brand/sources/`, and web icons, favicons, and an Open Graph image in `public/brand/web-seo/`. The app metadata already uses these web assets. `assets/brand/manifest.json` records the current export dimensions; generation prompts are saved with the sources. Master logo/icon exports and older store graphics also live under `assets/brand/`, outside `public`, so they remain available in the repository without being shipped as deployment assets. Keep only the web asset pack in `public/brand/`.
 
-See the [asset inventory](../public/brand/manifest.json) and [generation prompts](../public/brand/sources/prompts.md).
+See the [asset inventory](../assets/brand/manifest.json) and [generation prompts](../assets/brand/sources/prompts.md).

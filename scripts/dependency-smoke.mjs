@@ -22,10 +22,10 @@ assert.doesNotMatch(lock, /^\s+braces@/m, "unpatched braces dependency reintrodu
 
 for (const expected of [
   "'@babel/core@7.29.7':",
-  "'@opentelemetry/core@2.10.0':",
+  "'@opentelemetry/core@2.12.0':",
   "brace-expansion@1.1.21:",
   "brace-expansion@5.0.12:",
-  "fast-uri@3.1.8:",
+  "fast-uri@3.1.9:",
   "js-yaml@4.3.2:",
   "nanoid@3.3.19:",
   "postcss@8.5.23:",
@@ -35,7 +35,7 @@ for (const expected of [
   assert.ok(lock.includes(expected), `missing fixed lock entry: ${expected}`);
 }
 
-const fastUri = exactRequire("fast-uri@3.1.8/node_modules/fast-uri")("fast-uri");
+const fastUri = exactRequire("fast-uri@3.1.9/node_modules/fast-uri")("fast-uri");
 assert.equal(fastUri.parse("https://trusted.example/playground").host, "trusted.example");
 for (const maliciousUri of [
   "https://trusted.example\\@evil.example/playground",

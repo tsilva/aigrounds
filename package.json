@@ -29,7 +29,7 @@
     "@xyflow/react": "12.11.2",
     "next": "16.4.1",
     "onnxruntime-web": "1.23.2",
-    "pdfjs-dist": "5.4.296",
+    "pdfjs-dist": "6.4.299",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

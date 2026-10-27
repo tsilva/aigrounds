@@ -70,3 +70,5 @@ next-env.d.ts
 # Rebuilt from locked npm dependencies and lesson runtime sources.
 /public/ocr-line-detection/vendor/
 /public/ocr-line-detection/runtime/
+/INBOX.md
+/.local/repo-inbox/

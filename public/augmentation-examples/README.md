@@ -8,3 +8,7 @@ than SVG drawings.
 - `sneaker.jpg`: [File:Rick Owens Geobasket sneaker.jpg](https://commons.wikimedia.org/wiki/File:Rick_Owens_Geobasket_sneaker.jpg), CC0 1.0.
 - `stop-sign.jpg`: [File:Stop sign us.jpg](https://commons.wikimedia.org/wiki/File:Stop_sign_us.jpg), Wikimedia Commons file page license.
 - `leaf.jpg`: [File:Apple leaves.jpg](https://commons.wikimedia.org/wiki/File:Apple_leaves.jpg), CC0 1.0.
+
+## License
+
+[MIT License](../../LICENSE).

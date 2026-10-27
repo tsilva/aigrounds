@@ -1,0 +1,1096 @@
+{
+  "reviewedOn": "2026-10-27",
+  "scope": "Major transferable AI/ML teaching outcomes in active notebooks. Mapped means an identified live or planned owner, not implemented or complete notebook parity. Architecture history, framework setup and code recipes do not each become a lesson.",
+  "notebooks": [
+    {
+      "notebook": "1bit-neural-networks",
+      "lessons": [
+        "binary-ternary-training"
+      ],
+      "sourceSha256": "f114d70cf033e52a87a1f8153377357e009753a5821f552eedcff5702452f54f"
+    },
+    {
+      "notebook": "activation-functions",
+      "lessons": [
+        "activation-functions"
+      ],
+      "plannedExtensions": [
+        "activation-functions"
+      ],
+      "sourceSha256": "e5a1c4e20327eaee3398258c0a532846ccd17512cd4e9869a5b18c9745a3c914"
+    },
+    {
+      "notebook": "active-learning",
+      "lessons": [
+        "active-learning"
+      ],
+      "note": "Uncertainty, committee disagreement and diversity are comparable query-selection strategies within one fixed-budget loop.",
+      "sourceSha256": "49d703a8cc067850313a179db0dbd035682f70a383482a2aace6414795b665f5"
+    },
+    {
+      "notebook": "adversarial-robustness",
+      "lessons": [
+        "adversarial-perturbations"
+      ],
+      "sourceSha256": "e172056b1b841b051b673b262d001c1198be24c07cdcf4440f4c686cd9a7bbcc"
+    },
+    {
+      "notebook": "alexnet-breakthrough",
+      "lessons": [
+        "convolution-filter-lab",
+        "pooling-receptive-fields",
+        "dropout",
+        "neural-network-training-loop"
+      ],
+      "note": "Historical architecture case study: reuse convolution, pooling, dropout and training mechanics rather than create an AlexNet tour.",
+      "sourceSha256": "580cac1805b792f9b4c927fb6bb0a3a529bff5db6bdbca865826ab9711146f7c"
+    },
+    {
+      "notebook": "attention-mechanism",
+      "lessons": [
+        "transformer-attention",
+        "context-windows-attention-masks",
+        "multi-head-attention"
+      ],
+      "sourceSha256": "c0cdb3569a5fdba669b68c0e11948b992b4d7049aa3ea63f054f1500b4bca14d"
+    },
+    {
+      "notebook": "audio-processing",
+      "lessons": [
+        "audio-spectrograms",
+        "audio-waveforms-sampling",
+        "mel-frequency-features"
+      ],
+      "note": "Sampling, STFT and mel/cepstral compression are separate units; augmentation and classifier training reuse transform/training mechanics.",
+      "sourceSha256": "210e90ce49e1809312739596b90cce9b0fe023207ee73d82655fc4a0c9aa785d"
+    },
+    {
+      "notebook": "autoencoders",
+      "lessons": [
+        "autoencoders-latent-bottleneck",
+        "denoising-autoencoders"
+      ],
+      "sourceSha256": "851c8997733c53be93c7243df759e641f1351c97ff661c061d662eed9b4d258b"
+    },
+    {
+      "notebook": "batch-normalization",
+      "lessons": [
+        "batch-normalization"
+      ],
+      "sourceSha256": "aefe12456d9d5d128c3da8110312f293c66af1d702121d009f041fa390e2792f"
+    },
+    {
+      "notebook": "bayesian-ml-basics",
+      "lessons": [
+        "bayesian-parameter-estimation",
+        "bayesian-regression"
+      ],
+      "sourceSha256": "3204e4040fa7309c33bebbc41856267a77f071e3ac19be9e923dd44e3d8d015d"
+    },
+    {
+      "notebook": "bert-architecture",
+      "lessons": [
+        "masked-language-modeling"
+      ],
+      "sourceSha256": "c26c7f5f53729f57c613bffa7f76722c02bb69a0e85233d0b98191f3c5f96d8f"
+    },
+    {
+      "notebook": "bias-variance-overfitting",
+      "lessons": [
+        "overfitting",
+        "bias-variance-tradeoff",
+        "learning-curves-data-budgets",
+        "knn-classification"
+      ],
+      "sourceSha256": "cb50628f2a6e1f47dd3d11e48c1a09f5540f34ee49500295f2ae2337ade60c92"
+    },
+    {
+      "notebook": "calculus-refresher",
+      "lessons": [
+        "gradient-descent",
+        "autograd-graphs",
+        "backpropagation-inspector"
+      ],
+      "sourceSha256": "04d0975199596517459cc99d4f08d7287f6b6bcf7dc4d94c049021c3cc6e86f7"
+    },
+    {
+      "notebook": "calibration-and-thresholding",
+      "lessons": [
+        "fitting-calibrators",
+        "cost-sensitive-thresholds"
+      ],
+      "sourceSha256": "03d9a86e8b89aa93b40290ab360cd1e3957c484fc77a3f3006705037b30477a5",
+      "note": "Reliability inspection, calibration fitting, and observed-cost threshold selection have separate owners; changing a decision cutoff is distinct from fitting a class-weighted training loss."
+    },
+    {
+      "notebook": "capsule-networks",
+      "lessons": [
+        "capsule-routing"
+      ],
+      "sourceSha256": "2d0108bfd2d4e772486e7945bc47b895cb47bbb1f4e5b0ce29e9e70feed33b01"
+    },
+    {
+      "notebook": "chip8-emulator",
+      "excludedReason": "General CPU emulation and fetch/decode/execute are outside AI Grounds’ AI/ML learning scope.",
+      "sourceSha256": "6ffb65dd060aeb50c0723cb87bd8fd01b8116eaa0ae747ed66e8e24cf90088b4"
+    },
+    {
+      "notebook": "classification-text",
+      "lessons": [
+        "naive-bayes-smoothing",
+        "recurrent-hidden-state",
+        "lstm-gates",
+        "transfer-learning",
+        "multiclass-metric-averaging"
+      ],
+      "note": "Use text classification as a case for the existing classifier/sequence/adaptation units; no second generic classifier lesson.",
+      "sourceSha256": "7e13d85679e7e17e23f9929afbf57f09f91539bd6994117eb1203baafb372172"
+    },
+    {
+      "notebook": "clip-architecture",
+      "lessons": [
+        "clip-image-text-alignment"
+      ],
+      "sourceSha256": "795b44da4107453a8ca00158f937969434cb1f700afb35d704b32d82bd1de313"
+    },
+    {
+      "notebook": "computational-graphs",
+      "lessons": [
+        "autograd-graphs",
+        "backpropagation-inspector"
+      ],
+      "sourceSha256": "c896fec66fe8e1aba46fa51950c74de067b825a15c334fdfe0bd58d581666032"
+    },
+    {
+      "notebook": "confidence-intervals",
+      "lessons": [
+        "confidence-intervals",
+        "margin-of-error-sample-size",
+        "hypothesis-testing-basics",
+        "student-t-intervals"
+      ],
+      "note": "Source cells teach known-spread intervals and Student-t intervals; the README bootstrap label does not establish a bootstrap implementation.",
+      "sourceSha256": "93293d34de61385076425bb8ffa85ce5bc26612daf6c70943d91ac8d14ff3dd8"
+    },
+    {
+      "notebook": "continual-learning",
+      "lessons": [
+        "continual-learning",
+        "continual-parameter-protection",
+        "task-parameter-isolation"
+      ],
+      "note": "Replay, parameter-importance penalties and parameter isolation have separate primary interactions.",
+      "sourceSha256": "238a3626c3b60f2673d1a987fcb867442e7ffc81030b9123c8988a235b2c5c5a"
+    },
+    {
+      "notebook": "contrastive-learning",
+      "lessons": [
+        "contrastive-infonce"
+      ],
+      "sourceSha256": "444ab593a84f5c5c46fa17d43dcf766b36a0b5f6cfc2229d7f660930756f4b19"
+    },
+    {
+      "notebook": "cross-validation",
+      "lessons": [
+        "cross-validation"
+      ],
+      "sourceSha256": "aec0b9c7bd67b90b6e9848730496d6cdeba3bb297d2497936a37d7acb4f6d4ea"
+    },
+    {
+      "notebook": "curriculum-learning",
+      "lessons": [
+        "curriculum-training-order"
+      ],
+      "sourceSha256": "d65403ba1797660598e69484a9f340e0337f9214da3a445809c1e2ded54d75d2"
+    },
+    {
+      "notebook": "data-augmentation",
+      "lessons": [
+        "pytorch-image-augmentations",
+        "label-mixing-image-transforms"
+      ],
+      "sourceSha256": "080d1426ba22d8fc5a8103e49d3cf8e236fa820e9e8bf280a2ef4151787e4c22"
+    },
+    {
+      "notebook": "data-normalization",
+      "lessons": [
+        "feature-scaling"
+      ],
+      "plannedExtensions": [
+        "feature-scaling"
+      ],
+      "sourceSha256": "21c55a20f10e7eb9e50b57ff1796d81650b30787135e0487ba351b675672dede"
+    },
+    {
+      "notebook": "debugging-neural-networks",
+      "lessons": [
+        "debugging-neural-networks"
+      ],
+      "sourceSha256": "f37c38d308a3eb62bfa163042e5841e29a558da2105e603f727ea1dcf1ad5d39"
+    },
+    {
+      "notebook": "decision-trees",
+      "lessons": [
+        "decision-trees"
+      ],
+      "sourceSha256": "75ef54932f3485446399ed2f5c84bcdcd1b7ea8e783ee1691f83b64c61a1c8d3"
+    },
+    {
+      "notebook": "denoising-image",
+      "lessons": [
+        "denoising-autoencoders"
+      ],
+      "sourceSha256": "6f162312f5b16a6839a11a780cb365beb01fbead49a335d118dd578377e51dcc"
+    },
+    {
+      "notebook": "denoising-text",
+      "lessons": [
+        "edit-distance-error-rates"
+      ],
+      "sourceSha256": "dc102e02b0689e5846259a78660c53c7edd4e8a7c20ab506724741a26cad82c9"
+    },
+    {
+      "notebook": "diffusion-models",
+      "lessons": [
+        "diffusion-denoising",
+        "diffusion-sampling-budgets"
+      ],
+      "sourceSha256": "ce5754754ef3ea90f7ae697d995c94b27cf13e6743c3d04a63bc65d70b641484"
+    },
+    {
+      "notebook": "dimensionality-reduction",
+      "lessons": [
+        "projection-foundations",
+        "pca-principal-components",
+        "t-sne-neighborhood-map",
+        "umap-manifold-projection",
+        "distance-concentration"
+      ],
+      "sourceSha256": "063b1db8c1fba859172acdac8ab7c88b071fe8feaf495a637dbb93daec6d06a1"
+    },
+    {
+      "notebook": "double-descent",
+      "lessons": [
+        "double-descent"
+      ],
+      "sourceSha256": "2a530ccccdf9ce48e94c01e99faded78a1c32b4074b33f944276bc7fe516791d"
+    },
+    {
+      "notebook": "efficientnet-compound-scaling",
+      "lessons": [
+        "compound-network-scaling",
+        "channel-attention-gates"
+      ],
+      "sourceSha256": "c39c658578a41f99cae12757f0db86cfac5bb74289c3267466ee3165ecadd962"
+    },
+    {
+      "notebook": "embeddings",
+      "lessons": [
+        "vector-geometry-similarity",
+        "embedding-retrieval",
+        "word2vec-negative-sampling",
+        "positional-encoding-token-order"
+      ],
+      "sourceSha256": "a140a64215c0b14b9d539fae613a889a7e8ede964486fc39683c20f618d65bcf"
+    },
+    {
+      "notebook": "energy-based-neural-networks",
+      "lessons": [
+        "hopfield-associative-memory",
+        "rbm-gibbs-sampling"
+      ],
+      "sourceSha256": "39b597802d63cdd419fa98a14ff457296e03e08e01c8bb5d28771d6626e98e4b"
+    },
+    {
+      "notebook": "ensemble-methods",
+      "lessons": [
+        "bagging-random-forests",
+        "boosting",
+        "stacking"
+      ],
+      "sourceSha256": "5c4658113f7b546919c698c007425696d94bee65555f9c07cefe6d0c8a6ebed4"
+    },
+    {
+      "notebook": "feature-engineering",
+      "lessons": [
+        "categorical-feature-engineering",
+        "feature-binning"
+      ],
+      "sourceSha256": "c10d612714af28ff2245cfc57d32431348d313287ec3b1956f97b42823797acc"
+    },
+    {
+      "notebook": "flash-attention",
+      "lessons": [
+        "flash-attention-tiling"
+      ],
+      "sourceSha256": "49ff1210d82e48cedfa244c3f0474fdf7749a97e2d1522a5f7b2cbd0c8463a72"
+    },
+    {
+      "notebook": "forward-forward",
+      "lessons": [
+        "forward-forward-learning"
+      ],
+      "sourceSha256": "0ce15d85c4d6b099e184cf55b7ef7ddb011f4f75d17ad6a4f29a497721655b8f"
+    },
+    {
+      "notebook": "gan-fundamentals",
+      "lessons": [
+        "gan-adversarial-training"
+      ],
+      "note": "Alternative discriminator/generator losses remain controlled variants of the alternating-game unit rather than separate architecture cards.",
+      "sourceSha256": "af77c1c33186a75cdcba255c0bbdc94ce2bb036be9401abe945c0a1008769d41"
+    },
+    {
+      "notebook": "gaussian-mixture-models",
+      "lessons": [
+        "gaussian-mixtures-em"
+      ],
+      "sourceSha256": "c7206b9966af5bf45b0f399b1390c8bfc8a8e6d61b5ff81771770255f08002a3"
+    },
+    {
+      "notebook": "gpt-architecture",
+      "lessons": [
+        "transformer-attention",
+        "multi-head-attention",
+        "context-windows-attention-masks",
+        "transformer-block-residual-stream",
+        "autoregressive-generation-decoding"
+      ],
+      "sourceSha256": "fff5f9e2cdff76c7512b50e83e2323c0376463fc6c2d9f09025b6b32ec5a3c64"
+    },
+    {
+      "notebook": "gpu-hardware-basics",
+      "lessons": [
+        "gpu-memory-compute"
+      ],
+      "sourceSha256": "180fa5f8227cd034f715074859982b81b3fbfeed5731e8adb677d1dc56a5c3b8"
+    },
+    {
+      "notebook": "grad-cam-visualization",
+      "lessons": [
+        "grad-cam"
+      ],
+      "sourceSha256": "a1ce1532baed4c9c1370ae6fa8a5966e8521d51b035a907b9547d4bab5b09b3d"
+    },
+    {
+      "notebook": "gradient-flow-and-stabilization",
+      "lessons": [
+        "gradient-flow-clipping"
+      ],
+      "sourceSha256": "159bbb520301cdd18b884b70ffc5e7d305e002fd6d71a2fdafc595992a0f9030"
+    },
+    {
+      "notebook": "graph-neural-networks",
+      "lessons": [
+        "graph-message-passing"
+      ],
+      "sourceSha256": "80cd0952a9e0d62efd2e464976ce9c1c98e85e77af514adbc8701a4cc9568fba"
+    },
+    {
+      "notebook": "grokking",
+      "lessons": [
+        "grokking-delayed-generalization"
+      ],
+      "sourceSha256": "dd47706c69036652b9b65be55604d641194247553cfc84ba621994155f96d26e"
+    },
+    {
+      "notebook": "gru-from-scratch",
+      "lessons": [
+        "gru-gates"
+      ],
+      "sourceSha256": "afb8c17cee4a7bca68160b9c3511ad34f71cd5a6721cfd8c7cb6e0ce5088184e"
+    },
+    {
+      "notebook": "hybrid-retrieval-and-reranking",
+      "lessons": [
+        "hybrid-retrieval-reranking",
+        "query-rewriting-retrieval",
+        "candidate-reranking"
+      ],
+      "sourceSha256": "ba6ca1c4f2201bc5d87edc3c3f86f87984fcac42691809686bba373996803d64",
+      "note": "Fusion and candidate reranking are independent teaching units under one navigation card; reranking cannot recover an item absent from the candidate pool."
+    },
+    {
+      "notebook": "hyperparameter-tuning",
+      "lessons": [
+        "hyperparameter-search",
+        "bayesian-hyperparameter-search"
+      ],
+      "sourceSha256": "e53d023e07a1a0e3abff175f3e9dedc4679ff0729cc2cac31a3c58cc0337c979"
+    },
+    {
+      "notebook": "image-classification-basics",
+      "lessons": [
+        "neural-network-training-loop",
+        "convolution-filter-lab",
+        "classification-metrics-foundations",
+        "experiment-reproducibility"
+      ],
+      "note": "Use as a worked application of training, convolution, diagnostics and evaluation rather than another generic training-loop lesson.",
+      "sourceSha256": "6a08f461f8e2623ae386d7fd864024a61eee8c3bbec6eafa3ddf4cbf3b028cf0"
+    },
+    {
+      "notebook": "imbalanced-data",
+      "lessons": [
+        "class-weighting",
+        "resampling-imbalanced-data",
+        "synthetic-minority-sampling"
+      ],
+      "sourceSha256": "2aa37661082b208c48adc529f052a55e3963aae95611ac375b85871efbc75592"
+    },
+    {
+      "notebook": "inception-multiscale",
+      "lessons": [
+        "multiscale-convolution-branches"
+      ],
+      "sourceSha256": "a17183a58001cc38949e2165b381dd5e6abf4603d33f65404adb88bf630611c3"
+    },
+    {
+      "notebook": "instruction-tuning-and-alignment",
+      "lessons": [
+        "instruction-tuning-preferences",
+        "instruction-tuning"
+      ],
+      "note": "SFT target masking and DPO are separate planned units; the RLHF comparison composes preference evaluation and policy-gradient concepts, not a claim of implemented RLHF training.",
+      "sourceSha256": "3671e713a8b6c122e8dad2d130dd7899e0d961da920f08a160a688b401d5efa6"
+    },
+    {
+      "notebook": "int8-fp16-quantization",
+      "lessons": [
+        "quantization-aware-training",
+        "floating-point-precision"
+      ],
+      "sourceSha256": "4f5a4346ae3dd9be6aea33d73980f157415acc7ae87cfd6fba78f5594aae963f"
+    },
+    {
+      "notebook": "kl-divergence",
+      "lessons": [
+        "entropy-information",
+        "categorical-cross-entropy",
+        "kl-divergence"
+      ],
+      "sourceSha256": "137a48376071491c586f1f40e714c3bc50743b942615ef5fe63d9bc85472c81d"
+    },
+    {
+      "notebook": "kmeans-from-scratch",
+      "lessons": [
+        "k-means-clustering"
+      ],
+      "plannedExtensions": [
+        "k-means-clustering"
+      ],
+      "sourceSha256": "3732ec8aa32376b787a825b273d2b006c073fbbe83167c90d7af6a543bd446d6"
+    },
+    {
+      "notebook": "knowledge-distillation",
+      "lessons": [
+        "knowledge-distillation"
+      ],
+      "sourceSha256": "0959d6cfa2c0fcefbae992d8788a65ffd8333d29c0347a71d420660bb839c37d"
+    },
+    {
+      "notebook": "kv-caching",
+      "lessons": [
+        "kv-caching",
+        "grouped-query-attention"
+      ],
+      "sourceSha256": "381345914448f5cad3cddc257b9dde59ef36a866a9e2a312afd02e067bdfe3f7"
+    },
+    {
+      "notebook": "latent-diffusion",
+      "lessons": [
+        "latent-diffusion"
+      ],
+      "sourceSha256": "56988e11b1cbb1218dfe18d61c069dfdcc3a651b61a066625dcff681c7551461"
+    },
+    {
+      "notebook": "layer-normalization",
+      "lessons": [
+        "layer-normalization",
+        "rms-normalization"
+      ],
+      "sourceSha256": "d3d698bb66e0467201838d1cca9ae85f3744ff606f2afb9511d3b45e5f046bbe"
+    },
+    {
+      "notebook": "learning-rate-schedules",
+      "lessons": [
+        "learning-rate-schedules"
+      ],
+      "sourceSha256": "5b56e66d42f1f6de599f2d939e4455e79dec4ec9c159cb7e61e614f4db7448c0"
+    },
+    {
+      "notebook": "lenet-limitations",
+      "lessons": [
+        "convolution-filter-lab",
+        "pooling-receptive-fields",
+        "activation-functions",
+        "neural-network-training-loop"
+      ],
+      "note": "Historical architecture case study: reuse convolution, pooling, activation and training mechanics rather than create a LeNet tour.",
+      "sourceSha256": "04e863365feb727b605b5704fa2729f9e5957bea3dc4772d71d45df8b69cffd8"
+    },
+    {
+      "notebook": "linear-algebra",
+      "lessons": [
+        "vector-geometry-similarity",
+        "matrix-multiplication",
+        "projection-foundations",
+        "pca-principal-components",
+        "linear-transformations-eigenvectors",
+        "svd-low-rank-approximation"
+      ],
+      "sourceSha256": "92d8951ce530fb2fbae00a8d9bd5a3a21270726530bac4c9255e80d7d4bbfbf3"
+    },
+    {
+      "notebook": "linear-regression",
+      "lessons": [
+        "linear-regression-line-fitting",
+        "least-squares-loss-landscape",
+        "gradient-descent",
+        "regression-gradient-updates"
+      ],
+      "sourceSha256": "8fad32520164554a0f48df95b1116097930e1e2a19640bfb83f8e90f7de3cd90"
+    },
+    {
+      "notebook": "llm-evaluation-and-guardrails",
+      "lessons": [
+        "reference-answer-metrics",
+        "retrieval-ranking-metrics",
+        "rag-groundedness-metrics",
+        "safety-refusal-robustness-metrics",
+        "evidence-sufficiency-guardrails"
+      ],
+      "sourceSha256": "4b1a39c1a0c648cd7b2ab8e4b9699bd272b51ff2a31507895f30ef5f26a90182"
+    },
+    {
+      "notebook": "logistic-regression",
+      "lessons": [
+        "linear-classification-boundaries",
+        "log-loss-confidence-penalties",
+        "gradient-descent",
+        "neural-network-training-loop"
+      ],
+      "sourceSha256": "1a520ac41b012f91835d9d09527200d28e5c69865f96dd027c4bef84011f2348"
+    },
+    {
+      "notebook": "lora-peft",
+      "lessons": [
+        "lora-low-rank-adapters",
+        "fine-tuning-memory-budgets",
+        "soft-prompts-prefix-tuning"
+      ],
+      "note": "Low-rank updates, learned prompt/prefix insertion and memory accounting have separate owners; QLoRA composes quantization with adapters rather than duplicating them.",
+      "sourceSha256": "3fa15b05da42273718bfae10520d5dc3a818b60104d1f48f4b9618cd355f8d3f"
+    },
+    {
+      "notebook": "loss-functions",
+      "lessons": [
+        "least-squares-loss-landscape",
+        "log-loss-confidence-penalties",
+        "categorical-cross-entropy",
+        "svm-margins",
+        "mse-mae-regression-losses"
+      ],
+      "sourceSha256": "7801008bcddba7427c2a848f9e6325f8f534e0ae94a2d77c54dac712978d4cea"
+    },
+    {
+      "notebook": "lstm-from-scratch",
+      "lessons": [
+        "lstm-gates"
+      ],
+      "sourceSha256": "bc1b6042bfc3a591e49faf0ec1b9cfaa08701098b83bb3b164475d3f82b89a06"
+    },
+    {
+      "notebook": "mcts-simple",
+      "lessons": [
+        "exploration-exploitation",
+        "monte-carlo-tree-search"
+      ],
+      "sourceSha256": "bdb1ce538ef1b53de2677e9bf30a4a8ac6f327a70c516d3d29df3d30d73848a3"
+    },
+    {
+      "notebook": "meta-learning-few-shot",
+      "lessons": [
+        "few-shot-meta-learning",
+        "meta-learning-inner-outer-loops"
+      ],
+      "sourceSha256": "80deed8f079ef0ffbfa96b58cbad6f88d737a4e8666f1f90eeb08392612991bc"
+    },
+    {
+      "notebook": "metrics",
+      "lessons": [
+        "classification-metrics-foundations",
+        "roc-auc-thresholds",
+        "precision-recall-curves-imbalance",
+        "multiclass-metric-averaging"
+      ],
+      "sourceSha256": "c9455d587f517386430a4d288cf6a6fa472ae20aaf4a7944ec375b4926f9e7d3"
+    },
+    {
+      "notebook": "mini-batch-gradient-descent",
+      "lessons": [
+        "stochastic-gradient-noise",
+        "gradient-accumulation"
+      ],
+      "sourceSha256": "a58533c56e68e1e0f925d48ffe06488fbe1410848d6334c32880ea5d51e82aa7"
+    },
+    {
+      "notebook": "mixture-of-experts",
+      "lessons": [
+        "mixture-of-experts-routing"
+      ],
+      "sourceSha256": "1b0937067444b2ab492b8c1308d59417585bd1b01850656147dcd758acf006ea"
+    },
+    {
+      "notebook": "mobilenet-efficient-cnns",
+      "lessons": [
+        "depthwise-separable-convolutions"
+      ],
+      "sourceSha256": "787bf5f063a0579fbda9b0fcfdf7470be44af9437aedc6ef0820b6eb0b9d285c"
+    },
+    {
+      "notebook": "model-interpretability",
+      "lessons": [
+        "integrated-gradients",
+        "lime-local-surrogates",
+        "shap-feature-attribution"
+      ],
+      "note": "Attribution methods have separate units; sparsity or an attention map alone must not be presented as proof of faithful interpretation.",
+      "sourceSha256": "4ad04cbc946125f2ec47fe55ba7f893f2a0eb8112441b95a47b35b96a7d80962"
+    },
+    {
+      "notebook": "model-pruning",
+      "lessons": [
+        "model-pruning"
+      ],
+      "sourceSha256": "659dd0f566c4ac7567f2ff305981dd45865f673aef08f6c12e04c1f24f38b475"
+    },
+    {
+      "notebook": "multi-task-learning",
+      "lessons": [
+        "multi-task-loss-balancing"
+      ],
+      "note": "Sharing architectures are cases within the shared-gradient/loss-weight experiment, not separate architecture tours.",
+      "sourceSha256": "c1464fce5a67cfb9c135440c91776d6caffd96ce22e330a48d80ed6683cd5358"
+    },
+    {
+      "notebook": "naive-bayes",
+      "lessons": [
+        "naive-bayes-smoothing"
+      ],
+      "sourceSha256": "79504e6d6aa49a6b1d2bd84837abaf61518932fbc60618f35059db301d8945bb"
+    },
+    {
+      "notebook": "ner-token-classification",
+      "lessons": [
+        "token-classification-entities",
+        "crf-sequence-decoding"
+      ],
+      "sourceSha256": "155c9f4aa9f12e603cc4b37a2452899b06ca6a7b275f1df94e4e19969b686e35"
+    },
+    {
+      "notebook": "neural-network-fundamentals",
+      "lessons": [
+        "network-capacity-width-depth"
+      ],
+      "sourceSha256": "f995c8698da2eaa041c3220aa586fb9810ca58bedbe5b46bfaf99ae8714a3824"
+    },
+    {
+      "notebook": "neural-odes",
+      "lessons": [
+        "neural-odes"
+      ],
+      "sourceSha256": "88169a8dc4024be12b9664ad63f3babb953553974f4bf196c5d01bed321dd7f2"
+    },
+    {
+      "notebook": "neural-style-transfer",
+      "lessons": [
+        "neural-style-transfer"
+      ],
+      "sourceSha256": "651eff23fd34af9e5f062ab82ff81bc102d8d99827dc109b3ed0248e3923385c"
+    },
+    {
+      "notebook": "neural-turing-machines",
+      "lessons": [
+        "differentiable-memory-addressing",
+        "neural-memory-read-write"
+      ],
+      "sourceSha256": "80fbcd0202ba5e3ee39137058a8b7024099db22b5275ca7801696da85b2eae37"
+    },
+    {
+      "notebook": "neuroevolution-tic-tac-toe",
+      "lessons": [
+        "neuroevolution"
+      ],
+      "sourceSha256": "61288487871a5575853231c752d057f9245aec1bf637de1aee3acddeea866190"
+    },
+    {
+      "notebook": "numpy-fundamentals",
+      "lessons": [
+        "tensor-shape-broadcasting",
+        "matrix-multiplication",
+        "neural-network-forward-pass"
+      ],
+      "note": "Array and tensor concepts transfer; NumPy API syntax and indexing recipes are implementation reference, not standalone playgrounds.",
+      "sourceSha256": "a462bc8d1c163de9602cc8a4ea4fcc300b96f66221de166676f6b473e9d0d039"
+    },
+    {
+      "notebook": "object-detection-yolo",
+      "lessons": [
+        "object-detection-boxes",
+        "non-maximum-suppression"
+      ],
+      "sourceSha256": "6e128095ea42959639ffcee82706549b460e3b586f4897af2a60f6493b30de1a"
+    },
+    {
+      "notebook": "optimizers",
+      "lessons": [
+        "gradient-descent",
+        "adaptive-optimizers"
+      ],
+      "sourceSha256": "e640255ef10d990e1e5134f4f15e7aef469698f4a2c2c6955d670b4bbf444de5"
+    },
+    {
+      "notebook": "pooling-operations",
+      "lessons": [
+        "pooling-receptive-fields"
+      ],
+      "sourceSha256": "e3cbb94e6f8bbee97883f805e520a3a1deb2e5fa77e746f0d5638d154c709ed3"
+    },
+    {
+      "notebook": "positional-encodings",
+      "lessons": [
+        "positional-encoding-token-order"
+      ],
+      "plannedExtensions": [
+        "positional-encoding-token-order"
+      ],
+      "sourceSha256": "0a2c7952ec60de7c78d8eb98ffda74aadb908d8ebb94639179cefca7baead89a"
+    },
+    {
+      "notebook": "probability-distributions",
+      "lessons": [
+        "probability-rules",
+        "bernoulli-categorical-binomial",
+        "waiting-arrival-distributions",
+        "pdf-cdf-probability-area",
+        "normal-distribution-z-scores",
+        "bayesian-parameter-estimation"
+      ],
+      "note": "Named distributions illustrate discrete/continuous probabilities and prior or arrival models; introductory special cases do not each need a separate card.",
+      "sourceSha256": "673024bac48979b3955d2ceda78639efab6d8c84c6a2cd7021290d079498f352"
+    },
+    {
+      "notebook": "pytorch-fundamentals",
+      "lessons": [
+        "tensor-shape-broadcasting",
+        "autograd-graphs",
+        "neural-network-training-loop"
+      ],
+      "note": "Autograd and training mechanics transfer; nn.Module, device selection, serialization and framework syntax remain implementation reference.",
+      "sourceSha256": "2273e50c35af6e93c10c3ec3b5ce3f38d60fc0d9fdb991fec4e58ff12544cf82"
+    },
+    {
+      "notebook": "qa-extractive",
+      "lessons": [
+        "extractive-question-answering"
+      ],
+      "sourceSha256": "97c54678c0c7110aae85b1ea78e4a6dbf255f1d79fb5eac975e130e445696ab9"
+    },
+    {
+      "notebook": "rag-retrieval-augmented",
+      "lessons": [
+        "document-chunking",
+        "sparse-retrieval-bm25"
+      ],
+      "sourceSha256": "8fe7eba989f99ce769384fae1f55c23e8f0b959067f76aad5fdbca21dbd564eb"
+    },
+    {
+      "notebook": "regularization",
+      "lessons": [
+        "dropout",
+        "early-stopping"
+      ],
+      "sourceSha256": "681d2133ea0953b2d1b10804137ba34b3f0f2b3d3210aeda939b006eca59c0e7"
+    },
+    {
+      "notebook": "reproducibility-and-experiment-tracking",
+      "lessons": [
+        "experiment-reproducibility"
+      ],
+      "sourceSha256": "250fd77b135f28d661177de9ba983ee898d301dc068220a8d85d994d015f96a5"
+    },
+    {
+      "notebook": "resnet-skip-connections",
+      "lessons": [
+        "cnn-residual-connections"
+      ],
+      "sourceSha256": "aa6c114c8f50134d50fccd3e054c2129d5e9c9dca1556b49c30671b9a53fc0b1"
+    },
+    {
+      "notebook": "retrieval-fundamentals",
+      "lessons": [
+        "document-chunking",
+        "approximate-neighbor-search",
+        "sparse-retrieval-bm25"
+      ],
+      "sourceSha256": "26ca0bc3bad193a6848795653f1c92076459d0efff22f9ea464b5079d2864de2"
+    },
+    {
+      "notebook": "rl-advanced-policy-methods",
+      "lessons": [
+        "actor-critic",
+        "continuous-control-policies",
+        "soft-actor-critic",
+        "td3-delayed-updates",
+        "n-step-return-targets"
+      ],
+      "sourceSha256": "bb5d1d0f33941a4943f35e2856eaace9cc252192d62f3b4d7c3cfee3aba4a26a"
+    },
+    {
+      "notebook": "rl-deep-q-networks",
+      "lessons": [
+        "deep-q-networks"
+      ],
+      "sourceSha256": "b9914e8519aea14861d1b49d49b112838ee6c6586229e529f69564c786d45541"
+    },
+    {
+      "notebook": "rl-model-based",
+      "lessons": [
+        "model-based-rl",
+        "prioritized-planning"
+      ],
+      "sourceSha256": "b24511a6356a444458f9e6b0c11804969c69c97484d2bb9d41ad62916df76f74"
+    },
+    {
+      "notebook": "rl-policy-gradients",
+      "lessons": [
+        "policy-gradients",
+        "actor-critic",
+        "ppo-policy-updates",
+        "n-step-return-targets"
+      ],
+      "sourceSha256": "260aed611c091881aa64847ae1079150846e47585a2f287ea5986ec9dccad268"
+    },
+    {
+      "notebook": "rl-q-learning",
+      "lessons": [
+        "q-learning",
+        "sequential-decisions-returns"
+      ],
+      "sourceSha256": "29bbec66b9f54a9e9052f073ea64113351ce16c30655ea03474696aceb58611a"
+    },
+    {
+      "notebook": "rnn-from-scratch",
+      "lessons": [
+        "recurrent-hidden-state",
+        "backpropagation-through-time"
+      ],
+      "sourceSha256": "1ae792a30c4f3d6a9bf46b40369b9c2cf0d9871a77cb94149736e4bb6d306438"
+    },
+    {
+      "notebook": "self-supervised-learning",
+      "lessons": [
+        "self-supervised-objectives",
+        "masked-language-modeling"
+      ],
+      "note": "The objective-construction unit owns where labels come from; masked LM, contrastive training and denoising retain their own concrete mechanisms.",
+      "sourceSha256": "4fb3ed1a26b1764ea53964ab6dbe54774cf5adc8049b455da5963f6dd24ec87f"
+    },
+    {
+      "notebook": "seq2seq-with-attention",
+      "lessons": [
+        "seq2seq-cross-attention"
+      ],
+      "sourceSha256": "1dc5265da70dc8bb94b603e2e6067e4c87d17b35c3fdc83db80de875b3b31e82"
+    },
+    {
+      "notebook": "softmax-multiclass",
+      "lessons": [
+        "softmax-temperature",
+        "categorical-cross-entropy",
+        "multiclass-metric-averaging"
+      ],
+      "sourceSha256": "1e120234b9ede436f2f0463e14062f9f7638a2d65a79822cc71bacae69b2233d"
+    },
+    {
+      "notebook": "sparse-autoencoders",
+      "lessons": [
+        "sparse-autoencoder-features"
+      ],
+      "sourceSha256": "c526132740a23438eaa10bcb98e9db40e64369119105abc243ff3e5a9d1ca869"
+    },
+    {
+      "notebook": "speculative-decoding",
+      "lessons": [
+        "speculative-decoding"
+      ],
+      "sourceSha256": "9c18ec220b2ba078e098b571d92b27cba93bca9871ec4270877dac27317de41b"
+    },
+    {
+      "notebook": "speech-recognition",
+      "lessons": [
+        "ctc-alignment",
+        "edit-distance-error-rates"
+      ],
+      "sourceSha256": "72b5c222519ee965b9ea97b7b60366b973e12dac29a6139a6925cdb342556bc6"
+    },
+    {
+      "notebook": "support-vector-machines",
+      "lessons": [
+        "svm-margins",
+        "svm-kernels"
+      ],
+      "sourceSha256": "17fd85470c30bc199ef2b31b0fd2104edc144f128bc5e334a34e1a5f00743d68"
+    },
+    {
+      "notebook": "tensor-multiplication",
+      "lessons": [
+        "matrix-multiplication",
+        "tensor-shape-broadcasting"
+      ],
+      "sourceSha256": "68b44d0ba51710f53fc01fde00beec2bdb76c6c233f878736af38ad1a182c7cd"
+    },
+    {
+      "notebook": "tensors-convolution",
+      "lessons": [
+        "convolution-filter-lab",
+        "transposed-convolution-geometry"
+      ],
+      "plannedExtensions": [
+        "convolution-filter-lab"
+      ],
+      "sourceSha256": "a1ce7db99bcba87a37abee52ec4147c66293cdb6986a3ec41b10ff7b4f5eaebe"
+    },
+    {
+      "notebook": "tensors-operations",
+      "lessons": [
+        "tensor-shape-broadcasting",
+        "matrix-multiplication"
+      ],
+      "note": "Shape, broadcasting and matrix operations transfer; individual library methods are implementation reference.",
+      "sourceSha256": "8266c24fd2c0922cc1dae3e891352d3359b2b42a1a840bc16ecb8ee92b4810e0"
+    },
+    {
+      "notebook": "tokenization-methods",
+      "lessons": [
+        "tokenization-choices"
+      ],
+      "note": "Compare character, word and subword/OOV behavior; production tokenizer training and library APIs are outside the teaching contract.",
+      "sourceSha256": "14bc0c63b836b2c706612558f0e46a79ddafe306f06252d01c1d13aa2ee41fe5"
+    },
+    {
+      "notebook": "train-test-val-split",
+      "lessons": [
+        "train-test-generalization",
+        "cross-validation"
+      ],
+      "sourceSha256": "eccf816161d88503467351e75fd125a024eed4063ad2cc74f129672b6da35526"
+    },
+    {
+      "notebook": "transfer-learning",
+      "lessons": [
+        "transfer-learning"
+      ],
+      "sourceSha256": "55cef3ed9591a5fa22b09856f41b35bbd3c7ec3c377bd58586ddd3c96212da07"
+    },
+    {
+      "notebook": "transformer-fine-tuning-basics",
+      "lessons": [
+        "transfer-learning"
+      ],
+      "sourceSha256": "7529a3ab2ba24099d8344b9858f8faac7b455b3cefd6a7d1bde0e61e588438c4"
+    },
+    {
+      "notebook": "transformer-from-scratch",
+      "lessons": [
+        "multi-head-attention"
+      ],
+      "sourceSha256": "888c2a2d660252f6ba93f25228f160beddcba8e36d208632e0b8c137066a1cf3"
+    },
+    {
+      "notebook": "unet-architecture",
+      "lessons": [
+        "unet-segmentation"
+      ],
+      "sourceSha256": "d5efc6bb6e5e5b31ad88f77b3290699f74f14fd24f2f90c79b77898a386d603f"
+    },
+    {
+      "notebook": "unsloth-minimal-training",
+      "lessons": [
+        "instruction-tuning",
+        "fine-tuning-memory-budgets"
+      ],
+      "note": "Instruction masks, adapters, splits, early stopping and memory/throughput reasoning transfer; CUDA setup, vendor APIs, W&B wiring and deployment are implementation reference.",
+      "sourceSha256": "50dbde1fbf5e303c22eeef35a6dc1b0411737f82131813fc491038ee887dbaf5"
+    },
+    {
+      "notebook": "vae",
+      "lessons": [
+        "variational-autoencoders"
+      ],
+      "sourceSha256": "85269fa2fb048a2c1f8b5cdab52c0f9161c11e8143cfb3b29e66f338e40c5b3d"
+    },
+    {
+      "notebook": "vgg-depth-uniformity",
+      "lessons": [
+        "multiscale-convolution-branches"
+      ],
+      "note": "Stacked-kernel receptive fields and compute tradeoffs reuse pooling, multiscale branches and scaling; no separate architecture-history lesson.",
+      "sourceSha256": "2b7eca801252a26917d657e6073d3912e32d40e2f46e22d7d3558c6e29726268"
+    },
+    {
+      "notebook": "vision-transformers",
+      "lessons": [
+        "vision-transformer-patches"
+      ],
+      "sourceSha256": "19cc8a3047f213a2c59ae6378997f921c3dcec7c5c97ef53e6eac941031341c0"
+    },
+    {
+      "notebook": "vqvae",
+      "lessons": [
+        "vqvae-codebooks"
+      ],
+      "sourceSha256": "5f831c06d761d179c13be43300f78207f0f744a54f58813710cf56db19982ce4"
+    },
+    {
+      "notebook": "word2vec-from-scratch",
+      "lessons": [
+        "word2vec-negative-sampling"
+      ],
+      "sourceSha256": "39341321bb12aafc450b64d43472b7975b816f3b4888ba2d1f65c2e8d5e57cf0"
+    },
+    {
+      "notebook": "z2h-01-backprop",
+      "lessons": [
+        "autograd-graphs",
+        "backpropagation-inspector",
+        "neural-network-training-loop"
+      ],
+      "sourceSha256": "ccef99651d8e42f722d9745017e0c4d9d4cda74cc3e30bab3a3747ef744b4e9b"
+    },
+    {
+      "notebook": "z2h-02-bigram-lm",
+      "lessons": [
+        "bigram-language-model"
+      ],
+      "sourceSha256": "b572ccb81e7e2fb832993d17336b5ebf61644ec8ef9f81c400591d8df12a201e"
+    },
+    {
+      "notebook": "z2h-03-mlp-lm",
+      "lessons": [
+        "fixed-window-language-model",
+        "stable-softmax-logsumexp"
+      ],
+      "note": "Fixed context and embedding concatenation have a language-model owner; numerical stabilization has a separate numeric owner.",
+      "sourceSha256": "4e2a3f5e83a883de746c8ae7604b5ddd667c4a08e42c4ac6640cea2b160088e2"
+    },
+    {
+      "notebook": "z2h-04-optimization-pt1",
+      "lessons": [
+        "weight-initialization"
+      ],
+      "sourceSha256": "fba27c80ca79935731f1789220a03d55f1dc1914d53861935ba40cff91b79ea2"
+    }
+  ]
+}

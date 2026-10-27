@@ -1,6 +1,6 @@
 ---
-name: aigrounds-lesson
-description: Create, audit, fix, optimize, or redesign an individual AI Grounds lesson and its AI Guide. Use for playground URLs, lesson slugs, new concepts, and migrations to the shared design system; use aigrounds-curriculum for cross-lesson sequencing and splits.
+name: aigrounds_lesson
+description: Create, audit, fix, optimize, or redesign an individual AI Grounds lesson and its AI Guide. Use for playground URLs, lesson slugs, new concepts, and migrations to the shared design system; use aigrounds_curriculum for cross-lesson sequencing and splits.
 ---
 
 # AI Grounds Lesson
@@ -35,7 +35,7 @@ local source and reproduce remote defects locally. Stop dependent work and
 report deployment/configuration divergence when mapping or reproduction fails.
 
 Route sequencing, prerequisite-lesson creation, and lesson splits/merges to
-[$aigrounds-curriculum](../aigrounds-curriculum/SKILL.md). For an explicitly
+[$aigrounds_curriculum](../aigrounds_curriculum/SKILL.md). For an explicitly
 requested parallel batch, reserve targets separately, give workers disjoint
 module ownership, and integrate shared files in the main agent.
 

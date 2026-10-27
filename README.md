@@ -15,7 +15,9 @@
 
 AI Grounds is a web app for people learning artificial intelligence through hands-on experiments. Move data points, tune parameters, and step through algorithms to see how their behavior changes. Try the [live playgrounds](https://aigrounds.tsilva.eu) to explore statistics, probability, neural networks, and more.
 
-The gallery opens with a **20-step AI core** and optional paths for probability, inference, evaluation, retrieval, transformers, vision and search. Five pairs share a curriculum entry with linked chapters; every published chapter keeps its original URL. The Concept Atlas and Zero Knowledge Proofs sit under Explore & reference. Five new bridge lessons connect classification scores to decisions, backward gradients to training, token probabilities to generation, attention to a complete decoder block, and retrieval to answer evidence.
+The gallery opens with a **20-step AI core** and optional paths for probability, inference, evaluation, retrieval, transformers, vision and search. Five pairs of published chapters share a curriculum entry; every published chapter keeps its original URL. The Concept Atlas and Zero Knowledge Proofs sit under Explore & reference. Five new bridge lessons connect classification scores to decisions, backward gradients to training, token probabilities to generation, attention to a complete decoder block, and retrieval to answer evidence.
+
+The [planned curriculum](docs/curriculum.md#planned-curriculum-from-aiml-notebooks) contains 144 teaching-unit placeholders organized into 140 coming-soon cards, plus five planned extensions. Creation starts with Cross-Validation, Adaptive Optimizers and Decision Trees; learner order follows prerequisites independently. Advanced model families and NLP tasks use explicit optional branches. Units retain their notebook sources, and none has a lesson route until published.
 
 Lessons show prerequisites, chapter links and a path-aware next step. Visits, self-reported review and explained transfer checks are saved separately in this browser, with delayed recall practice; no account is required. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide in the experiment rail. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds. See the [curriculum](docs/curriculum.md) for the core, path map, chapter consolidations and bridge lessons.
 
@@ -39,6 +41,7 @@ pnpm start --port auto # serve a production build
 pnpm typecheck        # check TypeScript separately
 pnpm lint             # run ESLint
 pnpm check:cycles     # check for import cycles
+pnpm check:curriculum # validate lesson plans, paths and prerequisites
 pnpm check:bridges    # verify the five bridge engines independently
 pnpm test:deps        # check patched dependency security boundaries
 ```
@@ -121,11 +124,6 @@ pnpm test:deps        # check patched dependency security boundaries
 - Analytics and Sentry monitoring depend on environment configuration; see [configuration](docs/configuration.md) for settings and local credential handling.
 - All lessons use the shared [learning-page design system](DESIGN_SYSTEM.md), including reusable experiment presentation, evidence typography, parameter grids and accessible table styles. Lesson state, answer checking and mathematical representations stay in each module. [Development notes](docs/development.md) explain lesson registration, validation, update dates, branding, and project workflows. Branding sources and store graphics are kept in `assets/brand/`; only the web icons, manifest and social image are served from `public/brand/web-seo/`.
 
-## License
-
-[MIT](LICENSE)
-
-
 ## Model routing
 
 Development uses AgentBridge (`AGENTBRIDGE_BASE_URL`, default
@@ -138,3 +136,7 @@ Production text requests use `deepseek/deepseek-v4.1-flash-1017` with reasoning 
 Production secrets are delivered through the pinned shared GitHub Actions workflow. The standalone signed Infisical relay triggers synchronization and deployment; see [production delivery](docs/production-delivery.md) for scope and recovery.
 
 Production delivery keeps Vercel secret isolation enabled and distinguishes public configuration from private credentials; see [production delivery](docs/production-delivery.md).
+
+## License
+
+[MIT](LICENSE)

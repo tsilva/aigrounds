@@ -7,11 +7,12 @@ import packageJson from "../../package.json";
 export default function Home() {
   const live = new Map<string, (typeof activePlaygroundMetadata)[number]>(activePlaygroundMetadata.map(item => [item.slug, item]));
   const planned = new Map(upcomingPlaygrounds.map(item => [item.slug, item]));
+  const catalog = new Map<string, (typeof activePlaygroundMetadata)[number] | (typeof upcomingPlaygrounds)[number]>([...live, ...planned]);
   const playgrounds: HomePlaygroundCard[] = dashboardLessonPlanOrder.flatMap((slug, index) => {
     const item = live.get(slug) ?? planned.get(slug);
     if (!item) return [];
     const group = getLessonGroup(slug);
-    const chapters = group?.chapters.map(chapter => live.get(chapter)).filter(chapter => chapter !== undefined) ?? [];
+    const chapters = group?.chapters.map(chapter => catalog.get(chapter)).filter(chapter => chapter !== undefined) ?? [];
     const coreStep = coreLessonOrder.findIndex(item => item === slug) + 1;
     const reference = referenceSlugs.some(item => item === slug);
     const dates = [slug, ...(group?.chapters ?? [])].map(item => (playgroundUpdates as Record<string, string>)[item]).filter(Boolean).sort();
@@ -21,7 +22,7 @@ export default function Home() {
       duration: live.has(slug) ? (chapters.length ? "Two short chapters" : live.get(slug)!.estimatedDuration) : "coming soon",
       level: reference ? (slug === "ai-concept-atlas" ? "reference" : "explore extra") : coreStep ? `core step ${String(coreStep).padStart(2, "0")}` : "optional path",
       coreStep, paths: learningPaths.filter(path => path.lessons.includes(slug)).map(path => path.id),
-      chapters: group?.chapters.map(chapter => ({ slug: chapter, title: live.get(chapter)!.title })) ?? [], reference,
+      chapters: chapters.map(chapter => ({ slug: chapter.slug, title: chapter.title })), reference,
       recallGoals: Object.fromEntries((group?.chapters ?? [slug]).map(chapter => [chapter, live.get(chapter)?.learningGoals[0] ?? "Explain what you changed, what changed as a result, and why."])),
       concepts: [...new Set([...item.concepts, ...chapters.flatMap(chapter => chapter.concepts)])],
       status: live.has(slug) ? "live" as const : "coming-soon" as const,

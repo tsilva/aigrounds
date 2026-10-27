@@ -26,9 +26,21 @@ Reuse an existing development server. Otherwise, run `pnpm dev --port auto` and 
 
 Guided-discovery lessons use the shared [learning-page design system](../DESIGN_SYSTEM.md): a continuous white workbench, lavender experiment rail, matching scenario controls and summaries, and an AI Guide CTA below the exercise. The reusable shell includes scenario/reset controls, exact-value editing, accessible experiment choices and feedback, and pointer/keyboard number-line controls. New lessons and material redesigns compose these components from `src/components/learning-page/`, keeping mathematical visuals and experiment logic in each module.
 
-Project-local Codex workflows are [aigrounds-lesson](../.codex/skills/aigrounds-lesson/SKILL.md) for creating, auditing, fixing, optimizing, or redesigning one lesson and [aigrounds-curriculum](../.codex/skills/aigrounds-curriculum/SKILL.md) for sequencing, prerequisites, and live/planned reconciliation. Detailed lesson protocols are loaded only for the selected mode.
+Project-local Codex workflows are [aigrounds_lesson](../.codex/skills/aigrounds_lesson/SKILL.md) for creating, auditing, fixing, optimizing, or redesigning one lesson and [aigrounds_curriculum](../.codex/skills/aigrounds_curriculum/SKILL.md) for sequencing, prerequisites, and live/planned reconciliation. Detailed lesson protocols are loaded only for the selected mode.
 
 The home dashboard is the canonical current and future lesson plan. `activePlaygroundMetadata` holds published lessons, `upcomingPlaygrounds` holds planned lessons, and `dashboardLessonPlanOrder` controls their combined order.
+
+Planned lesson scope, concepts, notebook sources and prerequisites live together in
+`src/lib/planned-curriculum.ts`; `upcomingPlaygrounds` exposes that data to the
+dashboard. Chapter outlines are scope placeholders. `plannedLessonGroups` combines
+planned units into one coming-soon card while preserving their IDs. Optional paths
+carry `parentId`; creation priorities are independent of learner order. Planned extensions attach to existing workbenches without duplicate
+cards. `src/lib/notebook-coverage.json` records source dispositions and cell-source
+hashes. Keep the [curriculum](curriculum.md) in sync when changing these plans.
+`pnpm check:curriculum` validates priorities, the unchanged core, route registration,
+card/path membership, prerequisite order and coverage references, and runs before
+every production build. Add `--notebooks ../aiml-notebooks/notebooks` to verify the
+active inventory and reviewed cell sources when that checkout is available.
 
 To add a published lesson, create its self-contained module under `src/modules/`, add its metadata, register its component in `src/lib/playgrounds.ts`, and place its slug in the dashboard order. The dynamic playground route resolves registered slugs automatically; sitemap entries come from published metadata. Keep algorithm engines pure-functional and concept-specific logic inside each module.
 

@@ -1,3 +1,4 @@
+import { plannedPlaygroundDefinitions } from "@/lib/planned-curriculum";
 import {
   playgroundTutorPlans,
   type TutorPlan,
@@ -14,14 +15,6 @@ export type PlaygroundMetadata = {
   learningGoals: string[];
   tutorPlan: TutorPlan;
   layout?: "guided-discovery";
-};
-
-type UpcomingPlayground = {
-  slug: string;
-  title: string;
-  tag: string;
-  summary: string;
-  concepts: string[];
 };
 
 type ActivePlaygroundDefinition = Omit<PlaygroundMetadata, "tutorPlan"> & {
@@ -1604,8 +1597,8 @@ export const activePlaygroundMetadata: Array<
   tutorPlan: playgroundTutorPlans[metadata.slug],
 }));
 
-export const upcomingPlaygrounds: UpcomingPlayground[] = [
-];
+// Planned lessons share scope, sources and prerequisites with curriculum.ts.
+export const upcomingPlaygrounds = plannedPlaygroundDefinitions;
 
 export { dashboardLessonPlanOrder } from "@/lib/curriculum";
 

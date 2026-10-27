@@ -1,6 +1,6 @@
 ---
-name: aigrounds-curriculum
-description: Review or update the AI Grounds curriculum, including dashboard lesson order, live/planned status, missing prerequisites, and lesson splits or merges. Use aigrounds-lesson for work inside one playground and its AI Guide.
+name: aigrounds_curriculum
+description: Review or update the AI Grounds curriculum, including dashboard lesson order, live/planned status, missing prerequisites, and lesson splits or merges. Use aigrounds_lesson for work inside one playground and its AI Guide.
 ---
 
 # AI Grounds Curriculum
@@ -19,7 +19,7 @@ an audit-and-apply request is a write workflow. Preserve conversational approval
 Keep existing stakeholder curriculum intent authoritative. State assumptions
 behind significant sequencing judgments; clarify conflicts with approved intent
 before dependent changes. Route lesson implementation to
-[$aigrounds-lesson](../aigrounds-lesson/SKILL.md) only when authorized. Adding a
+[$aigrounds_lesson](../aigrounds_lesson/SKILL.md) only when authorized. Adding a
 planned prerequisite card does not itself authorize building a live playground.
 
 ## Inventory and Reconcile

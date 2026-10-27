@@ -75,7 +75,7 @@ At the start of substantive repository work, use `$specs-author` to read the ent
 
 ## Learning Page Workflows
 
-Use `$aigrounds-lesson` at `.codex/skills/aigrounds-lesson/SKILL.md` for creating, auditing, fixing, optimizing, or redesigning an individual playground and its AI Guide. Its Redesign mode handles migrations of older lessons to the shared scheme. Use `$aigrounds-curriculum` at `.codex/skills/aigrounds-curriculum/SKILL.md` for cross-lesson sequencing, live/planned reconciliation, prerequisite gaps, and lesson splits or merges.
+Use `$aigrounds_lesson` at `.codex/skills/aigrounds_lesson/SKILL.md` for creating, auditing, fixing, optimizing, or redesigning an individual playground and its AI Guide. Its Redesign mode handles migrations of older lessons to the shared scheme. Use `$aigrounds_curriculum` at `.codex/skills/aigrounds_curriculum/SKILL.md` for cross-lesson sequencing, live/planned reconciliation, prerequisite gaps, and lesson splits or merges.
 
 ## Learning Page Design System
 

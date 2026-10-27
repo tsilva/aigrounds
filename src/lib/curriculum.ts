@@ -1,3 +1,5 @@
+import { plannedLessonGroups, plannedPlaygroundDefinitions } from "./planned-curriculum";
+
 // Curriculum structure is independent of the component and tutor registries.
 // A path is a recommendation, never an access restriction.
 export type LearningPath = {
@@ -5,15 +7,18 @@ export type LearningPath = {
   title: string;
   summary: string;
   lessons: readonly string[];
+  parentId?: string;
 };
 
-export const lessonGroups = [
+const publishedLessonGroups = [
   { slug: "linear-regression-line-fitting", title: "Fit a Line & Understand Its Loss", chapters: ["linear-regression-line-fitting", "least-squares-loss-landscape"] },
   { slug: "classification-metrics-foundations", title: "Classification Decisions & Metrics", chapters: ["classification-metrics-foundations", "confusion-matrix-thresholds"] },
   { slug: "log-loss-confidence-penalties", title: "Probability Predictions & Cross Entropy", chapters: ["log-loss-confidence-penalties", "categorical-cross-entropy"] },
   { slug: "confidence-intervals", title: "Confidence Intervals & Precision", chapters: ["confidence-intervals", "margin-of-error-sample-size"] },
   { slug: "type-i-type-ii-errors", title: "Errors, Power & Sample Planning", chapters: ["type-i-type-ii-errors", "power-effect-size-sample-size"] },
 ] as const;
+
+export const lessonGroups = [...publishedLessonGroups, ...plannedLessonGroups];
 
 export const coreLessonOrder = [
   "mean-median-mode", "variance-standard-deviation", "sampling-sample-size", "sampling-bias",
@@ -24,21 +29,52 @@ export const coreLessonOrder = [
   "backpropagation-inspector", "neural-network-training-loop", "mnist-mlp-inference-debugger",
 ] as const;
 
-export const learningPaths: readonly LearningPath[] = [
+const learningPathDefinitions: readonly LearningPath[] = [
   { id: "core", title: "Start here: the AI core", summary: "Twenty steps from data to a working neural network. Skip familiar ideas and return whenever you need a refresher.", lessons: coreLessonOrder },
-  { id: "probability", title: "Data & probability", summary: "Describe data, count outcomes and reason about uncertainty.", lessons: ["mean-median-mode", "range-quartiles-iqr", "variance-standard-deviation", "shape-skew-outliers", "probability-rules", "conditional-probability", "bayes-rule", "bernoulli-categorical-binomial", "expected-value-risk", "law-large-numbers-simulation", "waiting-arrival-distributions", "pdf-cdf-probability-area", "normal-distribution-z-scores"] },
-  { id: "inference", title: "Statistical inference", summary: "Separate sampling uncertainty, interval coverage and test decisions.", lessons: ["sampling-sample-size", "sampling-bias", "sampling-distributions-standard-error", "central-limit-theorem", "confidence-intervals", "hypothesis-testing-basics", "type-i-type-ii-errors"] },
-  { id: "relationships", title: "Relationships & diagnostics", summary: "Inspect associations, residuals and repeated-fit behavior.", lessons: ["covariance-correlation", "correlation-shape-outliers", "simpsons-paradox-confounding", "linear-regression-line-fitting", "r-squared-residual-diagnostics", "train-test-generalization", "overfitting", "bias-variance-tradeoff"] },
-  { id: "evaluation", title: "Evaluate a classifier", summary: "Choose denominators, compare cutoffs and check probability calibration.", lessons: ["class-score-logits", "classification-metrics-foundations", "precision-recall-curves-imbalance", "roc-auc-thresholds", "softmax-temperature", "log-loss-confidence-penalties", "calibration-reliability-diagrams"] },
-  { id: "retrieval", title: "Build a retrieval pipeline", summary: "Go directly from distances and vectors to retrieval, ranking and grounded answers.", lessons: ["feature-scaling", "distance-metrics", "vector-geometry-similarity", "embedding-retrieval", "retrieval-ranking-metrics", "rag-pipeline", "rag-groundedness-metrics", "contrastive-loss"] },
-  { id: "projection", title: "Projection & clustering", summary: "Group points and compare linear projections with neighborhood maps.", lessons: ["feature-scaling", "distance-metrics", "k-means-clustering", "vector-geometry-similarity", "projection-foundations", "pca-principal-components", "t-sne-neighborhood-map", "umap-manifold-projection"] },
-  { id: "tools", title: "Math & implementation tools", summary: "Learn matrix and tensor rules at the point you need them.", lessons: ["matrix-multiplication", "tensor-shape-broadcasting"] },
+  { id: "probability", title: "Data & probability", summary: "Describe data, count outcomes and reason about uncertainty.", lessons: ["mean-median-mode", "range-quartiles-iqr", "variance-standard-deviation", "shape-skew-outliers", "probability-rules", "conditional-probability", "bayes-rule", "bernoulli-categorical-binomial", "expected-value-risk", "law-large-numbers-simulation", "waiting-arrival-distributions", "pdf-cdf-probability-area", "normal-distribution-z-scores", "bayesian-parameter-estimation"] },
+  { id: "inference", title: "Statistical inference", summary: "Separate sampling uncertainty, interval coverage and test decisions.", lessons: ["sampling-sample-size", "sampling-bias", "sampling-distributions-standard-error", "central-limit-theorem", "confidence-intervals", "student-t-intervals", "hypothesis-testing-basics", "type-i-type-ii-errors"] },
+  { id: "relationships", title: "Relationships & diagnostics", summary: "Inspect associations, residuals and repeated-fit behavior.", lessons: ["covariance-correlation", "correlation-shape-outliers", "simpsons-paradox-confounding", "linear-regression-line-fitting", "mse-mae-regression-losses", "r-squared-residual-diagnostics", "train-test-generalization", "overfitting", "bias-variance-tradeoff", "learning-curves-data-budgets"] },
+  { id: "relationships-bayesian", title: "Relationships · optional Bayesian regression", summary: "Build on fitted lines and parameter posteriors to compare posterior weights and predictive uncertainty.", lessons: ["linear-regression-line-fitting", "normal-distribution-z-scores", "bayesian-parameter-estimation", "bayesian-regression"], parentId: "relationships" },
+  { id: "evaluation", title: "Evaluate a classifier", summary: "Choose denominators, compare cutoffs and check probability calibration.", lessons: ["class-score-logits", "classification-metrics-foundations", "cost-sensitive-thresholds", "precision-recall-curves-imbalance", "roc-auc-thresholds", "softmax-temperature", "log-loss-confidence-penalties", "calibration-reliability-diagrams", "multiclass-metric-averaging", "fitting-calibrators"] },
+  { id: "model-selection", title: "Model selection & experiments", summary: "Choose models with honest validation and controlled comparisons.", lessons: ["train-test-generalization", "cross-validation", "experiment-reproducibility", "bias-variance-tradeoff", "learning-curves-data-budgets", "hyperparameter-search", "bayesian-parameter-estimation", "bayesian-hyperparameter-search"] },
+  { id: "training", title: "Training & optimization", summary: "Inspect optimizer state, stabilization, regularization and adaptation.", lessons: ["gradient-descent", "regression-gradient-updates", "neural-network-forward-pass", "network-capacity-width-depth", "weight-initialization", "neural-network-training-loop", "stochastic-gradient-noise", "adaptive-optimizers", "learning-rate-schedules", "gradient-flow-clipping", "dropout", "early-stopping", "debugging-neural-networks", "transfer-learning"] },
+  { id: "data-preparation", title: "Data preparation", summary: "Encode features and handle rare classes without evaluation leakage.", lessons: ["feature-scaling", "categorical-feature-engineering", "feature-binning", "precision-recall-curves-imbalance", "class-weighting", "cross-validation", "resampling-imbalanced-data", "synthetic-minority-sampling"] },
+  { id: "classical", title: "Classical machine learning", summary: "Introduce neighbor, linear and tree decisions before ensembles, with optional probabilistic and margin-based model families.", lessons: ["classification-metrics-foundations", "feature-scaling", "distance-metrics", "knn-classification", "linear-classification-boundaries", "entropy-information", "decision-trees", "bias-variance-tradeoff", "cross-validation", "bagging-random-forests", "boosting", "stacking"] },
+  { id: "classical-naive-bayes", title: "Classical ML · optional Naive Bayes", summary: "Build class scores from conditional feature likelihoods and inspect smoothing.", lessons: ["conditional-probability", "bayes-rule", "naive-bayes-smoothing"], parentId: "classical" },
+  { id: "classical-svm", title: "Classical ML · optional support vectors", summary: "Move from linear margins to nonlinear kernel boundaries without interrupting the introductory classifier sequence.", lessons: ["linear-classification-boundaries", "regularization", "svm-margins", "svm-kernels"], parentId: "classical" },
+  { id: "retrieval", title: "Build a retrieval pipeline", summary: "Go directly from distances and vectors to retrieval, ranking and grounded answers.", lessons: ["feature-scaling", "distance-metrics", "vector-geometry-similarity", "embedding-retrieval", "retrieval-ranking-metrics", "rag-pipeline", "rag-groundedness-metrics", "evidence-sufficiency-guardrails", "document-chunking", "tokenization-choices", "sparse-retrieval-bm25", "hybrid-retrieval-reranking", "query-rewriting-retrieval", "contrastive-loss"] },
+  { id: "retrieval-indexing", title: "Retrieval · optional search scaling", summary: "Compare clustered candidate search with an exact baseline after the basic retrieval pipeline.", lessons: ["distance-metrics", "distance-concentration", "k-means-clustering", "embedding-retrieval", "retrieval-ranking-metrics", "approximate-neighbor-search"], parentId: "retrieval" },
+  { id: "projection", title: "Projection & dimensionality reduction", summary: "Go from distances and vector projections to PCA, SVD and nonlinear neighborhood maps; clustering is an optional branch.", lessons: ["feature-scaling", "distance-metrics", "distance-concentration", "vector-geometry-similarity", "projection-foundations", "pca-principal-components", "linear-transformations-eigenvectors", "svd-low-rank-approximation", "t-sne-neighborhood-map", "umap-manifold-projection"] },
+  { id: "projection-clustering", title: "Projection · optional clustering", summary: "Compare hard assignments with soft Gaussian memberships after shared distance foundations.", lessons: ["feature-scaling", "distance-metrics", "k-means-clustering", "normal-distribution-z-scores", "conditional-probability", "gaussian-mixtures-em"], parentId: "projection" },
+  { id: "tools", title: "Math & implementation tools", summary: "Learn matrix and tensor rules at the point you need them.", lessons: ["matrix-multiplication", "tensor-shape-broadcasting", "vector-geometry-similarity", "linear-transformations-eigenvectors", "projection-foundations", "svd-low-rank-approximation", "floating-point-precision", "stable-softmax-logsumexp"] },
   { id: "information", title: "Information theory", summary: "Connect surprise, expected information and directional distribution mismatch.", lessons: ["bernoulli-categorical-binomial", "conditional-probability", "entropy-information", "log-loss-confidence-penalties", "kl-divergence"] },
-  { id: "vision", title: "Vision", summary: "Trace image features, input transforms and training-time normalization.", lessons: ["mnist-mlp-inference-debugger", "convolution-filter-lab", "tensor-shape-broadcasting", "ocr-line-detection", "pytorch-image-augmentations", "label-mixing-image-transforms", "batch-normalization"] },
-  { id: "transformers", title: "Understand transformers", summary: "Trace tokens through attention and a complete decoder block.", lessons: ["byte-pair-encoding", "llm-loss-perplexity", "vector-geometry-similarity", "matrix-multiplication", "softmax-temperature", "transformer-attention", "context-windows-attention-masks", "positional-encoding-token-order", "layer-normalization", "rms-normalization", "transformer-block-residual-stream", "linear-quantization-int4"] },
-  { id: "generation", title: "Understand text generation", summary: "Follow next-token predictions into generated sequences without taking every transformer lesson first.", lessons: ["class-score-logits", "softmax-temperature", "byte-pair-encoding", "llm-loss-perplexity", "autoregressive-generation-decoding", "llm-app-ops-metrics"] },
-  { id: "llm-evaluation", title: "Evaluate an LLM", summary: "Compare answer scores, judges, safety and operating tradeoffs.", lessons: ["reference-answer-metrics", "benchmark-scores-pass-k", "preference-judge-metrics", "safety-refusal-robustness-metrics", "embedding-retrieval", "retrieval-ranking-metrics", "rag-pipeline", "rag-groundedness-metrics", "llm-app-ops-metrics"] },
-  { id: "search", title: "Search & exploration", summary: "Balance observed reward against exploration, then inspect tree-search mechanics.", lessons: ["expected-value-risk", "exploration-exploitation", "monte-carlo-tree-search"] },
+  { id: "vision", title: "Vision", summary: "Prepare images and trace convolution, pooling and normalization before choosing an optional application branch.", lessons: ["mnist-mlp-inference-debugger", "pytorch-image-augmentations", "label-mixing-image-transforms", "convolution-filter-lab", "tensor-shape-broadcasting", "pooling-receptive-fields", "batch-normalization", "cnn-residual-connections", "neural-style-transfer"] },
+  { id: "efficient-vision", title: "Vision · optional efficient architectures", summary: "Compare channel factorization, parallel receptive fields and compute allocation.", lessons: ["convolution-filter-lab", "pooling-receptive-fields", "depthwise-separable-convolutions", "multiscale-convolution-branches", "channel-attention-gates", "network-capacity-width-depth", "compound-network-scaling"], parentId: "vision" },
+  { id: "vision-detection", title: "Vision · optional detection & OCR", summary: "Inspect boxes and filtering, then decode dense line predictions on real document pixels.", lessons: ["convolution-filter-lab", "tensor-shape-broadcasting", "object-detection-boxes", "ocr-line-detection"], parentId: "vision" },
+  { id: "vision-segmentation", title: "Vision · optional segmentation", summary: "Trace learned upsampling and spatial skip connections into pixelwise outputs.", lessons: ["convolution-filter-lab", "pooling-receptive-fields", "tensor-shape-broadcasting", "transposed-convolution-geometry", "unet-segmentation"], parentId: "vision" },
+  { id: "vision-transformers", title: "Vision · optional image transformers", summary: "Apply token, position and attention foundations to image patches.", lessons: ["transformer-attention", "multi-head-attention", "positional-encoding-token-order", "transformer-block-residual-stream", "vision-transformer-patches"], parentId: "vision" },
+  { id: "transformers", title: "Understand transformers", summary: "Trace tokens through attention and a complete decoder block.", lessons: ["byte-pair-encoding", "tokenization-choices", "llm-loss-perplexity", "vector-geometry-similarity", "matrix-multiplication", "softmax-temperature", "transformer-attention", "multi-head-attention", "context-windows-attention-masks", "positional-encoding-token-order", "layer-normalization", "rms-normalization", "transformer-block-residual-stream"] },
+  { id: "transformers-encoder", title: "Transformers · optional masked objectives", summary: "Compare causal targets with bidirectional visibility and masked-token supervision.", lessons: ["self-supervised-objectives", "context-windows-attention-masks", "masked-language-modeling"], parentId: "transformers" },
+  { id: "generation", title: "Understand text generation", summary: "Follow token probabilities into decoding and operating metrics; training and inference optimizations are optional paths.", lessons: ["class-score-logits", "softmax-temperature", "byte-pair-encoding", "llm-loss-perplexity", "autoregressive-generation-decoding", "llm-app-ops-metrics"] },
+  { id: "generation-efficiency", title: "Generation · optional inference efficiency", summary: "Inspect cached tensors, head sharing, draft verification and tiled attention after basic decoding.", lessons: ["autoregressive-generation-decoding", "transformer-attention", "multi-head-attention", "transformer-block-residual-stream", "kv-caching", "grouped-query-attention", "speculative-decoding", "gpu-memory-compute", "stable-softmax-logsumexp", "flash-attention-tiling"], parentId: "generation" },
+  { id: "sequence-models", title: "Sequence & language models", summary: "Compare fixed context, recurrent memory, temporal credit and cross-attention.", lessons: ["llm-loss-perplexity", "bigram-language-model", "neural-network-forward-pass", "fixed-window-language-model", "recurrent-hidden-state", "lstm-gates", "gru-gates", "backpropagation-through-time", "transformer-attention", "multi-head-attention", "seq2seq-cross-attention"] },
+  { id: "representations", title: "Learn representations", summary: "Learn embeddings, reconstruction and self-supervised representations.", lessons: ["embedding-retrieval", "neural-network-training-loop", "word2vec-negative-sampling", "self-supervised-objectives", "autoencoders-latent-bottleneck", "denoising-autoencoders", "sparse-autoencoder-features", "contrastive-loss", "contrastive-infonce", "clip-image-text-alignment"] },
+  { id: "nlp-applications", title: "Structured NLP · foundations", summary: "Refresh token scores and text-evaluation conventions, then choose an entity-label or answer-span application.", lessons: ["tokenization-choices", "class-score-logits", "reference-answer-metrics", "edit-distance-error-rates"] },
+  { id: "nlp-entities", title: "Structured NLP · optional entities", summary: "Predict entity spans before adding transition scores and constrained decoding.", lessons: ["token-classification-entities", "crf-sequence-decoding"], parentId: "nlp-applications" },
+  { id: "nlp-qa", title: "Structured NLP · optional answer spans", summary: "Select valid answer spans or no answer independently of the entity/CRF branch.", lessons: ["extractive-question-answering"], parentId: "nlp-applications" },
+  { id: "adaptation", title: "Adapt pretrained models", summary: "Move from frozen features to fine-tuning, adapters and preferences.", lessons: ["transfer-learning", "matrix-multiplication", "transformer-block-residual-stream", "instruction-tuning", "lora-low-rank-adapters", "soft-prompts-prefix-tuning", "floating-point-precision", "gpu-memory-compute", "fine-tuning-memory-budgets", "preference-judge-metrics", "kl-divergence", "instruction-tuning-preferences"] },
+  { id: "audio", title: "Audio & speech", summary: "Connect waveforms and spectrograms with unaligned speech targets.", lessons: ["audio-waveforms-sampling", "audio-spectrograms", "mel-frequency-features", "ctc-alignment", "edit-distance-error-rates"] },
+  { id: "generative", title: "Generative models · foundations", summary: "Refresh training and noise, then choose a latent, adversarial or diffusion branch with its own relevant loss refreshers.", lessons: ["neural-network-training-loop", "normal-distribution-z-scores"] },
+  { id: "generative-latents", title: "Generative models · optional latent models", summary: "Compare reconstruction bottlenecks, probabilistic latents and discrete codebooks.", lessons: ["autoencoders-latent-bottleneck", "self-supervised-objectives", "denoising-autoencoders", "kl-divergence", "variational-autoencoders", "k-means-clustering", "vqvae-codebooks"], parentId: "generative" },
+  { id: "generative-adversarial", title: "Generative models · optional adversarial training", summary: "Inspect the generator/discriminator game without taking the latent-model sequence.", lessons: ["neural-network-training-loop", "log-loss-confidence-penalties", "gan-adversarial-training"], parentId: "generative" },
+  { id: "generative-diffusion", title: "Generative models · optional diffusion", summary: "Learn noise and reverse sampling first; latent conditioning is a later composition, with architecture refreshers available separately.", lessons: ["normal-distribution-z-scores", "neural-network-training-loop", "diffusion-denoising", "diffusion-sampling-budgets", "variational-autoencoders", "seq2seq-cross-attention", "latent-diffusion"], parentId: "generative" },
+  { id: "llm-evaluation", title: "Evaluate an LLM", summary: "Compare answer scores, judges, safety and operating tradeoffs.", lessons: ["reference-answer-metrics", "benchmark-scores-pass-k", "preference-judge-metrics", "safety-refusal-robustness-metrics", "embedding-retrieval", "retrieval-ranking-metrics", "rag-pipeline", "rag-groundedness-metrics", "evidence-sufficiency-guardrails", "llm-app-ops-metrics"] },
+  { id: "search", title: "Search & reinforcement learning", summary: "Move from exploration and tree search to learned values, policies and world models.", lessons: ["expected-value-risk", "exploration-exploitation", "monte-carlo-tree-search", "sequential-decisions-returns", "q-learning", "n-step-return-targets", "model-based-rl", "prioritized-planning", "backpropagation-inspector", "neural-network-training-loop", "deep-q-networks", "softmax-temperature", "policy-gradients", "actor-critic", "ppo-policy-updates"] },
+  { id: "continuous-control", title: "Continuous control", summary: "Move from actor–critic foundations to bounded actions and off-policy control.", lessons: ["n-step-return-targets", "actor-critic", "continuous-control-policies", "deep-q-networks", "soft-actor-critic", "td3-delayed-updates"] },
+  { id: "efficiency", title: "Model efficiency", summary: "Compare compression, memory traffic and sparse computation.", lessons: ["floating-point-precision", "linear-quantization-int4", "neural-network-training-loop", "stochastic-gradient-noise", "gradient-accumulation", "quantization-aware-training", "binary-ternary-training", "softmax-temperature", "kl-divergence", "knowledge-distillation", "model-pruning", "matrix-multiplication", "tensor-shape-broadcasting", "gpu-memory-compute", "transformer-attention", "flash-attention-tiling", "transformer-block-residual-stream", "mixture-of-experts-routing"] },
+  { id: "interpretability", title: "Interpretability & input robustness", summary: "Compare local explanations, attribution assumptions and input attacks.", lessons: ["mnist-mlp-inference-debugger", "integrated-gradients", "lime-local-surrogates", "shap-feature-attribution", "convolution-filter-lab", "grad-cam", "adversarial-perturbations"] },
+  { id: "advanced", title: "Advanced learning & phenomena", summary: "Explore task adaptation, graph structure and unusual learning curves.", lessons: ["transfer-learning", "regularization", "continual-learning", "continual-parameter-protection", "task-parameter-isolation", "calibration-reliability-diagrams", "active-learning", "bias-variance-tradeoff", "learning-curves-data-budgets", "curriculum-training-order", "matrix-multiplication", "graph-message-passing", "few-shot-meta-learning", "meta-learning-inner-outer-loops", "multi-task-loss-balancing", "double-descent", "grokking-delayed-generalization"] },
+  { id: "alternatives", title: "Alternative architectures & learning", summary: "Explore energy-based memory, external state, continuous depth and gradient-free search.", lessons: ["matrix-multiplication", "hopfield-associative-memory", "rbm-gibbs-sampling", "recurrent-hidden-state", "transformer-attention", "differentiable-memory-addressing", "neural-memory-read-write", "convolution-filter-lab", "capsule-routing", "cnn-residual-connections", "neural-odes", "neural-network-training-loop", "forward-forward-learning", "neuroevolution"] },
 ];
 
 export const referenceSlugs = ["ai-concept-atlas", "zero-knowledge-proofs"] as const;
@@ -60,13 +96,9 @@ export function lessonHref(slug: string, path?: string) {
   return `/playgrounds/${slug}${getLearningPath(path) ? `?path=${encodeURIComponent(path!)}` : ""}`;
 }
 
-// Each catalog card appears once. Chapters retain their original reachable routes.
-export const dashboardLessonPlanOrder: readonly string[] = [...new Set([
-  ...learningPaths.flatMap(path => path.lessons), ...referenceSlugs,
-])];
-
 export type Prerequisite = { concept: string; lesson?: string };
 export const lessonPrerequisites: Record<string, readonly Prerequisite[]> = {
+  ...Object.fromEntries(plannedPlaygroundDefinitions.map(lesson => [lesson.slug, lesson.prerequisites])),
   "ocr-line-detection": [{ concept: "Image grids and convolution stride", lesson: "convolution-filter-lab" }, { concept: "Tensor axes and indexing", lesson: "tensor-shape-broadcasting" }, { concept: "Sigmoid scores", lesson: "activation-functions" }],
   "least-squares-loss-landscape": [{ concept: "Straight-line parameters and residuals", lesson: "linear-regression-line-fitting" }],
   "confusion-matrix-thresholds": [{ concept: "Confusion counts, precision and recall", lesson: "classification-metrics-foundations" }],
@@ -155,3 +187,41 @@ export const lessonPrerequisites: Record<string, readonly Prerequisite[]> = {
   "exploration-exploitation": [{ concept: "Observed sample means and rewards", lesson: "expected-value-risk" }],
   "monte-carlo-tree-search": [{ concept: "UCB exploration scores", lesson: "exploration-exploitation" }],
 };
+
+// Preserve preference order whenever prerequisites do not require a move.
+// Paths may assume foundations elsewhere, but may not reverse dependencies
+// when both lessons are present. The approved core retains its exact sequence.
+function orderWithPrerequisites(preference: readonly string[]): string[] {
+  const normalizedPreference = preference.map(canonicalLessonSlug);
+  const candidates = new Set(normalizedPreference);
+  const ordered: string[] = [];
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  function append(slug: string) {
+    if (visited.has(slug)) return;
+    if (visiting.has(slug)) throw new Error(`Cyclic curriculum prerequisite: ${slug}`);
+    visiting.add(slug);
+    for (const prerequisite of (getLessonGroup(slug)?.chapters ?? [slug]).flatMap(chapter => lessonPrerequisites[chapter] ?? [])) {
+      if (!prerequisite.lesson) continue;
+      const dependency = canonicalLessonSlug(prerequisite.lesson);
+      if (dependency !== slug && candidates.has(dependency)) append(dependency);
+    }
+    visiting.delete(slug);
+    visited.add(slug);
+    ordered.push(slug);
+  }
+  for (const slug of normalizedPreference) append(slug);
+  return ordered;
+}
+
+export const learningPaths: readonly LearningPath[] = learningPathDefinitions.map(path => ({
+  ...path,
+  lessons: path.id === "core" ? path.lessons : orderWithPrerequisites(path.lessons),
+}));
+
+// Learner order follows path foundations and prerequisites, independently of the build queue.
+// Shared chapters resolve to one dashboard card; every card appears once.
+export const dashboardLessonPlanOrder: readonly string[] = orderWithPrerequisites([
+  ...coreLessonOrder,
+  ...learningPaths.flatMap(path => path.lessons), ...referenceSlugs,
+]);

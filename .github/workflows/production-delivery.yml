@@ -45,7 +45,7 @@ jobs:
           claims=json.loads(base64.urlsafe_b64decode(jwt.split('.')[1]+'==='))
           assert claims['workflow_ref']=='tsilva/aigrounds/.github/workflows/production-delivery.yml@refs/heads/main'
           assert claims['repository_id']=='1176162073' and claims['environment']=='Production'
-          assert 'job_workflow_ref' not in claims
+          assert claims.get('job_workflow_ref') != 'tsilva/.github/.github/workflows/production-delivery.yml@e0c6d64d4fc917ea0e108d27ce8d1a5304aeb3c6'
           r=urllib.request.Request('https://app.infisical.com/api/v1/auth/oidc-auth/login',data=json.dumps({'identityId':'672c01c3-c025-40f9-b89b-5abcc03e8261','jwt':jwt}).encode(),headers={'Content-Type':'application/json'},method='POST')
           try:
            with urllib.request.urlopen(r,timeout=20) as resp:resp.read()

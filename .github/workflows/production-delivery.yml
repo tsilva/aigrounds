@@ -27,3 +27,29 @@ jobs:
     uses: tsilva/.github/.github/workflows/production-delivery.yml@e0c6d64d4fc917ea0e108d27ce8d1a5304aeb3c6
     secrets:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  verify-reader-isolation:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    environment: Production
+    permissions:
+      id-token: write
+    steps:
+      - name: Ordinary caller must be denied the shared reader
+        shell: python
+        run: |
+          import os,json,urllib.request,urllib.error,urllib.parse,base64
+          url=os.environ['ACTIONS_ID_TOKEN_REQUEST_URL'];assert urllib.parse.urlsplit(url).hostname.endswith('.actions.githubusercontent.com')
+          r=urllib.request.Request(url+('&' if '?' in url else '?')+urllib.parse.urlencode({'audience':'https://app.infisical.com'}),headers={'Authorization':'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
+          with urllib.request.urlopen(r,timeout=20) as resp:jwt=json.load(resp)['value']
+          claims=json.loads(base64.urlsafe_b64decode(jwt.split('.')[1]+'==='))
+          assert claims['workflow_ref']=='tsilva/aigrounds/.github/workflows/production-delivery.yml@refs/heads/main'
+          assert claims['repository_id']=='1176162073' and claims['environment']=='Production'
+          assert 'job_workflow_ref' not in claims
+          r=urllib.request.Request('https://app.infisical.com/api/v1/auth/oidc-auth/login',data=json.dumps({'identityId':'672c01c3-c025-40f9-b89b-5abcc03e8261','jwt':jwt}).encode(),headers={'Content-Type':'application/json'},method='POST')
+          try:
+           with urllib.request.urlopen(r,timeout=20) as resp:resp.read()
+           raise SystemExit('SECURITY CHECK FAILED: ordinary job unexpectedly authenticated.')
+          except urllib.error.HTTPError as error:
+           if error.code not in (400,401,403):raise SystemExit('Unexpected authentication status; private response suppressed.')
+           print('Verified: ordinary Production job on the allowed caller path was denied Infisical access (HTTP '+str(error.code)+').')

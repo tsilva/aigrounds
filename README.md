@@ -135,6 +135,6 @@ Production and Preview call OpenRouter directly using their own server-only
 Production credentials come from this app’s isolated Infisical project.
 Production text requests use `deepseek/deepseek-v4.1-flash-1017` with reasoning disabled.
 
-Production secrets are delivered through the pinned shared GitHub Actions workflow. A standalone signed Infisical relay triggers synchronization and deployment; see [production delivery](docs/production-delivery.md) for scope and recovery.
+Production secrets are delivered through the pinned shared GitHub Actions workflow. The standalone signed Infisical relay triggers synchronization and deployment; see [production delivery](docs/production-delivery.md) for scope and recovery.
 
 Production delivery keeps Vercel secret isolation enabled and distinguishes public configuration from private credentials; see [production delivery](docs/production-delivery.md).

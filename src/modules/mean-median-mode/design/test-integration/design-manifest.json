@@ -17,6 +17,7 @@
     "Preserve exploration state with a focused native dialog and reusable answer widgets",
     "Prefer unseen items and avoid frequent repeats and adjacent question families",
     "Add tactile controls, animated selection and feedback, smooth progress and a perfect-score trophy burst while respecting reduced motion",
+    "Keep results compact: remove objective scores, the answer-review heading/list and the Back to playground button",
     "Keep tests desktop-only for now, as explicitly selected by the user",
     "Preserve the original main lesson mockup; this reference covers only the added test integration",
     "Raster chart marks are illustrative; retained lesson geometry comes from its engine"

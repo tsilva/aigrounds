@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
-import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, ChevronDownIcon, SparklesIcon, TrophyIcon } from "@heroicons/react/24/outline";
-import { advanceTest, checkTestAnswer, createTestAttempt, currentTestQuestionId, gradeTest, isTestAnswerComplete, isTestAnswerCorrect, questionsPerObjective, testFirstAnswer, type TestAnswer, type TestBank, type TestQuestion } from "@/lib/lesson-test";
+import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, SparklesIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { advanceTest, checkTestAnswer, createTestAttempt, currentTestQuestionId, gradeTest, isTestAnswerComplete, isTestAnswerCorrect, questionsPerObjective, type TestAnswer, type TestBank, type TestQuestion } from "@/lib/lesson-test";
 import { updateTestProgress, useTestProgress } from "@/lib/lesson-test-progress";
 import { recordLearningProgress } from "@/lib/learning-progress";
 import { AnswerWidget } from "./answer-widget";
@@ -106,18 +106,7 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
         <p className={styles.score}>{result.correct} / {result.total}<span>{Math.round(result.correct / result.total * 100)}% first-answer accuracy</span></p>
         <p className={styles.intro}>{result.passed ? "Every first answer was correct. This ground is marked passed." : "Passing requires 100% on your first answers. You practiced your mistakes; try a fresh test when you’re ready."}</p>
         {!result.passed && history.passedAt && <p className={styles.small}>You passed an earlier attempt. That passed status is preserved.</p>}
-        <section className={styles.objectives} aria-label="Results by learning objective">{bank.objectives.map(objective => {
-          const questions = bank.questions.filter(q => q.objective === objective.id && attempt.questionIds.includes(q.id));
-          const count = questions.filter(q => isTestAnswerCorrect(q, testFirstAnswer(attempt, q.id))).length;
-          return <div key={objective.id}><span>{objective.label}</span><strong>{count}/{questionsPerObjective}</strong></div>;
-        })}</section>
-        <div className={styles.resultActions}><button type="button" className={styles.primary} onClick={start}>Take a new test<ArrowRightIcon aria-hidden="true" /></button><button type="button" className={styles.secondary} onClick={onClose}>Back to playground</button></div>
-        <section className={styles.review} aria-label="Answer review"><h2>Review your answers</h2>{attempt.questionIds.map((id, index) => {
-          const q = bank.questions.find(q => q.id === id)!;
-          const correct = isTestAnswerCorrect(q, testFirstAnswer(attempt, id));
-          return <details key={id}><summary><span>{index + 1}. {q.prompt}</span><strong data-correct={correct}>{correct ? "Correct" : "Incorrect"}</strong><ChevronDownIcon aria-hidden="true" /></summary>
-            {q.context && <p className={styles.context}>{q.context}</p>}<p><strong>Your first answer:</strong> {answerLabel(q, testFirstAnswer(attempt, id))}</p><p>{q.explanation}</p>{!correct && attempt.firstAnswers && <p><strong>Corrected answer:</strong> {answerLabel(q, attempt.answers[id])}</p>}</details>;
-        })}</section>
+        <div className={styles.resultActions}><button type="button" className={styles.primary} onClick={start}>Take a new test<ArrowRightIcon aria-hidden="true" /></button></div>
         {nextLesson && <div className={styles.continue}>{nextLesson}</div>}
       </> : question && <>
         <div className={styles.progressLabel}><span>{reviewing ? `Review mistakes · ${attempt.reviewIds!.length} remaining` : `Question ${attempt.index + 1} of ${total}`}</span><span className={styles.passTarget}><SparklesIcon aria-hidden="true" />100% to pass</span></div>

@@ -1,31 +1,67 @@
-# Shared learning-page layout QA
+# First lesson and quiz presentation QA
 
-The user approved the paired Mean, Median & Mode / Range, Quartiles & IQR preview and requested removal of the redundant top AI Guide button. `DESIGN_SYSTEM.md` is now the canonical design reference, backed by shared components and styles in `src/components/learning-page/`. Both lesson design manifests record the approved refinements. Generated chart positions are illustrative; application positions still use the existing engines.
+final result: passed
 
-## Locally verified implementation
+## Target and scope
 
-- Local URL: http://localhost:57457.
-- Evidence: `/Users/tsilva/.codex/visualizations/2026/10/01/01a0f75d-5c6f-7631-a7b0-9ea821a1e141/mean-shared-layout.png` and `range-shared-layout.png`.
-- Both screenshots use 1440 × 1024 CSS pixels. Shared navigation, workbench/rail proportions, title hierarchy, scenario controls, editor placement, summaries, numbered progress, and Guide CTA match the approved scheme. Range retains its construction evidence and before/now calculations.
-- The top Guide launcher is absent on both lessons; the contextual CTA below the exercise opens the existing assistant. Pages awaiting redesign retain a bottom-right launcher.
-- Future metadata with `layout: "guided-discovery"` also suppresses the old floating home button and global Guide launcher, avoiding duplicate navigation and assistance controls.
+Approved presentation migration for `mean-median-mode` and the reusable lesson-test UI. The selected playground is the **first number-line mockup**, not the later vertical-drag tile proposal. Existing lesson logic, question content, grading, rotation and progress keys remain authoritative.
 
-## Interaction evidence
+- Playground source: `src/modules/mean-median-mode/design/accepted-mockup.png`.
+- Quiz source: `src/modules/mean-median-mode/design/accepted-quiz-mockup.png`.
+- Implementation: `http://127.0.0.1:51403/playgrounds/mean-median-mode`; the optimized production build was also exercised locally.
+- Evidence directory: `/Users/tsilva/.codex/visualizations/2026/10/28/01a18396-5855-75a0-b3d5-7b104b9b3b24/implementation/`.
+- Final playground screenshot: `ground-final-clean-1440.jpg`; quiz dataset/selection/feedback screenshot: `quiz-data-choice-1440.jpg`.
 
-- Mean: Balanced I 66 → 90 yields mean 44.7, median 42, no mode. Repeated Peak A 18 → 24 yields mean 29.1, median/mode 24, mode frequency 4. Add Outlier I 92 → 28 yields mean 23.8, median/mode 24, mode frequency 3. All three explanation/completion paths and next-dataset transitions passed.
-- Mean: an incorrect prediction is acknowledged; an incorrect explanation shows a retry hint and cannot unlock the next dataset. A correct explanation unlocks it. Preset switching, Reset, numeric input, Home/End, and Shift+arrow passed.
-- Range: I 58 → 92 yields range 74 and IQR 20. H 48 → 68 yields range 74 and IQR 30. In new data I 88 → 30 yields range 34 and IQR 16. All three experiments completed; incorrect explanations show feedback and cannot advance.
-- Range: Wide Middle produces range 76 and IQR 52; Outlier, Return to experiment, Reset, numeric input, keyboard controls, and pointer drag passed. Dragging I to 92 reached the expected target.
-- At 768 CSS pixels, both lessons' numeric-editor interactions passed. Nine Range points at 100 occupy separate lanes with no overlapping handle rectangles or horizontal overflow.
-- At 767 CSS pixels, both lessons expose only the desktop notice in the accessibility tree; their sliders are hidden. At 768, 1024, and 1440 pixels, all nine sliders and the single contextual Guide CTA are visible with no horizontal document overflow.
-- Guide opening/closing and narrower lesson reflow passed for both lessons, including Mean at 768 pixels. Accessible names, slider values, radio states, status updates, and visible keyboard focus are retained. Native 200% zoom and full WCAG conformance were not certified.
-- Unaffected Variance & Standard Deviation lesson: switching to Wide and opening/closing its bottom-right Guide launcher passed. The launcher sits 16px above the viewport bottom.
-- No console errors in the final browser regression check.
+## Comparison evidence
 
-## Verification limits
+The primary CSS viewport is 1440 × 1024. The generated references are 1488 × 1058; the browser screenshot service returned 1425 × 1013 JPEGs. Native display density was not overridden. Both artifacts were normalized to 720 × 512 for full-view comparisons, preserving their essentially identical aspect ratios within pixel rounding. This is a visual comparison, not a pixel-difference threshold or a claim of identical antialiasing.
 
-Real AI Guide replies remain blocked locally: the rendered assistant reports that OpenRouter is not configured. Guide launch, opening content, static instructions, and deterministic exercises are verified. No full guided clean-pass or learner-validation claim is made. This was implementation of an approved layout, not a new teaching-model optimization.
+Opened and inspected combined source/implementation images:
 
-Checks: `pnpm typecheck`, `pnpm lint`, `pnpm check:cycles`, `pnpm build`, and `git diff --check` passed. No dependency changes, commits, pushes, or deployment were performed.
+- `ground-final-comparison.jpg`: initial Balanced/Predict state, no submitted test or selected prediction.
+- `quiz-data-comparison.jpg`: submitted correct answers, selected rows, authored dataset tiles and explanatory feedback. The source's illustrative outlier item is compared with an actual reservoir item; question text, item count and progress intentionally vary.
+- `ground-controls-comparison.jpg`: focused prediction controls, question typography and helper spacing.
+- `quiz-feedback-comparison.jpg`: focused correct-feedback strip and Continue action.
 
-Confidence: fixed/verified for the approved layout and deterministic behavior, local only.
+## Required fidelity surfaces
+
+| Surface | Finding |
+| --- | --- |
+| Fonts and typography | Existing Space Grotesk and IBM Plex Mono retained; larger headings, live summaries and choice rows preserve the approved hierarchy. Real question text wraps without clipping. Generated font shapes and raster antialiasing are not treated as exact font specifications. |
+| Spacing and layout | White workbench, approximately 66/34 lavender rail, right-aligned navigation, two-line scenario controls, sorted evidence and open summaries match the selected direction. Quiz uses a centered 920px workspace, inline progress, numbered answer rows and a feedback/Continue region. Narrow desktop feedback wraps its action below the explanation. |
+| Colors and tokens | Navy text, indigo interactions, lavender surfaces, green correct feedback and amber correction feedback remain distinct. Selection and correctness also have text, native input state and check/retry icons. |
+| Image and icon fidelity | No decorative raster assets are needed in the actual UI. Existing Heroicons supply real interface icons. Number-line marks are mathematical data geometry, not approximations of generated artwork. Mockups are retained as design references only. |
+| Copy and content | Existing authored questions and first-answer rules preserved. Data tiles reproduce all context values, repeats and order; automated checks compare each structured dataset with its authored context. Learning-path context and continuation remain available below the primary workspace/exercise. |
+
+## Comparison history
+
+1. Initial full-view and focused comparison found a P2 rail-spacing mismatch: the larger question-paragraph rule also enlarged helper text, pushing secondary actions downward.
+2. Changed the shared playful selector to `.exercise > p:not(.small)`, restoring the compact helper hierarchy without removing its dataset-reset warning.
+3. Captured `ground-final-clean-1440.jpg` and opened `ground-final-comparison.jpg` after the change. No actionable P0/P1/P2 mismatch remains. Native font rendering and minor illustration-to-CSS differences are P3 only.
+
+## Behavioral and regression evidence
+
+- All three guided experiments: prediction, exact-value changes, explanation, blocked incorrect explanation, correction, completion and scenario switching.
+- Balanced baseline: mean/median 42, sum 378, no mode. Moving I to 90 yields mean 44.7, median 42, sum 402. Repeated Peak after A joins 24 yields sum 262 and mode 24 occurring four times. Outlier after I moves to 28 yields sum 214, mean 23.8, median/mode 24.
+- Pointer drag I from 66 to 90; keyboard Home to 0, End to 100, Shift+ArrowLeft to 90; Reset and exact-value editing.
+- Quiz UI: radio, select-all, numeric, text and keyboard-operated slider widgets; disabled/locked submitted answers; immediate correct and incorrect feedback; mistake practice; 6/6 perfect result; corrected 5/6 still reports 83%; a later unsuccessful attempt preserves an earlier pass.
+- Real AI Guide opens/closes with the existing introduction. Opening it reduces available lesson width and stacks the rail without overflow. No live Guide message was sent in this presentation test.
+- 1440, 1024 and 768 CSS-pixel layouts exercised; exactly 768 remains operable. At 767, the production accessibility tree contains only the desktop notice, with no lesson/test controls.
+- Unaffected Range, Quartiles & IQR smoke check: moving I from 58 to 92 changes range 40 → 74 while IQR stays 20; its default presentation is retained.
+- No browser console errors in the checked lesson, quiz or neighboring lesson.
+- `pnpm typecheck`, `pnpm lint`, `pnpm check:cycles`, `node scripts/check-learning-design.mjs`, and `pnpm build` passed. The build includes 22,971 lesson-test checks and 1,600 balanced question draws.
+
+## Remaining verification limits
+
+Reduced-motion overrides are present in the rendered stylesheets; an OS/browser reduced-motion preference was not emulated. The browser controls did not confirm a true 200% zoom, so that specific zoom check remains unverified; 768px reflow was checked directly. Live AI Guide response quality is outside this presentation migration. No learner-effectiveness or full WCAG-conformance claim is made.
+
+## Implementation checklist
+
+- [x] Implement selected number-line playground and matching quiz presentation.
+- [x] Preserve mathematical logic, authored question reservoir and progress semantics.
+- [x] Verify affected controls, responsive boundaries and an unaffected lesson.
+- [x] Inspect full-view and focused comparisons after the spacing repair.
+- [x] Update authoritative design/lesson documentation and retain approved references.
+- [x] Pass repository gates; leave a clean local preview open.
+
+Stakeholder intent check: `SPECS.md` is unchanged; this implements the approved presentation within its existing constraints. An unrelated concurrent `AGENTS.md` edit was preserved.

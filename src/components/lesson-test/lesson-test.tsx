@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
-import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, SparklesIcon, TrophyIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, SparklesIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { advanceTest, checkTestAnswer, createTestAttempt, currentTestQuestionId, gradeTest, isTestAnswerComplete, isTestAnswerCorrect, questionsPerObjective, type TestAnswer, type TestBank, type TestQuestion } from "@/lib/lesson-test";
 import { updateTestProgress, useTestProgress } from "@/lib/lesson-test-progress";
 import { recordLearningProgress } from "@/lib/learning-progress";
@@ -14,14 +14,14 @@ function subscribeDesktop(notify: () => void) {
   media.addEventListener("change", notify);
   return () => media.removeEventListener("change", notify);
 }
-export function TestInvitation({ bank, onOpen }: { bank: TestBank; onOpen: () => void }) {
+export function TestInvitation({ bank, onOpen, appearance = "primary" }: { bank: TestBank; onOpen: () => void; appearance?: "primary" | "secondary" }) {
   const { history } = useTestProgress(bank);
   const inProgress = history.active && !history.active.submittedAt;
-  return <section className={styles.invitation} aria-label="Lesson test">
-    <h3>{history.passedAt ? <><CheckCircleIcon aria-hidden="true" />Test passed · 100%</> : "Take the test"}</h3>
+  return <section className={styles.invitation} data-appearance={appearance} aria-label="Lesson test">
+    <h3>{history.passedAt ? <><CheckCircleIcon aria-hidden="true" />Test passed · 100%</> : appearance === "secondary" ? "Ready to check your understanding?" : "Take the test"}</h3>
     <p>{bank.objectives.length * questionsPerObjective} questions · Get every first answer correct to pass.</p>
     <button type="button" className={styles.primary} onClick={onOpen}>
-      {inProgress ? "Resume test" : history.passedAt ? "View result or test again" : "Take the test"}<ArrowRightIcon aria-hidden="true" />
+      {inProgress ? "Resume test" : history.passedAt ? "View result or test again" : appearance === "secondary" ? "Take lesson test" : "Take the test"}<ArrowRightIcon aria-hidden="true" />
     </button>
   </section>;
 }
@@ -89,7 +89,7 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
       if (event.shiftKey && document.activeElement === first && last) { event.preventDefault(); last.focus(); }
       else if (!event.shiftKey && document.activeElement === last && first) { event.preventDefault(); first.focus(); }
     }}>
-    <nav className={styles.nav} aria-label="Test navigation"><span>AI Grounds</span><button type="button" onClick={onClose}>← Back to lesson</button></nav>
+    <nav className={styles.nav} aria-label="Test navigation"><span>AI Grounds</span><button type="button" onClick={onClose}><ArrowLeftIcon aria-hidden="true" />Back to lesson</button></nav>
     <main className={styles.content}>
       <p className={styles.eyebrow}>{bank.title}</p>
       {!attempt ? <>
@@ -109,11 +109,19 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
         <div className={styles.resultActions}><button type="button" className={styles.primary} onClick={start}>Take a new test<ArrowRightIcon aria-hidden="true" /></button></div>
         {nextLesson && <div className={styles.continue}>{nextLesson}</div>}
       </> : question && <>
-        <div className={styles.progressLabel}><span>{reviewing ? `Review mistakes · ${attempt.reviewIds!.length} remaining` : `Question ${attempt.index + 1} of ${total}`}</span><span className={styles.passTarget}><SparklesIcon aria-hidden="true" />100% to pass</span></div>
-        <div className={styles.progress} role="progressbar" aria-label="Test progress" aria-valuemin={0} aria-valuemax={total} aria-valuenow={completedQuestions}><span style={{ width: `${completedQuestions / total * 100}%` }} /></div>
+        <div className={styles.progressLabel}>
+          <span>{reviewing ? `Review mistakes · ${attempt.reviewIds!.length} remaining` : `Question ${attempt.index + 1} of ${total}`}</span>
+          <div className={styles.progress} role="progressbar" aria-label="Test progress" aria-valuemin={0} aria-valuemax={total} aria-valuenow={completedQuestions}><span style={{ width: `${completedQuestions / total * 100}%` }} /></div>
+          <span className={styles.passTarget}>100% to pass</span>
+        </div>
         <div key={`${attempt.id}-${question.id}-${reviewing}`} className={styles.questionScene}>
         <h1 ref={heading} tabIndex={-1} id="lesson-test-title">{question.prompt}</h1>
-        {question.context && <p className={styles.context}>{question.context}</p>}
+        {question.datasets ? <div className={styles.datasets} role="group" aria-label="Question data">
+          {question.datasets.map((dataset, row) => <div className={styles.datasetRow} key={row}>
+            <span className={styles.datasetLabel}>{dataset.label}</span>
+            <ol aria-label={dataset.label}>{dataset.values.map((value, index) => <li key={index} data-emphasized={dataset.emphasized?.includes(index) || undefined}>{value}</li>)}</ol>
+          </div>)}
+        </div> : question.context && <p className={styles.context}>{question.context}</p>}
         <form onSubmit={event => {
           event.preventDefault();
           updateTestProgress(bank, current => {
@@ -126,6 +134,7 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
           <fieldset disabled={checked} className={styles.answerArea} data-feedback={checked ? correct ? "correct" : "incorrect" : undefined} aria-label="Your response">
             <AnswerWidget key={question.id} question={question} answer={attempt.answers[question.id]} seed={attempt.seed + attempt.questionIds.indexOf(question.id)} onChange={setAnswer} />
           </fieldset>
+          <div ref={actions} className={styles.response} data-checked={checked}>
           {checked && <section className={styles.feedback} data-correct={correct} role="status" aria-live="polite">
             <div className={styles.feedbackHeading}>
               <span className={styles.feedbackIcon}>{correct ? <CheckCircleIcon aria-hidden="true" /> : <ArrowPathIcon aria-hidden="true" />}{correct && <Celebration />}</span>
@@ -135,10 +144,11 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
             <p>{question.explanation}</p>
             {(reviewing || !correct) && <p className={styles.feedbackNote}>{correct ? "Your first answer still counts as incorrect for this test." : reviewing ? "You’ll try this again. Your first-answer score stays the same." : "You’ll retry this at the end. This first answer counts as incorrect."}</p>}
           </section>}
-          <div ref={actions} className={styles.actions}>
-            <button type="submit" className={styles.primary} data-feedback={checked && correct ? "correct" : undefined} disabled={!checked && !isTestAnswerComplete(question, attempt.answers[question.id])}>
+          <div className={styles.actions}>
+            <button type="submit" className={styles.primary} disabled={!checked && !isTestAnswerComplete(question, attempt.answers[question.id])}>
               {checked ? lastFeedback ? "See results" : "Continue" : "Submit answer"}<ArrowRightIcon aria-hidden="true" />
             </button>
+          </div>
           </div>
         </form>
         </div>

@@ -112,6 +112,82 @@
 .guideInvitation p { color: #536487; font-size: 13px; line-height: 1.6; margin-top: 6px; }
 .guideInvitation button { display: flex; gap: 12px; align-items: center; padding: 11px 14px; margin-top: 16px; border: 1px solid #d5cdef; background: white; border-radius: 7px; font-size: 13px !important; font-weight: 600 !important; color: #422abe; }
 .guideInvitation button svg { width: 16px; height: 16px; }
+.journey { margin-top: 24px; }
+
+/* Opt-in presentation for the approved first-lesson mockup. Shared controls
+   keep their semantics; chart geometry remains owned by the lesson. */
+.page[data-appearance="playful"] { --lesson-control-radius: 10px; }
+.page[data-appearance="playful"] .nav { height: 72px; justify-content: space-between; padding-inline: 56px; }
+.page[data-appearance="playful"] .nav > a:first-child { font-size: 28px; }
+.page[data-appearance="playful"] .allLessons { border: 0; padding: 0; color: var(--indigo); font-size: 17px; font-weight: 500; }
+.page[data-appearance="playful"] .layout { grid-template-columns: minmax(0, 1fr) minmax(340px, 34%); min-height: calc(100vh - 72px); }
+.page[data-appearance="playful"] .workbench { padding: 32px 48px; }
+.page[data-appearance="playful"] .header h1 { font-size: clamp(36px, 3.6cqi, 52px); margin: 14px 0 6px; }
+.page[data-appearance="playful"] .header > p:last-child { font-size: 20px; }
+.page[data-appearance="playful"] .eyebrow { font-size: 13px; }
+.page[data-appearance="playful"] .toolbar { gap: 16px; margin-top: 24px; }
+.page[data-appearance="playful"] .presets { gap: 10px; }
+.page[data-appearance="playful"] .presets button { min-width: 166px; padding: 13px 16px; border-radius: var(--lesson-control-radius); box-shadow: 0 2px 0 #e9e5fa; transition: background 140ms ease, box-shadow 140ms ease, translate 140ms ease; }
+.page[data-appearance="playful"] .presets strong { font-size: 16px; }
+.page[data-appearance="playful"] .presets span { font-size: 14px; }
+.page[data-appearance="playful"] .presets button[aria-pressed="true"] { box-shadow: 0 3px 0 #34218f; }
+.page[data-appearance="playful"] .presets button:enabled:active { translate: 0 2px; box-shadow: none; }
+.page[data-appearance="playful"] .reset { padding: 13px 16px; border-radius: var(--lesson-control-radius); }
+.page[data-appearance="playful"] .chartHeading h2 { font-size: 18px; font-weight: 700; }
+.page[data-appearance="playful"] .point { width: 44px; height: 46px; border-radius: 50%; box-shadow: 0 2px 0 #dfe4f4; }
+.page[data-appearance="playful"] .point > span { font-size: 16px; line-height: 20px; }
+.page[data-appearance="playful"] .point > small { font-size: 10px; line-height: 13px; }
+.page[data-appearance="playful"] .point[data-selected="true"] { border-width: 2px; box-shadow: 0 0 0 3px #5031dc14, 0 3px 0 #d4caf7; }
+.page[data-appearance="playful"] .pointEditor { margin: 24px 0 18px; gap: 16px; }
+.page[data-appearance="playful"] .pointEditor label { font-size: 16px; gap: 16px; }
+.page[data-appearance="playful"] .pointEditor input { min-height: 46px; padding: 10px 12px; border-color: var(--line); border-radius: var(--lesson-control-radius); font-size: 19px; font-weight: 700; }
+.page[data-appearance="playful"] .pointEditor p { font-size: 12px; }
+.page[data-appearance="playful"] .summaries { padding: 22px 0 12px; }
+.page[data-appearance="playful"] .summary { padding-inline: 24px; }
+.page[data-appearance="playful"] .summary:first-child { padding-left: 0; }
+.page[data-appearance="playful"] .summary:last-child { padding-right: 0; }
+.page[data-appearance="playful"] .summary h2 { font-size: 18px; }
+.page[data-appearance="playful"] .definition { font-size: 15px; }
+.page[data-appearance="playful"] .summaryValue { font-size: 52px; margin: 8px 0; }
+.page[data-appearance="playful"] .formula { font-size: 11px; }
+.page[data-appearance="playful"] .rail { padding: 36px 36px 28px; }
+.page[data-appearance="playful"] .experimentTitle { font-size: 38px; margin-top: 14px; }
+.page[data-appearance="playful"] .steps { margin: 26px 0; padding-bottom: 28px; }
+.page[data-appearance="playful"] .steps li { gap: 8px; font-size: 14px; }
+.page[data-appearance="playful"] .steps li > span { width: 32px; height: 32px; font-size: 14px; }
+.page[data-appearance="playful"] .exercise h3 { font-size: 19px; }
+.page[data-appearance="playful"] .exercise > p:not(.small) { font-size: 17px; }
+.page[data-appearance="playful"] .choices { gap: 10px; margin-top: 20px; }
+.page[data-appearance="playful"] .choices label { gap: 14px; min-height: 60px; align-items: center; padding: 14px 16px; border-radius: var(--lesson-control-radius); font-size: 17px; box-shadow: 0 2px 0 #e8e4f7; transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease; }
+.page[data-appearance="playful"] .choices label:has(input:checked) { border-color: var(--indigo); box-shadow: 0 0 0 1px var(--indigo), 0 3px 0 #d4caf7; }
+.page[data-appearance="playful"] .choices input { width: 22px; height: 22px; margin: 0; }
+.page[data-appearance="playful"] .guideInvitation { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 16px; padding-top: 24px; margin-top: 24px; }
+.page[data-appearance="playful"] .guideInvitation > svg { grid-row: 1 / 4; width: 36px; height: 36px; margin: 0; }
+.page[data-appearance="playful"] .guideInvitation h3 { font-size: 18px; }
+.page[data-appearance="playful"] .guideInvitation p { font-size: 14px; }
+.page[data-appearance="playful"] .guideInvitation button { width: fit-content; padding: 10px 14px; border-radius: var(--lesson-control-radius); font-size: 14px !important; }
+@container (max-width: 1299px) {
+  .page[data-appearance="playful"] .workbench { padding-inline: 32px; }
+  .page[data-appearance="playful"] .rail { padding-inline: 28px; }
+  .page[data-appearance="playful"] .presets button { min-width: 142px; }
+  .page[data-appearance="playful"] .experimentTitle { font-size: 32px; }
+}
+@container (max-width: 1099px) {
+  .page[data-appearance="playful"] .layout { grid-template-columns: minmax(0, 1fr); }
+  .page[data-appearance="playful"] .workbench { padding: 32px; }
+  .page[data-appearance="playful"] .rail { padding: 28px 32px; }
+  .page[data-appearance="playful"] .guideInvitation { align-self: start; margin-top: 0; padding-top: 0; }
+}
+@container (max-width: 699px) {
+  .page[data-appearance="playful"] .nav { padding-inline: 20px; }
+  .page[data-appearance="playful"] .workbench { padding: 28px 20px; }
+  .page[data-appearance="playful"] .presets button { min-width: 0; padding: 10px; }
+  .page[data-appearance="playful"] .presets strong { font-size: 14px; }
+  .page[data-appearance="playful"] .presets span { font-size: 12px; }
+  .page[data-appearance="playful"] .summary { padding-inline: 12px; }
+  .page[data-appearance="playful"] .summaryValue { font-size: 42px; }
+  .page[data-appearance="playful"] .guideInvitation { margin-top: 28px; padding-top: 22px; }
+}
 @container (max-width: 1199px) { .layout { grid-template-columns: minmax(0, 1fr) 300px; } .workbench { padding: 30px 24px; } .rail { padding: 30px 22px; } .presets button { min-width: 120px; padding: 10px 12px; } .toolbar { flex-wrap: wrap; } .header h1 { font-size: 36px; } }
 @container (max-width: 1099px) { .layout { grid-template-columns: minmax(0, 1fr); } .rail { border-left: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 32px; } .rail > .eyebrow, .rail > .experimentTitle, .rail > .steps { grid-column: 1 / -1; } .guideInvitation { margin-top: 0; padding-top: 0; border-top: 0; } .steps { justify-content: flex-start; gap: 30px; } .workbench { padding: 30px 32px; } }
 @container (max-width: 699px) { .nav { padding: 0 20px; gap: 16px; } .allLessons { padding-left: 16px; } .workbench { padding: 24px 20px; } .header h1 { font-size: 32px; } .presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; } .presets button { min-width: 0; padding: 10px; } .chartHeading { flex-wrap: wrap; gap: 4px; } .rail { display: block; padding: 28px 20px; } .guideInvitation { border-top: 1px solid #dddaf1; margin-top: 28px; padding-top: 22px; } .summary { padding: 0 10px; } }

@@ -1,22 +1,22 @@
-.chart { margin-top: 18px; }
+.chart { margin-top: 24px; }
 .plotFrame { margin: 0 22px; }
 .plot { position: relative; user-select: none; }
 .axis { position: absolute; bottom: 0; height: 2px; background: #7a8cae; width: 100%; }
 .tick { position: absolute; bottom: -5px; width: 1px; height: 12px; background: #6d7fa4; }
 .tick > span { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); }
-.markerTracks { margin-top: 42px; display: grid; gap: 8px; }
+.markerTracks { margin-top: 44px; display: grid; gap: 14px; }
 .markerLane { position: relative; height: 16px; color: var(--marker-color); }
 .markerAxis { position: absolute; top: 13px; height: 1px; background: #8391ad; width: 100%; }
-.markerLabel { position: relative; z-index: 1; top: -8px; padding-right: 6px; font-size: 12px; background: #fff; font-weight: 600; }
+.markerLabel { position: relative; z-index: 1; top: -8px; padding-right: 8px; font-size: 15px; background: #fff; font-weight: 700; }
 .marker { position: absolute; top: 7px; width: 13px; height: 13px; border: 2px solid white; border-radius: 50%; background: var(--marker-color); transform: translateX(-50%); box-shadow: 0 0 0 1px var(--marker-color); }
 .noMarker { position: absolute; top: -8px; right: 0; padding-left: 6px; background: white; font-size: 12px; color: var(--muted); }
-.sorted { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.sorted h2 { font-size: 14px; font-weight: 600; }
+.sorted { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.sorted h2 { font-size: 16px; font-weight: 700; }
 .sorted h2 span { font-size: 12px; font-weight: 400; color: var(--muted); }
 .sorted p { font-size: 11px; color: var(--muted); margin-top: 3px; }
 .sorted ol { display: flex; gap: 6px; flex-wrap: wrap; }
-.sorted li { min-width: 39px; border: 1px solid #e1e6f5; border-radius: 7px; padding: 4px 6px; background: #f8f9ff; text-align: center; display: flex; flex-direction: column; }
-.sorted li > span { font-size: 13px; font-weight: 600; }
-.sorted li > small { font-size: 9px; color: var(--muted); }
+.sorted li { min-width: 46px; border: 1px solid #e1e6f5; border-radius: 7px; padding: 8px; background: #f8f9ff; text-align: center; display: flex; flex-direction: column; }
+.sorted li > span { font-size: 14px; font-weight: 600; }
+.sorted li > small { font-size: 10px; color: var(--muted); }
 .sorted li[data-mode="true"] { background: #fff0d4; border-color: #f1d294; }
 .sorted li[data-middle="true"] { outline: 2px solid #6540e7; outline-offset: 1px; }

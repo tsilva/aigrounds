@@ -34,6 +34,12 @@ for (const q of bank.questions) {
   ok(q.prompt && q.explanation && q.family && q.objective, `${q.id} has teaching metadata`);
   ok(engine.isTestAnswerCorrect(q, solution(q)), `${q.id} accepts authored correct answer`);
   equal(engine.isTestAnswerCorrect(q, undefined), false, `${q.id} rejects missing answer`);
+  if (q.datasets) {
+    const presented = q.datasets.map(row => row.values.map(String));
+    const authored = q.context.split("\n").map(row => row.replace(/^[A-Za-z]+:\s*/, "").replaceAll("−", "-").split(/,\s*/));
+    equal(presented, authored, `${q.id} visual data preserves every authored value and its order`);
+    for (const row of q.datasets) ok(row.emphasized?.every(i => Number.isInteger(i) && i >= 0 && i < row.values.length) ?? true, `${q.id} valid emphasized values`);
+  }
   if (q.type === "choice" || q.type === "multiple") {
     equal(new Set(q.options.map(o => o.id)).size, q.options.length, `${q.id} unique options`);
     const correct = q.type === "choice" ? [q.correct] : q.correct;

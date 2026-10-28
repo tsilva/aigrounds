@@ -1,11 +1,49 @@
-import type { TestBank, TestQuestion } from "@/lib/lesson-test";
+import type { QuestionDataset, TestBank, TestQuestion } from "@/lib/lesson-test";
+
+// Presentation data mirrors the authored context without changing scored items.
+const questionDatasets: Record<string, readonly QuestionDataset[]> = {
+  "mean-01": [{ label: "Values", values: [2, 4, 6] }],
+  "mean-03": [{ label: "Values", values: [2, 4, "x"] }],
+  "mean-05": [{ label: "Values", values: [10, 10, 20, 20] }],
+  "mean-09": [
+    { label: "Before", values: [1, 2, 3, 4, 5] },
+    { label: "After", values: [1, 2, 3, 4, 25], emphasized: [4] },
+  ],
+  "mean-12": [{ label: "Values", values: [3, 6, "x"] }],
+  "mean-13": [{ label: "Values", values: [2, 2, 8] }],
+  "mean-14": [{ label: "Start", values: [1, 3, 5, 7] }],
+  "median-01": [{ label: "Values", values: [9, 2, 5, 1, 7] }],
+  "median-03": [{ label: "Values", values: [2, 4, 8, 10] }],
+  "median-05": [{ label: "Values", values: [-8, -1, 2, 4, 9] }],
+  "median-07": [{ label: "Values", values: [10, 12, 20, 22] }],
+  "median-09": [{ label: "Start", values: [1, 3, 5, 7, 9] }],
+  "median-10": [{ label: "Values", values: [18, 2, 11, 7, 4] }],
+  "median-11": [{ label: "Values", values: [2, 4, "x", 10, 12] }],
+  "median-12": [{ label: "Start", values: [2, 4, 6] }],
+  "median-14": [{ label: "Start", values: [1, 2, 3, 4, 5] }],
+  "median-16": [{ label: "Start", values: [1, 2, 3, 100] }],
+  "mode-01": [{ label: "Values", values: [1, 2, 2, 3, 4] }],
+  "mode-03": [{ label: "Values", values: [2, 2, 4, 6, 6] }],
+  "mode-04": [{ label: "Values", values: [1, 4, 7] }],
+  "mode-05": [{ label: "Values", values: [1, 1, 2, 2, 3, 3, 4] }],
+  "mode-06": [{ label: "Values", values: [5, 5, 5, 8, 8] }],
+  "mode-07": [{ label: "Values", values: [1, 1, 1, 9] }],
+  "mode-08": [{ label: "Values", values: [7, 3, 7, 2, 3, 7] }],
+  "mode-09": [{ label: "Start", values: [1, 1, 2, 3] }],
+  "mode-10": [{ label: "Start", values: [2, 2, 5, 5] }],
+  "mode-11": [{ label: "Start", values: [2, 2, 3, 4, 9] }],
+  "mode-12": [{ label: "Values", values: [1, 1, 2, 2] }],
+  "mode-13": [{ label: "Values", values: [4, 8, 12, 16, 20] }],
+  "mode-14": [{ label: "Values", values: [1, 2, 2, 3, "x"] }],
+  "mode-15": [{ label: "Values", values: [1, 1, 2, 4, 7] }],
+};
 
 // Authored items, not random-number rewrites of the same prompt. Each objective
 // has eight foundation and eight application items. Answers use the lesson's
 // convention: unique values have no mode; ties at a repeated maximum all count.
-type Base = Pick<TestQuestion, "id" | "objective" | "level" | "family" | "prompt" | "context" | "explanation">;
+type Base = Pick<TestQuestion, "id" | "objective" | "level" | "family" | "prompt" | "context" | "datasets" | "explanation">;
 const base = (id: string, family: string, prompt: string, explanation: string, context?: string): Base => ({
-  id, objective: id.split("-")[0], level: Number(id.split("-")[1]) <= 8 ? "foundation" : "application", family, prompt, explanation, context,
+  id, objective: id.split("-")[0], level: Number(id.split("-")[1]) <= 8 ? "foundation" : "application", family, prompt, explanation, context, datasets: questionDatasets[id],
 });
 const number = (id: string, family: string, prompt: string, correct: number, explanation: string, context?: string): TestQuestion => ({ ...base(id, family, prompt, explanation, context), type: "number", correct });
 const choice = (id: string, family: string, prompt: string, labels: readonly string[], correct: number, explanation: string, context?: string): TestQuestion => ({

@@ -7,13 +7,15 @@ import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
 import { LessonJourneyIntro, LessonNext, TransferCompletion } from "@/components/curriculum/lesson-journey";
 import styles from "./learning-page.module.css";
 
-export function LearningPage({ title, subtitle, children, rail }: {
+export function LearningPage({ title, subtitle, children, rail, appearance = "default", eyebrow = "Guided discovery" }: {
   title: string;
   subtitle: string;
   children: ReactNode;
   rail: ReactNode;
+  appearance?: "default" | "playful";
+  eyebrow?: string;
 }) {
-  return <main className={styles.page}>
+  return <main className={styles.page} data-appearance={appearance}>
     <nav className={styles.nav} aria-label="Playground navigation">
       <Link href="/" aria-label="AI Grounds home">AI Grounds</Link>
       <Link href="/" className={styles.allLessons}>← All lessons</Link>
@@ -21,11 +23,12 @@ export function LearningPage({ title, subtitle, children, rail }: {
     <div className={styles.layout}>
       <div className={styles.workbench}>
         <header className={styles.header}>
-          <p className={styles.eyebrow}>Guided discovery</p>
+          <p className={styles.eyebrow}>{eyebrow}</p>
           <h1>{title}</h1><p>{subtitle}</p>
         </header>
-        <LessonJourneyIntro />
+        {appearance === "default" && <LessonJourneyIntro />}
         {children}
+        {appearance === "playful" && <div className={styles.journey}><LessonJourneyIntro /></div>}
       </div>
       {rail}
     </div>

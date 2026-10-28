@@ -1,4 +1,10 @@
 export type TestOption = { id: string; label: string };
+export type QuestionDataset = {
+  label: string;
+  values: readonly (number | string)[];
+  /** Indices to emphasize without relying on color alone. */
+  emphasized?: readonly number[];
+};
 type QuestionBase = {
   id: string;
   objective: string;
@@ -6,6 +12,7 @@ type QuestionBase = {
   family: string;
   prompt: string;
   context?: string;
+  datasets?: readonly QuestionDataset[];
   explanation: string;
 };
 export type TestQuestion = QuestionBase & (

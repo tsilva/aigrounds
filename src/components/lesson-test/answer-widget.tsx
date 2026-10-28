@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { CheckIcon } from "@heroicons/react/24/solid";
 import { shuffled, type TestAnswer, type TestQuestion } from "@/lib/lesson-test";
 import styles from "./lesson-test.module.css";
 
@@ -10,16 +11,18 @@ export function AnswerWidget({ question, answer, seed, onChange }: {
   const id = useId();
   if (question.type === "choice" || question.type === "multiple") {
     const multiple = question.type === "multiple";
-    return <fieldset className={styles.choices}>
+    return <fieldset className={styles.choices} data-multiple={multiple}>
       <legend className={styles.fieldLegend}>{multiple ? "Select all that apply" : "Choose one answer"}</legend>
-      {shuffled(question.options, seed).map(option => <label key={option.id}>
+      {shuffled(question.options, seed).map((option, index) => <label key={option.id}>
         <input type={multiple ? "checkbox" : "radio"} name={id} value={option.id}
           checked={multiple ? Array.isArray(answer) && answer.includes(option.id) : answer === option.id}
           onChange={event => {
             if (!multiple) onChange(option.id);
             else { const selected = Array.isArray(answer) ? answer : []; onChange(event.target.checked ? [...selected, option.id] : selected.filter(value => value !== option.id)); }
           }} />
-        <span>{option.label}</span>
+        <span className={styles.choiceNumber} aria-hidden="true">{index + 1}</span>
+        <span className={styles.choiceText}>{option.label}</span>
+        <CheckIcon className={styles.choiceCheck} aria-hidden="true" />
       </label>)}
     </fieldset>;
   }

@@ -1,0 +1,65 @@
+.invitation { margin-top: 24px; padding-top: 22px; border-top: 1px solid #dfe4f4; color: #0c1230; }
+.invitation h3 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; }
+.invitation h3 svg { width: 20px; height: 20px; color: #236746; }
+.invitation p { margin-top: 8px; color: #536487; font-size: 13px; line-height: 1.6; }
+.primary, .secondary { font: inherit; min-height: 46px; border-radius: 7px; padding: 11px 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.primary { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; border: 1px solid #5031dc; background: #5031dc; color: #fff; }
+.primary svg { width: 18px; height: 18px; flex: none; }
+.primary:disabled { border-color: #dfe4f4; background: #f3f4f8; color: #66728a; cursor: default; }
+.invitation .primary { margin-top: 16px; }
+.secondary { border: 1px solid #9faec9; background: #fff; color: #0c1230; }
+.secondary:disabled { opacity: .45; cursor: default; }
+.dialog { position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: #f6f5ff; color: #0c1230; overflow-y: auto; overscroll-behavior: contain; font-family: var(--font-space-grotesk), sans-serif; }
+.dialog::backdrop { background: #fff; }
+.dialog *, .invitation * { box-sizing: border-box; }
+.dialog button, .dialog input { font: inherit; }
+.dialog :where(button,input,summary):focus-visible, .invitation button:focus-visible { outline: 3px solid #5031dc; outline-offset: 4px; }
+.nav { min-height: 64px; display: flex; align-items: center; gap: 24px; padding: 12px 32px; background: #fff; border-bottom: 1px solid #dfe4f4; }
+.nav > span { font-size: 22px; font-weight: 700; letter-spacing: -.04em; }
+.nav button { border: 0; border-left: 1px solid #dfe4f4; padding: 8px 0 8px 24px; background: transparent; color: #536487; font-size: 14px; cursor: pointer; }
+.content { width: min(100%, 700px); padding: 36px 32px 48px; margin: 0 auto; }
+.eyebrow { margin: 0 0 18px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .065em; color: #5031dc; }
+.content h1 { font-size: 28px; font-weight: 700; line-height: 1.25; letter-spacing: -.04em; margin: 0 0 24px; }
+.content h1:focus { outline: none; }
+.intro { color: #536487; font-size: 16px; line-height: 1.7; margin: 0 0 24px; }
+.rules { list-style: disc; padding-left: 22px; margin: 20px 0 28px; font-size: 15px; line-height: 1.8; color: #536487; }
+.progressLabel { display: flex; justify-content: space-between; gap: 16px; color: #536487; font-size: 12px; margin-bottom: 10px; }
+.progress { height: 6px; border-radius: 6px; overflow: hidden; background: #dfe4f4; margin-bottom: 32px; }
+.progress span { height: 100%; display: block; background: #5031dc; }
+.context { padding: 16px; border-radius: 7px; background: #ebe7ff; font-family: var(--font-ibm-plex-mono), monospace; font-size: 15px; line-height: 1.8; white-space: pre-line; overflow-wrap: anywhere; margin: 0 0 24px; }
+.choices { display: grid; gap: 10px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.fieldLegend { color: #536487; font-size: 13px; margin-bottom: 12px; }
+.choices label { display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px solid #dcdcef; border-radius: 7px; padding: 14px; font-size: 15px; line-height: 1.5; min-height: 50px; cursor: pointer; }
+.choices label:has(input:checked) { border-color: #7258e5; background: #eeebff; color: #372180; }
+.choices input { width: 18px; height: 18px; flex: none; margin: 2px 0 0; accent-color: #5031dc; }
+.field { display: grid; gap: 12px; font-size: 14px; font-weight: 600; }
+.field input, .range input[type="number"] { border: 1px solid #9faec9; border-radius: 7px; background: #fff; color: #0c1230; padding: 12px; min-height: 48px; min-width: 0; font-size: 16px; font-weight: 400; }
+.range label { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 14px; font-weight: 600; }
+.range input[type="number"] { width: 140px; }
+.range input[type="range"] { display: block; width: 100%; min-height: 44px; accent-color: #5031dc; margin-top: 16px; }
+.rangeEnds { display: flex; justify-content: space-between; color: #536487; font-size: 12px; }
+.small { color: #536487; font-size: 13px; line-height: 1.6; margin-top: 14px; }
+.actions { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding-top: 24px; margin-top: 28px; border-top: 1px solid #dfe4f4; }
+.questionNav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+.questionNav button { min-width: 44px; min-height: 44px; background: #fff; color: #536487; border: 1px solid #dfe4f4; border-radius: 7px; cursor: pointer; }
+.questionNav button[aria-current] { background: #5031dc; color: #fff; border-color: #5031dc; }
+.storageNote { border-top: 1px solid #dfe4f4; margin-top: 32px; padding-top: 18px; color: #536487; font-size: 12px; line-height: 1.6; }
+.score { font-size: 48px; font-weight: 700; line-height: 1.1; letter-spacing: -.04em; color: #5031dc; margin: 16px 0; }
+.score span { display: block; font-size: 14px; letter-spacing: 0; font-weight: 400; color: #536487; margin-top: 12px; }
+.objectives { margin: 24px 0; }
+.objectives > div { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid #dfe4f4; font-size: 14px; line-height: 1.5; }
+.objectives strong { flex: none; }
+.resultActions { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin: 24px 0 32px; }
+.review { border-top: 1px solid #dfe4f4; padding-top: 24px; }
+.review h2 { font-size: 20px; font-weight: 700; margin-bottom: 18px; }
+.review details { border-bottom: 1px solid #dfe4f4; padding: 15px 0; }
+.review summary { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; cursor: pointer; font-size: 14px; line-height: 1.6; }
+.review summary strong { color: #236746; font-size: 12px; flex: none; }
+.review summary strong[data-correct="false"] { color: #785008; }
+.review summary > span { flex: 1; }
+.review summary > svg { width: 16px; height: 16px; flex: none; color: #536487; }
+.review details[open] summary > svg { transform: rotate(180deg); }
+.review details > p { font-size: 14px; line-height: 1.7; margin-top: 14px; }
+.continue { margin-top: 24px; }
+@media (max-width: 767px) { .dialog { display: none; } }
+@media (max-width: 480px) { .content { padding: 28px 20px; } .nav { padding: 12px 20px; gap: 16px; } .nav button { padding-left: 16px; } .resultActions { grid-template-columns: 1fr; } }

@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "node -e \"const ua = process.env.npm_config_user_agent || ''; if (!ua.startsWith('pnpm/')) { console.error('Use pnpm for this repo.'); process.exit(1); }\"",
     "dev": "python3 scripts/infisical/run.py dev",
-    "build": "node scripts/check-curriculum.mjs && node scripts/prepare-ocr-assets.mjs && node scripts/update-playground-dates.mjs && node scripts/verify-provider-routing.mjs && next build",
+    "build": "node scripts/check-curriculum.mjs && node scripts/verify-lesson-tests.mjs && node scripts/prepare-ocr-assets.mjs && node scripts/update-playground-dates.mjs && node scripts/verify-provider-routing.mjs && next build",
     "check:cycles": "node scripts/check-import-cycles.mjs",
     "check:curriculum": "node scripts/check-curriculum.mjs",
     "start": "node scripts/dev-server.mjs next start",
@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit --pretty false",
     "test:deps": "node scripts/dependency-smoke.mjs",
     "check:bridges": "node scripts/verify-bridge-engines.mjs",
+    "check:tests": "node scripts/verify-lesson-tests.mjs",
     "dev:app": "node scripts/prepare-ocr-assets.mjs && node scripts/update-playground-dates.mjs && node scripts/dev-server.mjs next dev",
     "dev:secrets": "python3 scripts/infisical/run.py dev",
     "build:secrets": "python3 scripts/infisical/run.py build",

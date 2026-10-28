@@ -70,3 +70,7 @@ The Guide CTA opens the existing assistant. Do not add a second Guide launcher i
 - Store and refresh approved mockups, prompts, and manifests for material redesigns. Record explicit refinements such as removed redundant controls; generated chart marks are illustrative, not a numeric oracle.
 
 Async lessons can pass `disabled` to `LessonToolbar`, `LessonSelect`, `ExperimentChoices` and `GuidedExperiment` while current evidence is loading. Defaults preserve synchronous lessons; use native disabled states rather than silently discarding learner actions.
+
+## Lesson tests
+
+The reusable test presentation in `src/components/lesson-test/` uses the same navy text, indigo actions, lavender exercise surface, white choices, thin rules and 7px controls. A lesson opts in with its own versioned question bank and `TestInvitation` below the exercise, before the single Guide invitation. Do not add test actions to lessons without banks. `LessonTest` opens a native modal dialog that makes the workbench and assistant inactive while testing; the lesson owns opening and closing so its exploration state is preserved. The generic `AnswerWidget` handles radio choices, select-all, numeric/text blanks and a keyboard slider with an exact-value field. Feedback belongs to the submitted result, never the active questions. Tests follow the desktop-only policy for this release.

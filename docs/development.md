@@ -19,7 +19,7 @@ pnpm build
 
 `pnpm test:deps` exercises patched dependency security boundaries. There is no general-purpose test framework. CI also runs a dependency audit after a frozen-lockfile install with lifecycle scripts disabled.
 
-`pnpm check:tests` checks the first lesson's 48-question reservoir, independent arithmetic/counting answers, exact 100% grading, balanced sampling and repeat avoidance across 1,600 draws, and versioned progress recovery. It also runs before every production build, including CI. It loads the pure TypeScript modules with the existing TypeScript dependency; no test runner or additional package is required.
+`pnpm check:tests` checks the first lesson's 48-question reservoir, independent arithmetic/counting answers, exact 100% first-submission grading, immutable first answers through correction, mistake-queue completion and reload recovery, balanced sampling and repeat avoidance across 1,600 draws, and versioned progress recovery. It also runs before every production build, including CI. It loads the pure TypeScript modules with the existing TypeScript dependency; no test runner or additional package is required.
 
 The learning-design check validates every published lesson's shared shell and layout metadata, resolves CSS-module references, and rejects duplicated evidence styling and the obsolete monospace font token.
 

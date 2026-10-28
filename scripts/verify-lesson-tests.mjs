@@ -95,33 +95,99 @@ for (let seed = 0; seed < 100; seed++) {
   equal(seen.size, 48, "all 48 questions exposed over eight attempts");
 }
 
+const wrongAnswer = q => q.type === "choice" ? q.options.find(o => o.id !== q.correct).id : q.type === "multiple" ? q.options.map(o => o.id) : q.type === "text" ? "wrong" : String(q.type === "slider" ? (q.correct === q.min ? q.max : q.min) : 999);
+function checkAnswer(history, answer) {
+  const id = engine.currentTestQuestionId(history.active);
+  const draft = { ...history, active: { ...history.active, answers: { ...history.active.answers, [id]: answer } } };
+  const before = JSON.stringify(draft);
+  const checked = engine.checkTestAnswer(bank, draft);
+  equal(JSON.stringify(draft), before, "checking does not mutate the draft");
+  return checked;
+}
+function completeFirstPass(history, wrongIds = []) {
+  for (let index = 0; index < 6; index++) {
+    const id = engine.currentTestQuestionId(history.active);
+    equal(engine.advanceTest(bank, history, 2000), history, "cannot advance before checking an answer");
+    history = checkAnswer(history, wrongIds.includes(id) ? wrongAnswer(question(id)) : solution(question(id)));
+    equal(engine.checkTestAnswer(bank, history), history, "duplicate submit does not change first answers");
+    equal(engine.parseTestHistory(JSON.stringify(history), bank), history, "feedback and first answer survive reload");
+    history = engine.advanceTest(bank, history, 2000);
+  }
+  return history;
+}
 let history = engine.createTestAttempt(bank, engine.emptyTestHistory(bank), 12345, "attempt");
-history.active.answers = Object.fromEntries(history.active.questionIds.map(id => [id, solution(question(id))]));
-equal(engine.gradeTest(bank, history.active), { complete: true, correct: 6, total: 6, passed: true }, "100% passes");
 for (const id of history.active.questionIds) {
-  const altered = structuredClone(history); delete altered.active.answers[id];
+  const altered = structuredClone(history); altered.active.answers[id] = solution(question(id));
+  equal(engine.gradeTest(bank, altered.active).correct, 0, "unsubmitted drafts do not affect score");
   equal(engine.submitTest(bank, altered, 1000).active.submittedAt, undefined, "incomplete attempt cannot be submitted");
 }
-const failing = structuredClone(history);
-const selectedId = failing.active.questionIds[0];
-const selected = question(selectedId);
-failing.active.answers[selectedId] = selected.type === "choice" ? selected.options.find(o => o.id !== selected.correct).id : selected.type === "multiple" ? selected.options.map(o => o.id) : "999";
+const selectedId = history.active.questionIds[0];
+let failing = completeFirstPass(structuredClone(history), [selectedId]);
 equal(engine.gradeTest(bank, failing.active), { complete: true, correct: 5, total: 6, passed: false }, "5/6 does not pass");
-equal(engine.submitTest(bank, failing, 1000).passedAt, undefined, "a failed attempt cannot mark a pass");
-history = engine.submitTest(bank, history, 2000);
-equal(history.passedAt, 2000, "pass is recorded on submission");
+equal(failing.active.reviewIds, [selectedId], "mistakes return after the first six questions");
+equal(engine.submitTest(bank, failing, 1000), failing, "pending corrections must be practiced before finishing");
+const originalWrong = structuredClone(failing.active.firstAnswers[selectedId]);
+failing = checkAnswer(failing, wrongAnswer(question(selectedId)));
+failing = engine.advanceTest(bank, failing, 2500);
+equal(failing.active.reviewIds, [selectedId], "another wrong correction stays in the queue");
+failing = checkAnswer(failing, solution(question(selectedId)));
+equal(failing.active.firstAnswers[selectedId], originalWrong, "correction never overwrites the first submission");
+equal(engine.parseTestHistory(JSON.stringify(failing), bank), failing, "checked correction survives reload");
+failing = engine.advanceTest(bank, failing, 3000);
+equal(failing.active.submittedAt, 3000, "last corrected mistake completes the attempt");
+equal(engine.gradeTest(bank, failing.active).correct, 5, "corrected answers still score 5/6");
+equal(failing.passedAt, undefined, "correcting mistakes cannot turn a failed test into a pass");
+history = completeFirstPass(history);
+equal(engine.gradeTest(bank, history.active), { complete: true, correct: 6, total: 6, passed: true }, "six correct first submissions pass");
+equal(history.passedAt, 2000, "pass is recorded after final feedback continuation");
 equal(engine.submitTest(bank, history, 3000), history, "submission is idempotent");
-const later = { ...failing, passedAt: history.passedAt, best: 6 };
-equal(engine.submitTest(bank, later, 4000).passedAt, 2000, "later failure does not revoke earlier pass");
+let later = engine.createTestAttempt(bank, history, 12345, "later");
+later = completeFirstPass(later, [later.active.questionIds[0]]);
+later = checkAnswer(later, solution(question(engine.currentTestQuestionId(later.active))));
+later = engine.advanceTest(bank, later, 4000);
+equal(later.passedAt, 2000, "later failure does not revoke earlier pass");
 equal(engine.parseTestHistory(JSON.stringify(history), bank), history, "submitted attempt survives reload");
-const resume = engine.createTestAttempt(bank, history, 54321, "resume");
-resume.active.index = 2;
-resume.active.answers[resume.active.questionIds[0]] = solution(question(resume.active.questionIds[0]));
+let resume = engine.createTestAttempt(bank, history, 54321, "resume");
+resume = checkAnswer(resume, solution(question(engine.currentTestQuestionId(resume.active))));
+resume = engine.advanceTest(bank, resume, 5000);
 equal(engine.parseTestHistory(JSON.stringify(resume), bank), resume, "partial answers, seed and current question survive reload");
+const legacyDraft = structuredClone(resume);
+delete legacyDraft.active.firstAnswers; delete legacyDraft.active.checked;
+legacyDraft.active.index = 5;
+const migrated = engine.parseTestHistory(JSON.stringify(legacyDraft), bank);
+equal(migrated.active.index, 0, "legacy free-navigation drafts restart at question one");
+equal(migrated.active.answers, legacyDraft.active.answers, "migration preserves draft answers");
+equal(migrated.active.firstAnswers, {}, "old drafts have no first submissions yet");
+const legacyResult = structuredClone(history);
+delete legacyResult.active.firstAnswers; delete legacyResult.active.checked; delete legacyResult.active.reviewIds;
+equal(engine.gradeTest(bank, engine.parseTestHistory(JSON.stringify(legacyResult), bank).active).passed, true, "legacy submitted results retain their score");
+let twoMistakes = engine.createTestAttempt(bank, engine.emptyTestHistory(bank), 431, "two");
+const mistakes = twoMistakes.active.questionIds.slice(0, 2);
+twoMistakes = completeFirstPass(twoMistakes, mistakes);
+twoMistakes = engine.advanceTest(bank, checkAnswer(twoMistakes, wrongAnswer(question(mistakes[0]))), 6000);
+equal(twoMistakes.active.reviewIds, [mistakes[1], mistakes[0]], "failed practice moves behind other mistakes");
+for (let i = 0; i < 2; i++) twoMistakes = engine.advanceTest(bank, checkAnswer(twoMistakes, solution(question(engine.currentTestQuestionId(twoMistakes.active)))), 6000);
+equal(engine.gradeTest(bank, twoMistakes.active).correct, 4, "multiple corrections preserve 4/6 first-answer accuracy");
+const multi = bank.questions.find(q => q.type === "multiple");
+let copyProbe = engine.createTestAttempt(bank, engine.emptyTestHistory(bank), 77, "copy");
+copyProbe.active.questionIds[0] = multi.id;
+const input = solution(multi);
+copyProbe = checkAnswer(copyProbe, input);
+input.pop();
+equal(copyProbe.active.firstAnswers[multi.id], solution(multi), "first multiple-select response is copied independently");
 for (const raw of ["bad json", "null", "{}", JSON.stringify({ ...history, version: 999 })]) equal(engine.parseTestHistory(raw, bank), engine.emptyTestHistory(bank), "invalid or different-version storage resets safely");
 for (const mutate of [a => a.questionIds.fill(a.questionIds[0]), a => a.questionIds[0] = "unknown", a => a.index = 99]) {
   const broken = structuredClone(history); mutate(broken.active);
   equal(engine.parseTestHistory(JSON.stringify(broken), bank).active, undefined, "corrupt active attempt is discarded");
+}
+for (const mutate of [
+  a => { a.reviewIds = ["unknown"]; },
+  a => { a.reviewIds = [a.questionIds[0]]; },
+  a => { delete a.submittedAt; a.reviewIds = []; },
+  a => { a.firstAnswers = []; },
+]) {
+  const broken = structuredClone(history); mutate(broken.active);
+  equal(engine.parseTestHistory(JSON.stringify(broken), bank).active, undefined, "corrupt correction state is discarded without trapping the learner");
 }
 const forged = structuredClone(history.active); forged.questionIds.fill(forged.questionIds[0]);
 equal(engine.gradeTest(bank, forged).passed, false, "duplicate IDs cannot create a pass");

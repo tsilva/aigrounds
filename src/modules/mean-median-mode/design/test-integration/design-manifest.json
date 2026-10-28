@@ -11,7 +11,9 @@
   "approvedRefinements": [
     "Use Take the test instead of Check my understanding",
     "Draw six questions from 48 authored questions, balanced across mean, median and mode",
-    "Only a complete 100% attempt passes; show explanations after submission",
+    "Only 100% on first submissions passes; show immediate feedback and explanations after each Submit answer",
+    "Return mistakes for correction at the end without changing first-answer accuracy",
+    "Remove Back, numbered question navigation, deferred-grading note and saved-progress footer",
     "Preserve exploration state with a focused native dialog and reusable answer widgets",
     "Prefer unseen items and avoid frequent repeats and adjacent question families",
     "Keep tests desktop-only for now, as explicitly selected by the user",

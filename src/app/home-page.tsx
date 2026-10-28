@@ -262,6 +262,7 @@ function PlaygroundTile({ playground, now, pathId, progress }: { playground: Hom
         {playground.outcome}.
       </p>
       <p className="mt-3 text-xs text-slate-500">{playground.duration}</p>
+      {progress.testPasses[playground.slug] && <p className="mt-2 text-xs font-semibold text-emerald-700!">Test passed · 100%</p>}
       {checked > 0 ? <p className="mt-2 text-xs font-medium text-indigo-700!">{checked}/{chapters.length} transfer checks explained</p> : reviewedCount > 0 ? <p className="mt-2 text-xs text-slate-500">{chapters.length > 1 ? `${reviewedCount}/${chapters.length} chapters marked reviewed` : "Marked reviewed"}</p> : chapters.some(slug => progress.visited.includes(slug)) ? <p className="mt-2 text-xs text-slate-500">Visited</p> : null}
       {!isComingSoon ? (
         <p className="mt-auto pt-4 font-mono text-xs text-slate-500">

@@ -21,6 +21,8 @@ The [planned curriculum](docs/curriculum.md#planned-curriculum-from-aiml-noteboo
 
 Lessons show prerequisites, chapter links and a path-aware next step. Visits, self-reported review and explained transfer checks are saved separately in this browser, with delayed recall practice; no account is required. Many lessons guide you through **Predict → Try → Explain**, with an optional AI Guide in the experiment rail. Use a desktop or laptop: screens below 768 pixels show a notice instead of the playgrounds. See the [curriculum](docs/curriculum.md) for the core, path map, chapter consolidations and bridge lessons.
 
+The first lesson, **Mean, Median & Mode**, also offers **Take the test** in its experiment rail. Each attempt draws six questions from a 48-question bank, covering mean, median and mode with one foundation and one application question each. Only 100% passes. Answers remain editable until submission; explanations appear afterward. Retakes prefer unseen questions, avoid the previous three attempts when possible, and vary question families and choice order. Attempts and passed status are saved separately in this browser; they do not turn visits or self-reported review into test passes. Tests are desktop-only for now. See [lesson tests](docs/lessons.md#lesson-tests) for the question-bank and progress rules.
+
 ## Install
 
 Use Node.js 24 (the CI version) and pnpm 10.27.0.
@@ -43,6 +45,7 @@ pnpm lint             # run ESLint
 pnpm check:cycles     # check for import cycles
 pnpm check:curriculum # validate lesson plans, paths and prerequisites
 pnpm check:bridges    # verify the five bridge engines independently
+pnpm check:tests      # verify lesson-test scoring, coverage and question rotation
 pnpm test:deps        # check patched dependency security boundaries
 ```
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { LessonTest, TestInvitation } from "@/components/lesson-test/lesson-test";
+import { meanMedianModeTestBank } from "./test-bank";
 import { NumberLinePoint, useNumberLineLayout } from "@/components/learning-page/number-line-controls";
 import { pointLanes } from "@/lib/number-line";
 import { DatasetHeading, ExperimentButton, ExperimentChoices, ExperimentRail, ExperimentResult, LearningPage, LessonSummaries, LessonToolbar, PointValueEditor } from "@/components/learning-page/learning-page";
@@ -14,6 +16,12 @@ const ticks = [0, 25, 50, 75, 100];
 const colors = { mean: "#1760db", median: "#5031dc", mode: "#976000" };
 const formatValue = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1);
 const position = (value: number) => ({ left: `${value}%` });
+const testNavigationEvent = "aigrounds-test-navigation";
+function subscribeTestLocation(notify: () => void) {
+  window.addEventListener("popstate", notify);
+  window.addEventListener(testNavigationEvent, notify);
+  return () => { window.removeEventListener("popstate", notify); window.removeEventListener(testNavigationEvent, notify); };
+}
 
 function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
   points: DataPoint[]; analysis: TypicalValuesAnalysis; selectedId: string;
@@ -59,9 +67,9 @@ function Summaries({ analysis }: { analysis: TypicalValuesAnalysis }) {
     ]} />;
 }
 
-function TypicalExperiment({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext }: {
+function TypicalExperiment({ experiment, points, preset, prediction, explanation, onPredict, onExplain, onNext, onTest }: {
   experiment: LearningExperiment; points: DataPoint[]; preset: TypicalPreset; prediction: string | null; explanation: string | null;
-  onPredict: (id: string) => void; onExplain: (id: string) => void; onNext: () => void;
+  onPredict: (id: string) => void; onExplain: (id: string) => void; onNext: () => void; onTest: () => void;
 }) {
   const reachedTarget = prediction !== null && isExperimentDataset(points, preset, experiment);
   const complete = reachedTarget && explanation === experiment.correctExplanation;
@@ -85,10 +93,12 @@ function TypicalExperiment({ experiment, points, preset, prediction, explanation
       </>}
       {complete && <ExperimentResult>{experiment.takeaway}</ExperimentResult>}
       {complete && <ExperimentButton arrow onClick={onNext}>Try another dataset</ExperimentButton>}
+      <TestInvitation bank={meanMedianModeTestBank} onOpen={onTest} />
     </ExperimentRail>;
 }
 
 export function MeanMedianModePlayground() {
+  const testing = useSyncExternalStore(subscribeTestLocation, () => new URLSearchParams(window.location.search).get("test") === "1", () => false);
   const [preset, setPreset] = useState(initialTypicalPreset);
   const [points, setPoints] = useState(() => pointsForPreset(initialTypicalPreset));
   const [selectedId, setSelectedId] = useState("point-9");
@@ -106,10 +116,17 @@ export function MeanMedianModePlayground() {
     if (points.find((point) => point.id === id)?.value === clampValue(value)) return;
     setPoints((current) => movePoint(current, id, value)); setExplanation(null);
   }
-  return <LearningPage title="Mean, Median & Mode" subtitle="Move one point. Watch three ideas of typical change."
+  function showTest(open: boolean) {
+    const url = new URL(window.location.href);
+    if (open) url.searchParams.set("test", "1");
+    else url.searchParams.delete("test");
+    window.history.pushState(null, "", url.pathname + url.search + url.hash);
+    window.dispatchEvent(new Event(testNavigationEvent));
+  }
+  return <><LearningPage title="Mean, Median & Mode" subtitle="Move one point. Watch three ideas of typical change."
     rail={<TypicalExperiment experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
       setPrediction(id); setExplanation(null); setPoints(pointsForPreset(preset)); setSelectedId(preset.id === "repeated-peak" ? "point-1" : "point-9");
-    }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} />}>
+    }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} onTest={() => showTest(true)} />}>
         <LessonToolbar scenarios={typicalPresets} selectedId={preset.id}
       onSelect={(id) => reset(typicalPresets.find((item) => item.id === id)!)} onReset={() => reset()} />
         <DatasetChart points={points} analysis={analysis} selectedId={selectedId} onSelect={setSelectedId} onMove={move} />
@@ -120,5 +137,5 @@ export function MeanMedianModePlayground() {
         </section>
         <Summaries analysis={analysis} />
         <p className={sharedStyles.liveUpdate} role="status" aria-live="polite" aria-atomic="true">Mean {analysis.mean.toFixed(1)}; median {formatValue(analysis.median)}; {analysis.modeValues.length ? `mode ${analysis.modeValues.join(", ")}, each appearing ${analysis.modeFrequency} times` : "no mode: no values repeat"}.</p>
-  </LearningPage>;
+  </LearningPage>{testing && <LessonTest bank={meanMedianModeTestBank} onClose={() => showTest(false)} />}</>;
 }

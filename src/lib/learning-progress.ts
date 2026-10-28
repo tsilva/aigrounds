@@ -9,9 +9,10 @@ export type LearningProgress = {
   visited: string[];
   reviewed: string[];
   transfers: Record<string, number>;
+  testPasses: Record<string, number>;
   last?: { slug: string; path?: string };
 };
-const emptyProgress: LearningProgress = { visited: [], reviewed: [], transfers: {} };
+const emptyProgress: LearningProgress = { visited: [], reviewed: [], transfers: {}, testPasses: {} };
 let memorySnapshot = "";
 
 export function parseLearningProgress(raw: string): LearningProgress {
@@ -27,8 +28,14 @@ export function parseLearningProgress(raw: string): LearningProgress {
         if (/^[a-z0-9-]+$/.test(slug) && typeof time === "number" && Number.isFinite(time) && time > 0) transfers[slug] = time;
       }
     }
+    const testPasses: Record<string, number> = {};
+    if (p.testPasses && typeof p.testPasses === "object") {
+      for (const [slug, time] of Object.entries(p.testPasses)) {
+        if (/^[a-z0-9-]+$/.test(slug) && typeof time === "number" && Number.isFinite(time) && time > 0) testPasses[slug] = time;
+      }
+    }
     const last = p.last && typeof p.last === "object" ? p.last as Record<string, unknown> : undefined;
-    return { visited: slugs(p.visited), reviewed: slugs(p.reviewed), transfers,
+    return { visited: slugs(p.visited), reviewed: slugs(p.reviewed), transfers, testPasses,
       last: typeof last?.slug === "string" && /^[a-z0-9-]+$/.test(last.slug)
         ? { slug: last.slug, path: typeof last.path === "string" && getLearningPath(last.path) ? last.path : undefined } : undefined };
   } catch { return emptyProgress; }
@@ -48,13 +55,14 @@ function subscribe(onChange: () => void) {
 export function useLearningProgress() {
   return parseLearningProgress(useSyncExternalStore(subscribe, readSnapshot, () => ""));
 }
-export function recordLearningProgress(slug: string, kind: "visited" | "reviewed" | "transfer", path?: string) {
+export function recordLearningProgress(slug: string, kind: "visited" | "reviewed" | "transfer" | "test", path?: string) {
   const progress = parseLearningProgress(readSnapshot());
-  const next = { ...progress, last: { slug, path: getLearningPath(path)?.id } };
+  const next = { ...progress, last: kind === "test" ? progress.last : { slug, path: getLearningPath(path)?.id } };
   if (kind === "visited") next.visited = [...new Set([...progress.visited, slug])];
   if (kind === "reviewed") next.reviewed = [...new Set([...progress.reviewed, slug])];
   // Revisiting a completed result must not reset the delayed-review clock.
   if (kind === "transfer" && !progress.transfers[slug]) next.transfers = { ...progress.transfers, [slug]: Date.now() };
+  if (kind === "test" && !progress.testPasses[slug]) next.testPasses = { ...progress.testPasses, [slug]: Date.now() };
   const serialized = JSON.stringify(next);
   if (serialized === readSnapshot()) return;
   memorySnapshot = serialized;

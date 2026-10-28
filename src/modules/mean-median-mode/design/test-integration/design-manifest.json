@@ -1,0 +1,21 @@
+{
+  "lessonPlanStep": 1,
+  "title": "Mean, Median & Mode test integration",
+  "slug": "mean-median-mode",
+  "modulePath": "src/modules/mean-median-mode",
+  "acceptedMockupPath": "src/modules/mean-median-mode/design/test-integration/accepted-mockup.png",
+  "promptPath": "src/modules/mean-median-mode/design/test-integration/imagegen-prompt.md",
+  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a18308-a973-7ad3-8306-c8afd629cd5d/exec-0827fa01-e5a1-4e13-8d27-19f666194baf.png",
+  "designSystem": "DESIGN_SYSTEM.md",
+  "approval": "User approved implementation and deployment of the first lesson test after reviewing the integration mockup and the 100% pass / question-reservoir requirements.",
+  "approvedRefinements": [
+    "Use Take the test instead of Check my understanding",
+    "Draw six questions from 48 authored questions, balanced across mean, median and mode",
+    "Only a complete 100% attempt passes; show explanations after submission",
+    "Preserve exploration state with a focused native dialog and reusable answer widgets",
+    "Prefer unseen items and avoid frequent repeats and adjacent question families",
+    "Keep tests desktop-only for now, as explicitly selected by the user",
+    "Preserve the original main lesson mockup; this reference covers only the added test integration",
+    "Raster chart marks are illustrative; retained lesson geometry comes from its engine"
+  ]
+}

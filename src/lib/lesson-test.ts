@@ -30,6 +30,10 @@ export type TestAttempt = {
   answers: Record<string, TestAnswer>;
   index: number;
   submittedAt?: number;
+  firstAnswers?: Record<string, TestAnswer>;
+  checked?: boolean;
+  // Undefined during the first pass; a queue during mistake practice.
+  reviewIds?: string[];
 };
 export type TestHistory = {
   version: number;
@@ -108,7 +112,40 @@ export function createTestAttempt(bank: TestBank, history: TestHistory, seed: nu
   const started = history.started + 1;
   return { ...history, started, seen: { ...history.seen, ...Object.fromEntries(questionIds.map(id => [id, started])) },
     recent: [questionIds, ...history.recent].slice(0, 3),
-    active: { id, seed, questionIds, answers: {}, index: 0 } };
+    active: { id, seed, questionIds, answers: {}, firstAnswers: {}, checked: false, index: 0 } };
+}
+export const testFirstAnswer = (attempt: TestAttempt, id: string) => (attempt.firstAnswers ?? attempt.answers)[id];
+export const currentTestQuestionId = (attempt: TestAttempt) => attempt.reviewIds ? attempt.reviewIds[0] : attempt.questionIds[attempt.index];
+export function checkTestAnswer(bank: TestBank, history: TestHistory): TestHistory {
+  const a = history.active;
+  if (!a || a.submittedAt || a.checked) return history;
+  const id = currentTestQuestionId(a);
+  const q = bank.questions.find(q => q.id === id);
+  const answer = a.answers[id];
+  if (!q || !isTestAnswerComplete(q, answer)) return history;
+  // Copy multi-select arrays so correction cannot mutate the scored response.
+  const firstAnswers = { ...a.firstAnswers };
+  if (firstAnswers[id] === undefined) firstAnswers[id] = Array.isArray(answer) ? [...answer] : answer!;
+  return { ...history, active: { ...a, firstAnswers, checked: true } };
+}
+export function advanceTest(bank: TestBank, history: TestHistory, now: number): TestHistory {
+  const a = history.active;
+  if (!a || a.submittedAt || !a.checked) return history;
+  if (a.reviewIds) {
+    const [id, ...remaining] = a.reviewIds;
+    const q = bank.questions.find(q => q.id === id);
+    if (!q) return history;
+    if (!isTestAnswerCorrect(q, a.answers[id])) remaining.push(id);
+    const next = { ...history, active: { ...a, reviewIds: remaining, checked: false } };
+    return remaining.length ? next : submitTest(bank, next, now);
+  }
+  if (a.index < a.questionIds.length - 1) return { ...history, active: { ...a, index: a.index + 1, checked: false } };
+  const reviewIds = a.questionIds.filter(id => {
+    const q = bank.questions.find(q => q.id === id)!;
+    return !isTestAnswerCorrect(q, testFirstAnswer(a, id));
+  });
+  const next = { ...history, active: { ...a, reviewIds, checked: false } };
+  return reviewIds.length ? next : submitTest(bank, next, now);
 }
 export function gradeTest(bank: TestBank, attempt: TestAttempt) {
   const expected = bank.objectives.length * questionsPerObjective;
@@ -116,12 +153,13 @@ export function gradeTest(bank: TestBank, attempt: TestAttempt) {
   const balanced = bank.objectives.every(objective => ["foundation", "application"].every(level =>
     questions.filter(q => q?.objective === objective.id && q.level === level).length === 1));
   const valid = attempt.questionIds.length === expected && new Set(attempt.questionIds).size === expected && balanced;
-  const complete = valid && questions.every(q => q && isTestAnswerComplete(q, attempt.answers[q.id]));
-  const correct = questions.filter(q => q && isTestAnswerCorrect(q, attempt.answers[q.id])).length;
+  const complete = valid && questions.every(q => q && isTestAnswerComplete(q, testFirstAnswer(attempt, q.id)));
+  const correct = questions.filter(q => q && isTestAnswerCorrect(q, testFirstAnswer(attempt, q.id))).length;
   return { complete, correct, total: expected, passed: complete && correct === expected };
 }
 export function submitTest(bank: TestBank, history: TestHistory, now: number): TestHistory {
   if (!history.active || history.active.submittedAt) return history;
+  if (history.active.firstAnswers && (!history.active.reviewIds || history.active.reviewIds.length)) return history;
   const result = gradeTest(bank, history.active);
   if (!result.complete) return history;
   return { ...history, active: { ...history.active, submittedAt: now }, best: Math.max(history.best, result.correct),
@@ -142,7 +180,6 @@ export function parseTestHistory(raw: string, bank: TestBank): TestHistory {
     if (!a || typeof a.id !== "string" || a.id.length > 100 || !Number.isInteger(a.seed) || !Array.isArray(a.questionIds)
       || !Number.isInteger(a.index) || a.index < 0 || a.index >= bank.objectives.length * questionsPerObjective
       || !a.answers || typeof a.answers !== "object" || Array.isArray(a.answers)) return result;
-    const probe = { ...a, answers: {} };
     // A blank attempt must still have the exact, balanced set of known items.
     const questions = a.questionIds.map(id => bank.questions.find(q => q.id === id));
     if (a.questionIds.length !== bank.objectives.length * questionsPerObjective || new Set(a.questionIds).size !== a.questionIds.length
@@ -152,7 +189,29 @@ export function parseTestHistory(raw: string, bank: TestBank): TestHistory {
       const answer = a.answers[question!.id];
       if (typeof answer === "string" && answer.length <= 200 || Array.isArray(answer) && answer.length <= 20 && answer.every(item => typeof item === "string" && item.length < 100)) answers[question!.id] = answer;
     }
-    result.active = { ...probe, answers, submittedAt: typeof a.submittedAt === "number" && Number.isFinite(a.submittedAt) && a.submittedAt > 0 ? a.submittedAt : undefined };
+    const submittedAt = typeof a.submittedAt === "number" && Number.isFinite(a.submittedAt) && a.submittedAt > 0 ? a.submittedAt : undefined;
+    result.active = { id: a.id, seed: a.seed, questionIds: a.questionIds, index: a.index, answers, submittedAt };
+    if (a.firstAnswers !== undefined) {
+      if (!a.firstAnswers || typeof a.firstAnswers !== "object" || Array.isArray(a.firstAnswers)) { result.active = undefined; return result; }
+      const firstAnswers = Object.fromEntries(questions.filter(q => isTestAnswerComplete(q!, a.firstAnswers![q!.id])).map(q => [q!.id, a.firstAnswers![q!.id]]));
+      result.active.firstAnswers = firstAnswers;
+      const missing = a.questionIds.findIndex(id => firstAnswers[id] === undefined);
+      if (a.reviewIds !== undefined) {
+        if (missing !== -1 || !Array.isArray(a.reviewIds) || new Set(a.reviewIds).size !== a.reviewIds.length
+          || !a.reviewIds.length && !submittedAt || submittedAt && a.reviewIds.length > 0
+          || a.reviewIds.some(id => !a.questionIds.includes(id) || isTestAnswerCorrect(bank.questions.find(q => q.id === id)!, firstAnswers[id]))) {
+          result.active = undefined; return result;
+        }
+        result.active.reviewIds = a.reviewIds;
+      } else if (missing !== -1) result.active.index = Math.min(a.index, missing);
+      const currentId = currentTestQuestionId(result.active);
+      const currentQuestion = bank.questions.find(q => q.id === currentId);
+      result.active.checked = a.checked === true && firstAnswers[currentId] !== undefined && Boolean(currentQuestion && isTestAnswerComplete(currentQuestion, answers[currentId]));
+    } else if (!submittedAt) {
+      // Legacy drafts had free navigation and no graded submissions. Keep their
+      // draft answers and start the first-submission flow at question one.
+      result.active = { ...result.active, index: 0, firstAnswers: {}, checked: false };
+    }
     if (result.active.submittedAt && !gradeTest(bank, result.active).complete) result.active = undefined;
     return result;
   } catch { return empty; }

@@ -2,7 +2,7 @@
 
 The [live gallery](https://aigrounds.tsilva.eu) is the current catalog of published and planned lessons. Published lessons open directly; planned lessons are marked coming soon.
 
-The gallery opens on the 20-step recommended AI core. Select a specialist learning path, Browse all lessons or Explore & reference; searching covers all lessons, including chapter titles. Five paired entries provide chapter links while preserving every original playground URL. Path-aware continuation stays within the selected path and explicitly identifies planned gaps. See [Curriculum](curriculum.md) for the sequence and bridge lessons.
+The gallery opens on the 20-step recommended AI core. Select a specialist learning path, Browse all lessons or Explore & reference; searching covers all lessons, including chapter titles. Five paired entries provide chapter links while preserving every original playground URL. Choose the next lesson or a different path from the gallery. Experiment rails end after the AI Guide invitation; they do not include a review button, next-lesson link or path chooser. See [Curriculum](curriculum.md) for the sequence and bridge lessons.
 
 Browser-local progress distinguishes visits, self-reported review and successfully explained transfer checks. Continue resumes the last chapter; delayed recall prompts invite revisiting explained material without claiming general mastery. AI Guide use remains optional.
 

@@ -51,6 +51,8 @@ Connect every `NumberLinePoint`'s `helpId` to the editor's instruction ID and pa
 6. Supporting construction evidence follows the editor, separated by horizontal rules. Summary values follow in open columns with subtle vertical dividers, not nested cards.
 7. The rail contains an experiment count, a compact title, numbered “Predict → Try → Explain” progress, prediction/action/explanation controls, feedback, and the “Talk it through” Guide CTA below the exercise.
 
+Every lesson’s experiment rail ends with the Guide invitation. Do not append free-exploration status text, a self-review action, next-lesson navigation, a path chooser or the former continuation footer. Lesson selection and path navigation remain on the dashboard.
+
 The Guide CTA opens the existing assistant. Do not add a second Guide launcher in the top navigation. Existing pages without an experiment rail retain the assistant shell's bottom-right launcher until redesigned.
 
 ## Visual tokens and hierarchy

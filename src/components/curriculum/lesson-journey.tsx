@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, type ReactNode } from "react";
-import { canonicalLessonSlug, getLessonGroup, getLessonPath, lessonHref, lessonPrerequisites, learningPaths } from "@/lib/curriculum";
-import { recordLearningProgress, useLearningProgress } from "@/lib/learning-progress";
+import { canonicalLessonSlug, getLessonGroup, getLessonPath, lessonHref, lessonPrerequisites } from "@/lib/curriculum";
+import { recordLearningProgress } from "@/lib/learning-progress";
 
 export type JourneyLesson = { slug: string; title: string; live: boolean };
 type Journey = { slug: string; pathId?: string; lessons: readonly JourneyLesson[] };
@@ -53,35 +53,4 @@ export function TransferCompletion() {
   const journey = useContext(JourneyContext);
   useEffect(() => { if (journey) recordLearningProgress(journey.slug, "transfer", journey.pathId); }, [journey]);
   return null;
-}
-
-export function LessonNext({ transfer = false }: { transfer?: boolean }) {
-  const journey = useContext(JourneyContext);
-  const progress = useLearningProgress();
-  if (!journey) return null;
-  const { slug, pathId, lessons } = journey;
-  const group = getLessonGroup(slug);
-  const chapter = group?.chapters.findIndex(item => item === slug) ?? -1;
-  const path = getLessonPath(slug, pathId);
-  const nextChapter = group?.chapters[chapter + 1];
-  const pathIndex = path?.lessons.indexOf(canonicalLessonSlug(slug)) ?? -1;
-  const nextSlug = nextChapter ?? path?.lessons[pathIndex + 1];
-  const next = lessons.find(item => item.slug === nextSlug);
-  const reviewed = progress.reviewed.includes(slug);
-  const checked = Boolean(progress.transfers[slug]);
-  const checkedChapters = group?.chapters.filter(item => progress.transfers[item]).length;
-  const laterLiveSlug = !next?.live && path ? path.lessons.slice(pathIndex + 1).find(item => lessons.some(lesson => lesson.slug === item && lesson.live)) : undefined;
-  const later = lessons.find(item => item.slug === laterLiveSlug);
-  return <section aria-label={transfer ? "Continue after transfer" : "Continue learning"} className="mt-5 border-t border-[#dfe4f4] pt-4 text-sm text-[#536487]">
-    <p>{checked ? "Transfer check explained" : reviewed ? "Marked reviewed" : "Explore freely or continue when ready"}{group && checkedChapters ? ` · ${checkedChapters}/${group.chapters.length} chapter checks explained` : ""}.</p>
-    {!transfer && !reviewed && <button type="button" className="mt-2 rounded border border-indigo-200 px-3 py-2 text-indigo-700!" onClick={() => recordLearningProgress(slug, "reviewed", pathId)}>Mark this chapter reviewed</button>}
-    {next?.live ? <Link href={lessonHref(next.slug, pathId)} className="mt-3 block font-semibold text-indigo-700! underline! underline-offset-2">
-      {nextChapter ? "Next chapter" : "Next lesson"}: {nextChapter ? next.title : getLessonGroup(next.slug)?.title ?? next.title} →
-    </Link> : next ? <>
-      <p className="mt-3">Next: {next.title} — coming soon.</p>
-      {later && <Link href={lessonHref(later.slug, pathId)} className="mt-2 block text-indigo-700! underline! underline-offset-2">Skip this planned step and explore {getLessonGroup(later.slug)?.title ?? later.title} →</Link>}
-    </> : <p className="mt-3">{path ? "You have reached the end of this path. " : ""}<Link href="/" className="text-indigo-700! underline! underline-offset-2">Choose another path →</Link></p>}
-    {!transfer && <details className="mt-3"><summary className="cursor-pointer">Choose a different path</summary><div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">{learningPaths.filter(item => item.lessons.includes(canonicalLessonSlug(slug))).map(item => <Link key={item.id} href={lessonHref(slug, item.id)} className="text-indigo-700! underline! underline-offset-2" aria-current={item.id === pathId ? "page" : undefined}>{item.title}</Link>)}</div></details>}
-    {!transfer && <p className="mt-3 text-xs">Visits, self-reported review and explained transfer checks are saved separately in this browser. No account needed.</p>}
-  </section>;
 }

@@ -14,7 +14,7 @@
     "Opt into the shared playful presentation for this lesson; preserve other lessons and all existing experiments.",
     "Keep one Guide CTA in the experiment rail; use a secondary outlined lesson-test action.",
     "Use the matching quiz visual style while retaining authored question content, rotation, native inputs, first-answer scoring and saved progress.",
-    "Preserve learning-path context below the workbench and continuation below the Guide."
+    "Preserve learning-path context below the workbench. Per the subsequent user annotation, remove the continuation footer below the Guide from all lessons."
   ],
   "quizMockupPath": "src/modules/mean-median-mode/design/accepted-quiz-mockup.png",
   "quizSourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a18396-5855-75a0-b3d5-7b104b9b3b24/exec-b86de5ec-2eb8-4790-aeb6-c0b2c9f1d3ca.png"

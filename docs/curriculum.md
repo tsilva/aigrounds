@@ -11,10 +11,12 @@ defines published versus planned status.
 - Global search, Browse all, 28 specialist main paths and 16 optional branches alongside
   the core. Regression is core step 5 and gradient descent is step 6.
 - Optional prerequisite refreshers appear within lessons.
-- Path-aware next links, explicit skips over planned steps, chapter links and
-  browser-local progress. No account is required.
-- Visits, self-reported reviews and successful **explicit transfer checks** are
-  separate records. Regular experiment completion does not establish transfer.
+- The dashboard owns path selection and lesson navigation. Lessons retain chapter
+  links and prerequisite refreshers; experiment rails end at the AI Guide invitation
+  without a continuation or review footer. No account is required.
+- Visits, existing self-reported reviews and successful **explicit transfer checks**
+  are separate records. Existing review history is retained after removing the
+  lesson-footer review control. Regular experiment completion does not establish transfer.
   Lessons without an explicit transfer result do not produce a transfer record.
 - After a day, completed transfer chapters offer a recall prompt tied to that
   chapter's learning goal. These prompts invite practice; they do not grade or

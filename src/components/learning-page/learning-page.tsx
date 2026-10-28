@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowPathIcon, ArrowRightIcon, ChatBubbleLeftRightIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { useId, useState, type CSSProperties, type ReactNode, type Ref } from "react";
 import { useOpenPlaygroundAssistant } from "@/lib/playground-assistant-context";
-import { LessonJourneyIntro, LessonNext, TransferCompletion } from "@/components/curriculum/lesson-journey";
+import { LessonJourneyIntro, TransferCompletion } from "@/components/curriculum/lesson-journey";
 import styles from "./learning-page.module.css";
 
 export function LearningPage({ title, subtitle, children, rail, appearance = "default", eyebrow = "Guided discovery" }: {
@@ -96,7 +96,6 @@ export function ExperimentRail({ label, title, phase, children }: {
     {phase !== undefined && <ExperimentProgress phase={phase} />}
     <div className={styles.exercise}>{children}</div>
     <GuideInvitation />
-    <LessonNext />
   </aside>;
 }
 

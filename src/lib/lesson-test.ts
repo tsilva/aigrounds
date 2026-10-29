@@ -172,6 +172,10 @@ export function submitTest(bank: TestBank, history: TestHistory, now: number): T
   return { ...history, active: { ...history.active, submittedAt: now }, best: Math.max(history.best, result.correct),
     passedAt: result.passed ? history.passedAt ?? now : history.passedAt };
 }
+export function serializeTestHistory(history: TestHistory): string {
+  const { version, started, seen, recent, best, passedAt } = history;
+  return JSON.stringify({ version, started, seen, recent, best, passedAt });
+}
 export function parseTestHistory(raw: string, bank: TestBank): TestHistory {
   const empty = emptyTestHistory(bank);
   try {
@@ -182,44 +186,8 @@ export function parseTestHistory(raw: string, bank: TestBank): TestHistory {
     const recent = Array.isArray(value.recent) ? value.recent.filter(ids => Array.isArray(ids) && ids.every(id => known.has(id))).slice(0, 3) : [];
     const passedAt = typeof value.passedAt === "number" && Number.isFinite(value.passedAt) && value.passedAt > 0 ? value.passedAt : undefined;
     const best = Number.isInteger(value.best) && value.best >= 0 && value.best <= bank.objectives.length * questionsPerObjective ? value.best : 0;
-    const result: TestHistory = { version: bank.version, started: value.started, seen, recent, passedAt, best };
-    const a = value.active;
-    if (!a || typeof a.id !== "string" || a.id.length > 100 || !Number.isInteger(a.seed) || !Array.isArray(a.questionIds)
-      || !Number.isInteger(a.index) || a.index < 0 || a.index >= bank.objectives.length * questionsPerObjective
-      || !a.answers || typeof a.answers !== "object" || Array.isArray(a.answers)) return result;
-    // A blank attempt must still have the exact, balanced set of known items.
-    const questions = a.questionIds.map(id => bank.questions.find(q => q.id === id));
-    if (a.questionIds.length !== bank.objectives.length * questionsPerObjective || new Set(a.questionIds).size !== a.questionIds.length
-      || questions.some(q => !q) || !bank.objectives.every(o => ["foundation", "application"].every(level => questions.filter(q => q?.objective === o.id && q.level === level).length === 1))) return result;
-    const answers: Record<string, TestAnswer> = {};
-    for (const question of questions) {
-      const answer = a.answers[question!.id];
-      if (typeof answer === "string" && answer.length <= 200 || Array.isArray(answer) && answer.length <= 20 && answer.every(item => typeof item === "string" && item.length < 100)) answers[question!.id] = answer;
-    }
-    const submittedAt = typeof a.submittedAt === "number" && Number.isFinite(a.submittedAt) && a.submittedAt > 0 ? a.submittedAt : undefined;
-    result.active = { id: a.id, seed: a.seed, questionIds: a.questionIds, index: a.index, answers, submittedAt };
-    if (a.firstAnswers !== undefined) {
-      if (!a.firstAnswers || typeof a.firstAnswers !== "object" || Array.isArray(a.firstAnswers)) { result.active = undefined; return result; }
-      const firstAnswers = Object.fromEntries(questions.filter(q => isTestAnswerComplete(q!, a.firstAnswers![q!.id])).map(q => [q!.id, a.firstAnswers![q!.id]]));
-      result.active.firstAnswers = firstAnswers;
-      const missing = a.questionIds.findIndex(id => firstAnswers[id] === undefined);
-      if (a.reviewIds !== undefined) {
-        if (missing !== -1 || !Array.isArray(a.reviewIds) || new Set(a.reviewIds).size !== a.reviewIds.length
-          || !a.reviewIds.length && !submittedAt || submittedAt && a.reviewIds.length > 0
-          || a.reviewIds.some(id => !a.questionIds.includes(id) || isTestAnswerCorrect(bank.questions.find(q => q.id === id)!, firstAnswers[id]))) {
-          result.active = undefined; return result;
-        }
-        result.active.reviewIds = a.reviewIds;
-      } else if (missing !== -1) result.active.index = Math.min(a.index, missing);
-      const currentId = currentTestQuestionId(result.active);
-      const currentQuestion = bank.questions.find(q => q.id === currentId);
-      result.active.checked = a.checked === true && firstAnswers[currentId] !== undefined && Boolean(currentQuestion && isTestAnswerComplete(currentQuestion, answers[currentId]));
-    } else if (!submittedAt) {
-      // Legacy drafts had free navigation and no graded submissions. Keep their
-      // draft answers and start the first-submission flow at question one.
-      result.active = { ...result.active, index: 0, firstAnswers: {}, checked: false };
-    }
-    if (result.active.submittedAt && !gradeTest(bank, result.active).complete) result.active = undefined;
-    return result;
+    // Legacy saved attempts are deliberately ignored. Only aggregate progress
+    // survives closing or refreshing a test.
+    return { version: bank.version, started: value.started, seen, recent, passedAt, best };
   } catch { return empty; }
 }

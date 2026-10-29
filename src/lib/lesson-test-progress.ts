@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import { parseTestHistory, type TestBank, type TestHistory } from "./lesson-test";
+import { parseTestHistory, serializeTestHistory, type TestBank, type TestHistory } from "./lesson-test";
 
 const eventName = "aigrounds-test-changed";
 const memory = new Map<string, string>();
@@ -22,11 +22,13 @@ function subscribe(key: string, notify: () => void) {
 }
 export function updateTestProgress(bank: TestBank, change: (history: TestHistory) => TestHistory) {
   const key = keyFor(bank);
-  const serialized = JSON.stringify(change(parseTestHistory(read(key), bank)));
+  const next = change(parseTestHistory(read(key), bank));
+  const serialized = serializeTestHistory(next);
   memory.set(key, serialized);
   try { window.localStorage.setItem(key, serialized); sessionOnly.delete(key); }
   catch { sessionOnly.add(key); }
   window.dispatchEvent(new Event(eventName));
+  return next;
 }
 export function useTestProgress(bank: TestBank) {
   const key = keyFor(bank);

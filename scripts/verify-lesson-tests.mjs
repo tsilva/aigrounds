@@ -116,7 +116,7 @@ function completeFirstPass(history, wrongIds = []) {
     equal(engine.advanceTest(bank, history, 2000), history, "cannot advance before checking an answer");
     history = checkAnswer(history, wrongIds.includes(id) ? wrongAnswer(question(id)) : solution(question(id)));
     equal(engine.checkTestAnswer(bank, history), history, "duplicate submit does not change first answers");
-    equal(engine.parseTestHistory(JSON.stringify(history), bank), history, "feedback and first answer survive reload");
+    equal(engine.parseTestHistory(JSON.stringify(history), bank).active, undefined, "checked answers are never restored");
     history = engine.advanceTest(bank, history, 2000);
   }
   return history;
@@ -138,7 +138,7 @@ failing = engine.advanceTest(bank, failing, 2500);
 equal(failing.active.reviewIds, [selectedId], "another wrong correction stays in the queue");
 failing = checkAnswer(failing, solution(question(selectedId)));
 equal(failing.active.firstAnswers[selectedId], originalWrong, "correction never overwrites the first submission");
-equal(engine.parseTestHistory(JSON.stringify(failing), bank), failing, "checked correction survives reload");
+equal(engine.parseTestHistory(JSON.stringify(failing), bank).active, undefined, "correction queue is never restored");
 failing = engine.advanceTest(bank, failing, 3000);
 equal(failing.active.submittedAt, 3000, "last corrected mistake completes the attempt");
 equal(engine.gradeTest(bank, failing.active).correct, 5, "corrected answers still score 5/6");
@@ -152,21 +152,31 @@ later = completeFirstPass(later, [later.active.questionIds[0]]);
 later = checkAnswer(later, solution(question(engine.currentTestQuestionId(later.active))));
 later = engine.advanceTest(bank, later, 4000);
 equal(later.passedAt, 2000, "later failure does not revoke earlier pass");
-equal(engine.parseTestHistory(JSON.stringify(history), bank), history, "submitted attempt survives reload");
-let resume = engine.createTestAttempt(bank, history, 54321, "resume");
-resume = checkAnswer(resume, solution(question(engine.currentTestQuestionId(resume.active))));
-resume = engine.advanceTest(bank, resume, 5000);
-equal(engine.parseTestHistory(JSON.stringify(resume), bank), resume, "partial answers, seed and current question survive reload");
-const legacyDraft = structuredClone(resume);
+const restoredResult = engine.parseTestHistory(JSON.stringify(history), bank);
+equal(restoredResult.active, undefined, "submitted result is not reopened");
+equal([restoredResult.best, restoredResult.passedAt], [6, 2000], "best score and earlier pass survive reload");
+let interrupted = engine.createTestAttempt(bank, history, 54321, "interrupted");
+interrupted = checkAnswer(interrupted, solution(question(engine.currentTestQuestionId(interrupted.active))));
+interrupted = engine.advanceTest(bank, interrupted, 5000);
+const restored = engine.parseTestHistory(JSON.stringify(interrupted), bank);
+equal(restored.active, undefined, "legacy partial answers, seed and current question are ignored");
+equal([restored.started, restored.seen, restored.recent, restored.best, restored.passedAt],
+  [interrupted.started, interrupted.seen, interrupted.recent, 6, 2000], "abandoned exposure history and completed progress survive");
+const serialized = JSON.parse(engine.serializeTestHistory(interrupted));
+equal(Object.keys(serialized).sort(), ["best", "passedAt", "recent", "seen", "started", "version"], "storage contains aggregate progress only");
+equal(engine.parseTestHistory(JSON.stringify(serialized), bank), restored, "new storage and legacy storage restore the same aggregate history");
+const fresh = engine.createTestAttempt(bank, restored, 789, "fresh");
+equal([fresh.active.index, fresh.active.checked, fresh.active.answers, fresh.active.firstAnswers, fresh.active.reviewIds, fresh.active.submittedAt],
+  [0, false, {}, {}, undefined, undefined], "reopening starts at an unanswered first question without feedback or results");
+equal(fresh.active.questionIds.some(id => interrupted.active.questionIds.includes(id)), false, "fresh attempt avoids the abandoned question set");
+equal(fresh.passedAt, 2000, "starting fresh preserves earlier pass");
+const legacyDraft = structuredClone(interrupted);
 delete legacyDraft.active.firstAnswers; delete legacyDraft.active.checked;
 legacyDraft.active.index = 5;
-const migrated = engine.parseTestHistory(JSON.stringify(legacyDraft), bank);
-equal(migrated.active.index, 0, "legacy free-navigation drafts restart at question one");
-equal(migrated.active.answers, legacyDraft.active.answers, "migration preserves draft answers");
-equal(migrated.active.firstAnswers, {}, "old drafts have no first submissions yet");
+equal(engine.parseTestHistory(JSON.stringify(legacyDraft), bank), restored, "older free-navigation drafts are also discarded");
 const legacyResult = structuredClone(history);
 delete legacyResult.active.firstAnswers; delete legacyResult.active.checked; delete legacyResult.active.reviewIds;
-equal(engine.gradeTest(bank, engine.parseTestHistory(JSON.stringify(legacyResult), bank).active).passed, true, "legacy submitted results retain their score");
+equal(engine.parseTestHistory(JSON.stringify(legacyResult), bank), restoredResult, "older result format preserves aggregates without restoring answers");
 let twoMistakes = engine.createTestAttempt(bank, engine.emptyTestHistory(bank), 431, "two");
 const mistakes = twoMistakes.active.questionIds.slice(0, 2);
 twoMistakes = completeFirstPass(twoMistakes, mistakes);
@@ -197,6 +207,35 @@ for (const mutate of [
 }
 const forged = structuredClone(history.active); forged.questionIds.fill(forged.questionIds[0]);
 equal(engine.gradeTest(bank, forged).passed, false, "duplicate IDs cannot create a pass");
+
+// Exercise the actual test store, including its in-memory storage fallback.
+for (const blocked of [false, true]) {
+  const testSaved = new Map();
+  const key = `aigrounds.test.${bank.slug}.v${bank.version}`;
+  testSaved.set(key, JSON.stringify(interrupted));
+  const store = load("src/lib/lesson-test-progress.ts", {
+    require: name => {
+      if (name === "react") return { useMemo: fn => fn(), useSyncExternalStore: (_subscribe, snapshot) => snapshot() };
+      if (name === "./lesson-test") return engine;
+      throw new Error(`Unexpected dependency ${name}`);
+    },
+    window: { localStorage: {
+      getItem: key => { if (blocked) throw new Error("blocked"); return testSaved.get(key); },
+      setItem: (key, value) => { if (blocked) throw new Error("blocked"); testSaved.set(key, value); },
+    }, dispatchEvent: () => {} },
+    Event: class {},
+  });
+  equal(store.useTestProgress(bank).history.active, undefined, "test hook cannot restore legacy attempt");
+  const opened = store.updateTestProgress(bank, saved => engine.createTestAttempt(bank, saved, 881, "open"));
+  ok(opened.active, "start returns the attempt to its owning dialog");
+  const snapshot = store.useTestProgress(bank);
+  equal(snapshot.history.active, undefined, "neither local storage nor memory cache retains an active attempt");
+  equal(snapshot.history.started, blocked ? 1 : interrupted.started + 1, "question exposure persists independently of the attempt");
+  equal(snapshot.sessionOnly, blocked, "blocked storage retains session-only metadata");
+  if (!blocked) equal(JSON.parse(testSaved.get(key)).active, undefined, "first write removes legacy saved attempt");
+  store.updateTestProgress(bank, saved => ({ ...saved, best: 6, passedAt: 9000 }));
+  equal(store.useTestProgress(bank).history.best, 6, "completion stores best score without an attempt");
+}
 
 // Exercise the actual progress reader/writer without rendering React hooks or
 // resolving paths. Visits, review and transfer cannot become test passes.

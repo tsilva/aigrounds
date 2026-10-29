@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AI Grounds
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Repository guidance for Codex.
 
 ## Project Overview
 
@@ -23,7 +23,7 @@ After application changes, run `pnpm typecheck`, `pnpm lint`, `pnpm check:cycles
 
 Reuse an existing development server. Otherwise run `pnpm dev --port auto` and report its printed URL. Never kill or restart an existing server; if startup or automatic port selection fails, stop and warn instead of choosing a fixed port.
 
-Use the native Codex Desktop in-app Browser for rendered checks. Load its bundled Browser skill/runtime, initialize `browser-client`, select `agent.browsers.get("iab")`, and use documented Playwright/CUA APIs. Follow its recovery guidance before falling back to another browser surface.
+Follow the global Browser Use and Testing policy for rendered checks: use Brave Stable’s Agents profile unless the user explicitly requests another browser. Load the bundled runtime, select `agent.browsers.get("brave")`, read its documentation, and use its documented APIs. If Brave is unavailable, report the connection problem without falling back to another browser.
 
 ## Architecture
 
@@ -65,13 +65,10 @@ Modules are described in `src/lib/playground-metadata.ts` and wired to component
 
 ## Product Specifications
 
-At the start of substantive repository work, use `$specs-author` to read the entire root `SPECS.md` once per ongoing task. Reuse unchanged contents across follow-ups and composed skills. Reread when the file or repository association changes, or new stakeholder intent requires a fresh comparison. Before finishing, always check for new or changed stakeholder intent; reread if the file or intent changed. Purely conversational follow-ups do not require another full read.
-
-- Treat `SPECS.md` as the persistent source of stakeholder requirements that cannot be inferred reliably from code or remembered conversations.
-- Apply the scope test to proposed and existing requirements: root `SPECS.md` contains only project-wide intent; scoped intent belongs in its nearest authoritative specification and must not be broadened to fit the root.
-- If the task, repository, or user request contradicts, omits, or ambiguously interprets the specification, tell the user. Continue safe exploration and work that does not depend on resolving the issue, but never silently choose an interpretation.
-- Never edit `SPECS.md` from inference. Propose the exact change, explain why it reflects stakeholder intent, and edit the file only after the user explicitly approves that exact change.
-- Keep `SPECS.md` complete, concise, and compacted. It must contain stakeholder intent rather than implementation, architecture, operations, or transient project detail.
+When specifications exist, use `$specs-author` for substantive work and
+specification changes. Follow its shared read/reuse cadence, provisional-scenario
+guidance, proportional detail, decision-based approval, and closing intent check.
+The maintained procedure is `/Users/tsilva/.codex/skills/private-skills/specs-author/SKILL.md`.
 
 ## Learning Page Workflows
 

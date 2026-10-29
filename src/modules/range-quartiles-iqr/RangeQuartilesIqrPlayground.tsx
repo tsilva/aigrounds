@@ -16,16 +16,16 @@ function SpreadChart({ points, summary, selectedId, onSelect, onMove }: {
   points: RangePoint[]; summary: FiveNumberSummary; selectedId: string;
   onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
-  const { trackRef, lanes } = useNumberLineLayout(points, 38);
+  const { trackRef, lanes, laneHeight } = useNumberLineLayout(points);
   return <section className={styles.chart} aria-label="Values, range, and box plot on the same 0 to 100 scale">
     <DatasetHeading />
     <div className={styles.chartRow}>
       <span className={styles.laneLabel}>Values</span>
-      <div className={styles.track} ref={trackRef} style={{ height: Math.max(76, lanes.count * 36 + 12) }}>
+      <div className={styles.track} ref={trackRef} style={{ height: Math.max(76, lanes.count * laneHeight + 12) }}>
         <span className={styles.valueAxis} aria-hidden="true" />
         {points.map((point) => <NumberLinePoint key={point.id} point={point} selected={selectedId === point.id}
           helpId="range-keyboard-help" trackRef={trackRef} onSelect={onSelect} onMove={onMove}
-          style={{ bottom: 8 + (lanes.positions.get(point.id) ?? 0) * 36 }} />)}
+          style={{ bottom: 8 + (lanes.positions.get(point.id) ?? 0) * laneHeight }} />)}
       </div>
     </div>
     <div className={styles.chartRow} aria-hidden="true">

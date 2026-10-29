@@ -65,3 +65,35 @@ Reduced-motion overrides are present in the rendered stylesheets; an OS/browser 
 - [x] Pass repository gates; leave a clean local preview open.
 
 Stakeholder intent check: `SPECS.md` is unchanged; this implements the approved presentation within its existing constraints. An unrelated concurrent `AGENTS.md` edit was preserved.
+
+
+## Shared rollout — 2026-10-29
+
+This run supersedes the earlier first-lesson-only scope and the earlier statement that Range retains its default presentation.
+
+**final result: passed** for the approved presentation migration. No new question banks were created, as requested. This is a visual/interaction migration, not an audit of every lesson's pedagogy or mathematical engine.
+
+### Visual comparison
+
+Compared `/tmp/aigrounds-global-reference-1440.jpg` and `/tmp/aigrounds-global-first-final.jpg` together at 1440 × 1024 in the same initial lesson state. The original approved hierarchy, palette, workspace/rail proportions, controls, number-line geometry and quiz invitation remain consistent. Reviewed the migrated Range and Transformer screenshots against that shared language. No actionable P0/P1/P2 difference remained; the development-server badge is outside the product UI.
+
+| Surface | Evidence |
+| --- | --- |
+| Shared shell | All 90 registered lessons use the same 72px navigation, larger title hierarchy, lavender rail and single Guide invitation. Path context follows the workspace. |
+| Control hierarchy | Raised scenario, reset, toggle and exercise actions; 44px exact-value fields; rounded prediction choices. Native semantics and focus styles remain. |
+| Mathematical evidence | All five shared number-line users retain numeric horizontal positions; larger handles use 46px packing and 50px vertical lanes. The collapsed Contrastive scenario keeps three 46px-high handles 50px apart. |
+| Quiz | Existing shared canvas, progress, datasets, feedback and first-answer scoring preserved. Invitations default to the outlined secondary action. |
+
+### Browser and behavior evidence
+
+- Brave Stable: all 90 routes checked at both 1440 × 1024 and 768 × 1024, plus eight representative dense/control-heavy lessons at 1024 × 1024. All 188 route/viewport checks found no page overflow, no overlapping slider buttons, a 72px navigation and one Guide invitation. Measurements: `/tmp/aigrounds-all-lessons-layout-report.json`.
+- Range: prediction → I=92 via exact editor yields range 74 and IQR 20. Incorrect explanation blocks completion; the correct explanation completes the experiment. Reset returns I=58, range 40 and IQR 20. Keyboard End then Shift+ArrowLeft yields 90. Pointer drag to 92 yields exactly 92.
+- Guide: opens with its existing introduction and closes; at a 384px available lesson width, the shell reflows without page overflow. No live AI message was sent.
+- At 767px, the accessibility tree exposes only the desktop notice (plus development tooling), with no lesson controls.
+- Contrastive: selecting Collapsed retains coincident values of 40 in separate rows; margin editing to 50 commits on Enter. At 768px the handles remain 50px apart without page overflow.
+- Quiz: x=12 for values 2, 4, x and mean 6 shows Correct feedback and locks the response. The dialog fits at 768px without overflow. Closing and reopening shows Start test.
+- No browser console errors observed. Full 200% zoom and reduced-motion emulation were not exercised; the existing reduced-motion override remains intact.
+
+### Checks
+
+`pnpm typecheck`, `pnpm lint`, `pnpm check:cycles`, `pnpm build` and `node scripts/check-learning-design.mjs` passed. The build includes 22,989 quiz checks, independent numeric oracles and 1,600 balanced selections. No dependencies or algorithm engines changed. Verification is local; this rollout has not been deployed.

@@ -9,7 +9,7 @@ AI Grounds helps people learn artificial intelligence concepts through interacti
 - The home experience must present published and planned lessons in the intended learning sequence.
 - The home experience must clearly distinguish published lessons from planned lessons and let learners open every published lesson.
 - Secrets used by server-backed learning assistance must never be exposed to browser clients.
-- New playgrounds and material playground redesigns must follow the approved shared learning-page design system, with AI Guide access in the experiment rail rather than the top navigation.
+- All playgrounds and their quizzes must follow the approved playful shared learning-page design system, with AI Guide access in the experiment rail rather than the top navigation.
 - Each playground offers a test using reusable question widgets.
 - A playground is marked passed only after a test attempt achieves 100% accuracy.
 - Every test opening starts fresh; closing or reloading must discard the current attempt rather than resume it.

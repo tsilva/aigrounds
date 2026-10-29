@@ -14,7 +14,7 @@ function subscribeDesktop(notify: () => void) {
   media.addEventListener("change", notify);
   return () => media.removeEventListener("change", notify);
 }
-export function TestInvitation({ bank, onOpen, appearance = "primary" }: { bank: TestBank; onOpen: () => void; appearance?: "primary" | "secondary" }) {
+export function TestInvitation({ bank, onOpen, appearance = "secondary" }: { bank: TestBank; onOpen: () => void; appearance?: "primary" | "secondary" }) {
   const { history } = useTestProgress(bank);
   return <section className={styles.invitation} data-appearance={appearance} aria-label="Lesson test">
     <h3>{history.passedAt ? <><CheckCircleIcon aria-hidden="true" />Test passed · 100%</> : appearance === "secondary" ? "Ready to check your understanding?" : "Take the test"}</h3>

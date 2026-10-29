@@ -12,6 +12,8 @@ Use the sort buttons to switch to newest updates first; search works in either v
 
 The Mean, Median & Mode lab pairs a live dataset workspace with guided predict → try → explain experiments. Its playful presentation uses larger type and drag handles, raised scenario controls, and clear selected predictions; the number line and summary markers still share the exact 0–100 scale. Learning-path context follows the workspace, and the AI Guide remains in the experiment rail. Drag individual points, use the keyboard or an exact value field, and compare aligned summary markers, sorted values, and calculations. The built-in experiments work independently of the optional AI Guide.
 
+All published lessons use the approved playful shared shell: right-aligned lesson navigation, larger headings and summaries, raised scenario and exercise controls, and a lavender experiment rail. Learning-path context follows the workspace. Shared number-line controls use wider collision spacing and taller lanes for the larger handles, preserving each numeric position and lesson-specific evidence. Quiz presentation uses the same design; only the first lesson currently has a question bank.
+
 ### Lesson tests
 
 Mean, Median & Mode is the first lesson with a formal **Take lesson test** action, below the exercise and above the AI Guide. It is available without completing the guided experiments. The test opens in a focused, keyboard-contained dialog; the playground and Guide are inactive behind it. Closing it restores the current playground, and the `?test=1` link opens the fresh test start screen directly. The existing desktop-only notice remains the only content below 768 pixels, including for tests.

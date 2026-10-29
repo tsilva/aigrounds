@@ -16,18 +16,18 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
   points: DataPoint[]; analysis: SpreadAnalysis; selectedId: string;
   onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
-  const { trackRef, lanes } = useNumberLineLayout(points, 40);
+  const { trackRef, lanes, laneHeight } = useNumberLineLayout(points);
   return <section className={styles.chart} aria-label="Interactive dataset">
     <DatasetHeading />
     <div className={styles.plotFrame}>
       <div className={styles.meanCaption}>Mean (average) <strong>{analysis.mean.toFixed(1)}</strong> · {analysis.count} points · values {analysis.min}–{analysis.max}</div>
-      <div ref={trackRef} className={styles.plot} style={{ height: Math.max(96, lanes.count * 40 + 16) }}>
+      <div ref={trackRef} className={styles.plot} style={{ height: Math.max(96, lanes.count * laneHeight + 16) }}>
         <div className={styles.axis} />
         {[0, 25, 50, 75, 100].map((tick) => <span key={tick} className={styles.tick} style={position(tick)}><span>{tick}</span></span>)}
         <div className={styles.meanMarker} style={position(analysis.mean)} aria-hidden="true" />
         {points.map((point) => <NumberLinePoint key={point.id} point={point} selected={selectedId === point.id} valueText={`${point.label}: ${point.value}; deviation ${signed(point.value - analysis.mean)}`}
           helpId="spread-keyboard-help" trackRef={trackRef} onSelect={onSelect} onMove={onMove}
-          style={{ bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 40 }} />)}
+          style={{ bottom: 12 + (lanes.positions.get(point.id) ?? 0) * laneHeight }} />)}
       </div>
     </div>
   </section>;

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, SparklesIcon, TrophyIcon } from "@heroicons/react/24/outline";
-import { advanceTest, checkTestAnswer, createTestAttempt, currentTestQuestionId, gradeTest, isTestAnswerComplete, isTestAnswerCorrect, questionsPerObjective, type TestAnswer, type TestBank, type TestQuestion } from "@/lib/lesson-test";
+import { advanceTest, checkTestAnswer, createTestAttempt, currentTestQuestionId, gradeTest, isTestAnswerComplete, isTestAnswerCorrect, questionsPerObjective, type TestAnswer, type TestAttempt, type TestBank, type TestQuestion } from "@/lib/lesson-test";
 import { updateTestProgress, useTestProgress } from "@/lib/lesson-test-progress";
 import { recordLearningProgress } from "@/lib/learning-progress";
 import { AnswerWidget } from "./answer-widget";
@@ -16,12 +16,11 @@ function subscribeDesktop(notify: () => void) {
 }
 export function TestInvitation({ bank, onOpen, appearance = "primary" }: { bank: TestBank; onOpen: () => void; appearance?: "primary" | "secondary" }) {
   const { history } = useTestProgress(bank);
-  const inProgress = history.active && !history.active.submittedAt;
   return <section className={styles.invitation} data-appearance={appearance} aria-label="Lesson test">
     <h3>{history.passedAt ? <><CheckCircleIcon aria-hidden="true" />Test passed · 100%</> : appearance === "secondary" ? "Ready to check your understanding?" : "Take the test"}</h3>
     <p>{bank.objectives.length * questionsPerObjective} questions · Get every first answer correct to pass.</p>
     <button type="button" className={styles.primary} onClick={onOpen}>
-      {inProgress ? "Resume test" : history.passedAt ? "View result or test again" : appearance === "secondary" ? "Take lesson test" : "Take the test"}<ArrowRightIcon aria-hidden="true" />
+      {history.passedAt ? "Take test again" : appearance === "secondary" ? "Take lesson test" : "Take the test"}<ArrowRightIcon aria-hidden="true" />
     </button>
   </section>;
 }
@@ -47,7 +46,7 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
   const heading = useRef<HTMLHeadingElement>(null);
   const actions = useRef<HTMLDivElement>(null);
   const { history } = useTestProgress(bank);
-  const attempt = history.active;
+  const [attempt, setAttempt] = useState<TestAttempt>();
   const submitted = Boolean(attempt?.submittedAt);
   const question = attempt ? bank.questions.find(q => q.id === currentTestQuestionId(attempt)) : undefined;
   const result = attempt ? gradeTest(bank, attempt) : null;
@@ -73,12 +72,13 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
   }, [checked, question?.id]);
   function start() {
     const seed = window.crypto.getRandomValues(new Uint32Array(1))[0];
-    updateTestProgress(bank, current => createTestAttempt(bank, current, seed, window.crypto.randomUUID()));
+    const next = updateTestProgress(bank, current => createTestAttempt(bank, current, seed, window.crypto.randomUUID()));
+    setAttempt(next.active);
   }
   function setAnswer(answer: TestAnswer) {
     if (!question || !attempt) return;
-    updateTestProgress(bank, current => current.active?.id !== attempt.id || current.active.submittedAt || current.active.checked || currentTestQuestionId(current.active) !== question.id ? current : {
-      ...current, active: { ...current.active, answers: { ...current.active.answers, [question.id]: answer } },
+    setAttempt(current => !current || current.id !== attempt.id || current.submittedAt || current.checked || currentTestQuestionId(current) !== question.id ? current : {
+      ...current, answers: { ...current.answers, [question.id]: answer },
     });
   }
   return <dialog ref={dialog} className={styles.dialog} aria-labelledby="lesson-test-title" onCancel={event => { event.preventDefault(); onClose(); }}
@@ -124,12 +124,13 @@ function TestDialog({ bank, onClose, nextLesson }: { bank: TestBank; onClose: ()
         </div> : question.context && <p className={styles.context}>{question.context}</p>}
         <form onSubmit={event => {
           event.preventDefault();
-          updateTestProgress(bank, current => {
-            if (current.active?.id !== attempt.id || currentTestQuestionId(current.active) !== question.id) return current;
-            const next = checked ? advanceTest(bank, current, Date.now()) : checkTestAnswer(bank, current);
-            if (next.active?.submittedAt && gradeTest(bank, next.active).passed) recordLearningProgress(bank.slug, "test");
-            return next;
-          });
+          const current = { ...history, active: attempt };
+          const next = checked ? advanceTest(bank, current, Date.now()) : checkTestAnswer(bank, current);
+          setAttempt(next.active);
+          if (next.active?.submittedAt) {
+            updateTestProgress(bank, saved => ({ ...saved, best: Math.max(saved.best, next.best), passedAt: saved.passedAt ?? next.passedAt }));
+            if (gradeTest(bank, next.active).passed) recordLearningProgress(bank.slug, "test");
+          }
         }}>
           <fieldset disabled={checked} className={styles.answerArea} data-feedback={checked ? correct ? "correct" : "incorrect" : undefined} aria-label="Your response">
             <AnswerWidget key={question.id} question={question} answer={attempt.answers[question.id]} seed={attempt.seed + attempt.questionIds.indexOf(question.id)} onChange={setAnswer} />

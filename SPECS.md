@@ -12,4 +12,5 @@ AI Grounds helps people learn artificial intelligence concepts through interacti
 - New playgrounds and material playground redesigns must follow the approved shared learning-page design system, with AI Guide access in the experiment rail rather than the top navigation.
 - Each playground offers a test using reusable question widgets.
 - A playground is marked passed only after a test attempt achieves 100% accuracy.
+- Every test opening starts fresh; closing or reloading must discard the current attempt rather than resume it.
 - Each playground maintains a varied question reservoir covering its learning objectives and avoids frequent repetition for each learner.

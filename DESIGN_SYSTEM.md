@@ -1,6 +1,6 @@
 # Learning-page design system
 
-This is the canonical visual and layout scheme for new playgrounds and material playground redesigns. The default reference is `src/modules/range-quartiles-iqr/design/accepted-mockup.png`. The first lesson's approved playful variant and matching quiz are in `src/modules/mean-median-mode/design/accepted-mockup.png` and `accepted-quiz-mockup.png`. These establish the visual language; mathematical geometry must always come from the engine, not raster references.
+This is the canonical visual and layout scheme for new playgrounds and material playground redesigns. The approved playful lesson and matching quiz references are in `src/modules/mean-median-mode/design/accepted-mockup.png` and `accepted-quiz-mockup.png`. They establish the visual language for every lesson and quiz; mathematical geometry must always come from the engine, not raster references.
 
 ## Shared implementation
 
@@ -43,8 +43,8 @@ Connect every `NumberLinePoint`'s `helpId` to the editor's instruction ID and pa
 
 ## Page anatomy
 
-1. A 64px navigation bar contains AI Grounds and “← All lessons”.
-2. A continuous white workbench occupies approximately 69% of the desktop page. A pale lavender experiment rail occupies the remainder, separated by a fine vertical rule.
+1. A 72px navigation bar contains AI Grounds and “← All lessons”.
+2. A continuous white workbench occupies approximately 66% of the desktop page. A pale lavender experiment rail occupies the remainder, separated by a fine vertical rule.
 3. The workbench begins with “Guided discovery”, the lesson title, and one short action-oriented subtitle. Keep the header inside the workbench.
 4. Separate two-line scenario buttons share one style and size. The active scenario is indigo. Reset is a small outlined action at the right of the toolbar.
 5. “Your dataset” introduces the primary manipulation surface. Place its exact-value editor and keyboard instructions directly below it, inside the workbench.
@@ -58,8 +58,8 @@ The Guide CTA opens the existing assistant. Do not add a second Guide launcher i
 ## Visual tokens and hierarchy
 
 - White canvas; lavender rail `#f6f5ff`; navy text `#0c1230`; muted text `#536487`; divider `#dfe4f4`; indigo interaction `#5031dc`.
-- Use the existing Space Grotesk typeface, with IBM Plex Mono for formulas. Desktop titles are 40px, experiment titles 28px, summary values 40px, body/instructional text 14–17px, and secondary guidance 12–13px.
-- Workbench padding is 32px; rail padding is 32px vertically and 28px horizontally. Use 7px control corners, modest gaps, and thin rules. Shadows and large rounded card containers are unnecessary.
+- Use the existing Space Grotesk typeface, with IBM Plex Mono for formulas. Desktop titles scale from 36px to 52px, experiment titles are 32–38px, summary values are 52px, body/instructional text is 15–20px, and secondary guidance is 12–14px.
+- Workbench padding is 32px vertically and 48px horizontally; the rail uses 36px padding, narrowing at smaller widths. Use 10px control corners, modest gaps, thin rules and restrained raised control edges. Keep the mathematical workbench open rather than nesting it in cards.
 - Semantic chart colors can vary with the concept. Always accompany color with labels, shape, position, or textual data; retain the indigo interaction/focus language.
 
 ## Adaptation and verification
@@ -75,9 +75,9 @@ Async lessons can pass `disabled` to `LessonToolbar`, `LessonSelect`, `Experimen
 
 ## Approved playful presentation
 
-The first lesson opts into `LearningPage appearance="playful"`. This approved presentation uses a 72px navigation bar with All lessons at the right, approximately 66% workbench / 34% rail, 48px workbench side padding, larger headings and summaries, 44px number-line handles, 10px control corners and restrained raised edges. The underlying number-line scale, collision packing, evidence and guided sequence remain unchanged. Path context follows the workspace. Other lessons retain the default presentation until explicitly migrated; shared styling stays in `learning-page.module.css`, rather than lesson overrides. The rail continues beneath the workbench at 1099px and below.
+Every `LearningPage` uses the approved playful presentation by default. This presentation uses a 72px navigation bar with All lessons at the right, approximately 66% workbench / 34% rail, 48px workbench side padding, larger headings and summaries, 44px number-line handles, 10px control corners and restrained raised edges. Number-line handles use 46px horizontal collision spacing and 50px vertical lanes so the larger handles remain separated. Numeric positions, evidence and the guided sequence remain lesson-owned. Path context follows the workspace. All published lessons inherit this styling centrally; shared styling stays in `learning-page.module.css`, rather than lesson overrides. The rail continues beneath the workbench at 1099px and below.
 
-`TestInvitation appearance="secondary"` supplies the outlined **Take lesson test** action below the exercise. The shared quiz uses a white canvas, right-aligned Back to lesson navigation, an inline progress track, large numbered answer rows and labeled data tiles from optional authored `TestQuestion.datasets`. Dataset tiles preserve source order and repeats; do not infer them from question prose or reveal a solution through highlighting. Checked responses remain locked. Correct feedback is a pale green strip with an explanatory check and indigo Continue action; mistakes use amber with an explicit correction. At narrower desktop sizes, the action wraps beneath feedback. The modal keeps its native focus/keyboard behavior, first-answer scoring and desktop-only boundary.
+`TestInvitation` defaults to the outlined secondary appearance and supplies the outlined **Take lesson test** action below the exercise. The shared quiz uses a white canvas, right-aligned Back to lesson navigation, an inline progress track, large numbered answer rows and labeled data tiles from optional authored `TestQuestion.datasets`. Dataset tiles preserve source order and repeats; do not infer them from question prose or reveal a solution through highlighting. Checked responses remain locked. Correct feedback is a pale green strip with an explanatory check and indigo Continue action; mistakes use amber with an explicit correction. At narrower desktop sizes, the action wraps beneath feedback. The modal keeps its native focus/keyboard behavior, first-answer scoring and desktop-only boundary.
 
 ## Lesson tests
 

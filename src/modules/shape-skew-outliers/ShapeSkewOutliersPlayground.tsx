@@ -14,7 +14,7 @@ const format = (value: number) => String(value);
 const signed = (value: number) => `${value > 0 ? "+" : ""}${Number.isInteger(value) ? value : value.toFixed(1)}`;
 
 function ShapeEvidence({ analysis, onMove }: { analysis: ShapeAnalysis; onMove: (value: number) => void }) {
-  const { trackRef, lanes } = useNumberLineLayout(analysis.points);
+  const { trackRef, lanes, laneHeight } = useNumberLineLayout(analysis.points);
   const maxCount = Math.max(5, ...analysis.histogram.map((bin) => bin.count));
   const movable = analysis.points.find((point) => point.role === "movable")!;
   return <>
@@ -43,11 +43,11 @@ function ShapeEvidence({ analysis, onMove }: { analysis: ShapeAnalysis; onMove: 
     </section>
     <section className={styles.numberLine} aria-label="Exact data values">
       <h2>Each dot is one point</h2><p>Drag M to change its value. The other 12 points stay fixed.</p>
-      <div className={styles.trackFrame}><div ref={trackRef} className={styles.track} style={{ height: Math.max(96, lanes.count * 36 + 24) }}>
+      <div className={styles.trackFrame}><div ref={trackRef} className={styles.track} style={{ height: Math.max(96, lanes.count * laneHeight + 24) }}>
         <div className={styles.axis} />
         {ticks.map((tick) => <span className={styles.tick} style={{ left: `${tick}%` }} key={tick}>{tick}</span>)}
-        {analysis.points.filter((point) => point.role === "fixed").map((point) => <span key={point.id} className={styles.fixedPoint} style={{ left: `${point.value}%`, bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 36 }} title={`${point.label}: ${point.value}`}><span>{point.value}</span><small>{point.label}</small></span>)}
-        <NumberLinePoint point={movable} selected helpId="shape-keyboard-help" trackRef={trackRef} onSelect={() => {}} onMove={(_, value) => onMove(value)} style={{ bottom: 12 + (lanes.positions.get(movable.id) ?? 0) * 36 }} />
+        {analysis.points.filter((point) => point.role === "fixed").map((point) => <span key={point.id} className={styles.fixedPoint} style={{ left: `${point.value}%`, bottom: 12 + (lanes.positions.get(point.id) ?? 0) * laneHeight }} title={`${point.label}: ${point.value}`}><span>{point.value}</span><small>{point.label}</small></span>)}
+        <NumberLinePoint point={movable} selected helpId="shape-keyboard-help" trackRef={trackRef} onSelect={() => {}} onMove={(_, value) => onMove(value)} style={{ bottom: 12 + (lanes.positions.get(movable.id) ?? 0) * laneHeight }} />
       </div></div>
       <PointValueEditor label="M" value={movable.value} helpId="shape-keyboard-help" onChange={onMove} />
       <p className={styles.values}>Sorted values: {analysis.sortedValues.map(format).join(", ")}</p>

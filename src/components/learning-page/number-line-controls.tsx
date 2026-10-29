@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObjec
 import { clientXToPercentValue, pointLanes, type NumericValuePoint } from "@/lib/number-line";
 import styles from "./learning-page.module.css";
 
-export function useNumberLineLayout(points: NumericValuePoint[], spacing = 36, initialWidth = 600) {
+// Allow a gap around the shared 44 × 46px handles in both directions.
+export function useNumberLineLayout(points: NumericValuePoint[], spacing = 46, initialWidth = 600) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(initialWidth);
   useEffect(() => {
@@ -15,7 +16,7 @@ export function useNumberLineLayout(points: NumericValuePoint[], spacing = 36, i
     return () => observer.disconnect();
   }, []);
   const lanes = useMemo(() => pointLanes(points, width, spacing), [points, width, spacing]);
-  return { trackRef, width, lanes };
+  return { trackRef, width, lanes, laneHeight: 50 };
 }
 
 // Fixed 0–100 scale shared by these lessons. Keep chart geometry in the caller.

@@ -27,8 +27,8 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
   points: DataPoint[]; analysis: TypicalValuesAnalysis; selectedId: string;
   onSelect: (id: string) => void; onMove: (id: string, value: number) => void;
 }) {
-  const { trackRef, width, lanes } = useNumberLineLayout(points, 46, 800);
-  const chartHeight = Math.max(100, lanes.count * 50 + 16);
+  const { trackRef, width, lanes, laneHeight } = useNumberLineLayout(points, 46, 800);
+  const chartHeight = Math.max(100, lanes.count * laneHeight + 16);
   const markers = [
     { label: "Mean", values: [analysis.mean], color: colors.mean },
     { label: "Median", values: [analysis.median], color: colors.median },
@@ -43,7 +43,7 @@ function DatasetChart({ points, analysis, selectedId, onSelect, onMove }: {
           {ticks.map((tick) => <span key={tick} className={styles.tick} style={position(tick)}><span>{tick}</span></span>)}
           {points.map((point) => <NumberLinePoint key={point.id} point={point} selected={selectedId === point.id} mode={analysis.modeValues.includes(point.value)}
           helpId="dataset-keyboard-help" trackRef={trackRef} onSelect={onSelect} onMove={onMove}
-          style={{ bottom: 12 + (lanes.positions.get(point.id) ?? 0) * 50 }} />)}
+          style={{ bottom: 12 + (lanes.positions.get(point.id) ?? 0) * laneHeight }} />)}
         </div>
         <div className={styles.markerTracks} aria-hidden="true">
           {markers.map((marker) => {
@@ -124,7 +124,7 @@ export function MeanMedianModePlayground() {
     window.dispatchEvent(new Event(testNavigationEvent));
   }
   return <><LearningPage title="Mean, Median & Mode" subtitle="Move one point. See three ways to describe typical."
-    appearance="playful" eyebrow="Lesson 1 · Guided discovery"
+    eyebrow="Lesson 1 · Guided discovery"
     rail={<TypicalExperiment experiment={experiment} points={points} preset={preset} prediction={prediction} explanation={explanation} onPredict={(id) => {
       setPrediction(id); setExplanation(null); setPoints(pointsForPreset(preset)); setSelectedId(preset.id === "repeated-peak" ? "point-1" : "point-9");
     }} onExplain={setExplanation} onNext={() => reset(typicalPresets[(typicalPresets.findIndex((item) => item.id === preset.id) + 1) % typicalPresets.length]!)} onTest={() => showTest(true)} />}>

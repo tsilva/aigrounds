@@ -49,6 +49,8 @@ pnpm check:tests      # verify lesson-test scoring, coverage and question rotati
 pnpm test:deps        # check patched dependency security boundaries
 ```
 
+Local builds skip Sentry source-map uploads. Runtime error reporting still uses the configured DSN.
+
 ## Notes
 
 - [OCR Line Detection](https://aigrounds.tsilva.eu/playgrounds/ocr-line-detection) runs the actual Indra ONNX detector in a browser WebAssembly worker on a real raster PDF. Inspect three output channels, change decoding controls and export tensors; local files stay in the browser. The model and its outputs use the bundled modified OpenRAIL-M license. The self-hosted PDF.js library and worker use minified builds from the locked dependency. [Lesson details](docs/ocr-line-detection.md) cover model provenance, runtime assets and verification.

@@ -24,7 +24,7 @@ SENTRY_PROJECT=aigrounds
 SENTRY_AUTH_TOKEN=...
 ```
 
-Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. Set `SENTRY_DSN` for server and edge errors, `NEXT_PUBLIC_SENTRY_DSN` for browser errors, and `SENTRY_AUTH_TOKEN` only in local/CI/Vercel build environments so production source maps can be uploaded. Do not commit real values.
+Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. Set `SENTRY_DSN` for server and edge errors, `NEXT_PUBLIC_SENTRY_DSN` for browser errors, and `SENTRY_AUTH_TOKEN` in the hosted Vercel build environment so production source maps can be uploaded. Do not commit real values.
 
 ## Analytics
 
@@ -42,7 +42,7 @@ pnpm secrets:check
 pnpm dev --port auto
 ```
 
-The launcher fetches only `AGENTBRIDGE_API_KEY` and `SENTRY_AUTH_TOKEN`, keeps them in memory, and removes manager credentials from the app process. Missing values cannot fall back to old dotenv credentials. A failed fetch stops before starting the app. Keep public settings such as the model name and Sentry DSN in local dotenv files.
+The launcher supplies `AGENTBRIDGE_API_KEY` to the local app and removes manager credentials from the app process. Local app commands skip Sentry source-map uploads. Missing values cannot fall back to old dotenv credentials. A failed fetch stops before starting the app. Keep public settings such as the model name and Sentry DSN in local dotenv files.
 
 `pnpm build:secrets` and `pnpm start:secrets` use the same development project. Vercel uses the ordinary `pnpm build` command with deployment variables supplied by its production sync.
 

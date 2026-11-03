@@ -1,0 +1,13 @@
+diff --git a/dist/commonjs/index.js b/dist/commonjs/index.js
+--- a/dist/commonjs/index.js
++++ b/dist/commonjs/index.js
+@@ -1509,4 +1509,9 @@
+ exports.minimatch.Minimatch = Minimatch;
+ exports.minimatch.escape = escape_js_1.escape;
+ exports.minimatch.unescape = unescape_js_1.unescape;
++// Preserve the callable CommonJS API used by older consumers.
++// Keep the v11 named exports for current consumers.
++module.exports = Object.assign(exports.minimatch, exports);
++module.exports.default = module.exports;
++Object.defineProperty(module.exports, "__esModule", { value: true });
+ //# sourceMappingURL=index.js.map

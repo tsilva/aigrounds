@@ -19,13 +19,15 @@ for (const dependencies of [packageJson.dependencies, packageJson.devDependencie
 }
 assert.doesNotMatch(lock, /(?:git\+|github\.com\/|\b(?:file|link):|\btarball:)/i);
 assert.doesNotMatch(lock, /^\s+braces@/m, "unpatched braces dependency reintroduced");
+assert.doesNotMatch(lock, /^\s+brace-expansion@1\./m, "retired brace-expansion branch reintroduced");
 
 for (const expected of [
   "'@babel/core@7.29.7':",
   "'@opentelemetry/core@2.12.0':",
-  "brace-expansion@1.1.21:",
   "brace-expansion@5.0.12:",
   "fast-uri@3.1.9:",
+  "glob@14.0.2:",
+  "minimatch@11.0.1:",
   "js-yaml@4.3.2:",
   "nanoid@3.3.19:",
   "postcss@8.5.23:",
@@ -44,11 +46,9 @@ for (const maliciousUri of [
   assert.match(fastUri.parse(maliciousUri).error, /literal backslash/i);
 }
 
-const braceV1 = exactRequire("brace-expansion@1.1.21/node_modules/brace-expansion")("brace-expansion");
 const braceV5Module = exactRequire("brace-expansion@5.0.12/node_modules/brace-expansion")("brace-expansion");
 const braceV5 = braceV5Module.expand ?? braceV5Module;
 const expansionStarted = Date.now();
-assert.equal(braceV1("{}".repeat(40)).length, 1);
 assert.equal(braceV5("{}".repeat(40), { max: 1_000 }).length, 1);
 assert.equal(braceV5("{1..1000000000}", { max: 1_000 }).length, 1_000);
 assert.ok(Date.now() - expansionStarted < 1_000, "brace expansion limits were not applied promptly");

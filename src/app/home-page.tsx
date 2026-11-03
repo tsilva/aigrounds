@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
-import { canonicalLessonSlug, getLearningPath, learningPaths, lessonHref } from "@/lib/curriculum";
+import { canonicalLessonSlug, getLearningPath, lessonHref } from "@/lib/curriculum";
 import { useLearningProgress } from "@/lib/learning-progress";
 
 export type HomePlaygroundCard = {
@@ -18,7 +18,6 @@ export type HomePlaygroundCard = {
   status: "live" | "coming-soon";
   href?: string;
   lastUpdated: string | null;
-  coreStep: number;
   paths: string[];
   chapters: { slug: string; title: string }[];
   reference: boolean;
@@ -34,9 +33,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
-  const [pathId, setPathId] = useState("core");
   const progress = useLearningProgress();
-  const selectedPath = getLearningPath(pathId);
 
   useEffect(() => {
     const refresh = () => setNow(Date.now());
@@ -52,8 +49,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
     const normalizedQuery = query.trim().toLowerCase();
 
     const filteredPlaygrounds = playgrounds.filter((playground) => {
-      if (!normalizedQuery && selectedPath && !selectedPath.lessons.includes(playground.slug)) return false;
-      if (!normalizedQuery && pathId === "extras" && !playground.reference) return false;
+      if (!normalizedQuery) return true;
       const searchableText = [
         playground.title,
         playground.slug,
@@ -83,10 +79,9 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
         if (dateDifference !== 0) return dateDifference;
       }
 
-      if (!normalizedQuery && selectedPath) return selectedPath.lessons.indexOf(a.slug) - selectedPath.lessons.indexOf(b.slug);
       return a.step - b.step;
     });
-  }, [playgrounds, query, sortOrder, selectedPath, pathId]);
+  }, [playgrounds, query, sortOrder]);
 
   return (
     <main className="min-h-screen bg-[#f7faff] px-4 py-5 text-slate-950 sm:px-6 lg:px-10">
@@ -117,8 +112,8 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
               AI Grounds
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-              Start with the AI core, follow a specialist path, or explore an
-              idea you need today. Learn by predicting, trying and explaining.
+              Start with the AI core or search for an idea you need today.
+              Learn by predicting, trying and explaining.
             </p>
           </div>
 
@@ -133,16 +128,6 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
             />
           </label>
         </header>
-
-        <section aria-label="Choose a learning path">
-          <label className="text-sm font-semibold text-slate-700">Learning path
-            <select value={pathId} onChange={event => setPathId(event.target.value)} className="ml-3 max-w-full rounded-lg border border-blue-200 bg-white px-3 py-2">
-              {learningPaths.map(path => <option key={path.id} value={path.id}>{path.title}</option>)}
-              <option value="all">Browse all lessons</option>
-              <option value="extras">Explore & reference</option>
-            </select>
-          </label>
-        </section>
 
         {now !== null && Object.entries(progress.transfers).some(([, time]) => now - time >= 86_400_000) && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">
           <h2 className="text-lg font-semibold">Recall an earlier idea</h2>
@@ -159,10 +144,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           })}
         </section>}
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-slate-500">
-            {visiblePlaygrounds.length} {pathId === "extras" && !query.trim() ? "explore entries" : visiblePlaygrounds.length === 1 ? "lesson" : "lessons"} · {visiblePlaygrounds.filter(item => item.status === "coming-soon").length} coming soon
-          </p>
+        <div className="flex justify-end">
           <div role="group" aria-label="Sort playgrounds" className="flex items-center gap-1 rounded-xl border border-blue-200 bg-white p-1">
             {([
               ["curriculum", "Curriculum order"],
@@ -187,7 +169,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
 
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => (
-            <PlaygroundTile key={playground.slug} playground={playground} now={now} pathId={query.trim() ? undefined : selectedPath?.id} progress={progress} />
+            <PlaygroundTile key={playground.slug} playground={playground} now={now} progress={progress} />
           ))}
         </section>
 
@@ -205,12 +187,11 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   );
 }
 
-function PlaygroundTile({ playground, now, pathId, progress }: { playground: HomePlaygroundCard; now: number | null; pathId?: string; progress: ReturnType<typeof useLearningProgress> }) {
+function PlaygroundTile({ playground, now, progress }: { playground: HomePlaygroundCard; now: number | null; progress: ReturnType<typeof useLearningProgress> }) {
   const isComingSoon = playground.status === "coming-soon";
   const chapters = playground.chapters.length ? playground.chapters.map(chapter => chapter.slug) : [playground.slug];
   const checked = chapters.filter(slug => progress.transfers[slug]).length;
   const reviewedCount = chapters.filter(slug => progress.reviewed.includes(slug)).length;
-  const localStep = pathId ? getLearningPath(pathId)!.lessons.indexOf(playground.slug) + 1 : playground.step;
   const updateLabel = playground.lastUpdated
     ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
     : null;
@@ -239,13 +220,13 @@ function PlaygroundTile({ playground, now, pathId, progress }: { playground: Hom
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className={levelClassName}>
-            {pathId ? `step ${String(localStep).padStart(2, "0")}` : playground.level}
+            {playground.level}
           </p>
           <h2 className={titleClassName}>
             {playground.title}
           </h2>
         </div>
-        {!playground.reference && <span className={stepClassName}>{String(localStep).padStart(2, "0")}</span>}
+        {!playground.reference && <span className={stepClassName}>{String(playground.step).padStart(2, "0")}</span>}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -282,7 +263,7 @@ function PlaygroundTile({ playground, now, pathId, progress }: { playground: Hom
   if (playground.href) {
     return (
       <Link
-        href={lessonHref(playground.slug, pathId)}
+        href={playground.href}
         prefetch={false}
         className={liveTileClassName}
       >

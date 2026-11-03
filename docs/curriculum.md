@@ -8,10 +8,11 @@ defines published versus planned status.
 
 ## Applied structure
 
-- Global search, Browse all, 28 specialist main paths and 16 optional branches alongside
-  the core. Regression is core step 5 and gradient descent is step 6.
+- The dashboard shows the full catalog in curriculum order by default. Global search
+  matches chapter titles and the names of 28 specialist main paths and 16 optional
+  branches. Regression is core step 5 and gradient descent is step 6.
 - Optional prerequisite refreshers appear within lessons.
-- The dashboard owns path selection and lesson navigation. Lessons retain chapter
+- The dashboard owns lesson navigation. Lessons retain chapter
   links and prerequisite refreshers; experiment rails end at the AI Guide invitation
   without a continuation or review footer. No account is required.
 - Visits, existing self-reported reviews and successful **explicit transfer checks**
@@ -22,8 +23,8 @@ defines published versus planned status.
   chapter's learning goal. These prompts invite practice; they do not grade or
   claim retained mastery. Progress stays in local storage, with an in-memory
   fallback when storage is unavailable.
-- The Concept Atlas and Zero Knowledge Proofs remain available under Explore &
-  reference, outside the numbered course.
+- The Concept Atlas and Zero Knowledge Proofs appear in the gallery as reference
+  and extra entries outside the numbered course.
 
 All previously published lesson routes remain registered. Five pairs now
 share one dashboard card, with two linked chapters and their original engines,
@@ -92,13 +93,13 @@ blocked. Local implementation does not imply deployment or learner validation.
 There are **144 teaching-unit placeholders**, grouped into **140 coming-soon
 cards**, plus **5 planned extensions** to published workbenches. Alongside
 90 live routes, the dashboard has 225 cards after chapter consolidation.
-The published 20-step core is unchanged. The selector offers 28 specialist
-main paths and 16 explicitly optional branches.
+The published 20-step core is unchanged. Search can find 28 specialist
+main paths and 16 optional branches by name.
 
 The first **creation priorities** remain **Cross-Validation & Fold Design**,
 **Adaptive Optimizers: RMSprop & Adam**, then **Decision Trees & Information Gain**.
-`curriculumCreationPriorities` owns this build queue. It does not seed Browse all
-or determine learner study order; the checker verifies that changing the queue
+`curriculumCreationPriorities` owns this build queue. It does not determine gallery
+order; the checker verifies that changing the queue
 leaves study order unchanged.
 
 All additions here are placeholders. No playground components, routes, algorithm

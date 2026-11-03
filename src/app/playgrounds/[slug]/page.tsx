@@ -2,7 +2,8 @@ import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { activePlaygrounds, getActivePlayground } from "@/lib/playgrounds";
+import { getLessonGroup, lessonHref } from "@/lib/curriculum";
+import { activePlaygrounds, getActivePlayground, type ActivePlayground } from "@/lib/playgrounds";
 
 type PlaygroundPageProps = {
   params: Promise<{
@@ -52,14 +53,77 @@ export default async function PlaygroundPage({
 
   const ModuleComponent = playground.component;
 
-  if (playground.layout === "guided-discovery") {
-    return <ModuleComponent />;
-  }
+  return (
+    <>
+      <MobileLessonSummary playground={playground} />
+      <div className="hidden md:block">
+        {playground.layout === "guided-discovery" ? (
+          <ModuleComponent />
+        ) : (
+          <PlaygroundPageWithHomeButton>
+            <ModuleComponent />
+          </PlaygroundPageWithHomeButton>
+        )}
+      </div>
+    </>
+  );
+}
+
+function MobileLessonSummary({ playground }: { playground: ActivePlayground }) {
+  const { slug, tag, title, summary, learningGoals } = playground;
+  const group = getLessonGroup(slug);
+  const chapters = group?.chapters
+    .map(getActivePlayground)
+    .filter(chapter => chapter !== undefined) ?? [];
 
   return (
-    <PlaygroundPageWithHomeButton>
-      <ModuleComponent />
-    </PlaygroundPageWithHomeButton>
+    <main className="min-h-dvh bg-[#f7faff] px-4 py-5 text-slate-950 md:hidden">
+      <div className="mx-auto max-w-xl">
+        <nav aria-label="Lesson navigation" className="border-b border-blue-100 pb-4">
+          <Link href="/" className="inline-flex min-h-11 items-center font-semibold text-indigo-700! underline! underline-offset-4">
+            ← All lessons
+          </Link>
+        </nav>
+
+        <header className="mt-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-700">{tag}</p>
+          <h1 className="mt-2 text-3xl leading-tight font-semibold">{title}</h1>
+          <p className="mt-3 leading-7 text-slate-700">{summary}</p>
+        </header>
+
+        <p className="mt-5 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm leading-6 text-indigo-950">
+          Open this page on a desktop or laptop to use the interactive playground.
+        </p>
+
+        {learningGoals.length > 0 && (
+          <section className="mt-6">
+            <h2 className="text-lg font-semibold">What you’ll learn</h2>
+            <ul className="mt-2 list-disc space-y-2 pl-5 leading-6 text-slate-700">
+              {learningGoals.map(goal => <li key={goal}>{goal}</li>)}
+            </ul>
+          </section>
+        )}
+
+        {chapters.length > 1 && (
+          <nav aria-label="Lesson chapters" className="mt-6 border-t border-blue-100 pt-5">
+            <h2 className="text-lg font-semibold">{group?.title}</h2>
+            <ol className="mt-2 list-decimal pl-5">
+              {chapters.map(chapter => (
+                <li key={chapter.slug}>
+                  {chapter.slug === slug ? (
+                    <span aria-current="page" className="inline-flex min-h-11 items-center py-2 font-semibold">{chapter.title}</span>
+                  ) : (
+                    <Link href={lessonHref(chapter.slug)} className="inline-flex min-h-11 items-center py-2 text-indigo-700! underline! underline-offset-4">
+                      {chapter.title}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+      </div>
+    </main>
   );
 }
 

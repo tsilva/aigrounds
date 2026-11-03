@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { DesktopOnlyNotice } from "@/components/desktop-only-notice";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import "./globals.css";
 
@@ -128,8 +127,7 @@ export default function RootLayout({
         className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} antialiased`}
       >
         <GoogleAnalytics />
-        <DesktopOnlyNotice />
-        <div className="desktop-only-content">{children}</div>
+        {children}
         {shouldLoadVercelAnalytics ? <Analytics /> : null}
       </body>
     </html>

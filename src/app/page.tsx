@@ -21,7 +21,7 @@ export default function Home() {
       outcome: group ? chapters.map(chapter => chapter.summary.split(".")[0]).join(". ") : item.summary.split(".")[0],
       duration: live.has(slug) ? (chapters.length ? "Two short chapters" : live.get(slug)!.estimatedDuration) : "coming soon",
       level: reference ? (slug === "ai-concept-atlas" ? "reference" : "explore extra") : coreStep ? `core step ${String(coreStep).padStart(2, "0")}` : "optional path",
-      coreStep, paths: learningPaths.filter(path => path.lessons.includes(slug)).map(path => path.id),
+      paths: learningPaths.filter(path => path.lessons.includes(slug)).map(path => path.id),
       chapters: chapters.map(chapter => ({ slug: chapter.slug, title: chapter.title })), reference,
       recallGoals: Object.fromEntries((group?.chapters ?? [slug]).map(chapter => [chapter, live.get(chapter)?.learningGoals[0] ?? "Explain what you changed, what changed as a result, and why."])),
       concepts: [...new Set([...item.concepts, ...chapters.flatMap(chapter => chapter.concepts)])],

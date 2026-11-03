@@ -1,7 +1,6 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
-import { DesktopOnlyNotice } from "@/components/desktop-only-notice";
 import NextError from "next/error";
 import { useEffect } from "react";
 
@@ -17,10 +16,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <DesktopOnlyNotice />
-        <div className="desktop-only-content">
-          <NextError statusCode={0} />
-        </div>
+        <NextError statusCode={0} />
       </body>
     </html>
   );

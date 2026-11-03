@@ -53,6 +53,8 @@ Local builds skip Sentry source-map uploads. Runtime error reporting still uses 
 
 ## Notes
 
+Each published playground has its own canonical URL and social metadata. The sitemap lists the homepage and all published playgrounds.
+
 - [OCR Line Detection](https://aigrounds.tsilva.eu/playgrounds/ocr-line-detection) runs the actual Indra ONNX detector in a browser WebAssembly worker on a real raster PDF. Inspect three output channels, change decoding controls and export tensors; local files stay in the browser. The model and its outputs use the bundled modified OpenRAIL-M license. The self-hosted PDF.js library and worker use minified builds from the locked dependency. [Lesson details](docs/ocr-line-detection.md) cover model provenance, runtime assets and verification.
 
 - [The Training Loop](src/modules/neural-network-training-loop) steps an actual tiny model through forward values, batch loss, backward gradients and parameter updates while keeping held-out rows out of fitting.

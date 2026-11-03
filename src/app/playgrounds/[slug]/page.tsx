@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -18,7 +18,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: PlaygroundPageProps): Promise<Metadata> {
+}: PlaygroundPageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const playground = getActivePlayground(slug);
 
@@ -26,9 +26,17 @@ export async function generateMetadata({
     return {};
   }
 
+  const title = `${playground.title} | AI Grounds`;
+  const description = playground.summary;
+  const path = `/playgrounds/${playground.slug}`;
+  const inherited = await parent;
+
   return {
-    title: `${playground.title} | AI Grounds`,
-    description: playground.summary,
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: { ...inherited.openGraph, title, description, url: path },
+    twitter: { ...inherited.twitter, title, description },
   };
 }
 

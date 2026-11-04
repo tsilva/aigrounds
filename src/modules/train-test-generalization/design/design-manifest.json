@@ -5,7 +5,7 @@
   "modulePath": "src/modules/train-test-generalization",
   "mockupPath": "src/modules/train-test-generalization/design/accepted-mockup.png",
   "promptPath": "src/modules/train-test-generalization/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-cd9ee59e-5c3f-4423-8b1c-e6cf00ab8305.png",
+  "sourceGeneratedImagePath": null,
   "review": "V4 self-reviewed under user authorization",
   "rejected": [
     "V1: instruction text leaked into learner action and one validation marker absent",

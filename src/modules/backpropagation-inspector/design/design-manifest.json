@@ -5,7 +5,7 @@
   "modulePath": "src/modules/backpropagation-inspector",
   "acceptedMockup": "src/modules/backpropagation-inspector/design/accepted-mockup.png",
   "prompt": "src/modules/backpropagation-inspector/design/imagegen-prompt.md",
-  "sourceGeneratedImage": "/Users/tsilva/.codex/generated_images/01a0f7ec-f42f-7a93-b16a-678258a2e29a/exec-8b39f68d-bc6f-4668-9043-e8f028a7a38a.png",
+  "sourceGeneratedImage": null,
   "approval": "User: implement the one you prefer (2026-10-01)",
   "refinements": [
     "One progress row; prediction precedes evidence and explanations.",

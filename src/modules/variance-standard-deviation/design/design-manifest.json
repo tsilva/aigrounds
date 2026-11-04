@@ -5,7 +5,7 @@
   "modulePath": "src/modules/variance-standard-deviation",
   "acceptedMockupPath": "src/modules/variance-standard-deviation/design/accepted-mockup.png",
   "promptPath": "src/modules/variance-standard-deviation/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f7c4-9121-7973-abf1-a91cd445177d/exec-0c5a66ba-89f8-4b67-9104-9ccbd8bb9cc8.png",
+  "sourceGeneratedImagePath": null,
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User approved the recommended latest mockup with: now implement your favorite one.",
   "approvedRefinements": [

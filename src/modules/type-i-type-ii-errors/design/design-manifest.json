@@ -5,7 +5,7 @@
   "modulePath": "src/modules/type-i-type-ii-errors",
   "mockupPath": "design/accepted-mockup.png",
   "promptPath": "design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-99ccd331-12e8-463a-8496-9e2727b55d83.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Autonomous self-review explicitly authorized by user",
   "refinements": [
     "Canonical native slider/editor, shared toolbar and modest Guide invitation.",

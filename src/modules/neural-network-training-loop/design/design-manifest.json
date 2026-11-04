@@ -5,7 +5,7 @@
   "modulePath": "src/modules/neural-network-training-loop",
   "mockupPath": "src/modules/neural-network-training-loop/design/accepted-mockup.png",
   "promptPath": "src/modules/neural-network-training-loop/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a10b84-7ef8-7881-9979-0969f179e6ef/exec-fb3e06a8-8c4d-4730-8288-0d970bfd0d2e.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Explicit user approval on 2026-10-05",
   "refinements": [
     "Reuse the shared LearningPage and ExperimentRail.",

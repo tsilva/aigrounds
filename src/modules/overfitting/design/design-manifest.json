@@ -5,7 +5,7 @@
   "modulePath": "src/modules/overfitting",
   "mockupPath": "src/modules/overfitting/design/accepted-mockup.png",
   "promptPath": "src/modules/overfitting/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-943218e9-cf37-4cf3-b9a4-fe931b2cba49.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Self-reviewed under explicit user authorization for the legacy redesign batch.",
   "refinements": [
     "First draft rejected for two Guide buttons and an incorrect logarithmic loss view; accepted second draft restores one CTA and a linear scale.",

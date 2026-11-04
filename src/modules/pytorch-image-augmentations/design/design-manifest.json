@@ -5,7 +5,7 @@
   "modulePath": "src/modules/pytorch-image-augmentations",
   "acceptedMockupPath": "src/modules/pytorch-image-augmentations/design/accepted-mockup.png",
   "promptPath": "src/modules/pytorch-image-augmentations/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-393c923a-6a81-41a7-b83b-1cb69a4cbece.png",
+  "sourceGeneratedImagePath": null,
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User explicitly authorized self-review without requesting approval.",
   "approvedRefinements": [

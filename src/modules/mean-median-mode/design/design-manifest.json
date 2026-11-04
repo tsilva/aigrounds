@@ -5,7 +5,7 @@
   "modulePath": "src/modules/mean-median-mode",
   "acceptedMockupPath": "src/modules/mean-median-mode/design/accepted-mockup.png",
   "promptPath": "src/modules/mean-median-mode/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a18396-5855-75a0-b3d5-7b104b9b3b24/exec-db3f12d7-e111-47da-be24-3d4d790b4642.png",
+  "sourceGeneratedImagePath": "src/modules/mean-median-mode/design/accepted-mockup.png",
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User selected the first number-line playground mockup and requested implementation for the ground and matching quiz.",
   "approvedRefinements": [
@@ -17,5 +17,5 @@
     "Preserve learning-path context below the workbench. Per the subsequent user annotation, remove the continuation footer below the Guide from all lessons."
   ],
   "quizMockupPath": "src/modules/mean-median-mode/design/accepted-quiz-mockup.png",
-  "quizSourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a18396-5855-75a0-b3d5-7b104b9b3b24/exec-b86de5ec-2eb8-4790-aeb6-c0b2c9f1d3ca.png"
+  "quizSourceGeneratedImagePath": "src/modules/mean-median-mode/design/accepted-quiz-mockup.png"
 }

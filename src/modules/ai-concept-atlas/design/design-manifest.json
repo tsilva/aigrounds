@@ -4,7 +4,7 @@
   "modulePath": "src/modules/ai-concept-atlas",
   "acceptedMockupPath": "src/modules/ai-concept-atlas/design/accepted-mockup.png",
   "promptPath": "src/modules/ai-concept-atlas/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-5b525033-e377-4c9f-a633-3d25ba445a98.png",
+  "sourceGeneratedImagePath": null,
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User authorized self-review without approval questions.",
   "approvedRefinements": [

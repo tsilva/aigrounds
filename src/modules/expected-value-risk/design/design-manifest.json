@@ -5,7 +5,7 @@
   "modulePath": "src/modules/expected-value-risk",
   "mockupPath": "src/modules/expected-value-risk/design/accepted-mockup.png",
   "promptPath": "src/modules/expected-value-risk/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-641c3cea-ec71-4d7d-89c0-0212fa13558f.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User authorized autonomous mockup review for the legacy redesign batch.",
   "refinements": [
     "Use shared shell, horizontal progress, rail Guide invitation and bounded exact editors, including their help text.",

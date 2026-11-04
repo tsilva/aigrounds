@@ -5,7 +5,7 @@
   "modulePath": "src/modules/llm-app-ops-metrics",
   "mockupPath": "src/modules/llm-app-ops-metrics/design/accepted-mockup.png",
   "promptPath": "src/modules/llm-app-ops-metrics/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-438f2428-fa3d-437c-8773-7cfca63ff72e.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User-authorized self-review; original shared scheme",
   "rejectedDrafts": [
     "V1 changed main title and added duplicate navigation Guide"

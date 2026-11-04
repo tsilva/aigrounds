@@ -5,7 +5,7 @@
   "modulePath": "src/modules/calibration-reliability-diagrams",
   "mockupPath": "src/modules/calibration-reliability-diagrams/design/accepted-mockup.png",
   "promptPath": "src/modules/calibration-reliability-diagrams/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-e3721f47-f459-4ed1-b006-131356e23a84.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User authorized self-review; direct original shared-render V3 accepted",
   "designSystem": "DESIGN_SYSTEM.md",
   "refinements": [

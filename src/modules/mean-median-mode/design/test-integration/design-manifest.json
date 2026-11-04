@@ -5,7 +5,7 @@
   "modulePath": "src/modules/mean-median-mode",
   "acceptedMockupPath": "src/modules/mean-median-mode/design/test-integration/accepted-mockup.png",
   "promptPath": "src/modules/mean-median-mode/design/test-integration/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a18308-a973-7ad3-8306-c8afd629cd5d/exec-0827fa01-e5a1-4e13-8d27-19f666194baf.png",
+  "sourceGeneratedImagePath": "src/modules/mean-median-mode/design/test-integration/accepted-mockup.png",
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User approved implementation and deployment of the first lesson test after reviewing the integration mockup and the 100% pass / question-reservoir requirements.",
   "approvedRefinements": [

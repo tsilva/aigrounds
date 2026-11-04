@@ -5,7 +5,7 @@
   "modulePath": "src/modules/llm-loss-perplexity",
   "mockupPath": "src/modules/llm-loss-perplexity/design/accepted-mockup.png",
   "promptPath": "src/modules/llm-loss-perplexity/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-331a3571-368b-4bbe-96d6-dda5ab7be78e.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User-authorized self review; original shared scheme",
   "rejectedDrafts": [
     "V1 wrong2^natural-logmean formula and25%-geometry labeled50%;missingpositionselect",

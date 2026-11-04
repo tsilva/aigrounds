@@ -12,7 +12,13 @@ After approval, persist or refresh these files under `src/modules/{slug}/design/
 - `accepted-mockup.png`;
 - `imagegen-prompt.md`;
 - `design-manifest.json`, recording lesson-plan step or `null`, title, slug,
-  module path, mockup path, prompt path, and source generated-image path.
+  module path, mockup path, prompt path, and retained source generated-image path.
+
+Use repository-relative paths for versioned artifacts. Optional transient source
+or preview paths must be `null` when no byte-identical versioned copy is retained.
+Keep generator/model facts and content hashes; do not substitute a different image
+for a missing original. Keep complete local provenance privately under ignored
+`.internal/reference/`, rather than publishing workstation or tool-session paths.
 
 Record approved refinements that differ from the image, such as removing a
 redundant launcher. Keep session reports in gitignored `.internal/qa/YYYY-MM-DD-<lesson>.md` and captures in `.internal/evidence/<lesson>/` at the Git root. Verify exclusion before writing; keep approved design inputs needed for maintenance in their existing tracked design directory.

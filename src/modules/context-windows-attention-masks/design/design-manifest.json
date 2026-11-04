@@ -5,7 +5,7 @@
   "modulePath": "src/modules/context-windows-attention-masks",
   "mockupPath": "src/modules/context-windows-attention-masks/design/accepted-mockup.png",
   "promptPath": "src/modules/context-windows-attention-masks/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-acb6f98e-7a59-4646-a4c3-5ab647a581a6.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User-authorized self review; original shared scheme",
   "rejectedDrafts": [
     "V1 universal self-always-allowed claim",

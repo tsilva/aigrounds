@@ -5,7 +5,7 @@
   "modulePath": "src/modules/waiting-arrival-distributions",
   "mockupPath": "src/modules/waiting-arrival-distributions/design/accepted-mockup.png",
   "promptPath": "src/modules/waiting-arrival-distributions/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-328ecebe-0b74-4193-ba96-1677164d2673.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Self-reviewed under the user's explicit authorization for the legacy redesign batch.",
   "refinements": [
     "Use shared immediate radio feedback rather than the mockup's redundant Submit answer button.",

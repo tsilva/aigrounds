@@ -5,7 +5,7 @@
   "modulePath": "src/modules/autoregressive-generation-decoding",
   "mockupPath": "src/modules/autoregressive-generation-decoding/design/accepted-mockup.png",
   "promptPath": "src/modules/autoregressive-generation-decoding/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a10b84-7ef8-7881-9979-0969f179e6ef/exec-a1542e92-bed1-459a-8c03-86afd3f5a9ab.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Explicit user approval on 2026-10-05",
   "refinements": [
     "Reuse the shared LearningPage and ExperimentRail.",

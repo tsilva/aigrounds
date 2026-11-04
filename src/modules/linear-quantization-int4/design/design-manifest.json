@@ -5,7 +5,7 @@
   "modulePath": "src/modules/linear-quantization-int4",
   "acceptedMockupPath": "src/modules/linear-quantization-int4/design/accepted-mockup.png",
   "promptPath": "src/modules/linear-quantization-int4/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-adb61428-40fd-4738-ae2a-fe0c15ade14f.png",
+  "sourceGeneratedImagePath": null,
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User authorized self-review without requesting approval.",
   "approvedRefinements": [

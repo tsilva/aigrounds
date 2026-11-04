@@ -5,7 +5,7 @@
   "modulePath": "src/modules/linear-regression-line-fitting",
   "mockupPath": "design/accepted-mockup.png",
   "promptPath": "design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-8f630c27-b5fe-4162-abab-98289e6b6b47.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Autonomous self-review authorized by user",
   "refinements": [
     "Canonical shared controls, exact editors, selected toolbar and phases used.",

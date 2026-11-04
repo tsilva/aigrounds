@@ -5,7 +5,7 @@
   "modulePath": "src/modules/entropy-information",
   "mockupPath": "src/modules/entropy-information/design/accepted-mockup.png",
   "promptPath": "src/modules/entropy-information/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-412ffae0-dd69-4cbf-8e9c-6e4120852527.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User authorized self-review without approval questions; V2 accepted",
   "review": [
     {

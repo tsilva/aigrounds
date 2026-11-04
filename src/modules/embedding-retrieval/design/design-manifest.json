@@ -5,7 +5,7 @@
   "modulePath": "src/modules/embedding-retrieval",
   "mockupPath": "src/modules/embedding-retrieval/design/accepted-mockup.png",
   "promptPath": "src/modules/embedding-retrieval/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-961cc88f-f44c-4cd2-b334-2f54f9c34064.png",
+  "sourceGeneratedImagePath": null,
   "approval": "User authorized self-review without approval questions; V2 accepted",
   "review": [
     {

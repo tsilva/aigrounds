@@ -5,7 +5,7 @@
   "modulePath": "src/modules/classification-metrics-foundations",
   "mockupPath": "src/modules/classification-metrics-foundations/design/accepted-mockup.png",
   "promptPath": "src/modules/classification-metrics-foundations/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-202306b9-4095-4da4-bcdc-27912b52ca52.png",
+  "sourceGeneratedImagePath": null,
   "review": "V1 self-reviewed; correct actual-row/predicted-column matrix counts and denominator states",
   "refinements": [
     "Canonical shared toolbar selected indigo state instead of literal selected text",

@@ -5,7 +5,7 @@
   "modulePath": "src/modules/range-quartiles-iqr",
   "acceptedMockupPath": "src/modules/range-quartiles-iqr/design/accepted-mockup.png",
   "promptPath": "src/modules/range-quartiles-iqr/design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0f75d-5c6f-7631-a7b0-9ea821a1e141/exec-cbf743c6-45fa-45d1-9d75-95854dad2f8b.png",
+  "sourceGeneratedImagePath": null,
   "designSystem": "DESIGN_SYSTEM.md",
   "approval": "User approved the paired shared-layout mockup and requested removal of the redundant top AI Guide launcher.",
   "approvedRefinements": [

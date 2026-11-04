@@ -5,7 +5,7 @@
   "modulePath": "src/modules/hypothesis-testing-basics",
   "mockupPath": "design/accepted-mockup.png",
   "promptPath": "design/imagegen-prompt.md",
-  "sourceGeneratedImagePath": "/Users/tsilva/.codex/generated_images/01a0fce8-b69c-7ff2-9a57-ee64db8c25d3/exec-e7aa2ed6-6db5-46e2-876e-75ccce7a3afd.png",
+  "sourceGeneratedImagePath": null,
   "approval": "Autonomous self-review explicitly authorized by user",
   "refinements": [
     "Actual shared components govern controls, compact Guide CTA and desktop reflow",

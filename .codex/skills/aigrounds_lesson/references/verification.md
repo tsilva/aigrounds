@@ -49,7 +49,7 @@ Use different exploration or answer paths in the two passes:
    labels, redundant surfaces, ambiguous affordances, uncovered misconceptions,
    and unresolved material friction.
 
-Store compact records outside the repository: URL/build identity, CSS viewport
+Store compact records in gitignored `.internal/qa/YYYY-MM-DD-<lesson>.md` and screenshots in `.internal/evidence/<lesson>/` at the Git root. Verify exclusion and absence from `git ls-files -- .internal` before writing. Records include: URL/build identity, CSS viewport
 and zoom, reset marker, exact paths/answers, oracle expected-versus-observed
 results, console/accessibility-tree results, and selective screenshots.
 

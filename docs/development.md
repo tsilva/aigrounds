@@ -56,3 +56,19 @@ Read [SPECS.md](../SPECS.md) and [AGENTS.md](../AGENTS.md) before repository wor
 The indigo learning-blocks branding includes a README logo at `logo.png`, transparent source artwork in `assets/brand/sources/`, and web icons, favicons, and an Open Graph image in `public/brand/web-seo/`. The app metadata already uses these web assets. `assets/brand/manifest.json` records the current export dimensions; generation prompts are saved with the sources. Master logo/icon exports and older store graphics also live under `assets/brand/`, outside `public`, so they remain available in the repository without being shipped as deployment assets. Keep only the web asset pack in `public/brand/`.
 
 See the [asset inventory](../assets/brand/manifest.json) and [generation prompts](../assets/brand/sources/prompts.md).
+
+## Browser regression checks
+
+For a lesson or shared presentation change, test the affected lesson at 768,
+1024 and 1440 CSS pixels. Check reflow with the Guide open, persistent navigation,
+number-line handles and control labels; page overflow must not hide controls.
+At 767 CSS pixels, verify the desktop notice is the only reachable lesson UI.
+
+Exercise scenarios, reset, exact-value editing, pointer and keyboard controls,
+prediction submission, incorrect-explanation recovery and completion. Verify the
+Guide opens and closes without a duplicate launcher. A quiz must preserve the
+first submitted answer, provide correction feedback, and start a fresh attempt
+after closing or reloading. Check focus, accessible names and console errors.
+After shared UI changes, include an unaffected lesson. Synthetic checks establish
+application behavior; they do not establish learning effectiveness or complete
+accessibility conformance.

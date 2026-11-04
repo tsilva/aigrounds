@@ -15,7 +15,7 @@ After approval, persist or refresh these files under `src/modules/{slug}/design/
   module path, mockup path, prompt path, and source generated-image path.
 
 Record approved refinements that differ from the image, such as removing a
-redundant launcher. Keep transient verification artifacts outside the repository.
+redundant launcher. Keep session reports in gitignored `.internal/qa/YYYY-MM-DD-<lesson>.md` and captures in `.internal/evidence/<lesson>/` at the Git root. Verify exclusion before writing; keep approved design inputs needed for maintenance in their existing tracked design directory.
 
 ## New Lesson Integration
 

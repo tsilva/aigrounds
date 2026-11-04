@@ -72,3 +72,6 @@ next-env.d.ts
 /public/ocr-line-detection/runtime/
 /INBOX.md
 /.local/repo-inbox/
+
+# Private working reports and QA evidence
+/.internal/

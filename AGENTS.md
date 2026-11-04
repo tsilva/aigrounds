@@ -91,3 +91,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Secrets
 
 `pnpm dev --port auto` fetches only the linked Infisical development project through the saved human CLI login. Private keys must remain out of dotenv files, command arguments, logs, and browser bundles. Use `pnpm secrets:check` for presence-only verification. Production uses the separate `aigrounds-production` project and its Vercel Production sync. Do not inject production credentials into local development.
+
+## Internal reports
+
+Keep session QA reports in `.internal/qa/YYYY-MM-DD-<topic>.md`, reusable private
+notes in `.internal/reference/`, and browser captures/measurements in
+`.internal/evidence/`, all beneath the Git root. Verify `/.internal/` is ignored
+and contains no tracked files before writing. Public testing/development docs
+retain reproducible checks and known limitations; do not link them to private
+reports or add machine paths and operator/session details.

@@ -71,7 +71,7 @@ only when rendering behavior needs to change.
 ## Verify and Report
 
 For an audit, verify that tracked and non-ignored untracked contents/status
-still match the baseline; keep transient evidence outside the repository.
+still match the baseline; keep transient reports/evidence in root `.internal/qa/` and `.internal/evidence/`. Verify `/.internal/` is ignored and contains no tracked files before writing.
 After changes, run repository gates and inspect the rendered dashboard with the
 configured browser. Confirm visible order matches `dashboardLessonPlanOrder`,
 published/planned states are distinguishable, and every published card opens

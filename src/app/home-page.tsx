@@ -92,7 +92,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Open AI Grounds on GitHub"
-            className="absolute top-0 right-0 flex size-11 items-center justify-center rounded-lg border border-blue-100 bg-white text-slate-700 shadow-[0_12px_30px_rgba(79,70,229,0.08)] transition hover:border-indigo-200 hover:text-slate-950 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+            className="absolute top-0 right-0 flex size-11 items-center justify-center rounded-lg border border-blue-100 bg-white text-slate-700 shadow-[0_12px_30px_rgba(79,70,229,0.08)] transition hover:border-indigo-200 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <svg
               aria-hidden="true"
@@ -124,7 +124,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search playgrounds"
-              className="h-12 w-full rounded-xl border border-blue-200 bg-white px-4 font-mono text-sm text-slate-900 shadow-[0_12px_30px_rgba(79,70,229,0.08)] outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+              className="h-12 w-full rounded-xl border border-blue-200 bg-white px-4 font-mono text-sm text-slate-900 shadow-[0_12px_30px_rgba(79,70,229,0.08)] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             />
           </label>
         </header>
@@ -155,7 +155,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
                 type="button"
                 aria-pressed={sortOrder === value}
                 onClick={() => setSortOrder(value)}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-4 focus:ring-indigo-100 ${
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
                   sortOrder === value
                     ? "bg-indigo-50 text-indigo-700!"
                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
@@ -167,6 +167,10 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           </div>
         </div>
 
+        <p role="status" aria-atomic="true" className="sr-only">
+          {visiblePlaygrounds.length} {query.trim() ? "matching " : ""}
+          playground{visiblePlaygrounds.length === 1 ? "" : "s"}.
+        </p>
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => (
             <PlaygroundTile key={playground.slug} playground={playground} now={now} progress={progress} />

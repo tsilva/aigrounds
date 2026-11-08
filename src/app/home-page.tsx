@@ -171,7 +171,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           {visiblePlaygrounds.length} {query.trim() ? "matching " : ""}
           playground{visiblePlaygrounds.length === 1 ? "" : "s"}.
         </p>
-        <section aria-label="Playgrounds" className="playground-catalog grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => {
             const updateLabel = playground.status === "live" && playground.lastUpdated
               ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)

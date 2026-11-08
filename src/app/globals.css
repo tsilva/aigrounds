@@ -63,6 +63,14 @@ a {
   background: rgba(15, 118, 110, 0.22);
 }
 
+@media (max-height: 75rem) {
+  /* Keep the first four desktop rows fully laid out on initial load. */
+  .playground-catalog > :nth-child(n + 13) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 16rem;
+  }
+}
+
 .assistant-chat-scrollbar {
   scrollbar-color: transparent transparent;
   scrollbar-width: thin;

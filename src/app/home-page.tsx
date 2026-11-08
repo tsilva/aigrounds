@@ -17,19 +17,20 @@ export type HomePlaygroundCard = {
   status: "live" | "coming-soon";
   href?: string;
   lastUpdated: string | null;
-  pathTitles: string[];
+  pathTitleIndexes: number[];
   chapters: { slug: string; title: string }[];
   reference: boolean;
-  recallGoals: Record<string, string>;
+  recallGoals?: Record<string, string>;
 };
 
 type HomePageProps = {
   playgrounds: HomePlaygroundCard[];
   learningPathIds: string[];
+  learningPathTitles: string[];
   version: string;
 };
 
-export function HomePage({ playgrounds, learningPathIds, version }: HomePageProps) {
+export function HomePage({ playgrounds, learningPathIds, learningPathTitles, version }: HomePageProps) {
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
@@ -60,7 +61,7 @@ export function HomePage({ playgrounds, learningPathIds, version }: HomePageProp
         playground.status,
         ...playground.concepts,
         ...playground.chapters.map(chapter => chapter.title),
-        ...playground.pathTitles,
+        ...playground.pathTitleIndexes.map(index => learningPathTitles[index]),
       ]
         .join(" ")
         .toLowerCase();
@@ -81,7 +82,7 @@ export function HomePage({ playgrounds, learningPathIds, version }: HomePageProp
 
       return a.step - b.step;
     });
-  }, [playgrounds, query, sortOrder]);
+  }, [learningPathTitles, playgrounds, query, sortOrder]);
 
   return (
     <main className="min-h-screen bg-[#f7faff] px-4 py-5 text-slate-950 sm:px-6 lg:px-10">
@@ -138,7 +139,7 @@ export function HomePage({ playgrounds, learningPathIds, version }: HomePageProp
             const title = lesson.chapters.find(chapter => chapter.slug === slug)?.title ?? lesson.title;
             return <div key={slug} className="mt-3 border-t border-blue-100 pt-3 text-sm">
               <p className="font-semibold">{title}</p>
-              <p className="mt-1">From memory: {lesson.recallGoals[slug] ?? "Explain what you changed, what changed as a result, and why."}</p>
+              <p className="mt-1">From memory: {lesson.recallGoals?.[slug] ?? "Explain what you changed, what changed as a result, and why."}</p>
               <Link href={`/playgrounds/${slug}`} className="mt-2 inline-block text-indigo-700! underline! underline-offset-2">Revisit the experiment →</Link>
             </div>;
           })}

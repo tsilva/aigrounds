@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { getLearningPath } from "@/lib/curriculum";
 
 const storageKey = "aigrounds.learning.v1";
@@ -53,7 +53,8 @@ function subscribe(onChange: () => void) {
   };
 }
 export function useLearningProgress() {
-  return parseLearningProgress(useSyncExternalStore(subscribe, readSnapshot, () => ""));
+  const snapshot = useSyncExternalStore(subscribe, readSnapshot, () => "");
+  return useMemo(() => parseLearningProgress(snapshot), [snapshot]);
 }
 export function recordLearningProgress(slug: string, kind: "visited" | "reviewed" | "transfer" | "test", path?: string) {
   const progress = parseLearningProgress(readSnapshot());

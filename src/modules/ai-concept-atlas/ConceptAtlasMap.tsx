@@ -1,6 +1,7 @@
 "use client";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Handle, Position, ReactFlow, type Edge, type Node, type NodeProps, type ReactFlowInstance } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import { LessonAction } from "@/components/learning-page/learning-page";
 import { atlasConceptById, atlasDomainById, type AtlasConceptKind, type AtlasDomainId } from "./ai-concept-atlas-data";
 import { NODE_HEIGHT, NODE_WIDTH, getAncestorIds, type AtlasBranchSide, type AtlasView } from "./ai-concept-atlas-engine";

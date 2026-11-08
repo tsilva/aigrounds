@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
 import { canonicalLessonSlug, getLearningPath, lessonHref } from "@/lib/curriculum";
 import { useLearningProgress } from "@/lib/learning-progress";
@@ -172,9 +172,12 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           playground{visiblePlaygrounds.length === 1 ? "" : "s"}.
         </p>
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {visiblePlaygrounds.map((playground) => (
-            <PlaygroundTile key={playground.slug} playground={playground} now={now} progress={progress} />
-          ))}
+          {visiblePlaygrounds.map((playground) => {
+            const updateLabel = playground.status === "live" && playground.lastUpdated
+              ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
+              : null;
+            return <PlaygroundTile key={playground.slug} playground={playground} updateLabel={updateLabel} progress={progress} />;
+          })}
         </section>
 
         {visiblePlaygrounds.length === 0 ? (
@@ -191,14 +194,15 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
   );
 }
 
-function PlaygroundTile({ playground, now, progress }: { playground: HomePlaygroundCard; now: number | null; progress: ReturnType<typeof useLearningProgress> }) {
+const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, progress }: {
+  playground: HomePlaygroundCard;
+  updateLabel: string | null;
+  progress: ReturnType<typeof useLearningProgress>;
+}) {
   const isComingSoon = playground.status === "coming-soon";
   const chapters = playground.chapters.length ? playground.chapters.map(chapter => chapter.slug) : [playground.slug];
   const checked = chapters.filter(slug => progress.transfers[slug]).length;
   const reviewedCount = chapters.filter(slug => progress.reviewed.includes(slug)).length;
-  const updateLabel = playground.lastUpdated
-    ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
-    : null;
   const baseTileClassName =
     "group flex min-h-56 flex-col rounded-xl border p-5";
   const liveTileClassName =
@@ -277,4 +281,4 @@ function PlaygroundTile({ playground, now, progress }: { playground: HomePlaygro
   }
 
   return <article className={comingSoonTileClassName}>{content}</article>;
-}
+});

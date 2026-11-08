@@ -1,61 +1,14 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
 import { getLearningPath } from "@/lib/curriculum";
+import { readLearningProgress, readSnapshot, writeSnapshot, type LearningProgress } from "@/lib/learning-progress-store";
 
-const storageKey = "aigrounds.learning.v1";
-const changeEvent = "aigrounds-learning-changed";
-export type LearningProgress = {
-  visited: string[];
-  reviewed: string[];
-  transfers: Record<string, number>;
-  testPasses: Record<string, number>;
-  last?: { slug: string; path?: string };
-};
-const emptyProgress: LearningProgress = { visited: [], reviewed: [], transfers: {}, testPasses: {} };
-let memorySnapshot = "";
+export type { LearningProgress } from "@/lib/learning-progress-store";
 
 export function parseLearningProgress(raw: string): LearningProgress {
-  try {
-    const value: unknown = JSON.parse(raw);
-    if (!value || typeof value !== "object") return emptyProgress;
-    const p = value as Record<string, unknown>;
-    const slugs = (items: unknown) => Array.isArray(items)
-      ? [...new Set(items.filter((item): item is string => typeof item === "string" && /^[a-z0-9-]+$/.test(item)))] : [];
-    const transfers: Record<string, number> = {};
-    if (p.transfers && typeof p.transfers === "object") {
-      for (const [slug, time] of Object.entries(p.transfers)) {
-        if (/^[a-z0-9-]+$/.test(slug) && typeof time === "number" && Number.isFinite(time) && time > 0) transfers[slug] = time;
-      }
-    }
-    const testPasses: Record<string, number> = {};
-    if (p.testPasses && typeof p.testPasses === "object") {
-      for (const [slug, time] of Object.entries(p.testPasses)) {
-        if (/^[a-z0-9-]+$/.test(slug) && typeof time === "number" && Number.isFinite(time) && time > 0) testPasses[slug] = time;
-      }
-    }
-    const last = p.last && typeof p.last === "object" ? p.last as Record<string, unknown> : undefined;
-    return { visited: slugs(p.visited), reviewed: slugs(p.reviewed), transfers, testPasses,
-      last: typeof last?.slug === "string" && /^[a-z0-9-]+$/.test(last.slug)
-        ? { slug: last.slug, path: typeof last.path === "string" && getLearningPath(last.path) ? last.path : undefined } : undefined };
-  } catch { return emptyProgress; }
+  return readLearningProgress(raw, path => Boolean(getLearningPath(path)));
 }
-function readSnapshot() {
-  try { return window.localStorage.getItem(storageKey) ?? memorySnapshot; }
-  catch { return memorySnapshot; }
-}
-function subscribe(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  window.addEventListener(changeEvent, onChange);
-  return () => {
-    window.removeEventListener("storage", onChange);
-    window.removeEventListener(changeEvent, onChange);
-  };
-}
-export function useLearningProgress() {
-  const snapshot = useSyncExternalStore(subscribe, readSnapshot, () => "");
-  return useMemo(() => parseLearningProgress(snapshot), [snapshot]);
-}
+
 export function recordLearningProgress(slug: string, kind: "visited" | "reviewed" | "transfer" | "test", path?: string) {
   const progress = parseLearningProgress(readSnapshot());
   const next = { ...progress, last: kind === "test" ? progress.last : { slug, path: getLearningPath(path)?.id } };
@@ -64,9 +17,5 @@ export function recordLearningProgress(slug: string, kind: "visited" | "reviewed
   // Revisiting a completed result must not reset the delayed-review clock.
   if (kind === "transfer" && !progress.transfers[slug]) next.transfers = { ...progress.transfers, [slug]: Date.now() };
   if (kind === "test" && !progress.testPasses[slug]) next.testPasses = { ...progress.testPasses, [slug]: Date.now() };
-  const serialized = JSON.stringify(next);
-  if (serialized === readSnapshot()) return;
-  memorySnapshot = serialized;
-  try { window.localStorage.setItem(storageKey, serialized); } catch { /* Session-only progress remains available. */ }
-  window.dispatchEvent(new Event(changeEvent));
+  writeSnapshot(JSON.stringify(next));
 }

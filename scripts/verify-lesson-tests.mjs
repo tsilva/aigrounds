@@ -240,16 +240,22 @@ for (const blocked of [false, true]) {
 // Exercise the actual progress reader/writer without rendering React hooks or
 // resolving paths. Visits, review and transfer cannot become test passes.
 const saved = new Map();
-const progress = load("src/lib/learning-progress.ts", {
+const progressStore = load("src/lib/learning-progress-store.ts", {
   require: name => {
-    if (name === "react") return {};
-    if (name === "@/lib/curriculum") return { getLearningPath: () => undefined };
+    if (name === "react") return { useMemo: read => read(), useSyncExternalStore: (_, getSnapshot) => getSnapshot() };
     throw new Error(`Unexpected dependency ${name}`);
   },
   window: { localStorage: { getItem: key => saved.get(key), setItem: (key, value) => saved.set(key, value) }, dispatchEvent: () => {} },
   Event: class { constructor(type) { this.type = type; } },
 });
-for (const kind of ["visited", "reviewed", "transfer"]) progress.recordLearningProgress(bank.slug, kind);
+const progress = load("src/lib/learning-progress.ts", {
+  require: name => {
+    if (name === "@/lib/curriculum") return { getLearningPath: id => id === "core" ? { id } : undefined };
+    if (name === "@/lib/learning-progress-store") return progressStore;
+    throw new Error(`Unexpected dependency ${name}`);
+  },
+});
+for (const kind of ["visited", "reviewed", "transfer"]) progress.recordLearningProgress(bank.slug, kind, "core");
 let learning = progress.parseLearningProgress(saved.get("aigrounds.learning.v1"));
 equal(learning.testPasses, {}, "existing learning signals do not mark a test passed");
 const last = learning.last;
@@ -257,6 +263,8 @@ progress.recordLearningProgress(bank.slug, "test");
 learning = progress.parseLearningProgress(saved.get("aigrounds.learning.v1"));
 ok(learning.testPasses[bank.slug] > 0, "separate test-pass record persists");
 equal(learning.last, last, "test pass preserves the current learning path");
+equal(progressStore.useLearningProgress(["core"]), learning, "the homepage reads the same progress as the lesson writer");
+equal(progressStore.useLearningProgress([]).last?.path, undefined, "the homepage discards a stale learning path");
 equal([learning.visited, learning.reviewed], [[bank.slug], [bank.slug]], "old progress flags survive adding a test pass");
 equal(progress.parseLearningProgress('{"testPasses":{"mean-median-mode":-1}}').testPasses, {}, "invalid test timestamp ignored");
 console.log(`Lesson-test checks passed: ${checks}; 48 authored items, independent numeric oracles and 1,600 balanced draws.`);

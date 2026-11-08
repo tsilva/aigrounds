@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { memo, useEffect, useMemo, useState } from "react";
 import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
-import { canonicalLessonSlug, getLearningPath, lessonHref } from "@/lib/curriculum";
-import { useLearningProgress } from "@/lib/learning-progress";
+import { useLearningProgress } from "@/lib/learning-progress-store";
 
 export type HomePlaygroundCard = {
   step: number;
@@ -18,7 +17,7 @@ export type HomePlaygroundCard = {
   status: "live" | "coming-soon";
   href?: string;
   lastUpdated: string | null;
-  paths: string[];
+  pathTitles: string[];
   chapters: { slug: string; title: string }[];
   reference: boolean;
   recallGoals: Record<string, string>;
@@ -26,14 +25,15 @@ export type HomePlaygroundCard = {
 
 type HomePageProps = {
   playgrounds: HomePlaygroundCard[];
+  learningPathIds: string[];
   version: string;
 };
 
-export function HomePage({ playgrounds, version }: HomePageProps) {
+export function HomePage({ playgrounds, learningPathIds, version }: HomePageProps) {
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
-  const progress = useLearningProgress();
+  const progress = useLearningProgress(learningPathIds);
 
   useEffect(() => {
     const refresh = () => setNow(Date.now());
@@ -60,7 +60,7 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
         playground.status,
         ...playground.concepts,
         ...playground.chapters.map(chapter => chapter.title),
-        ...playground.paths.map(id => getLearningPath(id)?.title ?? id),
+        ...playground.pathTitles,
       ]
         .join(" ")
         .toLowerCase();
@@ -133,13 +133,13 @@ export function HomePage({ playgrounds, version }: HomePageProps) {
           <h2 className="text-lg font-semibold">Recall an earlier idea</h2>
           <p className="mt-1 text-sm text-slate-600">Explain one idea from memory before reopening its experiment.</p>
           {Object.entries(progress.transfers).filter(([, time]) => now - time >= 86_400_000).sort((a, b) => a[1] - b[1]).slice(0, 3).map(([slug]) => {
-            const lesson = playgrounds.find(item => item.slug === canonicalLessonSlug(slug));
+            const lesson = playgrounds.find(item => item.slug === slug || item.chapters.some(chapter => chapter.slug === slug));
             if (!lesson) return null;
             const title = lesson.chapters.find(chapter => chapter.slug === slug)?.title ?? lesson.title;
             return <div key={slug} className="mt-3 border-t border-blue-100 pt-3 text-sm">
               <p className="font-semibold">{title}</p>
               <p className="mt-1">From memory: {lesson.recallGoals[slug] ?? "Explain what you changed, what changed as a result, and why."}</p>
-              <Link href={lessonHref(slug)} className="mt-2 inline-block text-indigo-700! underline! underline-offset-2">Revisit the experiment →</Link>
+              <Link href={`/playgrounds/${slug}`} className="mt-2 inline-block text-indigo-700! underline! underline-offset-2">Revisit the experiment →</Link>
             </div>;
           })}
         </section>}

@@ -1,3 +1,4 @@
+import "./playground-utilities.css";
 import { PlaygroundAssistantShell } from "@/components/playground-assistant-shell";
 import { Suspense } from "react";
 import { LessonJourneyProvider } from "@/components/curriculum/lesson-journey";

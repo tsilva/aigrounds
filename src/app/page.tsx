@@ -1,3 +1,4 @@
+import "./catalog.css";
 import { HomePage, type HomePlaygroundCard } from "@/app/home-page";
 import { activePlaygroundMetadata, upcomingPlaygrounds } from "@/lib/playground-metadata";
 import { dashboardLessonPlanOrder, getLessonGroup, learningPaths, referenceSlugs, coreLessonOrder } from "@/lib/curriculum";

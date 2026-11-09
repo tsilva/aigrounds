@@ -224,22 +224,42 @@ const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, p
   const chapters = playground.chapters.length ? playground.chapters.map(chapter => chapter.slug) : [playground.slug];
   const checked = chapters.filter(slug => progress.transfers[slug]).length;
   const reviewedCount = chapters.filter(slug => progress.reviewed.includes(slug)).length;
+  const baseTileClassName =
+    "group flex min-h-56 flex-col rounded-xl border p-5";
+  const liveTileClassName =
+    "group flex min-h-56 flex-col rounded-xl border border-blue-100 bg-white p-5 shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)]";
+  const comingSoonTileClassName = `${baseTileClassName} cursor-default border-slate-200 bg-slate-50/80 shadow-none`;
+  const levelClassName = isComingSoon
+    ? "font-mono text-xs font-medium uppercase tracking-[0.18em] text-slate-500"
+    : "font-mono text-xs font-medium uppercase tracking-[0.18em] text-slate-600";
+  const titleClassName = isComingSoon
+    ? "mt-4 text-2xl leading-tight font-semibold text-slate-500"
+    : "mt-4 text-2xl leading-tight font-semibold text-slate-950";
+  const stepClassName = isComingSoon
+    ? "shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs font-medium text-slate-500"
+    : "shrink-0 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 font-mono text-xs font-medium text-indigo-700!";
+  const tagClassName = isComingSoon
+    ? "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"
+    : "text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600";
+  const outcomeClassName = isComingSoon
+    ? "mt-3 text-sm leading-6 text-slate-500"
+    : "mt-3 text-sm leading-6 text-slate-600";
   const content = (
     <>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="catalog-level">
+          <p className={levelClassName}>
             {playground.level}
           </p>
-          <h2 className="catalog-title">
+          <h2 className={titleClassName}>
             {playground.title}
           </h2>
         </div>
-        {!playground.reference && <span className="catalog-step">{String(playground.step).padStart(2, "0")}</span>}
+        {!playground.reference && <span className={stepClassName}>{String(playground.step).padStart(2, "0")}</span>}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <p className="catalog-tag">
+        <p className={tagClassName}>
           {playground.tag}
         </p>
         {isComingSoon ? (
@@ -248,7 +268,7 @@ const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, p
           </span>
         ) : null}
       </div>
-      <p className="catalog-outcome">
+      <p className={outcomeClassName}>
         {playground.outcome}.
       </p>
       <p className="mt-3 text-xs text-slate-500">{playground.duration}</p>
@@ -274,12 +294,12 @@ const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, p
       <Link
         href={playground.href}
         prefetch={false}
-        className="group catalog-card catalog-card-live"
+        className={liveTileClassName}
       >
         {content}
       </Link>
     );
   }
 
-  return <article className="group catalog-card catalog-card-planned">{content}</article>;
+  return <article className={comingSoonTileClassName}>{content}</article>;
 });

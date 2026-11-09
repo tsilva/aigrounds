@@ -3,7 +3,6 @@ import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import "./globals.css";
-import "./catalog.css";
 
 const SITE_URL = "https://aigrounds.tsilva.eu";
 const SITE_TITLE = "AI Grounds | Interactive AI Playgrounds";

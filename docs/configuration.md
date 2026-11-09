@@ -31,6 +31,7 @@ Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. S
 - Google Analytics loads when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set.
 - Vercel Analytics renders when `VERCEL=1`.
 - Browser Sentry initializes when `NEXT_PUBLIC_SENTRY_DSN` is present. Server and edge Sentry use `SENTRY_DSN`, falling back to `NEXT_PUBLIC_SENTRY_DSN`.
+- The browser, server and edge SDKs disable automatic collection of user information, cookies, HTTP headers and bodies, URL query parameters and instrumented AI inputs and outputs.
 
 ## Local credentials
 

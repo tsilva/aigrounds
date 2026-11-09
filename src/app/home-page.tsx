@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { memo, useEffect, useMemo, useState } from "react";
-import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
+import { formatPlaygroundUpdateLabel, RELATIVE_UPDATE_WINDOW_MS } from "@/lib/playground-update-label";
 import { useLearningProgress } from "@/lib/learning-progress-store";
 
 export type HomePlaygroundCard = {
@@ -35,16 +35,36 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
   const progress = useLearningProgress(learningPathIds);
+  const hasTransferHistory = Object.keys(progress.transfers).length > 0;
 
   useEffect(() => {
-    const refresh = () => setNow(Date.now());
+    const refresh = () => {
+      const time = Date.now();
+      const needsClock = hasTransferHistory || playgrounds.some(({ status, lastUpdated }) => {
+        if (status !== "live" || !lastUpdated) return false;
+        const age = time - Date.parse(lastUpdated);
+        return age >= 0 && age <= RELATIVE_UPDATE_WINDOW_MS;
+      });
+      // Calendar dates stay stable until there is a relative date or recall to show.
+      setNow(needsClock ? time : null);
+    };
     const initialRefresh = window.setTimeout(refresh, 0);
     const interval = window.setInterval(refresh, 60_000);
     return () => {
       window.clearTimeout(initialRefresh);
       window.clearInterval(interval);
     };
-  }, []);
+  }, [hasTransferHistory, playgrounds]);
+
+  const updateLabels = useMemo(() => {
+    const labels = new Map<string, string | null>();
+    for (const { status, lastUpdated } of playgrounds) {
+      if (status === "live" && lastUpdated && !labels.has(lastUpdated)) {
+        labels.set(lastUpdated, formatPlaygroundUpdateLabel(lastUpdated, now));
+      }
+    }
+    return labels;
+  }, [now, playgrounds]);
 
   const visiblePlaygrounds = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -175,7 +195,7 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => {
             const updateLabel = playground.status === "live" && playground.lastUpdated
-              ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
+              ? updateLabels.get(playground.lastUpdated) ?? null
               : null;
             return <PlaygroundTile key={playground.slug} playground={playground} updateLabel={updateLabel} progress={progress} />;
           })}

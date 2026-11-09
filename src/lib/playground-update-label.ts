@@ -1,7 +1,7 @@
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
-const WEEK = 7 * DAY;
+export const RELATIVE_UPDATE_WINDOW_MS = 7 * DAY;
 
 const calendarDate = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
@@ -9,7 +9,7 @@ const calendarDate = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
   timeZone: "UTC",
 });
-const relativeTime = new Intl.RelativeTimeFormat("en", { numeric: "always" });
+let relativeTime: Intl.RelativeTimeFormat | undefined;
 
 export function formatPlaygroundUpdateLabel(
   lastUpdated: string,
@@ -20,8 +20,9 @@ export function formatPlaygroundUpdateLabel(
 
   // Render a stable calendar date until the browser clock is available.
   const elapsed = now === null ? null : now - timestamp;
-  if (elapsed !== null && elapsed >= 0 && elapsed <= WEEK) {
+  if (elapsed !== null && elapsed >= 0 && elapsed <= RELATIVE_UPDATE_WINDOW_MS) {
     if (elapsed < MINUTE) return "just now";
+    relativeTime ??= new Intl.RelativeTimeFormat("en", { numeric: "always" });
     if (elapsed < HOUR) {
       return relativeTime.format(-Math.floor(elapsed / MINUTE), "minute");
     }

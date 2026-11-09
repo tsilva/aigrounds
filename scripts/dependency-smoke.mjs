@@ -23,7 +23,6 @@ assert.doesNotMatch(lock, /^\s+brace-expansion@1\./m, "retired brace-expansion b
 
 for (const expected of [
   "'@babel/core@7.29.7':",
-  "'@opentelemetry/core@2.12.0':",
   "brace-expansion@5.0.12:",
   "fast-uri@3.1.9:",
   "glob@14.0.2:",
@@ -63,15 +62,20 @@ assert.deepEqual(yaml.load("lesson:\n  title: Probability\n  active: true\n"), {
   lesson: { title: "Probability", active: true },
 });
 
-const { ROOT_CONTEXT, propagation } = virtualRequire("@opentelemetry/api");
-const { W3CBaggagePropagator } = virtualRequire("@opentelemetry/core");
-const oversizedBaggage = Array.from({ length: 1_000 }, (_, index) => `key${index}=value`).join(",");
-const extractedContext = new W3CBaggagePropagator().extract(
-  ROOT_CONTEXT,
-  { baggage: oversizedBaggage },
-  { get: (carrier, key) => carrier[key], keys: (carrier) => Object.keys(carrier) },
-);
-assert.equal(propagation.getBaggage(extractedContext).getAllEntries().length, 180);
+// Sentry 11 no longer installs OpenTelemetry. If it returns, retain the
+// fixed version and the oversized-baggage regression check.
+if (lock.includes("'@opentelemetry/core@")) {
+  assert.ok(lock.includes("'@opentelemetry/core@2.12.0':"));
+  const { ROOT_CONTEXT, propagation } = virtualRequire("@opentelemetry/api");
+  const { W3CBaggagePropagator } = virtualRequire("@opentelemetry/core");
+  const oversizedBaggage = Array.from({ length: 1_000 }, (_, index) => `key${index}=value`).join(",");
+  const extractedContext = new W3CBaggagePropagator().extract(
+    ROOT_CONTEXT,
+    { baggage: oversizedBaggage },
+    { get: (carrier, key) => carrier[key], keys: (carrier) => Object.keys(carrier) },
+  );
+  assert.equal(propagation.getBaggage(extractedContext).getAllEntries().length, 180);
+}
 
 // Reject indexed maps that would expand into billions of generated lines.
 const { SourceMapConsumer, SourceNode } = virtualRequire("source-map-js");

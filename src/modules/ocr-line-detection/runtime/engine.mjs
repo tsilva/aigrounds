@@ -9,15 +9,28 @@ function ask(data){return new Promise((resolve,reject)=>{const id=++nextId;pendi
 const ready=ask({type:'ready'});
 const hash='f2bd4cba23e9c328cf7ec824634e423e191a2c6aacbbf35c62bd79dd70f62f59';
 const revision='bd02167fdf2005a19962cc15188f8496a2c87d3b';
-let pdf=null,current=null,serial=0,cached=null;
+let pdfTask=null,pdf=null,current=null,serial=0,cached=null;
 const makeCanvas=(w,h)=>Object.assign(document.createElement('canvas'),{width:w,height:h});
+async function closePdf(){
+ const task=pdfTask;
+ pdfTask=null;pdf=null;
+ await task?.destroy();
+}
 async function openFile(file){
  if(file.size>25*1024*1024)throw Error('Choose a file smaller than 25 MB.');
  const bytes=new Uint8Array(await file.arrayBuffer());
- if(pdf){await pdf.destroy();pdf=null;}
+ await closePdf();
  if(new TextDecoder().decode(bytes.subarray(0,4))==='%PDF'){
-  pdf=await pdfjs.getDocument({data:bytes,isEvalSupported:false,cMapUrl:'/ocr-line-detection/vendor/cmaps/',cMapPacked:true,standardFontDataUrl:'/ocr-line-detection/vendor/standard_fonts/'}).promise;
-  if(pdf.numPages>500){await pdf.destroy();pdf=null;throw Error('Choose a PDF with at most 500 pages.');}
+  pdfTask=pdfjs.getDocument({
+   data:bytes,
+   cMapUrl:'/ocr-line-detection/vendor/cmaps/',
+   cMapPacked:true,
+   standardFontDataUrl:'/ocr-line-detection/vendor/standard_fonts/',
+   iccUrl:'/ocr-line-detection/vendor/iccs/',
+   wasmUrl:'/ocr-line-detection/vendor/wasm/',
+  });
+  pdf=await pdfTask.promise;
+  if(pdf.numPages>500){await closePdf();throw Error('Choose a PDF with at most 500 pages.');}
   current={kind:'pdf',name:file.name,id:++serial};return {name:file.name,pages:pdf.numPages};
  }
  const image=await createImageBitmap(file);
@@ -85,9 +98,9 @@ async function analyze(p){const started=performance.now(),key=[p.source,p.source
  const c=cached,w=c.outputShape[3],h=c.outputShape[2],t=performance.now(),decoded=decode(c.out,w,h,p.threshold,p.min_area,c.scale,[c.source.height,c.source.width]),decodeMs=performance.now()-t,display=maps(c.out,w,h,decoded);
  return {source:p.source==='upload'?current.name+' / page '+p.page:p.source,original_shape:[c.source.height,c.source.width],input_shape:c.shape,output_shape:c.outputShape,input_scale:c.scale,threshold:p.threshold,min_area:p.min_area,resolution:p.resolution,model_sha256:hash,revision,
   boxes:decoded.boxes,components:decoded.components,labels:decoded.labels,tensor:c.out,ink:c.x,images:{source:c.source,input:c.input,...display.images},distance_caps:display.caps,
-  runtime:'ONNX Runtime Web 1.23.2 · WebAssembly · browser CPU · worker',timings:{preprocess_ms:c.preMs,inference_ms:c.ms,decode_ms:decodeMs,request_ms:performance.now()-started,cached_inference:cachedInference}};
+  runtime:'ONNX Runtime Web · WebAssembly · browser CPU · worker',timings:{preprocess_ms:c.preMs,inference_ms:c.ms,decode_ms:decodeMs,request_ms:performance.now()-started,cached_inference:cachedInference}};
 }
 
-function dispose(){worker.terminate();for(const p of pending.values())p.reject(Error('Detector closed'));pending.clear();if(pdf)void pdf.destroy();pdf=null;current=null;cached=null;}
+function dispose(){worker.terminate();for(const p of pending.values())p.reject(Error('Detector closed'));pending.clear();void closePdf();current=null;cached=null;}
 return {ready,openFile,openProvided,analyze,dispose};
 }

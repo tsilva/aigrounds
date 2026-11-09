@@ -21,7 +21,7 @@ The JavaScript decoder follows Indra's `det_post.decode`: sigmoid channel 0, str
 
 ## Browser runtime and privacy
 
-ONNX Runtime Web **1.23.2** executes the detector on browser CPU through single-thread WebAssembly in a dedicated worker. PDF.js **5.4.296** renders one selected PDF page at a time. JavaScript preprocessing constructs the actual float32 ink tensor; there is no PDF text-layer shortcut, server inference endpoint or runtime CDN. The worker and document are disposed when leaving the lesson.
+ONNX Runtime Web executes the detector on browser CPU through single-thread WebAssembly in a dedicated worker. PDF.js renders one selected PDF page at a time with same-origin CMaps, standard fonts, ICC profiles and WebAssembly assets. The build records the installed package versions in `/ocr-line-detection/vendor/versions.json`. JavaScript preprocessing constructs the actual float32 ink tensor; there is no PDF text-layer shortcut, server inference endpoint or runtime CDN. The worker and document are disposed when leaving the lesson.
 
 The bundled two-page PDF is an authored raster classroom fixture about a fictional community library. It contains no personal records. The source sandbox's private lab PDF, downloaded tensors and screenshots are not copied into this repo. A learner can open a local PDF/image; its bytes are never uploaded. Existing AI Guide requests use the site's server route and visible lesson context; users should not paste private content into the Guide.
 

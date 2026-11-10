@@ -15,12 +15,10 @@ export type HomePlaygroundCard = {
   level: string;
   concepts: string[];
   status: "live" | "coming-soon";
-  href?: string;
   lastUpdated: string | null;
   pathTitleIndexes: number[];
   chapters: { slug: string; title: string }[];
   reference: boolean;
-  recallGoals?: Record<string, string>;
 };
 
 type HomePageProps = {
@@ -34,8 +32,14 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
+  const [recallGoals, setRecallGoals] = useState<Record<string, string> | null>(null);
   const progress = useLearningProgress(learningPathIds);
   const hasTransferHistory = Object.keys(progress.transfers).length > 0;
+  const dueRecall = now === null ? [] : Object.entries(progress.transfers)
+    .filter(([, time]) => now - time >= 86_400_000)
+    .sort((a, b) => a[1] - b[1])
+    .slice(0, 3);
+  const hasDueRecall = dueRecall.length > 0;
 
   useEffect(() => {
     const refresh = () => {
@@ -55,6 +59,21 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
       window.clearInterval(interval);
     };
   }, [hasTransferHistory, playgrounds]);
+
+  useEffect(() => {
+    if (!hasDueRecall || recallGoals !== null) return;
+    const controller = new AbortController();
+    void fetch("/recall-prompts.json", { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Could not load recall prompts.");
+        return response.json() as Promise<Record<string, string>>;
+      })
+      .then(
+        (goals) => { if (!controller.signal.aborted) setRecallGoals(goals); },
+        () => { if (!controller.signal.aborted) setRecallGoals({}); },
+      );
+    return () => controller.abort();
+  }, [hasDueRecall, recallGoals]);
 
   const updateLabels = useMemo(() => {
     const labels = new Map<string, string | null>();
@@ -150,16 +169,18 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
           </label>
         </header>
 
-        {now !== null && Object.entries(progress.transfers).some(([, time]) => now - time >= 86_400_000) && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">
+        {hasDueRecall && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">
           <h2 className="text-lg font-semibold">Recall an earlier idea</h2>
           <p className="mt-1 text-sm text-slate-600">Explain one idea from memory before reopening its experiment.</p>
-          {Object.entries(progress.transfers).filter(([, time]) => now - time >= 86_400_000).sort((a, b) => a[1] - b[1]).slice(0, 3).map(([slug]) => {
+          {dueRecall.map(([slug]) => {
             const lesson = playgrounds.find(item => item.slug === slug || item.chapters.some(chapter => chapter.slug === slug));
             if (!lesson) return null;
-            const title = lesson.chapters.find(chapter => chapter.slug === slug)?.title ?? lesson.title;
+            const chapter = lesson.chapters.find(chapter => chapter.slug === slug);
+            const title = chapter?.title ?? lesson.title;
+            const goal = lesson.chapters.length && !chapter ? undefined : recallGoals?.[slug];
             return <div key={slug} className="mt-3 border-t border-blue-100 pt-3 text-sm">
               <p className="font-semibold">{title}</p>
-              <p className="mt-1">From memory: {lesson.recallGoals?.[slug] ?? "Explain what you changed, what changed as a result, and why."}</p>
+              <p className="mt-1">From memory: {goal ?? "Explain what you changed, what changed as a result, and why."}</p>
               <Link href={`/playgrounds/${slug}`} className="mt-2 inline-block text-indigo-700! underline! underline-offset-2">Revisit the experiment →</Link>
             </div>;
           })}
@@ -289,10 +310,10 @@ const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, p
     </>
   );
 
-  if (playground.href) {
+  if (!isComingSoon) {
     return (
       <Link
-        href={playground.href}
+        href={`/playgrounds/${playground.slug}`}
         prefetch={false}
         className={liveTileClassName}
       >

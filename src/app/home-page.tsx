@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { memo, useEffect, useMemo, useState } from "react";
-import { formatPlaygroundUpdateLabel } from "@/lib/playground-update-label";
+import { formatPlaygroundUpdateLabel, RELATIVE_UPDATE_WINDOW_MS } from "@/lib/playground-update-label";
 import { useLearningProgress } from "@/lib/learning-progress-store";
 
 export type HomePlaygroundCard = {
@@ -15,12 +15,10 @@ export type HomePlaygroundCard = {
   level: string;
   concepts: string[];
   status: "live" | "coming-soon";
-  href?: string;
   lastUpdated: string | null;
   pathTitleIndexes: number[];
   chapters: { slug: string; title: string }[];
   reference: boolean;
-  recallGoals?: Record<string, string>;
 };
 
 type HomePageProps = {
@@ -34,17 +32,58 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);
+  const [recallGoals, setRecallGoals] = useState<Record<string, string> | null>(null);
   const progress = useLearningProgress(learningPathIds);
+  const hasTransferHistory = Object.keys(progress.transfers).length > 0;
+  const dueRecall = now === null ? [] : Object.entries(progress.transfers)
+    .filter(([, time]) => now - time >= 86_400_000)
+    .sort((a, b) => a[1] - b[1])
+    .slice(0, 3);
+  const hasDueRecall = dueRecall.length > 0;
 
   useEffect(() => {
-    const refresh = () => setNow(Date.now());
+    const refresh = () => {
+      const time = Date.now();
+      const needsClock = hasTransferHistory || playgrounds.some(({ status, lastUpdated }) => {
+        if (status !== "live" || !lastUpdated) return false;
+        const age = time - Date.parse(lastUpdated);
+        return age >= 0 && age <= RELATIVE_UPDATE_WINDOW_MS;
+      });
+      // Calendar dates stay stable until there is a relative date or recall to show.
+      setNow(needsClock ? time : null);
+    };
     const initialRefresh = window.setTimeout(refresh, 0);
     const interval = window.setInterval(refresh, 60_000);
     return () => {
       window.clearTimeout(initialRefresh);
       window.clearInterval(interval);
     };
-  }, []);
+  }, [hasTransferHistory, playgrounds]);
+
+  useEffect(() => {
+    if (!hasDueRecall || recallGoals !== null) return;
+    const controller = new AbortController();
+    void fetch("/recall-prompts.json", { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Could not load recall prompts.");
+        return response.json() as Promise<Record<string, string>>;
+      })
+      .then(
+        (goals) => { if (!controller.signal.aborted) setRecallGoals(goals); },
+        () => { if (!controller.signal.aborted) setRecallGoals({}); },
+      );
+    return () => controller.abort();
+  }, [hasDueRecall, recallGoals]);
+
+  const updateLabels = useMemo(() => {
+    const labels = new Map<string, string | null>();
+    for (const { status, lastUpdated } of playgrounds) {
+      if (status === "live" && lastUpdated && !labels.has(lastUpdated)) {
+        labels.set(lastUpdated, formatPlaygroundUpdateLabel(lastUpdated, now));
+      }
+    }
+    return labels;
+  }, [now, playgrounds]);
 
   const visiblePlaygrounds = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -130,16 +169,18 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
           </label>
         </header>
 
-        {now !== null && Object.entries(progress.transfers).some(([, time]) => now - time >= 86_400_000) && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">
+        {hasDueRecall && <section aria-label="Recall practice" className="rounded-xl border border-blue-100 bg-white p-5">
           <h2 className="text-lg font-semibold">Recall an earlier idea</h2>
           <p className="mt-1 text-sm text-slate-600">Explain one idea from memory before reopening its experiment.</p>
-          {Object.entries(progress.transfers).filter(([, time]) => now - time >= 86_400_000).sort((a, b) => a[1] - b[1]).slice(0, 3).map(([slug]) => {
+          {dueRecall.map(([slug]) => {
             const lesson = playgrounds.find(item => item.slug === slug || item.chapters.some(chapter => chapter.slug === slug));
             if (!lesson) return null;
-            const title = lesson.chapters.find(chapter => chapter.slug === slug)?.title ?? lesson.title;
+            const chapter = lesson.chapters.find(chapter => chapter.slug === slug);
+            const title = chapter?.title ?? lesson.title;
+            const goal = lesson.chapters.length && !chapter ? undefined : recallGoals?.[slug];
             return <div key={slug} className="mt-3 border-t border-blue-100 pt-3 text-sm">
               <p className="font-semibold">{title}</p>
-              <p className="mt-1">From memory: {lesson.recallGoals?.[slug] ?? "Explain what you changed, what changed as a result, and why."}</p>
+              <p className="mt-1">From memory: {goal ?? "Explain what you changed, what changed as a result, and why."}</p>
               <Link href={`/playgrounds/${slug}`} className="mt-2 inline-block text-indigo-700! underline! underline-offset-2">Revisit the experiment →</Link>
             </div>;
           })}
@@ -175,7 +216,7 @@ export function HomePage({ playgrounds, learningPathIds, learningPathTitles, ver
         <section aria-label="Playgrounds" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visiblePlaygrounds.map((playground) => {
             const updateLabel = playground.status === "live" && playground.lastUpdated
-              ? formatPlaygroundUpdateLabel(playground.lastUpdated, now)
+              ? updateLabels.get(playground.lastUpdated) ?? null
               : null;
             return <PlaygroundTile key={playground.slug} playground={playground} updateLabel={updateLabel} progress={progress} />;
           })}
@@ -204,58 +245,38 @@ const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, p
   const chapters = playground.chapters.length ? playground.chapters.map(chapter => chapter.slug) : [playground.slug];
   const checked = chapters.filter(slug => progress.transfers[slug]).length;
   const reviewedCount = chapters.filter(slug => progress.reviewed.includes(slug)).length;
-  const baseTileClassName =
-    "group flex min-h-56 flex-col rounded-xl border p-5";
-  const liveTileClassName =
-    "group flex min-h-56 flex-col rounded-xl border border-blue-100 bg-white p-5 shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)]";
-  const comingSoonTileClassName = `${baseTileClassName} cursor-default border-slate-200 bg-slate-50/80 shadow-none`;
-  const levelClassName = isComingSoon
-    ? "font-mono text-xs font-medium uppercase tracking-[0.18em] text-slate-500"
-    : "font-mono text-xs font-medium uppercase tracking-[0.18em] text-slate-600";
-  const titleClassName = isComingSoon
-    ? "mt-4 text-2xl leading-tight font-semibold text-slate-500"
-    : "mt-4 text-2xl leading-tight font-semibold text-slate-950";
-  const stepClassName = isComingSoon
-    ? "shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs font-medium text-slate-500"
-    : "shrink-0 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 font-mono text-xs font-medium text-indigo-700!";
-  const tagClassName = isComingSoon
-    ? "text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"
-    : "text-xs font-semibold uppercase tracking-[0.22em] text-indigo-600";
-  const outcomeClassName = isComingSoon
-    ? "mt-3 text-sm leading-6 text-slate-500"
-    : "mt-3 text-sm leading-6 text-slate-600";
   const content = (
     <>
-      <div className="flex items-start justify-between gap-4">
+      <div className="catalog-card-header">
         <div>
-          <p className={levelClassName}>
+          <p className="catalog-card-level">
             {playground.level}
           </p>
-          <h2 className={titleClassName}>
+          <h2 className="catalog-card-title">
             {playground.title}
           </h2>
         </div>
-        {!playground.reference && <span className={stepClassName}>{String(playground.step).padStart(2, "0")}</span>}
+        {!playground.reference && <span className="catalog-card-step">{String(playground.step).padStart(2, "0")}</span>}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <p className={tagClassName}>
+      <div className="catalog-card-tags">
+        <p className="catalog-card-tag">
           {playground.tag}
         </p>
         {isComingSoon ? (
-          <span className="rounded-full border border-amber-300 bg-amber-100 px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-[0.14em] text-amber-900">
+          <span className="catalog-card-soon">
             coming soon
           </span>
         ) : null}
       </div>
-      <p className={outcomeClassName}>
+      <p className="catalog-card-outcome">
         {playground.outcome}.
       </p>
-      <p className="mt-3 text-xs text-slate-500">{playground.duration}</p>
+      <p className="catalog-card-duration">{playground.duration}</p>
       {progress.testPasses[playground.slug] && <p className="mt-2 text-xs font-semibold text-emerald-700!">Test passed · 100%</p>}
       {checked > 0 ? <p className="mt-2 text-xs font-medium text-indigo-700!">{checked}/{chapters.length} transfer checks explained</p> : reviewedCount > 0 ? <p className="mt-2 text-xs text-slate-500">{chapters.length > 1 ? `${reviewedCount}/${chapters.length} chapters marked reviewed` : "Marked reviewed"}</p> : chapters.some(slug => progress.visited.includes(slug)) ? <p className="mt-2 text-xs text-slate-500">Visited</p> : null}
       {!isComingSoon ? (
-        <p className="mt-auto pt-4 font-mono text-xs text-slate-500">
+        <p className="catalog-card-updated">
           {playground.lastUpdated && updateLabel ? (
             <>
               Updated{" "}
@@ -269,17 +290,17 @@ const PlaygroundTile = memo(function PlaygroundTile({ playground, updateLabel, p
     </>
   );
 
-  if (playground.href) {
+  if (!isComingSoon) {
     return (
       <Link
-        href={playground.href}
+        href={`/playgrounds/${playground.slug}`}
         prefetch={false}
-        className={liveTileClassName}
+        className="group catalog-card catalog-card--live"
       >
         {content}
       </Link>
     );
   }
 
-  return <article className={comingSoonTileClassName}>{content}</article>;
+  return <article className="group catalog-card catalog-card--planned">{content}</article>;
 });

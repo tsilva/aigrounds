@@ -17,10 +17,6 @@ export default function Home() {
     const coreStep = coreLessonOrder.findIndex(item => item === slug) + 1;
     const reference = referenceSlugs.some(item => item === slug);
     const dates = [slug, ...(group?.chapters ?? [])].map(item => (playgroundUpdates as Record<string, string>)[item]).filter(Boolean).sort();
-    const recallGoals = Object.fromEntries((group?.chapters ?? [slug]).flatMap(chapter => {
-      const goal = live.get(chapter)?.learningGoals[0];
-      return goal === undefined ? [] : [[chapter, goal]];
-    }));
     return [{
       step: index + 1, slug, title: group?.title ?? item.title, tag: item.tag,
       outcome: group ? chapters.map(chapter => chapter.summary.split(".")[0]).join(". ") : item.summary.split(".")[0],
@@ -28,10 +24,8 @@ export default function Home() {
       level: reference ? (slug === "ai-concept-atlas" ? "reference" : "explore extra") : coreStep ? `core step ${String(coreStep).padStart(2, "0")}` : "optional path",
       pathTitleIndexes: learningPaths.flatMap((path, index) => path.lessons.includes(slug) ? [index] : []),
       chapters: chapters.map(chapter => ({ slug: chapter.slug, title: chapter.title })), reference,
-      ...(Object.keys(recallGoals).length ? { recallGoals } : {}),
       concepts: [...new Set([...item.concepts, ...chapters.flatMap(chapter => chapter.concepts)])],
       status: live.has(slug) ? "live" as const : "coming-soon" as const,
-      href: live.has(slug) ? `/playgrounds/${slug}` : undefined,
       lastUpdated: dates.at(-1) ?? null,
     }];
   });

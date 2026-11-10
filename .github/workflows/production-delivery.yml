@@ -3,7 +3,14 @@ name: Production delivery
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - .github/workflows/production-delivery.yml
   workflow_dispatch:
+    inputs:
+      stage_prebuilt:
+        description: Stage and verify a GitHub-built artifact without changing production domains
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -24,7 +31,9 @@ jobs:
       contents: read
       actions: read
       id-token: write
-    uses: tsilva/.github/.github/workflows/production-delivery.yml@e0c6d64d4fc917ea0e108d27ce8d1a5304aeb3c6
+    uses: tsilva/.github/.github/workflows/production-delivery.yml@48a4449de4ac5f4d5e14343f70fe5fc57bc2cd74
+    with:
+      sync_only: ${{ inputs.stage_prebuilt }}
     secrets:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
@@ -45,7 +54,7 @@ jobs:
           claims=json.loads(base64.urlsafe_b64decode(jwt.split('.')[1]+'==='))
           assert claims['workflow_ref']=='tsilva/aigrounds/.github/workflows/production-delivery.yml@refs/heads/main'
           assert claims['repository_id']=='1176162073' and claims['environment']=='Production'
-          assert claims.get('job_workflow_ref') != 'tsilva/.github/.github/workflows/production-delivery.yml@e0c6d64d4fc917ea0e108d27ce8d1a5304aeb3c6'
+          assert claims.get('job_workflow_ref') != 'tsilva/.github/.github/workflows/production-delivery.yml@48a4449de4ac5f4d5e14343f70fe5fc57bc2cd74'
           r=urllib.request.Request('https://app.infisical.com/api/v1/auth/oidc-auth/login',data=json.dumps({'identityId':'672c01c3-c025-40f9-b89b-5abcc03e8261','jwt':jwt}).encode(),headers={'Content-Type':'application/json'},method='POST')
           try:
            with urllib.request.urlopen(r,timeout=20) as resp:resp.read()
@@ -53,3 +62,17 @@ jobs:
           except urllib.error.HTTPError as error:
            if error.code not in (400,401,403):raise SystemExit('Unexpected authentication status; private response suppressed.')
            print('Verified: ordinary Production job on the allowed caller path was denied Infisical access (HTTP '+str(error.code)+').')
+
+  stage_prebuilt:
+    needs: deliver
+    if: github.ref == 'refs/heads/main' && inputs.stage_prebuilt
+    uses: tsilva/.github/.github/workflows/vercel-prebuilt.yml@22bb600ee7e3b22d238b284c132a3ad64a968719
+    with:
+      project_id: prj_Ktcv99ngBNGKzh3hFdM1XbzEl1PS
+      project_name: aigrounds
+      production_domains: '["aigrounds.tsilva.eu","aigrounds.vercel.app"]'
+      public_environment: '["NEXT_PUBLIC_GA_MEASUREMENT_ID","NEXT_PUBLIC_SENTRY_DSN","SENTRY_ORG","SENTRY_PROJECT"]'
+      source_maps: true
+    secrets:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

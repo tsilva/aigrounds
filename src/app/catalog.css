@@ -5,3 +5,34 @@
 
 @source "./page.tsx";
 @source "./home-page.tsx";
+
+@layer components {
+  .catalog-card {
+    @apply flex min-h-56 flex-col rounded-xl border p-5;
+  }
+
+  .catalog-card--live {
+    @apply border-blue-100 bg-white shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)];
+  }
+
+  .catalog-card--planned {
+    @apply cursor-default border-slate-200 bg-slate-50/80 shadow-none;
+  }
+
+  .catalog-card-header { @apply flex items-start justify-between gap-4; }
+  .catalog-card-level { @apply font-mono text-xs font-medium uppercase tracking-[0.18em] text-slate-500; }
+  .catalog-card-title { @apply mt-4 text-2xl leading-tight font-semibold text-slate-500; }
+  .catalog-card-step { @apply shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs font-medium text-slate-500; }
+  .catalog-card-tags { @apply mt-4 flex flex-wrap items-center gap-2; }
+  .catalog-card-tag { @apply text-xs font-semibold uppercase tracking-[0.22em] text-slate-500; }
+  .catalog-card-soon { @apply rounded-full border border-amber-300 bg-amber-100 px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-[0.14em] text-amber-900; }
+  .catalog-card-outcome { @apply mt-3 text-sm leading-6 text-slate-500; }
+  .catalog-card-duration { @apply mt-3 text-xs text-slate-500; }
+  .catalog-card-updated { @apply mt-auto pt-4 font-mono text-xs text-slate-500; }
+
+  .catalog-card--live .catalog-card-level,
+  .catalog-card--live .catalog-card-outcome { @apply text-slate-600; }
+  .catalog-card--live .catalog-card-title { @apply text-slate-950; }
+  .catalog-card--live .catalog-card-step { @apply border-indigo-200 bg-indigo-50 text-indigo-700!; }
+  .catalog-card--live .catalog-card-tag { @apply text-indigo-600; }
+}

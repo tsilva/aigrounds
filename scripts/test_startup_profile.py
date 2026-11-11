@@ -79,6 +79,29 @@ class StartupProfileTests(unittest.TestCase):
         self.assertFalse(output["beforeLcpAvailable"])
         self.assertIsNone(output["topFunctions"][0]["beforeLcpMs"])
 
+    def test_structure_reports_threads_and_container_counts_without_trace_content(self):
+        data = trace()
+        data["traceEvents"][-1]["args"]["data"]["private-key"] = "do-not-log"
+        output = profile.structure(data)
+        self.assertEqual(output["rendererMainThreads"], [{"pid": 1, "tid": 2}])
+        self.assertEqual(output["targetNavigationThreads"], [{"pid": 1, "tid": 2}])
+        self.assertEqual(output["cpuThreads"][0]["nestedSamples"], 2)
+        self.assertEqual(output["cpuThreads"][0]["deltas"], 2)
+        self.assertEqual(output["cpuThreads"][0]["nodes"], 2)
+        for private in ("private-key", "do-not-log", "secret", "hydrateRoot", profile.HOST):
+            self.assertNotIn(private, json.dumps(output))
+
+    def test_structure_exposes_mismatched_threads_without_accepting_worker_samples(self):
+        data = trace()
+        for event in data["traceEvents"]:
+            if event["name"] in ("Profile", "ProfileChunk"):
+                event["tid"] = 9
+        output = profile.structure(data)
+        self.assertEqual(output["cpuThreads"][0]["tid"], 9)
+        self.assertEqual(output["rendererMainThreads"][0]["tid"], 2)
+        with self.assertRaisesRegex(ValueError, "no renderer CPU samples"):
+            profile.functions(data, 15)
+
     def test_cleanup_preserves_existing_artifacts_and_unrelated_files(self):
         with tempfile.TemporaryDirectory(prefix="startup-profile-test-") as directory:
             root = Path(directory)

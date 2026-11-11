@@ -57,6 +57,41 @@ def symbol(value):
     return "<anonymous>"
 
 
+def structure(trace):
+    """Numeric topology only, for diagnosing Chrome trace schema/thread changes."""
+    renderers, navigations = set(), set()
+    profiles = defaultdict(lambda: Counter())
+    for event in trace["traceEvents"]:
+        pid, tid = event.get("pid"), event.get("tid")
+        if type(pid) is not int or type(tid) is not int:
+            continue
+        name = event.get("name")
+        data = event.get("args", {}).get("data", {})
+        if name == "thread_name" and event.get("args", {}).get("name") == "CrRendererMain":
+            renderers.add((pid, tid))
+        if name == "navigationStart" and is_target(data.get("documentLoaderURL", "")):
+            navigations.add((pid, tid))
+        if name not in ("Profile", "ProfileChunk", "CpuProfile"):
+            continue
+        row = profiles[(pid, tid)]
+        row[name] += 1
+        cpu = data.get("cpuProfile", data if name == "CpuProfile" else {})
+        for output, value in (("nodes", cpu.get("nodes")),
+                              ("nestedSamples", cpu.get("samples")),
+                              ("outerSamples", data.get("samples")),
+                              ("deltas", data.get("timeDeltas", cpu.get("timeDeltas")))):
+            if isinstance(value, list):
+                row[output] += len(value)
+    return {
+        "rendererMainThreads": [{"pid": p, "tid": t} for p, t in sorted(renderers)[:15]],
+        "targetNavigationThreads": [{"pid": p, "tid": t} for p, t in sorted(navigations)[:15]],
+        "cpuThreads": [{"pid": p, "tid": t, **counts}
+                       for (p, t), counts in sorted(profiles.items())[:15]],
+        "threadCounts": {"renderers": len(renderers), "navigations": len(navigations),
+                         "profiles": len(profiles)},
+    }
+
+
 def functions(trace, observed_lcp):
     events = trace["traceEvents"]
     main = {(e.get("pid"), e.get("tid")) for e in events
@@ -162,7 +197,14 @@ def summarize(workspace, manifest):
         if path.stat().st_size > 200_000_000:
             raise ValueError("Trace exceeds the bounded reader limit.")
         metrics = report["audits"]["metrics"]["details"]["items"][0]
-        profile = functions(json.loads(path.read_text()), metrics.get("observedLargestContentfulPaint"))
+        trace = json.loads(path.read_text())
+        try:
+            profile = functions(trace, metrics.get("observedLargestContentfulPaint"))
+        except ValueError:
+            print("STARTUP_PROFILE_STRUCTURE " + json.dumps(
+                {"sample": sample, "diagnosticOnly": True, **structure(trace)},
+                separators=(",", ":"), allow_nan=False), flush=True)
+            raise
         output = {"sample": sample, "diagnosticOnly": True, "lighthouse": VERSION,
                   "representative": entry.get("isRepresentativeRun") is True,
                   "performance": entry["summary"]["performance"],

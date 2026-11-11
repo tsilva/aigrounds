@@ -19,7 +19,9 @@ minified; locations refer to the emitted script. The reader omits headers, page
 content, source text, URL queries and third-party URL paths. It publishes no raw
 trace/network artifacts or public report, and removes newly created raw files
 without deleting pre-existing files. No application/provider secrets are passed
-to the profiling process.
+to the profiling process. If Chrome's profile format or thread association cannot
+be read, the job fails and emits bounded numeric thread/event/container counts
+for diagnosis. These counts omit function names, URLs and trace contents.
 
 Reader tests are dependency-free:
 

@@ -1,0 +1,43 @@
+name: Startup CPU profile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: startup-profile
+  cancel-in-progress: false
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test the bounded trace reader
+        run: python3 -B -m unittest discover -s scripts -p test_startup_profile.py
+      - name: Configure diagnostic collection
+        id: configure
+        run: python3 -B scripts/startup_profile.py configure --output "$RUNNER_TEMP/startup-profile.json" --guard "$RUNNER_TEMP/startup-profile-guard.json"
+      - name: Collect three diagnostic samples
+        id: profile
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
+        env:
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
+        with:
+          configPath: ${{ runner.temp }}/startup-profile.json
+          uploadArtifacts: false
+          temporaryPublicStorage: false
+      - name: Log bounded CPU summaries
+        env:
+          LIGHTHOUSE_MANIFEST: ${{ steps.profile.outputs.manifest }}
+        run: python3 -B scripts/startup_profile.py summarize
+      - name: Remove raw trace and network artifacts
+        if: always() && steps.configure.outcome == 'success'
+        run: python3 -B scripts/startup_profile.py cleanup --guard "$RUNNER_TEMP/startup-profile-guard.json"

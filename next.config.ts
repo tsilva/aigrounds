@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
 const isHostedBuild = process.env.VERCEL === "1" && Boolean(process.env.VERCEL_DEPLOYMENT_ID);
 
 export default withSentryConfig(nextConfig, {
+  bundleSizeOptimizations: { excludeDebugStatements: true },
   sourcemaps: { disable: !isHostedBuild },
   webpack: { disableSentryConfig: !isHostedBuild },
   useRunAfterProductionCompileHook: isHostedBuild ? undefined : false,

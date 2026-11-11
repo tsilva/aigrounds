@@ -82,6 +82,13 @@ def structure(trace):
                               ("deltas", data.get("timeDeltas", cpu.get("timeDeltas")))):
             if isinstance(value, list):
                 row[output] += len(value)
+                if output == "deltas":
+                    valid = [item for item in value if number(item)]
+                    row["nonNumericDeltas"] += len(value) - len(valid)
+                    row["negativeDeltas"] += sum(item < 0 for item in valid)
+                    if valid:
+                        row["minDelta"] = min(row.get("minDelta", min(valid)), min(valid))
+                        row["maxDelta"] = max(row.get("maxDelta", max(valid)), max(valid))
     return {
         "rendererMainThreads": [{"pid": p, "tid": t} for p, t in sorted(renderers)[:15]],
         "targetNavigationThreads": [{"pid": p, "tid": t} for p, t in sorted(navigations)[:15]],
@@ -122,17 +129,22 @@ def functions(trace, observed_lcp):
         key = identity(event)
         owners[key].add((event.get("pid"), event.get("tid")))
         if (event.get("pid"), event.get("tid")) in main:
-            data = event.get("args", {}).get("data", {})
-            cursor = data.get("startTime") if number(data.get("startTime")) else None
+            # Match DevTools: payload startTime uses a different clock domain.
+            cursor = event.get("ts") if number(event.get("ts")) else None
             if key in anchors and anchors[key] != cursor:
                 raise ValueError("Ambiguous CPU profile start markers.")
             anchors[key] = cursor
     if any(len(owners[key]) != 1 for key in anchors):
         raise ValueError("CPU profile identity has multiple thread owners.")
-    profiles = {key: {"nodes": {}, "cursor": cursor} for key, cursor in anchors.items()}
+    profiles = {key: {"nodes": {}, "cursor": cursor or 0,
+                      "clockKnown": cursor is not None, "points": []}
+                for key, cursor in anchors.items()}
+    states = list(profiles.values())
     totals = defaultdict(lambda: [0.0, 0.0, 0])
     sampled = 0
     timing_available = True
+    negative_deltas = 0
+    estimated_tail_ms = 0.0
     for event in sorted(events, key=lambda e: e.get("ts", 0)):
         name = event.get("name")
         data = event.get("args", {}).get("data", {})
@@ -143,12 +155,10 @@ def functions(trace, observed_lcp):
             profile = data.get("cpuProfile", {})
         elif name == "CpuProfile" and (event.get("pid"), event.get("tid")) in main:
             profile = data.get("cpuProfile", data)
-            state = {"nodes": {}, "cursor": profile.get("startTime")
-                     if number(profile.get("startTime")) else None}
+            state = {"nodes": {}, "cursor": 0, "clockKnown": False, "points": []}
+            states.append(state)
         else:
             continue
-        if state["cursor"] is None and number(profile.get("startTime")):
-            state["cursor"] = profile["startTime"]
         for node in profile.get("nodes", []):
             state["nodes"][node["id"]] = node.get("callFrame", {})
         samples = profile.get("samples", [])
@@ -156,13 +166,25 @@ def functions(trace, observed_lcp):
         if len(samples) != len(deltas):
             raise ValueError("CPU sample/duration lengths differ.")
         for node_id, delta in zip(samples, deltas):
-            if not number(delta) or not 0 <= delta <= 60_000_000:
-                raise ValueError("Invalid CPU sample duration.")
-            cursor = state["cursor"]
-            end = cursor + delta if cursor is not None else None
-            state["cursor"] = end
-            if cursor is None:
-                timing_available = False
+            if not number(delta) or abs(delta) > 60_000_000:
+                raise ValueError("Invalid CPU sample delta.")
+            negative_deltas += delta < 0
+            state["cursor"] += delta
+            state["points"].append((state["cursor"], node_id))
+    active_states = [state for state in states if state["points"]]
+    if len(active_states) > 1:
+        raise ValueError("Multiple CPU profiles for the audited renderer.")
+    for state in active_states:
+        points = sorted(state["points"], key=lambda point: point[0])
+        if len(points) < 2:
+            raise ValueError("Insufficient CPU samples to establish intervals.")
+        # DevTools sorts sample timestamps and estimates the final interval
+        # from their average spacing. Deltas are offsets, not durations.
+        tail = (points[-1][0] - points[0][0]) / (len(points) - 1)
+        estimated_tail_ms += tail / 1000
+        timing_available = timing_available and state["clockKnown"]
+        for index, (cursor, node_id) in enumerate(points):
+            end = points[index + 1][0] if index + 1 < len(points) else cursor + tail
             frame = state["nodes"].get(node_id)
             if frame is None:
                 raise ValueError("CPU sample references an unknown frame.")
@@ -171,8 +193,8 @@ def functions(trace, observed_lcp):
             if not all(type(value) is int for value in key[2:]):
                 raise ValueError("Invalid CPU frame location.")
             row = totals[key]
-            row[0] += delta / 1000
-            if cutoff is not None and cursor is not None:
+            row[0] += (end - cursor) / 1000
+            if cutoff is not None and state["clockKnown"]:
                 row[1] += max(0, min(end, cutoff) - max(cursor, start)) / 1000
             row[2] += 1
             sampled += 1
@@ -188,6 +210,7 @@ def functions(trace, observed_lcp):
     for row in rows:
         sources[row["source"]] += row["selfMs"]
     return {"samples": sampled, "beforeLcpAvailable": before_lcp_available,
+            "negativeDeltas": negative_deltas, "estimatedTailMs": round(estimated_tail_ms, 3),
             "selfMsBySource": {key: round(value, 2) for key, value in sorted(sources.items())},
             "topFunctions": sorted(rows, key=lambda r: r["selfMs"], reverse=True)[:15],
             "topBeforeLcp": sorted(rows, key=lambda r: r["beforeLcpMs"] or 0, reverse=True)[:15]}

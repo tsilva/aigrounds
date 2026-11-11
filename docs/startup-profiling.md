@@ -17,7 +17,12 @@ The job logs bounded main-thread function summaries, including sampled self time
 before observed LCP when a navigation marker is available. Function names may be
 minified; locations refer to the emitted script. CPU chunks are attributed through
 the renderer's profile-start marker and process/profile ID, since Chrome may emit
-them on a helper thread. Worker profiles and ambiguous ownership are excluded. The reader omits headers, page
+them on a helper thread. Worker profiles and ambiguous ownership are excluded.
+Following [Chrome DevTools](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/models/trace/handlers/SamplesHandler.ts),
+the reader uses the trace event clock, reconstructs and sorts sample timestamps,
+and estimates the final sample interval from the mean spacing. Signed time deltas
+are timestamp offsets, not CPU durations. Summaries label that tail estimate and
+negative-delta count; sampled times are approximate. The reader omits headers, page
 content, source text, URL queries and third-party URL paths. It publishes no raw
 trace/network artifacts or public report, and removes newly created raw files
 without deleting pre-existing files. No application/provider secrets are passed

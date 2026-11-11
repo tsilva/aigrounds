@@ -17,7 +17,7 @@ def trace():
          "args": {"data": {"cpuProfile": {"nodes": [
              {"id": 1, "callFrame": {"functionName": "hydrateRoot", "url": profile.TARGET + "_next/static/chunks/app.js?token=do-not-log", "lineNumber": 0, "columnNumber": 12}},
              {"id": 2, "callFrame": {"functionName": "run", "url": profile.TARGET + "cdn-cgi/challenge/secret", "lineNumber": 2, "columnNumber": 3}},
-         ], "samples": [1, 2]}, "timeDeltas": [10000, 10000]}}},
+         ], "samples": [1, 2]}, "timeDeltas": [0, 10000]}}},
     ]}
 
 
@@ -41,7 +41,7 @@ class StartupProfileTests(unittest.TestCase):
 
     def test_before_lcp_excludes_time_before_navigation(self):
         data = trace()
-        data["traceEvents"][2]["args"]["data"]["startTime"] = 990_000
+        data["traceEvents"][2]["ts"] = 990_000
         output = profile.functions(data, 15)
         rows = {r["function"]: r for r in output["topFunctions"]}
         self.assertEqual(rows["hydrateRoot"]["beforeLcpMs"], 0)
@@ -49,11 +49,31 @@ class StartupProfileTests(unittest.TestCase):
 
     def test_missing_sample_clock_marks_paint_attribution_unavailable(self):
         data = trace()
-        data["traceEvents"][2]["args"]["data"].pop("startTime")
+        data["traceEvents"][2].pop("ts")
         output = profile.functions(data, 15)
         self.assertEqual(output["samples"], 2)
         self.assertFalse(output["beforeLcpAvailable"])
         self.assertTrue(all(row["beforeLcpMs"] is None for row in output["topFunctions"]))
+
+    def test_trace_clock_is_used_instead_of_monotonic_payload_clock(self):
+        data = trace()
+        expected = profile.functions(data, 15)
+        data["traceEvents"][2]["args"]["data"]["startTime"] = 9_000_000_000
+        self.assertEqual(profile.functions(data, 15), expected)
+
+    def test_negative_deltas_reorder_points_without_negative_self_time(self):
+        data = trace()
+        chunk = data["traceEvents"][-1]["args"]["data"]
+        chunk["cpuProfile"]["samples"] = [1, 2, 1]
+        chunk["timeDeltas"] = [10000, -5000, 15000]
+        output = profile.functions(data, 12)
+        rows = {row["function"]: row for row in output["topFunctions"]}
+        self.assertEqual(output["negativeDeltas"], 1)
+        self.assertEqual(output["estimatedTailMs"], 7.5)
+        self.assertEqual(rows["hydrateRoot"]["selfMs"], 17.5)
+        self.assertEqual(rows["run"]["selfMs"], 5)
+        self.assertEqual(rows["hydrateRoot"]["beforeLcpMs"], 2)
+        self.assertEqual(rows["run"]["beforeLcpMs"], 5)
 
     def test_trace_order_does_not_change_profile_results(self):
         data = trace()
@@ -129,6 +149,8 @@ class StartupProfileTests(unittest.TestCase):
         self.assertEqual(output["targetNavigationThreads"], [{"pid": 1, "tid": 2}])
         self.assertEqual(output["cpuThreads"][0]["nestedSamples"], 2)
         self.assertEqual(output["cpuThreads"][0]["deltas"], 2)
+        self.assertEqual(output["cpuThreads"][0]["minDelta"], 0)
+        self.assertEqual(output["cpuThreads"][0]["maxDelta"], 10000)
         self.assertEqual(output["cpuThreads"][0]["nodes"], 2)
         for private in ("private-key", "do-not-log", "secret", "hydrateRoot", profile.HOST):
             self.assertNotIn(private, json.dumps(output))

@@ -1,7 +1,9 @@
 name: Production delivery
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
     inputs:
@@ -19,24 +21,56 @@ concurrency:
 
 jobs:
   secrets:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'workflow_run' && github.event.action == 'completed' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_sha == github.sha &&
+        github.event.workflow_run.path == '.github/workflows/ci.yml' &&
+        github.event.workflow_run.repository.id == github.repository_id &&
+        github.event.workflow_run.head_repository.id == github.repository_id))
     name: Check committed secrets before production delivery
     uses: ./.github/workflows/secret-scanning.yml
 
   deliver:
     needs: secrets
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'workflow_run' && github.event.action == 'completed' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_sha == github.sha &&
+        github.event.workflow_run.path == '.github/workflows/ci.yml' &&
+        github.event.workflow_run.repository.id == github.repository_id &&
+        github.event.workflow_run.head_repository.id == github.repository_id))
     permissions:
       contents: read
       actions: read
       id-token: write
-    uses: tsilva/.github/.github/workflows/production-delivery.yml@48a4449de4ac5f4d5e14343f70fe5fc57bc2cd74
+    uses: tsilva/.github/.github/workflows/production-delivery.yml@c262be7b75fe4654c170eb5e13240808a70b9936
     with:
       sync_only: true
     secrets:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   verify-reader-isolation:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      (github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'workflow_run' && github.event.action == 'completed' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_sha == github.sha &&
+        github.event.workflow_run.path == '.github/workflows/ci.yml' &&
+        github.event.workflow_run.repository.id == github.repository_id &&
+        github.event.workflow_run.head_repository.id == github.repository_id))) &&
+      (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     environment: Production
     permissions:
@@ -52,7 +86,7 @@ jobs:
           claims=json.loads(base64.urlsafe_b64decode(jwt.split('.')[1]+'==='))
           assert claims['workflow_ref']=='tsilva/aigrounds/.github/workflows/production-delivery.yml@refs/heads/main'
           assert claims['repository_id']=='1176162073' and claims['environment']=='Production'
-          assert claims.get('job_workflow_ref') != 'tsilva/.github/.github/workflows/production-delivery.yml@48a4449de4ac5f4d5e14343f70fe5fc57bc2cd74'
+          assert claims.get('job_workflow_ref') != 'tsilva/.github/.github/workflows/production-delivery.yml@c262be7b75fe4654c170eb5e13240808a70b9936'
           r=urllib.request.Request('https://app.infisical.com/api/v1/auth/oidc-auth/login',data=json.dumps({'identityId':'672c01c3-c025-40f9-b89b-5abcc03e8261','jwt':jwt}).encode(),headers={'Content-Type':'application/json'},method='POST')
           try:
            with urllib.request.urlopen(r,timeout=20) as resp:resp.read()
@@ -63,7 +97,17 @@ jobs:
 
   publish:
     needs: deliver
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'workflow_run' && github.event.action == 'completed' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_sha == github.sha &&
+        github.event.workflow_run.path == '.github/workflows/ci.yml' &&
+        github.event.workflow_run.repository.id == github.repository_id &&
+        github.event.workflow_run.head_repository.id == github.repository_id))
     uses: tsilva/.github/.github/workflows/vercel-prebuilt.yml@22bb600ee7e3b22d238b284c132a3ad64a968719
     with:
       project_id: prj_Ktcv99ngBNGKzh3hFdM1XbzEl1PS

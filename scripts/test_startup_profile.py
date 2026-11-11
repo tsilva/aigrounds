@@ -39,6 +39,22 @@ class StartupProfileTests(unittest.TestCase):
         self.assertNotIn("secret", json.dumps(output))
         self.assertNotIn("do-not-log", json.dumps(output))
 
+    def test_before_lcp_excludes_time_before_navigation(self):
+        data = trace()
+        data["traceEvents"][2]["args"]["data"]["startTime"] = 990_000
+        output = profile.functions(data, 15)
+        rows = {r["function"]: r for r in output["topFunctions"]}
+        self.assertEqual(rows["hydrateRoot"]["beforeLcpMs"], 0)
+        self.assertEqual(rows["run"]["beforeLcpMs"], 10)
+
+    def test_missing_sample_clock_marks_paint_attribution_unavailable(self):
+        data = trace()
+        data["traceEvents"][2]["args"]["data"].pop("startTime")
+        output = profile.functions(data, 15)
+        self.assertEqual(output["samples"], 2)
+        self.assertFalse(output["beforeLcpAvailable"])
+        self.assertTrue(all(row["beforeLcpMs"] is None for row in output["topFunctions"]))
+
     def test_trace_order_does_not_change_profile_results(self):
         data = trace()
         expected = profile.functions(data, 15)
@@ -49,8 +65,32 @@ class StartupProfileTests(unittest.TestCase):
         data = trace()
         extra = json.loads(json.dumps(data["traceEvents"][-1]))
         extra["tid"] = 9
-        data["traceEvents"].append(extra)
+        extra["id"] = "worker"
+        anchor = json.loads(json.dumps(data["traceEvents"][2]))
+        anchor["tid"], anchor["id"] = 9, "worker"
+        data["traceEvents"].extend([anchor, extra])
         self.assertEqual(profile.functions(data, 15)["samples"], 2)
+
+    def test_helper_thread_chunks_belong_to_their_renderer_profile_owner(self):
+        data = trace()
+        expected = profile.functions(data, 15)
+        data["traceEvents"][-1]["tid"] = 14
+        self.assertEqual(profile.functions(data, 15), expected)
+
+    def test_unanchored_helper_chunks_are_not_guessed_as_main_thread(self):
+        data = trace()
+        data["traceEvents"][-1]["tid"] = 14
+        data["traceEvents"] = [e for e in data["traceEvents"] if e["name"] != "Profile"]
+        with self.assertRaisesRegex(ValueError, "no renderer CPU samples"):
+            profile.functions(data, 15)
+
+    def test_ambiguous_profile_owner_is_rejected(self):
+        data = trace()
+        anchor = json.loads(json.dumps(data["traceEvents"][2]))
+        anchor["tid"] = 9
+        data["traceEvents"].append(anchor)
+        with self.assertRaisesRegex(ValueError, "multiple thread owners"):
+            profile.functions(data, 15)
 
     def test_missing_sampling_or_duration_mismatch_is_an_explicit_failure(self):
         data = trace()
@@ -65,10 +105,12 @@ class StartupProfileTests(unittest.TestCase):
     def test_other_renderer_main_threads_are_excluded(self):
         data = trace()
         extra = json.loads(json.dumps(data["traceEvents"][-1]))
-        extra["pid"] = 9
+        extra["pid"], extra["tid"] = 9, 14
+        anchor = json.loads(json.dumps(data["traceEvents"][2]))
+        anchor["pid"] = 9
         data["traceEvents"].extend([
             {"name": "thread_name", "pid": 9, "tid": 2, "args": {"name": "CrRendererMain"}},
-            extra,
+            anchor, extra,
         ])
         self.assertEqual(profile.functions(data, 15)["samples"], 2)
 

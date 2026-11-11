@@ -15,7 +15,9 @@ verification. The regular Lighthouse CI workflow remains authoritative.
 
 The job logs bounded main-thread function summaries, including sampled self time
 before observed LCP when a navigation marker is available. Function names may be
-minified; locations refer to the emitted script. The reader omits headers, page
+minified; locations refer to the emitted script. CPU chunks are attributed through
+the renderer's profile-start marker and process/profile ID, since Chrome may emit
+them on a helper thread. Worker profiles and ambiguous ownership are excluded. The reader omits headers, page
 content, source text, URL queries and third-party URL paths. It publishes no raw
 trace/network artifacts or public report, and removes newly created raw files
 without deleting pre-existing files. No application/provider secrets are passed

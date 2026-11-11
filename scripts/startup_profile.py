@@ -107,22 +107,46 @@ def functions(trace, observed_lcp):
     elif len(main) != 1:
         raise ValueError("Cannot identify the audited page's renderer thread.")
     cutoff = start + observed_lcp * 1000 if starts and number(observed_lcp) else None
-    profiles = defaultdict(lambda: {"nodes": {}, "cursor": None})
+    # Profile owns the sampled thread; ProfileChunk may be emitted on a
+    # profiler helper thread. Correlate by process/profile ID, never chunk TID.
+    def identity(event):
+        value = event.get("id", event.get("id2", {}).get("local",
+                    event.get("id2", {}).get("global", "default")))
+        return event.get("pid"), str(value)
+
+    owners = defaultdict(set)
+    anchors = {}
+    for event in events:
+        if event.get("name") != "Profile":
+            continue
+        key = identity(event)
+        owners[key].add((event.get("pid"), event.get("tid")))
+        if (event.get("pid"), event.get("tid")) in main:
+            data = event.get("args", {}).get("data", {})
+            cursor = data.get("startTime") if number(data.get("startTime")) else None
+            if key in anchors and anchors[key] != cursor:
+                raise ValueError("Ambiguous CPU profile start markers.")
+            anchors[key] = cursor
+    if any(len(owners[key]) != 1 for key in anchors):
+        raise ValueError("CPU profile identity has multiple thread owners.")
+    profiles = {key: {"nodes": {}, "cursor": cursor} for key, cursor in anchors.items()}
     totals = defaultdict(lambda: [0.0, 0.0, 0])
     sampled = 0
+    timing_available = True
     for event in sorted(events, key=lambda e: e.get("ts", 0)):
-        if (event.get("pid"), event.get("tid")) not in main:
-            continue
         name = event.get("name")
-        if name not in ("Profile", "ProfileChunk", "CpuProfile"):
-            continue
-        identity = event.get("id", event.get("id2", {}).get("local", "default"))
-        state = profiles[(event["pid"], event["tid"], str(identity))]
         data = event.get("args", {}).get("data", {})
-        if name == "Profile":
-            state["cursor"] = data.get("startTime") if number(data.get("startTime")) else None
+        if name == "ProfileChunk":
+            state = profiles.get(identity(event))
+            if state is None:
+                continue
+            profile = data.get("cpuProfile", {})
+        elif name == "CpuProfile" and (event.get("pid"), event.get("tid")) in main:
+            profile = data.get("cpuProfile", data)
+            state = {"nodes": {}, "cursor": profile.get("startTime")
+                     if number(profile.get("startTime")) else None}
+        else:
             continue
-        profile = data.get("cpuProfile", data if name == "CpuProfile" else {})
         if state["cursor"] is None and number(profile.get("startTime")):
             state["cursor"] = profile["startTime"]
         for node in profile.get("nodes", []):
@@ -137,6 +161,8 @@ def functions(trace, observed_lcp):
             cursor = state["cursor"]
             end = cursor + delta if cursor is not None else None
             state["cursor"] = end
+            if cursor is None:
+                timing_available = False
             frame = state["nodes"].get(node_id)
             if frame is None:
                 raise ValueError("CPU sample references an unknown frame.")
@@ -147,20 +173,21 @@ def functions(trace, observed_lcp):
             row = totals[key]
             row[0] += delta / 1000
             if cutoff is not None and cursor is not None:
-                row[1] += max(0, min(end, cutoff) - cursor) / 1000
+                row[1] += max(0, min(end, cutoff) - max(cursor, start)) / 1000
             row[2] += 1
             sampled += 1
     if not sampled:
         names = Counter(e.get("name") for e in events if e.get("name") in ("Profile", "ProfileChunk", "CpuProfile"))
         raise ValueError("Trace has no renderer CPU samples; event counts=" + json.dumps(names))
+    before_lcp_available = cutoff is not None and timing_available
     rows = [{"source": key[0], "function": key[1], "line": key[2], "column": key[3],
              "selfMs": round(value[0], 2),
-             "beforeLcpMs": round(value[1], 2) if cutoff is not None else None,
+             "beforeLcpMs": round(value[1], 2) if before_lcp_available else None,
              "samples": value[2]} for key, value in totals.items()]
     sources = defaultdict(float)
     for row in rows:
         sources[row["source"]] += row["selfMs"]
-    return {"samples": sampled, "beforeLcpAvailable": cutoff is not None,
+    return {"samples": sampled, "beforeLcpAvailable": before_lcp_available,
             "selfMsBySource": {key: round(value, 2) for key, value in sorted(sources.items())},
             "topFunctions": sorted(rows, key=lambda r: r["selfMs"], reverse=True)[:15],
             "topBeforeLcp": sorted(rows, key=lambda r: r["beforeLcpMs"] or 0, reverse=True)[:15]}

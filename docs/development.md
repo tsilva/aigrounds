@@ -9,6 +9,7 @@ Use Node.js 24, matching CI, and pnpm 10.27.0, pinned in `package.json`. The rep
 After application changes, run:
 
 ```bash
+pnpm test:home
 pnpm typecheck
 pnpm lint
 pnpm check:cycles
@@ -16,6 +17,8 @@ pnpm check:tests
 node scripts/check-learning-design.mjs
 pnpm build
 ```
+
+`pnpm test:home` verifies lossless catalogue transfer encoding, including all card fields, grouped chapters, sparse ordering, planned/published states and numeric-looking search text. The browser reconstructs the same catalogue synchronously; search and progress need no additional request.
 
 `pnpm test:deps` exercises patched dependency security boundaries. There is no general-purpose test framework. CI also runs a dependency audit after a frozen-lockfile install with lifecycle scripts disabled.
 

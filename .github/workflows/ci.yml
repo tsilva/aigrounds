@@ -33,6 +33,7 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm audit --audit-level low
       - run: pnpm run test:deps
+      - run: pnpm run test:home
       - run: pnpm run lint
       - run: pnpm run typecheck
       - run: pnpm run check:cycles

@@ -5,30 +5,17 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { formatPlaygroundUpdateLabel, RELATIVE_UPDATE_WINDOW_MS } from "@/lib/playground-update-label";
 import { useLearningProgress } from "@/lib/learning-progress-store";
 
-export type HomePlaygroundCard = {
-  step: number;
-  slug: string;
-  title: string;
-  tag: string;
-  outcome: string;
-  duration: string;
-  level: string;
-  concepts: string[];
-  status: "live" | "coming-soon";
-  lastUpdated: string | null;
-  pathTitleIndexes: number[];
-  chapters: { slug: string; title: string }[];
-  reference: boolean;
-};
+import { unpackHomeCatalogue, type PackedHomeCatalogue, type HomePlaygroundCard } from "@/lib/home-catalogue";
 
 type HomePageProps = {
-  playgrounds: HomePlaygroundCard[];
+  catalogue: PackedHomeCatalogue;
   learningPathIds: string[];
   learningPathTitles: string[];
   version: string;
 };
 
-export function HomePage({ playgrounds, learningPathIds, learningPathTitles, version }: HomePageProps) {
+export function HomePage({ catalogue, learningPathIds, learningPathTitles, version }: HomePageProps) {
+  const playgrounds = useMemo(() => unpackHomeCatalogue(catalogue), [catalogue]);
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"curriculum" | "updated">("curriculum");
   const [now, setNow] = useState<number | null>(null);

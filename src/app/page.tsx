@@ -1,5 +1,6 @@
 import "./catalog.css";
-import { HomePage, type HomePlaygroundCard } from "@/app/home-page";
+import { HomePage } from "@/app/home-page";
+import { packHomeCatalogue, type HomePlaygroundCard } from "@/lib/home-catalogue";
 import { activePlaygroundMetadata, upcomingPlaygrounds } from "@/lib/playground-metadata";
 import { dashboardLessonPlanOrder, getLessonGroup, learningPaths, referenceSlugs, coreLessonOrder } from "@/lib/curriculum";
 import playgroundUpdates from "@/lib/playground-updates.json";
@@ -30,7 +31,7 @@ export default function Home() {
     }];
   });
   return <HomePage
-    playgrounds={playgrounds}
+    catalogue={packHomeCatalogue(playgrounds)}
     learningPathIds={learningPaths.map(path => path.id)}
     learningPathTitles={learningPaths.map(path => path.title)}
     version={packageJson.version}

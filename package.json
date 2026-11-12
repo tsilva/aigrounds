@@ -22,7 +22,8 @@
     "secrets:check": "python3 scripts/infisical/run.py check",
     "test:secrets": "python3 -m unittest discover -s scripts/infisical -p test_secrets.py",
     "test:provider": "node scripts/verify-provider-routing.mjs",
-    "prepare:ocr": "node scripts/prepare-ocr-assets.mjs"
+    "prepare:ocr": "node scripts/prepare-ocr-assets.mjs",
+    "test:home": "node --test test/home-catalogue.test.mjs"
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",

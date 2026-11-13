@@ -11,6 +11,12 @@
     @apply flex min-h-56 flex-col rounded-xl border p-5;
   }
 
+  /* Keep the opening rows fully laid out; render later cards as they approach. */
+  .catalog-card:nth-child(n + 7) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 16rem;
+  }
+
   .catalog-card--live {
     @apply border-blue-100 bg-white shadow-[0_16px_40px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_20px_48px_rgba(37,99,235,0.12)];
   }

@@ -15,6 +15,9 @@ AI Grounds is an interactive educational web app for learning AI concepts throug
 - `pnpm check:cycles` — verify local imports are acyclic
 - `pnpm start` — serve production build locally
 
+Use `$aigrounds_build-release` at `.codex/skills/aigrounds_build-release/SKILL.md`
+for website build, publication and delivery verification.
+
 No test framework is configured yet.
 
 After application changes, run `pnpm typecheck`, `pnpm lint`, `pnpm check:cycles`, and `pnpm build`. For instruction-only changes, validate skill metadata, reference paths, and the Git diff instead.

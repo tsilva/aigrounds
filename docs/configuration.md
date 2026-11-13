@@ -33,21 +33,11 @@ Use the same Sentry project DSN for `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN`. S
 - Browser Sentry initializes when `NEXT_PUBLIC_SENTRY_DSN` is present. Server and edge Sentry use `SENTRY_DSN`, falling back to `NEXT_PUBLIC_SENTRY_DSN`.
 - The browser, server and edge SDKs disable automatic collection of user information, cookies, HTTP headers and bodies, URL query parameters and instrumented AI inputs and outputs.
 
-## Local credentials
+## Local configuration
 
-Private values live in Infisical, in the linked `aigrounds` project, Development environment, root folder. `.infisical.json` contains public connection settings only. Authenticate with your human account once:
-
-```bash
-infisical login
-pnpm secrets:check
-pnpm dev --port auto
-```
-
-The launcher supplies `AGENTBRIDGE_API_KEY` to the local app and removes manager credentials from the app process. Local app commands skip Sentry source-map uploads. Missing values cannot fall back to old dotenv credentials. A failed fetch stops before starting the app. Keep public settings such as the model name and Sentry DSN in local dotenv files.
-
-`pnpm build:secrets` and `pnpm start:secrets` use the same development project. Vercel uses the ordinary `pnpm build` command with deployment variables supplied by its production sync.
-
-The legacy Keyenv manifest and one-time import command have been retired. Keychain originals are retained until migration and rotation are verified.
+Set the optional gateway token and public settings in your development
+environment. The standard app commands do not require a secret-manager login
+or personal agent tooling. Production keeps its separate deployment credentials.
 
 ## Production
 
@@ -57,4 +47,4 @@ Development and production project separation is an access boundary; separate pr
 
 Production chat uses its own server-only `OPENROUTER_API_KEY` and `deepseek/deepseek-v4.1-flash-1017`; AgentBridge is development-only. Deploy the app with a server runtime for `/api/chat`; a static file host alone cannot serve the Guide.
 
-Production builds and `next start` require the deployment’s own `OPENROUTER_API_KEY`. The development launcher supplies AgentBridge only; it does not deliver production credentials.
+Production builds and `next start` require the deployment’s own `OPENROUTER_API_KEY`. Local development does not deliver production credentials.

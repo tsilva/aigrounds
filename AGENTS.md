@@ -90,7 +90,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Secrets
 
-`pnpm dev --port auto` fetches only the linked Infisical development project through the saved human CLI login. Private keys must remain out of dotenv files, command arguments, logs, and browser bundles. Use `pnpm secrets:check` for presence-only verification. Production uses the separate `aigrounds-production` project and its Vercel Production sync. Do not inject production credentials into local development.
+Keep server credentials out of browser bundles and committed files. Development
+uses its configured AgentBridge environment; hosted Production uses its own
+isolated credentials. Do not mix production credentials into local development.
 
 ## Internal reports
 

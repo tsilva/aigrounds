@@ -112,7 +112,7 @@ jobs:
     with:
       project_id: prj_Ktcv99ngBNGKzh3hFdM1XbzEl1PS
       project_name: aigrounds
-      production_domains: '["aigrounds.tsilva.eu","aigrounds.vercel.app"]'
+      production_domains: '["aigrounds.tsilva.eu"]'
       public_environment: '["NEXT_PUBLIC_GA_MEASUREMENT_ID","NEXT_PUBLIC_SENTRY_DSN","SENTRY_ORG","SENTRY_PROJECT"]'
       source_maps: true
       promote: ${{ !inputs.stage_prebuilt }}

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import "./globals.css";
 
@@ -109,8 +108,6 @@ const jsonLd = {
   },
 };
 
-const shouldLoadVercelAnalytics = process.env.VERCEL === "1";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -129,7 +126,6 @@ export default function RootLayout({
       >
         <GoogleAnalytics />
         {children}
-        {shouldLoadVercelAnalytics ? <Analytics /> : null}
       </body>
     </html>
   );
